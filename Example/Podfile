@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Boardy_Example' do
+  pod 'Boardy', :path => '../'
+
+  target 'Boardy_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
