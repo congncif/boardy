@@ -1,0 +1,59 @@
+PODS:
+  - Boardy (1.0.0):
+    - RIBs
+    - RxDataSources
+    - SnapKit
+  - Differentiator (4.0.1)
+  - RIBs (0.9.3):
+    - RxRelay (~> 5.1)
+    - RxSwift (~> 5.1)
+  - RxCocoa (5.1.1):
+    - RxRelay (~> 5)
+    - RxSwift (~> 5)
+  - RxDataSources (4.0.1):
+    - Differentiator (~> 4.0)
+    - RxCocoa (~> 5.0)
+    - RxSwift (~> 5.0)
+  - RxRelay (5.1.1):
+    - RxSwift (~> 5)
+  - RxSwift (5.1.1)
+  - SnapKit (4.2.0)
+
+DEPENDENCIES:
+  - Boardy (from `../`)
+  - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
+
+SPEC REPOS:
+  trunk:
+    - Differentiator
+    - RxCocoa
+    - RxDataSources
+    - RxRelay
+    - RxSwift
+    - SnapKit
+
+EXTERNAL SOURCES:
+  Boardy:
+    :path: "../"
+  RIBs:
+    :branch: master
+    :git: https://github.com/uber/RIBs.git
+
+CHECKOUT OPTIONS:
+  RIBs:
+    :commit: ffc489f00db785c8c0051678393f7aba0d52f1a4
+    :git: https://github.com/uber/RIBs.git
+
+SPEC CHECKSUMS:
+  Boardy: cbb4a2401f6db4cd4b7e447d77432cbade64e018
+  Differentiator: 886080237d9f87f322641dedbc5be257061b0602
+  RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
+  RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
+  RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
+  RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
+  RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
+  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
+
+PODFILE CHECKSUM: 8a39d8eb8a106ffde1f78274cce3f91c2732d387
+
+COCOAPODS: 1.9.3
