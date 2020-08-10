@@ -1,16 +1,17 @@
 //
-//  UIBoard.swift
+//  UIRIBBoard.swift
 //  Boardy
 //
-//  Created by NGUYEN CHI CONG on 3/18/20.
+//  Created by NGUYEN CHI CONG on 8/8/20.
 //
 
 import Foundation
-import RxCocoa
+import RIBs
+import RxRelay
 import RxSwift
 import UIKit
 
-open class UIBoard: Board, UIPluggableBoard {
+open class UIRIBBoard: RIBBoard, UILinkableRIBBoard, UIActivatableBoard, UIPluggableBoard {
     public var version: Int = 0
     public var isVisible: Bool = true
     public var options: Any?
@@ -21,9 +22,7 @@ open class UIBoard: Board, UIPluggableBoard {
         assert(contentViewController != nil, "Content view controller was not set.")
         return contentViewController ?? UIViewController()
     }
-}
 
-open class UIViewControllerBoard: UIBoard, UILinkableViewControllerBoard, UIActivatableBoard {
     private let changeRelay = PublishRelay<UIActivatableBoard>()
 
     open var changeSequence: Observable<UIActivatableBoard> {
@@ -35,13 +34,13 @@ open class UIViewControllerBoard: UIBoard, UILinkableViewControllerBoard, UIActi
         changeRelay.accept(self)
     }
 
-    open func buildInterface(withOption option: Any?) -> UIViewController? {
+    open func buildInterface(withOption option: Any?) -> ViewableRouting? {
         assertionFailure("Abstract method should be overridden in subclass")
         return nil
     }
 
-    open func linkInterface(_ viewController: UIViewController) {
-        rootViewController.addChild(viewController)
-        contentViewController = viewController
+    open func linkInterface(_ viewRouter: ViewableRouting) {
+        rootRouter.attachChild(viewRouter)
+        contentViewController = viewRouter.viewControllable.uiviewController
     }
 }

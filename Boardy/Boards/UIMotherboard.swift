@@ -1,12 +1,11 @@
 //
 //  UIMotherboard.swift
-//  
+//  Boardy
 //
 //  Created by NGUYEN CHI CONG on 3/18/20.
 //
 
 import Foundation
-import RIBs
 import UIKit
 
 open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageable {
@@ -30,24 +29,10 @@ open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageabl
         self.install(into: rootViewController)
     }
 
-    public convenience init(identifier: String = UUID().uuidString,
-                            uiboards: [UIActivatableBoard] = [],
-                            rootRouter: ViewableRouting) {
-        self.init(identifier: identifier, uiboards: uiboards)
-        self.install(into: rootRouter)
-    }
-
-    open override func install(into rootRouter: ViewableRouting) {
-        super.install(into: rootRouter)
-        for board in uiboards {
-            board.install(into: rootRouter)
-        }
-    }
-
-    open override func install(into rootViewController: UIViewController) {
+    override open func install(into rootViewController: UIViewController) {
         super.install(into: rootViewController)
         for board in uiboards {
-            board.install(into: router)
+            board.install(into: rootViewController)
         }
     }
 }

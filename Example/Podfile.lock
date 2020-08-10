@@ -1,5 +1,5 @@
 PODS:
-  - Boardy (1.0.0):
+  - Boardy (0.9.0):
     - RIBs
     - RxDataSources
     - SnapKit
@@ -45,7 +45,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: cbb4a2401f6db4cd4b7e447d77432cbade64e018
+  Boardy: 0ff6810b804a6a99c69df60b2022a1a5e45790af
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601

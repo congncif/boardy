@@ -1,12 +1,11 @@
 //
 //  ListViewController.swift
-//
+//  Boardy
 //
 //  Created by NGUYEN CHI CONG on 12/12/19.
 //
 
 import Foundation
-import RIBs
 import RxCocoa
 import RxDataSources
 import RxSwift

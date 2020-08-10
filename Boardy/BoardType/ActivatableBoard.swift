@@ -1,12 +1,11 @@
 //
 //  ActivatableBoard.swift
-//  
+//  Boardy
 //
 //  Created by NGUYEN CHI CONG on 3/18/20.
 //
 
 import Foundation
-import RIBs
 import RxCocoa
 import RxSwift
 import UIKit
@@ -18,17 +17,9 @@ public protocol BoardDelegate: AnyObject {
 // MARK: - Board
 
 public protocol InstallableBoard {
-    var router: ViewableRouting { get }
     var rootViewController: UIViewController { get }
 
-    func install(into rootRouter: ViewableRouting)
     func install(into rootViewController: UIViewController)
-}
-
-extension InstallableBoard {
-    public var rootViewController: UIViewController {
-        router.viewControllable.uiviewController
-    }
 }
 
 public protocol IdentifiableBoard {

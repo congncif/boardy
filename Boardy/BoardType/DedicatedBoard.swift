@@ -1,6 +1,6 @@
 //
 //  DedicatedBoard.swift
-//  
+//  Boardy
 //
 //  Created by NGUYEN CHI CONG on 3/18/20.
 //
@@ -16,7 +16,7 @@ public protocol AdaptableBoard {
 }
 
 extension AdaptableBoard {
-    func convertOptionToInput(_ option: Any?) -> InputType? {
+    public func convertOptionToInput(_ option: Any?) -> InputType? {
         var input: InputType?
         for adapter in validAdapters {
             input = adapter(option)

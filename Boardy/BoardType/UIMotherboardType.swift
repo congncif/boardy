@@ -1,12 +1,11 @@
 //
 //  UIMotherboardType.swift
-//  
+//  Boardy
 //
 //  Created by NGUYEN CHI CONG on 3/18/20.
 //
 
 import Foundation
-import RIBs
 import RxCocoa
 import RxSwift
 import UIKit
@@ -42,11 +41,5 @@ extension UIMotherboardType {
     public func plug(in interface: UIBoardInterface, with disposeBag: DisposeBag) {
         visibleBoardItems.bind(to: interface.boardItems).disposed(by: disposeBag)
         reloadBoards()
-    }
-
-    public func flashInstall(into rootRouter: ViewableRouting, interface: UIBoardInterface, disposeBag: DisposeBag, activationHandler: ([UIActivatableBoard]) -> Void) {
-        install(into: rootRouter)
-        activationHandler(uiboards)
-        plug(in: interface, with: disposeBag)
     }
 }

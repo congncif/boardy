@@ -8,6 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */; };
+		27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */; };
+		27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */; };
+		27FD0A8824E0DE31002855D6 /* Motherboard+RIB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7C24E0DE31002855D6 /* Motherboard+RIB.swift */; };
+		27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7F24E0DE31002855D6 /* InstallableRIBBoard.swift */; };
+		27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8024E0DE31002855D6 /* RIBBoard.swift */; };
+		27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8224E0DE31002855D6 /* PlaceholderBuilder.swift */; };
+		27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8324E0DE31002855D6 /* PlaceholderInteractor.swift */; };
+		27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8424E0DE31002855D6 /* PlaceholderViewController.swift */; };
+		27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -29,6 +39,16 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleImport.swift; sourceTree = "<group>"; };
+		27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIRIBBoard.swift; sourceTree = "<group>"; };
+		27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILinkableRIBBoard.swift; sourceTree = "<group>"; };
+		27FD0A7C24E0DE31002855D6 /* Motherboard+RIB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Motherboard+RIB.swift"; sourceTree = "<group>"; };
+		27FD0A7F24E0DE31002855D6 /* InstallableRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstallableRIBBoard.swift; sourceTree = "<group>"; };
+		27FD0A8024E0DE31002855D6 /* RIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RIBBoard.swift; sourceTree = "<group>"; };
+		27FD0A8224E0DE31002855D6 /* PlaceholderBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderBuilder.swift; sourceTree = "<group>"; };
+		27FD0A8324E0DE31002855D6 /* PlaceholderInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderInteractor.swift; sourceTree = "<group>"; };
+		27FD0A8424E0DE31002855D6 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
+		27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderRouter.swift; sourceTree = "<group>"; };
 		332F4C45DEAAF8E1227D9F45 /* Pods_Boardy_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Boardy_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D947400602DE8BEA9543E57 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* Boardy_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Boardy_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,6 +89,62 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27FD0A7724E0DE31002855D6 /* Board+RIBs */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A7824E0DE31002855D6 /* UIRIBBoard */,
+				27FD0A7B24E0DE31002855D6 /* Motherboard+RIB */,
+				27FD0A7E24E0DE31002855D6 /* RIBBoard */,
+				27FD0A8124E0DE31002855D6 /* PlaceholderRIB */,
+			);
+			path = "Board+RIBs";
+			sourceTree = "<group>";
+		};
+		27FD0A7824E0DE31002855D6 /* UIRIBBoard */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */,
+				27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */,
+			);
+			path = UIRIBBoard;
+			sourceTree = "<group>";
+		};
+		27FD0A7B24E0DE31002855D6 /* Motherboard+RIB */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A7C24E0DE31002855D6 /* Motherboard+RIB.swift */,
+				27FD0A7D24E0DE31002855D6 /* New Group */,
+			);
+			path = "Motherboard+RIB";
+			sourceTree = "<group>";
+		};
+		27FD0A7D24E0DE31002855D6 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		27FD0A7E24E0DE31002855D6 /* RIBBoard */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A7F24E0DE31002855D6 /* InstallableRIBBoard.swift */,
+				27FD0A8024E0DE31002855D6 /* RIBBoard.swift */,
+			);
+			path = RIBBoard;
+			sourceTree = "<group>";
+		};
+		27FD0A8124E0DE31002855D6 /* PlaceholderRIB */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A8224E0DE31002855D6 /* PlaceholderBuilder.swift */,
+				27FD0A8324E0DE31002855D6 /* PlaceholderInteractor.swift */,
+				27FD0A8424E0DE31002855D6 /* PlaceholderViewController.swift */,
+				27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */,
+			);
+			path = PlaceholderRIB;
+			sourceTree = "<group>";
+		};
 		2A40B3689338181255C90E6A /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +186,8 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
+				27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */,
+				27FD0A7724E0DE31002855D6 /* Board+RIBs */,
 			);
 			name = "Example for Boardy";
 			path = Boardy;
@@ -345,7 +423,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */,
+				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
+				27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */,
+				27FD0A8824E0DE31002855D6 /* Motherboard+RIB.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
+				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
+				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,
+				27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */,
+				27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */,
+				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -498,7 +586,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -513,7 +601,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
