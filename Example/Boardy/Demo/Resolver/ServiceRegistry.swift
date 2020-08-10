@@ -1,0 +1,26 @@
+//
+//  ServiceRegistry.swift
+//  Boardy_Example
+//
+//  Created by NGUYEN CHI CONG on 8/10/20.
+//  Copyright © 2020 CocoaPods. All rights reserved.
+//
+
+import Boardy
+import Foundation
+import Resolver
+
+struct ServiceRegistry: Resolving {
+    func registerAllServices() {
+        resolver.register { LoginBuilder() }.implements(LoginBuildable.self)
+        resolver.register { MainBuilder() }.implements(MainBuildable.self)
+
+        resolver.register { rsv -> Motherboard in
+            let login = LoginBoard(builder: rsv.resolve())
+            let main = MainBoard(builder: rsv.resolve())
+            return Motherboard(boards: [
+                login, main
+            ])
+        }
+    }
+}

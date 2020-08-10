@@ -10,6 +10,8 @@ import RxCocoa
 import RxSwift
 import UIKit
 
+public typealias BoardID = String
+
 public protocol BoardDelegate: AnyObject {
     func board(_ board: IdentifiableBoard, didSendData data: Any?)
 }
@@ -24,12 +26,16 @@ public protocol InstallableBoard {
 
 public protocol IdentifiableBoard {
     var delegate: BoardDelegate? { get set }
-    var identifier: String { get }
+    var identifier: BoardID { get }
 }
 
 extension IdentifiableBoard {
     public func sendToMotherboard(data: Any?) {
         delegate?.board(self, didSendData: data)
+    }
+    
+    public func sendToMotherboard() {
+        delegate?.board(self, didSendData: nil)
     }
 }
 

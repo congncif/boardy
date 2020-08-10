@@ -12,7 +12,7 @@ open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageabl
     public private(set) var uiboards: [UIActivatableBoard]
     public var flows: [BoardFlow] = []
 
-    public init(identifier: String = UUID().uuidString,
+    public init(identifier: BoardID = UUID().uuidString,
                 uiboards: [UIActivatableBoard] = []) {
         self.uiboards = uiboards
         super.init(identifier: identifier)
@@ -22,7 +22,7 @@ open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageabl
         }
     }
 
-    public convenience init(identifier: String = UUID().uuidString,
+    public convenience init(identifier: BoardID = UUID().uuidString,
                             uiboards: [UIActivatableBoard] = [],
                             rootViewController: UIViewController) {
         self.init(identifier: identifier, uiboards: uiboards)

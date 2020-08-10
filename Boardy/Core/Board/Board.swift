@@ -9,12 +9,12 @@ import Foundation
 import UIKit
 
 open class Board: InstallableBoard, IdentifiableBoard {
-    public let identifier: String
+    public let identifier: BoardID
     public weak var delegate: BoardDelegate?
 
     private weak var hostingViewController: UIViewController?
 
-    public init(identifier: String = UUID().uuidString) {
+    public init(identifier: BoardID = UUID().uuidString) {
         self.identifier = identifier
     }
 

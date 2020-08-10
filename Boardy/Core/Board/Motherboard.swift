@@ -13,7 +13,7 @@ open class Motherboard: Board, MotherboardType, BoardDelegate, FlowManageable {
     public private(set) var boards: [ActivatableBoard]
     public var flows: [BoardFlow] = []
 
-    public init(identifier: String = UUID().uuidString,
+    public init(identifier: BoardID = UUID().uuidString,
                 boards: [ActivatableBoard] = []) {
         self.boards = boards
         super.init(identifier: identifier)
@@ -23,7 +23,7 @@ open class Motherboard: Board, MotherboardType, BoardDelegate, FlowManageable {
         }
     }
 
-    public convenience init(identifier: String = UUID().uuidString,
+    public convenience init(identifier: BoardID = UUID().uuidString,
                             boards: [ActivatableBoard] = [],
                             rootViewController: UIViewController) {
         self.init(identifier: identifier, boards: boards)

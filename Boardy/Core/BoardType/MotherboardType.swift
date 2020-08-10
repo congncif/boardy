@@ -12,11 +12,11 @@ public protocol MotherboardType: InstallableBoard {
 }
 
 extension MotherboardType {
-    public func getBoard(identifier: String) -> ActivatableBoard? {
+    public func getBoard(identifier: BoardID) -> ActivatableBoard? {
         return boards.first { $0.identifier == identifier }
     }
 
-    public func activateBoard(identifier: String, withOption option: Any? = nil) {
+    public func activateBoard(identifier: BoardID, withOption option: Any? = nil) {
         guard let board = getBoard(identifier: identifier) else {
             assertionFailure("Board with identifier \(identifier) was not found in mother board \(self)")
             return

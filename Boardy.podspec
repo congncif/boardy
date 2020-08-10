@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '0.9.1'
+    s.version          = '0.9.2'
     s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
@@ -10,8 +10,23 @@ Pod::Spec.new do |s|
     s.license          = { :type => 'MIT', :file => 'LICENSE' }
     s.author           = { 'congncif' => 'congnc.if@gmail.com' }
     s.source           = { :git => 'https://github.com/congncif/boardy.git', :tag => s.version.to_s }
-    s.ios.deployment_target = '9.3'
-    s.source_files = 'Boardy/**/*'
-    s.dependency 'RxDataSources'
-    s.dependency 'SnapKit'
+    s.ios.deployment_target = '10.0'
+    
+    s.default_subspec = 'Default'
+    
+    s.subspec 'Default' do |co|
+        co.dependency 'Boardy/Core'
+    end
+    
+    s.subspec 'Core' do |co|
+        co.source_files = 'Boardy/Core/**/*'
+    end
+    
+    s.subspec 'UI' do |co|
+        co.source_files = 'Boardy/UI/**/*'
+        
+        co.dependency 'Boardy/Core'
+        s.dependency 'RxDataSources'
+        s.dependency 'SnapKit'
+    end
 end

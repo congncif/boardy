@@ -32,7 +32,7 @@ public protocol UIActivatableBoard: UIPluggableBoard, ActivatableBoard {
 
 public struct UIBoardItem: Equatable {
     public private(set) weak var viewController: UIViewController?
-    public let identifier: String
+    public let identifier: BoardID
     public let version: Int
     public let options: Any?
 
@@ -40,7 +40,7 @@ public struct UIBoardItem: Equatable {
         return lhs.identifier == rhs.identifier && lhs.version == rhs.version
     }
 
-    public init(identifier: String, version: Int, viewController: UIViewController, options: Any? = nil) {
+    public init(identifier: BoardID, version: Int, viewController: UIViewController, options: Any? = nil) {
         self.identifier = identifier
         self.version = version
         self.viewController = viewController

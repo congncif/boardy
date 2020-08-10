@@ -112,12 +112,12 @@ public struct IDFlowStep {
     }
 }
 
-infix operator ->>: MultiplicationPrecedence
-public func ->> (left: FlowID, right: FlowID) -> [IDFlowStep] {
+infix operator =>: MultiplicationPrecedence
+public func => (left: FlowID, right: FlowID) -> [IDFlowStep] {
     return [IDFlowStep(source: left, destination: right)]
 }
 
-public func ->> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
+public func => (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
     guard let lastLeft = left.last else {
         assertionFailure("Empty flow is not allowed")
         return []

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kOx-7S-liq">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Login-->
+        <scene sceneID="UeT-4x-rcP">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="kOx-7S-liq" customClass="LoginViewController" customModule="Boardy_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bSZ-gG-gj5">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="username" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="zff-1C-wRN">
+                                <rect key="frame" x="42" y="256" width="335" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="password" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="eYV-2c-fcr">
+                                <rect key="frame" x="42" y="313" width="335" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FaY-7B-upX">
+                                <rect key="frame" x="42" y="433" width="335" height="30"/>
+                                <state key="normal" title="Login"/>
+                                <connections>
+                                    <action selector="loginButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="Wsb-FS-LqK"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="zff-1C-wRN" firstAttribute="leading" secondItem="eYV-2c-fcr" secondAttribute="leading" id="5wg-52-wFf"/>
+                            <constraint firstItem="eYV-2c-fcr" firstAttribute="top" secondItem="zff-1C-wRN" secondAttribute="bottom" constant="23" id="7SB-sp-dVy"/>
+                            <constraint firstItem="eYV-2c-fcr" firstAttribute="leading" secondItem="FaY-7B-upX" secondAttribute="leading" id="EYj-qK-ZL3"/>
+                            <constraint firstItem="zff-1C-wRN" firstAttribute="leading" secondItem="vkK-vj-Ps2" secondAttribute="leading" constant="42" id="JOK-tp-GPP"/>
+                            <constraint firstItem="vkK-vj-Ps2" firstAttribute="trailing" secondItem="zff-1C-wRN" secondAttribute="trailing" constant="37" id="Y7h-xa-ADn"/>
+                            <constraint firstItem="eYV-2c-fcr" firstAttribute="trailing" secondItem="FaY-7B-upX" secondAttribute="trailing" id="iEu-c7-Cw0"/>
+                            <constraint firstItem="zff-1C-wRN" firstAttribute="top" secondItem="vkK-vj-Ps2" secondAttribute="top" constant="168" id="mcu-os-OI8"/>
+                            <constraint firstItem="zff-1C-wRN" firstAttribute="trailing" secondItem="eYV-2c-fcr" secondAttribute="trailing" id="n6k-z1-oD3"/>
+                            <constraint firstItem="FaY-7B-upX" firstAttribute="centerY" secondItem="bSZ-gG-gj5" secondAttribute="centerY" id="veS-kj-gG7"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="vkK-vj-Ps2"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Login" id="wRP-sK-xz5">
+                        <barButtonItem key="backBarButtonItem" title=" " id="Leg-EJ-Xn4"/>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="loginButton" destination="FaY-7B-upX" id="mFK-7W-bGs"/>
+                        <outlet property="passwordField" destination="eYV-2c-fcr" id="TKL-ZZ-THB"/>
+                        <outlet property="usernameField" destination="zff-1C-wRN" id="J8r-7T-5sC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ikk-K8-l44" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="131.8840579710145" y="138.61607142857142"/>
+        </scene>
+    </scenes>
+</document>

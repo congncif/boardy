@@ -18,6 +18,21 @@
 		27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8324E0DE31002855D6 /* PlaceholderInteractor.swift */; };
 		27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8424E0DE31002855D6 /* PlaceholderViewController.swift */; };
 		27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */; };
+		27FD0A9424E0E430002855D6 /* LoginViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27FD0A9124E0E430002855D6 /* LoginViewController.storyboard */; };
+		27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9224E0E430002855D6 /* LoginViewController.swift */; };
+		27FD0A9624E0E430002855D6 /* LoginViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9324E0E430002855D6 /* LoginViewState.swift */; };
+		27FD0A9824E0EA10002855D6 /* LoginProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9724E0EA10002855D6 /* LoginProtocols.swift */; };
+		27FD0A9A24E0EA2B002855D6 /* LoginBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9924E0EA2B002855D6 /* LoginBuilder.swift */; };
+		27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9B24E0EB17002855D6 /* LoginBoard.swift */; };
+		27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A9E24E0EBA4002855D6 /* BoardID.swift */; };
+		27FD0AA224E0ED19002855D6 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AA124E0ED19002855D6 /* ServiceRegistry.swift */; };
+		27FD0AA924E0EF5F002855D6 /* MainRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AA424E0EF5F002855D6 /* MainRouter.swift */; };
+		27FD0AAA24E0EF5F002855D6 /* MainViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27FD0AA524E0EF5F002855D6 /* MainViewController.storyboard */; };
+		27FD0AAB24E0EF5F002855D6 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AA624E0EF5F002855D6 /* MainViewController.swift */; };
+		27FD0AAC24E0EF5F002855D6 /* MainBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AA724E0EF5F002855D6 /* MainBuilder.swift */; };
+		27FD0AAD24E0EF5F002855D6 /* MainInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AA824E0EF5F002855D6 /* MainInteractor.swift */; };
+		27FD0AAF24E0F007002855D6 /* MainBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AAE24E0F007002855D6 /* MainBoard.swift */; };
+		27FD0AB224E0FF7F002855D6 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0AB124E0FF7F002855D6 /* UserInfo.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -49,6 +64,21 @@
 		27FD0A8324E0DE31002855D6 /* PlaceholderInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderInteractor.swift; sourceTree = "<group>"; };
 		27FD0A8424E0DE31002855D6 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
 		27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceholderRouter.swift; sourceTree = "<group>"; };
+		27FD0A9124E0E430002855D6 /* LoginViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LoginViewController.storyboard; sourceTree = "<group>"; };
+		27FD0A9224E0E430002855D6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		27FD0A9324E0E430002855D6 /* LoginViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewState.swift; sourceTree = "<group>"; };
+		27FD0A9724E0EA10002855D6 /* LoginProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginProtocols.swift; sourceTree = "<group>"; };
+		27FD0A9924E0EA2B002855D6 /* LoginBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBuilder.swift; sourceTree = "<group>"; };
+		27FD0A9B24E0EB17002855D6 /* LoginBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBoard.swift; sourceTree = "<group>"; };
+		27FD0A9E24E0EBA4002855D6 /* BoardID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardID.swift; sourceTree = "<group>"; };
+		27FD0AA124E0ED19002855D6 /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
+		27FD0AA424E0EF5F002855D6 /* MainRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRouter.swift; sourceTree = "<group>"; };
+		27FD0AA524E0EF5F002855D6 /* MainViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainViewController.storyboard; sourceTree = "<group>"; };
+		27FD0AA624E0EF5F002855D6 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		27FD0AA724E0EF5F002855D6 /* MainBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBuilder.swift; sourceTree = "<group>"; };
+		27FD0AA824E0EF5F002855D6 /* MainInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainInteractor.swift; sourceTree = "<group>"; };
+		27FD0AAE24E0F007002855D6 /* MainBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBoard.swift; sourceTree = "<group>"; };
+		27FD0AB124E0FF7F002855D6 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		332F4C45DEAAF8E1227D9F45 /* Pods_Boardy_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Boardy_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D947400602DE8BEA9543E57 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* Boardy_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Boardy_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,16 +143,8 @@
 			isa = PBXGroup;
 			children = (
 				27FD0A7C24E0DE31002855D6 /* Motherboard+RIB.swift */,
-				27FD0A7D24E0DE31002855D6 /* New Group */,
 			);
 			path = "Motherboard+RIB";
-			sourceTree = "<group>";
-		};
-		27FD0A7D24E0DE31002855D6 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
 			sourceTree = "<group>";
 		};
 		27FD0A7E24E0DE31002855D6 /* RIBBoard */ = {
@@ -143,6 +165,68 @@
 				27FD0A8524E0DE31002855D6 /* PlaceholderRouter.swift */,
 			);
 			path = PlaceholderRIB;
+			sourceTree = "<group>";
+		};
+		27FD0A8F24E0E3EB002855D6 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0AB024E0FF6F002855D6 /* Models */,
+				27FD0AA024E0ED04002855D6 /* Resolver */,
+				27FD0A9D24E0EB98002855D6 /* Board */,
+				27FD0A9024E0E408002855D6 /* Login */,
+				27FD0AA324E0EF2F002855D6 /* Main */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		27FD0A9024E0E408002855D6 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A9124E0E430002855D6 /* LoginViewController.storyboard */,
+				27FD0A9224E0E430002855D6 /* LoginViewController.swift */,
+				27FD0A9324E0E430002855D6 /* LoginViewState.swift */,
+				27FD0A9724E0EA10002855D6 /* LoginProtocols.swift */,
+				27FD0A9924E0EA2B002855D6 /* LoginBuilder.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		27FD0A9D24E0EB98002855D6 /* Board */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0A9E24E0EBA4002855D6 /* BoardID.swift */,
+				27FD0A9B24E0EB17002855D6 /* LoginBoard.swift */,
+				27FD0AAE24E0F007002855D6 /* MainBoard.swift */,
+			);
+			path = Board;
+			sourceTree = "<group>";
+		};
+		27FD0AA024E0ED04002855D6 /* Resolver */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0AA124E0ED19002855D6 /* ServiceRegistry.swift */,
+			);
+			path = Resolver;
+			sourceTree = "<group>";
+		};
+		27FD0AA324E0EF2F002855D6 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0AA424E0EF5F002855D6 /* MainRouter.swift */,
+				27FD0AA524E0EF5F002855D6 /* MainViewController.storyboard */,
+				27FD0AA624E0EF5F002855D6 /* MainViewController.swift */,
+				27FD0AA724E0EF5F002855D6 /* MainBuilder.swift */,
+				27FD0AA824E0EF5F002855D6 /* MainInteractor.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		27FD0AB024E0FF6F002855D6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				27FD0AB124E0FF7F002855D6 /* UserInfo.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		2A40B3689338181255C90E6A /* Pods */ = {
@@ -180,6 +264,7 @@
 		607FACD21AFB9204008FA782 /* Example for Boardy */ = {
 			isa = PBXGroup;
 			children = (
+				27FD0A8F24E0E3EB002855D6 /* Demo */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -324,7 +409,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27FD0AAA24E0EF5F002855D6 /* MainViewController.storyboard in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				27FD0A9424E0E430002855D6 /* LoginViewController.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);
@@ -349,23 +436,31 @@
 				"${PODS_ROOT}/Target Support Files/Pods-Boardy_Example/Pods-Boardy_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Boardy/Boardy.framework",
 				"${BUILT_PRODUCTS_DIR}/Differentiator/Differentiator.framework",
+				"${BUILT_PRODUCTS_DIR}/Localize-Swift/Localize_Swift.framework",
 				"${BUILT_PRODUCTS_DIR}/RIBs/RIBs.framework",
+				"${BUILT_PRODUCTS_DIR}/Resolver/Resolver.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
 				"${BUILT_PRODUCTS_DIR}/RxRelay/RxRelay.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SiFUtilities/SiFUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+				"${BUILT_PRODUCTS_DIR}/ViewStateCore/ViewStateCore.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Boardy.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differentiator.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Localize_Swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RIBs.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Resolver.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SiFUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ViewStateCore.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -423,18 +518,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27FD0AAB24E0EF5F002855D6 /* MainViewController.swift in Sources */,
 				27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */,
 				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
+				27FD0AB224E0FF7F002855D6 /* UserInfo.swift in Sources */,
 				27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */,
 				27FD0A8824E0DE31002855D6 /* Motherboard+RIB.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				27FD0AA924E0EF5F002855D6 /* MainRouter.swift in Sources */,
+				27FD0AAF24E0F007002855D6 /* MainBoard.swift in Sources */,
+				27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
+				27FD0A9824E0EA10002855D6 /* LoginProtocols.swift in Sources */,
 				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
 				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,
+				27FD0A9624E0E430002855D6 /* LoginViewState.swift in Sources */,
 				27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */,
+				27FD0AAC24E0EF5F002855D6 /* MainBuilder.swift in Sources */,
 				27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */,
+				27FD0AA224E0ED19002855D6 /* ServiceRegistry.swift in Sources */,
 				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,
+				27FD0A9A24E0EA2B002855D6 /* LoginBuilder.swift in Sources */,
+				27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */,
+				27FD0AAD24E0EF5F002855D6 /* MainInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +689,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Boardy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -596,6 +705,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Boardy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -618,6 +728,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -636,6 +747,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

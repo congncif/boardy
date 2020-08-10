@@ -1,16 +1,19 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '9.3'
+platform :ios, '11.0'
 use_frameworks!
 inhibit_all_warnings!
 
 target 'Boardy_Example' do
   pod 'Boardy', :path => '../'
+  pod 'Boardy/UI', :path => '../'
+  
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
+  pod 'ViewStateCore'
+  pod 'SiFUtilities'
+  pod 'Resolver' , '~> 1.1'
 
   target 'Boardy_Tests' do
     inherit! :search_paths
-
-    
   end
 end
