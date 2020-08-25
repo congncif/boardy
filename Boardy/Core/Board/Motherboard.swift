@@ -9,16 +9,17 @@
 import Foundation
 import UIKit
 
-open class Motherboard: Board, MotherboardType, BoardDelegate, FlowManageable {
-    public private(set) var boards: [ActivatableBoard]
+open class Motherboard: Board, MotherboardRepresentable, MotherboardType, BoardDelegate, FlowManageable {
+    var mainboard: [BoardID: ActivatableBoard] = [:]
+
     public var flows: [BoardFlow] = []
 
     public init(identifier: BoardID = UUID().uuidString,
                 boards: [ActivatableBoard] = []) {
-        self.boards = boards
         super.init(identifier: identifier)
 
-        for var board in self.boards {
+        for var board in boards {
+            self.addBoard(board)
             board.delegate = self
         }
     }

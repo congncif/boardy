@@ -33,7 +33,7 @@ extension IdentifiableBoard {
     public func sendToMotherboard(data: Any?) {
         delegate?.board(self, didSendData: data)
     }
-    
+
     public func sendToMotherboard() {
         delegate?.board(self, didSendData: nil)
     }
@@ -41,4 +41,12 @@ extension IdentifiableBoard {
 
 public protocol ActivatableBoard: IdentifiableBoard, InstallableBoard {
     func activate(withOption option: Any?)
+}
+
+// MARK: - Utility extensions
+
+extension UIViewController {
+    public func install(board: InstallableBoard) {
+        board.install(into: self)
+    }
 }
