@@ -14,6 +14,7 @@ struct ServiceRegistry: Resolving {
     func registerAllServices() {
         resolver.register { LoginBuilder() }.implements(LoginBuildable.self)
         resolver.register { MainBuilder() }.implements(MainBuildable.self)
+            .scope(ResolverScopeCache())
 
         resolver.register { rsv -> Motherboard in
             let login = LoginBoard(builder: rsv.resolve())

@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        motherboard.registerFlowSteps(.login => .main => .login)
+        motherboard.registerFlowSteps(.login >=> .main >=> .login)
         
         motherboard.install(into: self)
     }
