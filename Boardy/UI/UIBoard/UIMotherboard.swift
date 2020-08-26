@@ -6,18 +6,29 @@
 //
 
 import Foundation
+import RxRelay
+import RxSwift
 import UIKit
 
-open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageable {
-    public private(set) var uiboards: [UIActivatableBoard]
+open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObservable, BoardDelegate, FlowManageable {
+    var uimainboard: [BoardID: UIActivatableBoard] = [:] {
+        didSet {
+            self.uiboardsRelay.accept(uiboards)
+        }
+    }
+
+    var visibleBoards: Observable<[UIActivatableBoard]> { self.uiboardsRelay.asObservable() }
+
+    private lazy var uiboardsRelay = BehaviorRelay<[UIActivatableBoard]>(value: uiboards)
+
     public var flows: [BoardFlow] = []
 
     public init(identifier: BoardID = UUID().uuidString,
                 uiboards: [UIActivatableBoard] = []) {
-        self.uiboards = uiboards
         super.init(identifier: identifier)
 
         for var board in uiboards {
+            self.addUIBoard(board)
             board.delegate = self
         }
     }
@@ -31,7 +42,7 @@ open class UIMotherboard: Board, UIMotherboardType, BoardDelegate, FlowManageabl
 
     override open func install(into rootViewController: UIViewController) {
         super.install(into: rootViewController)
-        for board in uiboards {
+        for board in self.uiboards {
             board.install(into: rootViewController)
         }
     }

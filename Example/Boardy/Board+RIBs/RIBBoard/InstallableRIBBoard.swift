@@ -24,3 +24,9 @@ extension InstallableRIBBoard {
         install(into: rootRouter.viewControllable.uiviewController)
     }
 }
+
+extension ViewableRouting {
+    public func install(board: InstallableRIBBoard) {
+        board.install(into: self)
+    }
+}

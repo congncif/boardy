@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-open class Motherboard: Board, MotherboardRepresentable, MotherboardType, BoardDelegate, FlowManageable {
+open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowManageable {
     var mainboard: [BoardID: ActivatableBoard] = [:]
 
     public var flows: [BoardFlow] = []
