@@ -10,7 +10,13 @@ import Foundation
 import UIKit
 
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowManageable {
-    var mainboard: [BoardID: ActivatableBoard] = [:]
+    var mainboard: [BoardID: ActivatableBoard] = [:] {
+        didSet {
+            for var board in boards {
+                board.delegate = self
+            }
+        }
+    }
 
     public var flows: [BoardFlow] = []
 
@@ -19,8 +25,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMana
         super.init(identifier: identifier)
 
         for var board in boards {
-            self.addBoard(board)
-            board.delegate = self
+            addBoard(board)
         }
     }
 
@@ -28,7 +33,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMana
                             boards: [ActivatableBoard] = [],
                             rootViewController: UIViewController) {
         self.init(identifier: identifier, boards: boards)
-        self.install(into: rootViewController)
+        install(into: rootViewController)
     }
 
     override open func install(into rootViewController: UIViewController) {

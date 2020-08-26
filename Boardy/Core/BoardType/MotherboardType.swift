@@ -10,6 +10,7 @@ import Foundation
 public protocol MotherboardType: InstallableBoard {
     var boards: [ActivatableBoard] { get }
 
+    /// Append list of boards, this doesn't include installing board into rootViewController.
     func addBoard(_ board: ActivatableBoard)
     func removeBoard(withIdentifier identifier: BoardID)
 
@@ -27,6 +28,12 @@ extension MotherboardType {
 
     public func removeBoard(_ board: ActivatableBoard) {
         removeBoard(withIdentifier: board.identifier)
+    }
+
+    /// Install additional a board after its Motherboard was installed.
+    public func installBoard(_ board: ActivatableBoard) {
+        addBoard(board)
+        board.install(into: rootViewController)
     }
 }
 

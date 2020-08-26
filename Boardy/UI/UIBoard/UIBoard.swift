@@ -10,7 +10,7 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-// Unlike normal Board, an UIBoard must be activated(built & linked) before using.
+/// Unlike normal Board, an UIBoard must be activated(built & linked) before using.
 
 open class UIBoard: Board, UIPluggableBoard {
     public var version: Int = 0

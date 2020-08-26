@@ -13,18 +13,46 @@ import UIKit
 public protocol UIMotherboardType: InstallableBoard {
     var uiboards: [UIActivatableBoard] { get }
 
+    /// Append list of boards, this doesn't include installing board into rootViewController.
     func addUIBoard(_ board: UIActivatableBoard)
     func removeUIBoard(withIdentifier identifier: BoardID)
 
     func getUIBoard(identifier: BoardID) -> UIActivatableBoard?
 
+    /// Activate all UIBoards before plugging them in an UIBoardInterface.
     func plug(in interface: UIBoardInterface, with disposeBag: DisposeBag)
     func reloadBoards()
 }
 
 extension UIMotherboardType {
+    public func activateUIBoard(identifier: BoardID, withOption option: Any? = nil) {
+        guard let board = getUIBoard(identifier: identifier) else {
+            assertionFailure("Board with identifier \(identifier) was not found in mother board \(self)")
+            return
+        }
+        board.activate(withOption: option)
+    }
+
+    /// Activate all of uiboards in UIMotherboard at once. This is useful for preparing to plug them in UIBoardInterface.
+    public func activateAllUIBoards(withOptions options: [BoardID: Any] = [:]) {
+        for board in uiboards {
+            let option = options[board.identifier]
+            board.activate(withOption: option)
+        }
+    }
+
     public func reloadBoards() {
         uiboards.forEach { $0.reload() }
+    }
+
+    public func removeUIBoard(_ board: UIActivatableBoard) {
+        removeUIBoard(withIdentifier: board.identifier)
+    }
+
+    /// Install additional a board after its Motherboard was installed.
+    public func installUIBoard(_ board: UIActivatableBoard) {
+        addUIBoard(board)
+        board.install(into: rootViewController)
     }
 }
 

@@ -13,11 +13,14 @@ import UIKit
 open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObservable, BoardDelegate, FlowManageable {
     var uimainboard: [BoardID: UIActivatableBoard] = [:] {
         didSet {
-            self.uiboardsRelay.accept(uiboards)
+            for var board in uiboards {
+                board.delegate = self
+            }
+            uiboardsRelay.accept(uiboards)
         }
     }
 
-    var visibleBoards: Observable<[UIActivatableBoard]> { self.uiboardsRelay.asObservable() }
+    var visibleBoards: Observable<[UIActivatableBoard]> { uiboardsRelay.asObservable() }
 
     private lazy var uiboardsRelay = BehaviorRelay<[UIActivatableBoard]>(value: uiboards)
 
@@ -28,8 +31,7 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
         super.init(identifier: identifier)
 
         for var board in uiboards {
-            self.addUIBoard(board)
-            board.delegate = self
+            addUIBoard(board)
         }
     }
 
@@ -37,12 +39,12 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
                             uiboards: [UIActivatableBoard] = [],
                             rootViewController: UIViewController) {
         self.init(identifier: identifier, uiboards: uiboards)
-        self.install(into: rootViewController)
+        install(into: rootViewController)
     }
 
     override open func install(into rootViewController: UIViewController) {
         super.install(into: rootViewController)
-        for board in self.uiboards {
+        for board in uiboards {
             board.install(into: rootViewController)
         }
     }
