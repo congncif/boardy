@@ -24,7 +24,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMana
                 boards: [ActivatableBoard] = []) {
         super.init(identifier: identifier)
 
-        for var board in boards {
+        for board in boards {
             addBoard(board)
         }
     }

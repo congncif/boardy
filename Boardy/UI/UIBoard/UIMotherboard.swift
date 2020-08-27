@@ -30,7 +30,7 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
                 uiboards: [UIActivatableBoard] = []) {
         super.init(identifier: identifier)
 
-        for var board in uiboards {
+        for board in uiboards {
             addUIBoard(board)
         }
     }
