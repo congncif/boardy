@@ -26,7 +26,7 @@ open class Board: InstallableBoard, IdentifiableBoard {
         return viewController
     }
 
-    public func install(into rootViewController: UIViewController) {
+    open func install(into rootViewController: UIViewController) {
         hostingViewController = rootViewController
     }
 }

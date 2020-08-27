@@ -10,6 +10,8 @@ import RxCocoa
 import RxSwift
 import UIKit
 
+public typealias FlowUIMotherboard = UIMotherboardType & FlowManageable
+
 public protocol UIMotherboardType: InstallableBoard {
     var uiboards: [UIActivatableBoard] { get }
 

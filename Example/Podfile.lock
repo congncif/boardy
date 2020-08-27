@@ -1,16 +1,16 @@
 PODS:
-  - Boardy (0.9.2):
-    - Boardy/Default (= 0.9.2)
+  - Boardy (0.9.5):
+    - Boardy/Default (= 0.9.5)
     - RxDataSources
     - SnapKit
-  - Boardy/Core (0.9.2):
+  - Boardy/Core (0.9.5):
     - RxDataSources
     - SnapKit
-  - Boardy/Default (0.9.2):
+  - Boardy/Default (0.9.5):
     - Boardy/Core
     - RxDataSources
     - SnapKit
-  - Boardy/UI (0.9.2):
+  - Boardy/UI (0.9.5):
     - Boardy/Core
     - RxDataSources
     - SnapKit
@@ -99,7 +99,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: 3f5183b3a43db15b77d395204cd93fe8c26946c9
+  Boardy: a75bd4e3e77384f7916261fc5d95b499bb18725a
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Localize-Swift: 4bed4f0ccac8be2ec3517ee359da80ba2adb0fae
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
