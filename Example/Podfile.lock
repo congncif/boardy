@@ -1,16 +1,16 @@
 PODS:
-  - Boardy (0.9.5):
-    - Boardy/Default (= 0.9.5)
+  - Boardy (0.9.7):
+    - Boardy/Default (= 0.9.7)
     - RxDataSources
     - SnapKit
-  - Boardy/Core (0.9.5):
+  - Boardy/Core (0.9.7):
     - RxDataSources
     - SnapKit
-  - Boardy/Default (0.9.5):
+  - Boardy/Default (0.9.7):
     - Boardy/Core
     - RxDataSources
     - SnapKit
-  - Boardy/UI (0.9.5):
+  - Boardy/UI (0.9.7):
     - Boardy/Core
     - RxDataSources
     - SnapKit
@@ -30,10 +30,10 @@ PODS:
   - RxRelay (5.1.1):
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
-  - SiFUtilities (4.7.0):
-    - SiFUtilities/Default (= 4.7.0)
-  - SiFUtilities/Core (4.7.0)
-  - SiFUtilities/Default (4.7.0):
+  - SiFUtilities (4.9.1):
+    - SiFUtilities/Default (= 4.9.1)
+  - SiFUtilities/Core (4.9.1)
+  - SiFUtilities/Default (4.9.1):
     - SiFUtilities/Core
     - SiFUtilities/Endpoint
     - SiFUtilities/Helpers
@@ -45,23 +45,23 @@ PODS:
     - SiFUtilities/Runtime
     - SiFUtilities/Show
     - SiFUtilities/WeakObject
-  - SiFUtilities/Endpoint (4.7.0)
-  - SiFUtilities/Helpers (4.7.0)
-  - SiFUtilities/IBDesignable (4.7.0):
+  - SiFUtilities/Endpoint (4.9.1)
+  - SiFUtilities/Helpers (4.9.1)
+  - SiFUtilities/IBDesignable (4.9.1):
     - SiFUtilities/Core
-  - SiFUtilities/KeyValue (4.7.0)
-  - SiFUtilities/Loading (4.7.0)
-  - SiFUtilities/Localize (4.7.0):
+  - SiFUtilities/KeyValue (4.9.1)
+  - SiFUtilities/Loading (4.9.1)
+  - SiFUtilities/Localize (4.9.1):
     - Localize-Swift
     - SiFUtilities/Core
     - SiFUtilities/Runtime
-  - SiFUtilities/Nib (4.7.0):
+  - SiFUtilities/Nib (4.9.1):
     - SiFUtilities/Core
-  - SiFUtilities/Runtime (4.7.0)
-  - SiFUtilities/Show (4.7.0):
+  - SiFUtilities/Runtime (4.9.1)
+  - SiFUtilities/Show (4.9.1):
     - SiFUtilities/Core
     - SiFUtilities/Localize
-  - SiFUtilities/WeakObject (4.7.0)
+  - SiFUtilities/WeakObject (4.9.1)
   - SnapKit (5.0.1)
   - ViewStateCore (1.7.0)
 
@@ -99,7 +99,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: a75bd4e3e77384f7916261fc5d95b499bb18725a
+  Boardy: 0081d6486b492d3350289a091cc531baa9365dd5
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Localize-Swift: 4bed4f0ccac8be2ec3517ee359da80ba2adb0fae
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
@@ -108,7 +108,7 @@ SPEC CHECKSUMS:
   RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
-  SiFUtilities: b65c75d62fd43c3c30018cd64f58d0a048e9e19c
+  SiFUtilities: 07b7787ad6401b3e3ccaf10ab5a76e29e8867457
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 

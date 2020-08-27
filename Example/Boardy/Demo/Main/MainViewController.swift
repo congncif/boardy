@@ -13,6 +13,7 @@ import UIKit
 
 protocol MainPresentableListener: AnyObject {
     func performLogout()
+    func showDashboard()
 }
 
 final class MainViewController: UIViewController, MainPresentable, MainViewControllable {
@@ -26,7 +27,7 @@ final class MainViewController: UIViewController, MainPresentable, MainViewContr
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         userInfoHandler?()
     }
 
@@ -36,6 +37,10 @@ final class MainViewController: UIViewController, MainPresentable, MainViewContr
 
     @IBAction private func logoutButtonDidTap() {
         listener?.performLogout()
+    }
+
+    @IBAction private func dashboardButtonDidTap() {
+        listener?.showDashboard()
     }
 
     func showUserInfo(_ userInfo: UserInfo) {

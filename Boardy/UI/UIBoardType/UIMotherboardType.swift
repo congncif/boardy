@@ -35,12 +35,23 @@ extension UIMotherboardType {
         board.activate(withOption: option)
     }
 
+    public func activateUIBoard(model: BoardInputModel) {
+        activateUIBoard(identifier: model.identifier, withOption: model.option)
+    }
+
     /// Activate all of uiboards in UIMotherboard at once. This is useful for preparing to plug them in UIBoardInterface.
     public func activateAllUIBoards(withOptions options: [BoardID: Any] = [:]) {
         for board in uiboards {
             let option = options[board.identifier]
             board.activate(withOption: option)
         }
+    }
+
+    public func activateAllUIBoards(models: [BoardInputModel]) {
+        let options: [BoardID: Any] = models.reduce([:]) { result, model in
+            result.merging([model.identifier: model.option]) { $1 }
+        }
+        activateAllUIBoards(withOptions: options)
     }
 
     public func reloadBoards() {

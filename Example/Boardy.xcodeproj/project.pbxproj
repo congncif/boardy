@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		27950A5C24F80296005779B7 /* DashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5B24F80296005779B7 /* DashboardViewController.swift */; };
+		27950A6224F80944005779B7 /* DashboardBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5D24F80944005779B7 /* DashboardBuilder.swift */; };
+		27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5F24F80944005779B7 /* DashboardViewState.swift */; };
+		27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6024F80944005779B7 /* DashboardBoard.swift */; };
+		27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6124F80944005779B7 /* DashboardProtocols.swift */; };
 		27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */; };
 		27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */; };
 		27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */; };
@@ -54,6 +59,11 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		27950A5B24F80296005779B7 /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
+		27950A5D24F80944005779B7 /* DashboardBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBuilder.swift; sourceTree = "<group>"; };
+		27950A5F24F80944005779B7 /* DashboardViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewState.swift; sourceTree = "<group>"; };
+		27950A6024F80944005779B7 /* DashboardBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBoard.swift; sourceTree = "<group>"; };
+		27950A6124F80944005779B7 /* DashboardProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardProtocols.swift; sourceTree = "<group>"; };
 		27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleImport.swift; sourceTree = "<group>"; };
 		27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIRIBBoard.swift; sourceTree = "<group>"; };
 		27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILinkableRIBBoard.swift; sourceTree = "<group>"; };
@@ -119,6 +129,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27950A5A24F80268005779B7 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				27950A6024F80944005779B7 /* DashboardBoard.swift */,
+				27950A5D24F80944005779B7 /* DashboardBuilder.swift */,
+				27950A6124F80944005779B7 /* DashboardProtocols.swift */,
+				27950A5B24F80296005779B7 /* DashboardViewController.swift */,
+				27950A5F24F80944005779B7 /* DashboardViewState.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
 		27FD0A7724E0DE31002855D6 /* Board+RIBs */ = {
 			isa = PBXGroup;
 			children = (
@@ -170,6 +192,7 @@
 		27FD0A8F24E0E3EB002855D6 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				27950A5A24F80268005779B7 /* Dashboard */,
 				27FD0AB024E0FF6F002855D6 /* Models */,
 				27FD0AA024E0ED04002855D6 /* Resolver */,
 				27FD0A9D24E0EB98002855D6 /* Board */,
@@ -182,11 +205,12 @@
 		27FD0A9024E0E408002855D6 /* Login */ = {
 			isa = PBXGroup;
 			children = (
+				27FD0A9B24E0EB17002855D6 /* LoginBoard.swift */,
+				27FD0A9924E0EA2B002855D6 /* LoginBuilder.swift */,
+				27FD0A9724E0EA10002855D6 /* LoginProtocols.swift */,
 				27FD0A9124E0E430002855D6 /* LoginViewController.storyboard */,
 				27FD0A9224E0E430002855D6 /* LoginViewController.swift */,
 				27FD0A9324E0E430002855D6 /* LoginViewState.swift */,
-				27FD0A9724E0EA10002855D6 /* LoginProtocols.swift */,
-				27FD0A9924E0EA2B002855D6 /* LoginBuilder.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -195,8 +219,6 @@
 			isa = PBXGroup;
 			children = (
 				27FD0A9E24E0EBA4002855D6 /* BoardID.swift */,
-				27FD0A9B24E0EB17002855D6 /* LoginBoard.swift */,
-				27FD0AAE24E0F007002855D6 /* MainBoard.swift */,
 			);
 			path = Board;
 			sourceTree = "<group>";
@@ -212,11 +234,12 @@
 		27FD0AA324E0EF2F002855D6 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				27FD0AAE24E0F007002855D6 /* MainBoard.swift */,
+				27FD0AA724E0EF5F002855D6 /* MainBuilder.swift */,
+				27FD0AA824E0EF5F002855D6 /* MainInteractor.swift */,
 				27FD0AA424E0EF5F002855D6 /* MainRouter.swift */,
 				27FD0AA524E0EF5F002855D6 /* MainViewController.storyboard */,
 				27FD0AA624E0EF5F002855D6 /* MainViewController.swift */,
-				27FD0AA724E0EF5F002855D6 /* MainBuilder.swift */,
-				27FD0AA824E0EF5F002855D6 /* MainInteractor.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -518,19 +541,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */,
 				27FD0AAB24E0EF5F002855D6 /* MainViewController.swift in Sources */,
+				27950A6224F80944005779B7 /* DashboardBuilder.swift in Sources */,
 				27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */,
 				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
 				27FD0AB224E0FF7F002855D6 /* UserInfo.swift in Sources */,
 				27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */,
 				27FD0A8824E0DE31002855D6 /* Motherboard+RIB.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				27950A5C24F80296005779B7 /* DashboardViewController.swift in Sources */,
 				27FD0AA924E0EF5F002855D6 /* MainRouter.swift in Sources */,
 				27FD0AAF24E0F007002855D6 /* MainBoard.swift in Sources */,
 				27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
 				27FD0A9824E0EA10002855D6 /* LoginProtocols.swift in Sources */,
 				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
+				27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */,
 				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,
 				27FD0A9624E0E430002855D6 /* LoginViewState.swift in Sources */,
 				27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */,
@@ -540,6 +567,7 @@
 				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,
 				27FD0A9A24E0EA2B002855D6 /* LoginBuilder.swift in Sources */,
 				27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */,
+				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */,
 				27FD0AAD24E0EF5F002855D6 /* MainInteractor.swift in Sources */,

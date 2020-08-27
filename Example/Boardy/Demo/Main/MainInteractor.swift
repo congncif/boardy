@@ -14,18 +14,19 @@ protocol MainRouting: ViewableRouting {}
 
 protocol MainPresentable: Presentable {
     var listener: MainPresentableListener? { get set }
-    
+
     func showUserInfo(_ userInfo: UserInfo)
 }
 
 protocol MainListener: AnyObject {
     func didLogout()
+    func showDashboard()
 }
 
 final class MainInteractor: PresentableInteractor<MainPresentable>, MainInteractable, MainPresentableListener {
     weak var router: MainRouting?
     weak var listener: MainListener?
-    
+
     private let userInfo: UserInfo
 
     init(presenter: MainPresentable, userInfo: UserInfo) {
@@ -36,7 +37,7 @@ final class MainInteractor: PresentableInteractor<MainPresentable>, MainInteract
 
     override func didBecomeActive() {
         super.didBecomeActive()
-        
+
         presenter.showUserInfo(userInfo)
     }
 
@@ -47,5 +48,9 @@ final class MainInteractor: PresentableInteractor<MainPresentable>, MainInteract
     func performLogout() {
         // Perform logout here
         listener?.didLogout()
+    }
+
+    func showDashboard() {
+        listener?.showDashboard()
     }
 }

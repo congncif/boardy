@@ -18,7 +18,7 @@ open class SuperBoard: ContinuousBoard {
         super.init(identifier: identifier, motherboard: motherboard)
     }
 
-    override public func install(into rootViewController: UIViewController) {
+    override open func install(into rootViewController: UIViewController) {
         super.install(into: rootViewController)
         uimotherboard.install(into: rootViewController)
     }

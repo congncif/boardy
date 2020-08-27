@@ -24,15 +24,24 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello, Name!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gh4-GN-kB1">
-                                <rect key="frame" x="138" y="44" width="98" height="21"/>
+                                <rect key="frame" x="138.5" y="44" width="98" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="red-oV-ptg">
+                                <rect key="frame" x="150" y="210" width="75" height="30"/>
+                                <state key="normal" title="Dashboard"/>
+                                <connections>
+                                    <action selector="dashboardButtonDidTap" destination="vKn-9P-Ny8" eventType="touchUpInside" id="oVI-sr-PF9"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="gh4-GN-kB1" firstAttribute="centerX" secondItem="Iba-7e-LSr" secondAttribute="centerX" id="0B8-hc-5JY"/>
+                            <constraint firstItem="Iba-7e-LSr" firstAttribute="top" secondItem="red-oV-ptg" secondAttribute="bottom" constant="16" id="IXX-JL-Puf"/>
+                            <constraint firstItem="red-oV-ptg" firstAttribute="centerX" secondItem="Iba-7e-LSr" secondAttribute="centerX" id="M4t-JB-iVf"/>
                             <constraint firstItem="Iba-7e-LSr" firstAttribute="top" secondItem="HgA-Aw-ocO" secondAttribute="top" constant="256" id="Q5k-9M-hjg"/>
                             <constraint firstItem="gh4-GN-kB1" firstAttribute="top" secondItem="HgA-Aw-ocO" secondAttribute="top" constant="44" id="QDM-1J-F4o"/>
                             <constraint firstItem="Iba-7e-LSr" firstAttribute="centerX" secondItem="BNZ-bO-rhc" secondAttribute="centerX" id="yXH-wi-nkb"/>

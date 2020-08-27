@@ -12,11 +12,13 @@ import Foundation
 extension BoardID {
     static let login = "login"
     static let main = "main"
+    static let dashboard = "dashboard"
 }
 
-enum BoardIdentity {
+enum BoardIdentity: BoardInputModel {
     case login
     case main(userInfo: UserInfo)
+    case dashboard
 
     var identifier: String {
         switch self {
@@ -24,21 +26,23 @@ enum BoardIdentity {
             return .login
         case .main:
             return .main
+        case .dashboard:
+            return .dashboard
         }
     }
 
     var option: Any? {
         switch self {
-        case .login:
-            return nil
         case let .main(userInfo: info):
             return info
+        default:
+            return nil
         }
     }
 }
 
 extension MotherboardType {
     func activateBoard(identity: BoardIdentity) {
-        activateBoard(identifier: identity.identifier, withOption: identity.option)
+        activateBoard(model: identity)
     }
 }

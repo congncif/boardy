@@ -13,17 +13,32 @@ final class MainBoard: RIBBoard, GuaranteedBoard {
     typealias InputType = UserInfo
 
     private let builder: MainBuildable
+    private let motherboard: FlowMotherboard
 
-    init(builder: MainBuildable) {
+    init(builder: MainBuildable, motherboard: FlowMotherboard) {
         self.builder = builder
+        self.motherboard = motherboard
         super.init(identifier: .main)
+    }
+
+    convenience init(builder: MainBuildable, continuousBoards: [ActivatableBoard]) {
+        let motherboard = Motherboard(boards: continuousBoards)
+        self.init(builder: builder, motherboard: motherboard)
+    }
+
+    override func install(into rootViewController: UIViewController) {
+        super.install(into: rootViewController)
+        motherboard.install(into: rootViewController)
     }
 
     func activate(withGuaranteedInput input: UserInfo) {
         let router = builder.build(withListener: self, userInfo: input)
         rootRouter.attachChild(router)
-        router.viewControllable.uiviewController.modalPresentationStyle = .fullScreen
-        rootRouter.viewControllable.uiviewController.present(router.viewControllable.uiviewController, animated: true)
+
+        let nav = UINavigationController(rootViewController: router.viewControllable.uiviewController)
+        nav.modalPresentationStyle = .fullScreen
+        
+        rootRouter.viewControllable.uiviewController.present(nav, animated: true)
     }
 }
 
@@ -34,5 +49,9 @@ extension MainBoard: MainListener {
         rootRouter.viewControllable.uiviewController.dismiss(animated: true) {
             self.sendToMotherboard()
         }
+    }
+
+    func showDashboard() {
+        motherboard.activateBoard(identity: .dashboard)
     }
 }

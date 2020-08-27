@@ -7,6 +7,11 @@
 
 import Foundation
 
+public protocol BoardInputModel {
+    var identifier: BoardID { get }
+    var option: Any? { get }
+}
+
 public protocol MotherboardType: InstallableBoard {
     var boards: [ActivatableBoard] { get }
 
@@ -24,6 +29,10 @@ extension MotherboardType {
             return
         }
         board.activate(withOption: option)
+    }
+
+    public func activateBoard(model: BoardInputModel) {
+        activateBoard(identifier: model.identifier, withOption: model.option)
     }
 
     public func removeBoard(_ board: ActivatableBoard) {
