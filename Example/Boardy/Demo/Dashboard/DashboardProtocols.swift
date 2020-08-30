@@ -6,9 +6,10 @@
 //  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
+import Boardy
 import UIKit
 
-protocol DashboardController: UIViewController {
+protocol DashboardController: UIViewController, UIBoardInterface {
     var delegate: DashboardDelegate? { get set }
 }
 

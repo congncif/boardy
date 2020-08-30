@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kOx-7S-liq">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Title-->
+        <scene sceneID="UeT-4x-rcP">
+            <objects>
+                <viewController storyboardIdentifier="FeaturedViewController" id="kOx-7S-liq" customClass="FeaturedViewController" customModule="Boardy_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="bSZ-gG-gj5">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="300"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pl9-6l-tfZ">
+                                <rect key="frame" x="183" y="100" width="48" height="100"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Go !!!">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerY" secondItem="bSZ-gG-gj5" secondAttribute="centerY" id="TH5-6f-02Q"/>
+                            <constraint firstItem="pl9-6l-tfZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="UaH-z3-1uQ"/>
+                            <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="gPF-mA-i99"/>
+                            <constraint firstAttribute="bottom" secondItem="pl9-6l-tfZ" secondAttribute="bottom" constant="100" id="hXg-3W-p0v"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Title" id="wRP-sK-xz5">
+                        <barButtonItem key="backBarButtonItem" title=" " id="Leg-EJ-Xn4"/>
+                    </navigationItem>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="300"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ikk-K8-l44" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="139" y="84"/>
+        </scene>
+    </scenes>
+</document>

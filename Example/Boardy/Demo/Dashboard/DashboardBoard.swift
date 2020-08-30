@@ -8,22 +8,29 @@
 
 import Boardy
 import Foundation
+import RxSwift
 import SiFUtilities
 import UIKit
 
-final class DashboardBoard: Board, GuaranteedBoard {
+final class DashboardBoard: SuperBoard, GuaranteedBoard {
     typealias InputType = Any?
 
     private let builder: DashboardBuildable
 
-    init(builder: DashboardBuildable) {
+    private let disposeBag = DisposeBag()
+
+    init(builder: DashboardBuildable, elementBoards: [UIActivatableBoard]) {
         self.builder = builder
-        super.init(identifier: .dashboard)
+        let uicontainerBoard = UIMotherboard(uiboards: elementBoards)
+        super.init(identifier: .dashboard, uimotherboard: uicontainerBoard)
     }
 
     func activate(withGuaranteedInput input: Any?) {
         let dashboard = builder.build()
         rootViewController.topPresentedViewController.show(dashboard)
+
+        uimotherboard.activateAllUIBoards()
+        uimotherboard.plug(in: dashboard, with: disposeBag)
     }
 }
 

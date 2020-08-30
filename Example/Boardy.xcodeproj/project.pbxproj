@@ -13,6 +13,18 @@
 		27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5F24F80944005779B7 /* DashboardViewState.swift */; };
 		27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6024F80944005779B7 /* DashboardBoard.swift */; };
 		27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6124F80944005779B7 /* DashboardProtocols.swift */; };
+		27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */; };
+		27CA1D5324FB3DE300694463 /* HeadlineViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */; };
+		27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */; };
+		27CA1D5524FB3DE300694463 /* HeadlineViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4F24FB3DE300694463 /* HeadlineViewState.swift */; };
+		27CA1D5624FB3DE300694463 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */; };
+		27CA1D5724FB3DE300694463 /* HeadlineProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */; };
+		27CA1D6424FB62DF00694463 /* FeaturedBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */; };
+		27CA1D6524FB62DF00694463 /* FeaturedViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */; };
+		27CA1D6624FB62DF00694463 /* FeaturedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6124FB62DF00694463 /* FeaturedViewController.swift */; };
+		27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */; };
+		27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */; };
+		27CA1D6A24FB62EB00694463 /* FeaturedUIBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */; };
 		27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */; };
 		27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */; };
 		27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */; };
@@ -64,6 +76,18 @@
 		27950A5F24F80944005779B7 /* DashboardViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewState.swift; sourceTree = "<group>"; };
 		27950A6024F80944005779B7 /* DashboardBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBoard.swift; sourceTree = "<group>"; };
 		27950A6124F80944005779B7 /* DashboardProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardProtocols.swift; sourceTree = "<group>"; };
+		27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBuilder.swift; sourceTree = "<group>"; };
+		27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = HeadlineViewController.storyboard; sourceTree = "<group>"; };
+		27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineViewController.swift; sourceTree = "<group>"; };
+		27CA1D4F24FB3DE300694463 /* HeadlineViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineViewState.swift; sourceTree = "<group>"; };
+		27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
+		27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineProtocols.swift; sourceTree = "<group>"; };
+		27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBuilder.swift; sourceTree = "<group>"; };
+		27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FeaturedViewController.storyboard; sourceTree = "<group>"; };
+		27CA1D6124FB62DF00694463 /* FeaturedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedViewController.swift; sourceTree = "<group>"; };
+		27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedViewState.swift; sourceTree = "<group>"; };
+		27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedProtocols.swift; sourceTree = "<group>"; };
+		27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedUIBoard.swift; sourceTree = "<group>"; };
 		27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleImport.swift; sourceTree = "<group>"; };
 		27FD0A7924E0DE31002855D6 /* UIRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIRIBBoard.swift; sourceTree = "<group>"; };
 		27FD0A7A24E0DE31002855D6 /* UILinkableRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILinkableRIBBoard.swift; sourceTree = "<group>"; };
@@ -141,6 +165,41 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
+		27CA1D4A24FB3D5600694463 /* Sections */ = {
+			isa = PBXGroup;
+			children = (
+				27CA1D5E24FB62CA00694463 /* Featured */,
+				27CA1D4B24FB3D6200694463 /* Headline */,
+			);
+			path = Sections;
+			sourceTree = "<group>";
+		};
+		27CA1D4B24FB3D6200694463 /* Headline */ = {
+			isa = PBXGroup;
+			children = (
+				27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */,
+				27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */,
+				27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */,
+				27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */,
+				27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */,
+				27CA1D4F24FB3DE300694463 /* HeadlineViewState.swift */,
+			);
+			path = Headline;
+			sourceTree = "<group>";
+		};
+		27CA1D5E24FB62CA00694463 /* Featured */ = {
+			isa = PBXGroup;
+			children = (
+				27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */,
+				27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */,
+				27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */,
+				27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */,
+				27CA1D6124FB62DF00694463 /* FeaturedViewController.swift */,
+				27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */,
+			);
+			path = Featured;
+			sourceTree = "<group>";
+		};
 		27FD0A7724E0DE31002855D6 /* Board+RIBs */ = {
 			isa = PBXGroup;
 			children = (
@@ -192,6 +251,7 @@
 		27FD0A8F24E0E3EB002855D6 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				27CA1D4A24FB3D5600694463 /* Sections */,
 				27950A5A24F80268005779B7 /* Dashboard */,
 				27FD0AB024E0FF6F002855D6 /* Models */,
 				27FD0AA024E0ED04002855D6 /* Resolver */,
@@ -432,11 +492,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27CA1D6524FB62DF00694463 /* FeaturedViewController.storyboard in Resources */,
 				27FD0AAA24E0EF5F002855D6 /* MainViewController.storyboard in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				27FD0A9424E0E430002855D6 /* LoginViewController.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				27CA1D5324FB3DE300694463 /* HeadlineViewController.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,30 +604,40 @@
 			buildActionMask = 2147483647;
 			files = (
 				27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */,
+				27CA1D5724FB3DE300694463 /* HeadlineProtocols.swift in Sources */,
 				27FD0AAB24E0EF5F002855D6 /* MainViewController.swift in Sources */,
 				27950A6224F80944005779B7 /* DashboardBuilder.swift in Sources */,
 				27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */,
 				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
 				27FD0AB224E0FF7F002855D6 /* UserInfo.swift in Sources */,
+				27CA1D6624FB62DF00694463 /* FeaturedViewController.swift in Sources */,
 				27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */,
 				27FD0A8824E0DE31002855D6 /* Motherboard+RIB.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				27950A5C24F80296005779B7 /* DashboardViewController.swift in Sources */,
 				27FD0AA924E0EF5F002855D6 /* MainRouter.swift in Sources */,
 				27FD0AAF24E0F007002855D6 /* MainBoard.swift in Sources */,
+				27CA1D5624FB3DE300694463 /* HeadlineBoard.swift in Sources */,
 				27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */,
+				27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
+				27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */,
 				27FD0A9824E0EA10002855D6 /* LoginProtocols.swift in Sources */,
+				27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */,
+				27CA1D6424FB62DF00694463 /* FeaturedBuilder.swift in Sources */,
 				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
 				27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */,
 				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,
+				27CA1D5524FB3DE300694463 /* HeadlineViewState.swift in Sources */,
 				27FD0A9624E0E430002855D6 /* LoginViewState.swift in Sources */,
 				27FD0A8624E0DE31002855D6 /* UIRIBBoard.swift in Sources */,
 				27FD0AAC24E0EF5F002855D6 /* MainBuilder.swift in Sources */,
 				27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */,
+				27CA1D6A24FB62EB00694463 /* FeaturedUIBoard.swift in Sources */,
 				27FD0AA224E0ED19002855D6 /* ServiceRegistry.swift in Sources */,
 				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,
 				27FD0A9A24E0EA2B002855D6 /* LoginBuilder.swift in Sources */,
+				27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */,
 				27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */,
 				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
