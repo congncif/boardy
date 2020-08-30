@@ -70,26 +70,27 @@ extension UIMotherboardType {
 }
 
 protocol UIMotherboardRepresentable: AnyObject, UIMotherboardType {
-    var uimainboard: [BoardID: UIActivatableBoard] { get set }
+    /// UIBoard should maintain order so they will be stored in array.
+    var uimainboard: [UIActivatableBoard] { get set }
 }
 
 extension UIMotherboardRepresentable {
     public var uiboards: [UIActivatableBoard] {
-        uimainboard.map { $0.value }
+        uimainboard
     }
 
     public func getUIBoard(identifier: BoardID) -> UIActivatableBoard? {
-        return uimainboard[identifier]
+        return uiboards.first { $0.identifier == identifier }
     }
 
     public func addUIBoard(_ board: UIActivatableBoard) {
-        assert(uimainboard[board.identifier] == nil, " 💔 UIBoard with identifier \(board.identifier) was already added to motherboard \(self).")
-        uimainboard[board.identifier] = board
+        assert(getUIBoard(identifier: board.identifier) == nil, " 💔 UIBoard with identifier \(board.identifier) was already added to motherboard \(self).")
+        uimainboard.append(board)
     }
 
     public func removeUIBoard(withIdentifier identifier: BoardID) {
-        assert(uimainboard[identifier] != nil, " 💔 UIBoard with identifier \(identifier) was not in motherboard \(self).")
-        uimainboard[identifier] = nil
+        assert(getUIBoard(identifier: identifier) != nil, " 💔 UIBoard with identifier \(identifier) was not in motherboard \(self).")
+        uimainboard.removeAll { $0.identifier == identifier }
     }
 }
 

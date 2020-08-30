@@ -15,12 +15,18 @@ final class FeaturedUIBoard: UIViewControllerOpenBoard {
 
     init(builder: FeaturedBuildable) {
         self.builder = builder
-        super.init(identifier: .featured)
+        super.init()
     }
 
     override func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
-        builder.build()
+        let featured = builder.build()
+        featured.delegate = self
+        return featured
     }
 }
 
-extension FeaturedUIBoard: FeaturedDelegate {}
+extension FeaturedUIBoard: FeaturedDelegate {
+    func featuredContentDidUpdate() {
+        reload()
+    }
+}

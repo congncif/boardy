@@ -11,7 +11,7 @@ import RxSwift
 import UIKit
 
 open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObservable, BoardDelegate, FlowManageable {
-    var uimainboard: [BoardID: UIActivatableBoard] = [:] {
+    var uimainboard: [UIActivatableBoard] = [] {
         didSet {
             for var board in uiboards {
                 board.delegate = self
@@ -20,7 +20,14 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
         }
     }
 
-    var visibleBoards: Observable<[UIActivatableBoard]> { uiboardsRelay.asObservable() }
+    var visibleBoards: Observable<[UIActivatableBoard]> {
+        uiboardsRelay.flatMap {
+            Observable.combineLatest($0.map { $0.changeSequence })
+                .map {
+                    $0.filter { $0.isVisible }
+                }
+        }
+    }
 
     private lazy var uiboardsRelay = BehaviorRelay<[UIActivatableBoard]>(value: uiboards)
 

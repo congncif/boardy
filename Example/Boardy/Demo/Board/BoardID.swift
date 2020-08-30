@@ -13,9 +13,6 @@ extension BoardID {
     static let login = "login"
     static let main = "main"
     static let dashboard = "dashboard"
-
-    static let headline = "headline"
-    static let featured = "featured"
 }
 
 enum BoardIdentity: BoardInputModel {

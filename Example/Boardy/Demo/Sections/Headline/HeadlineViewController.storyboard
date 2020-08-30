@@ -24,7 +24,6 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="2bq-gg-syZ" firstAttribute="centerY" secondItem="bSZ-gG-gj5" secondAttribute="centerY" id="Eg2-jH-cTq"/>
                             <constraint firstItem="2bq-gg-syZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="QNF-P8-irh"/>
                             <constraint firstItem="2bq-gg-syZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="lEH-la-0VG"/>
                             <constraint firstAttribute="bottom" secondItem="2bq-gg-syZ" secondAttribute="bottom" constant="100" id="tV0-bN-5c9"/>

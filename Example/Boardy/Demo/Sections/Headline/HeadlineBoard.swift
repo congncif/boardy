@@ -17,11 +17,13 @@ final class HeadlineUIBoard: UIViewControllerOpenBoard {
 
     init(builder: HeadlineBuildable) {
         self.builder = builder
-        super.init(identifier: .headline)
+        super.init()
     }
 
     override func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
-        builder.build()
+        let viewController = builder.build()
+        viewController.delegate = self
+        return viewController
     }
 }
 

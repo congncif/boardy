@@ -26,9 +26,13 @@ final class FeaturedViewController: UIViewController, FeaturedController {
 
     // MARK: Privates
 
-    // @IBOutlet private weak var
+    @IBOutlet private var bottomConstraint: NSLayoutConstraint!
 
-    // @IBAction private func
+    @IBAction private func goButtonDidTap() {
+        let randomSpace = CGFloat.random(in: 50 ... 150)
+        bottomConstraint.constant = randomSpace
+        delegate?.featuredContentDidUpdate()
+    }
 }
 
 // MARK: - Behaviors

@@ -25,7 +25,7 @@ struct ServiceRegistry: Resolving {
             let featured = FeaturedUIBoard(builder: rsv.resolve())
 
             let dashboard = DashboardBoard(builder: rsv.resolve(), elementBoards: [
-                featured, headline
+                headline, featured
             ])
 
             let main = MainBoard(builder: rsv.resolve(), continuousBoards: [

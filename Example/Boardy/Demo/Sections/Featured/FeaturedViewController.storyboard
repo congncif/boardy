@@ -21,11 +21,13 @@
                                 <state key="normal" title="Go !!!">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <action selector="goButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="x4w-Ip-MnB"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerY" secondItem="bSZ-gG-gj5" secondAttribute="centerY" id="TH5-6f-02Q"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="UaH-z3-1uQ"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="gPF-mA-i99"/>
                             <constraint firstAttribute="bottom" secondItem="pl9-6l-tfZ" secondAttribute="bottom" constant="100" id="hXg-3W-p0v"/>
@@ -37,6 +39,9 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="300"/>
+                    <connections>
+                        <outlet property="bottomConstraint" destination="hXg-3W-p0v" id="vsx-sN-HpS"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ikk-K8-l44" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
