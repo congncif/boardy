@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -32,6 +33,7 @@
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="gPF-mA-i99"/>
                             <constraint firstAttribute="bottom" secondItem="pl9-6l-tfZ" secondAttribute="bottom" constant="100" id="hXg-3W-p0v"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="K48-Om-wnK"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="wRP-sK-xz5">
                         <barButtonItem key="backBarButtonItem" title=" " id="Leg-EJ-Xn4"/>
@@ -40,7 +42,7 @@
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="300"/>
                     <connections>
-                        <outlet property="bottomConstraint" destination="hXg-3W-p0v" id="vsx-sN-HpS"/>
+                        <outlet property="constraint" destination="UaH-z3-1uQ" id="dlo-2E-c9q"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ikk-K8-l44" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

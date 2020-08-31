@@ -25,8 +25,4 @@ final class FeaturedUIBoard: UIViewControllerOpenBoard {
     }
 }
 
-extension FeaturedUIBoard: FeaturedDelegate {
-    func featuredContentDidUpdate() {
-        reload()
-    }
-}
+extension FeaturedUIBoard: FeaturedDelegate {}

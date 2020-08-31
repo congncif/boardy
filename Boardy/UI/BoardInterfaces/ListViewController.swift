@@ -79,7 +79,7 @@ extension ListViewController {
     }
 
     private func buildDataSource() -> DataSource {
-        let animationConfiguration = AnimationConfiguration(insertAnimation: .fade, reloadAnimation: .fade, deleteAnimation: .fade)
+        let animationConfiguration = AnimationConfiguration(insertAnimation: .automatic, reloadAnimation: .automatic, deleteAnimation: .automatic)
         let transition: DataSource.DecideViewTransition = { _, _, _ in .reload }
 
         return DataSource(

@@ -6,6 +6,7 @@
 //  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
+import SiFUtilities
 import UIKit
 import ViewStateCore
 
@@ -26,12 +27,17 @@ final class FeaturedViewController: UIViewController, FeaturedController {
 
     // MARK: Privates
 
-    @IBOutlet private var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet private var constraint: NSLayoutConstraint!
 
     @IBAction private func goButtonDidTap() {
         let randomSpace = CGFloat.random(in: 50 ... 150)
-        bottomConstraint.constant = randomSpace
-        delegate?.featuredContentDidUpdate()
+        constraint.constant = randomSpace
+
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        }
+
+        self.view.closestContainerTableView?.performUpdates()
     }
 }
 

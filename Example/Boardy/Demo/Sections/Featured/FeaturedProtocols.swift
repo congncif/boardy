@@ -12,9 +12,7 @@ protocol FeaturedController: UIViewController {
     var delegate: FeaturedDelegate? { get set }
 }
 
-protocol FeaturedDelegate: AnyObject {
-    func featuredContentDidUpdate()
-}
+protocol FeaturedDelegate: AnyObject {}
 
 protocol FeaturedBuildable {
     func build() -> FeaturedController
