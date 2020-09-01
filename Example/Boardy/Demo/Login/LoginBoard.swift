@@ -3,17 +3,17 @@
 //  Boardy_Example
 //
 //  Created by NGUYEN CHI CONG on 8/10/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
 import Foundation
+import Resolver
 
 final class LoginBoard: Board, ActivatableBoard {
-    private let builder: LoginBuildable
+    @LazyInjected var builder: LoginBuildable
 
-    init(builder: LoginBuildable) {
-        self.builder = builder
+    init() {
         super.init(identifier: .login)
     }
 
@@ -21,7 +21,8 @@ final class LoginBoard: Board, ActivatableBoard {
         let login = builder.build()
         login.delegate = self
         login.modalPresentationStyle = .fullScreen
-        rootViewController.present(login, animated: true)
+        login.modalTransitionStyle = .crossDissolve
+        rootViewController.topPresentedViewController.present(login, animated: true)
     }
 }
 

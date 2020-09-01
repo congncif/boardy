@@ -3,20 +3,20 @@
 //  Boardy
 //
 //  Created by NGUYEN CHI CONG on 8/30/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
 import Foundation
+import Resolver
 import UIKit
 
 final class HeadlineUIBoard: UIViewControllerOpenBoard {
     typealias InputType = Any?
 
-    private let builder: HeadlineBuildable
+    @LazyInjected var builder: HeadlineBuildable
 
-    init(builder: HeadlineBuildable) {
-        self.builder = builder
+    init() {
         super.init()
     }
 

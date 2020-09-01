@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */; };
+		2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860A24FE4DA80046FDB9 /* AppMainboard.swift */; };
+		2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860C24FE57A20046FDB9 /* HomeMainboard.swift */; };
 		27950A5C24F80296005779B7 /* DashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5B24F80296005779B7 /* DashboardViewController.swift */; };
 		27950A6224F80944005779B7 /* DashboardBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5D24F80944005779B7 /* DashboardBuilder.swift */; };
 		27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A5F24F80944005779B7 /* DashboardViewState.swift */; };
@@ -71,6 +74,9 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkAppClub.swift; sourceTree = "<group>"; };
+		2792860A24FE4DA80046FDB9 /* AppMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMainboard.swift; sourceTree = "<group>"; };
+		2792860C24FE57A20046FDB9 /* HomeMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMainboard.swift; sourceTree = "<group>"; };
 		27950A5B24F80296005779B7 /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
 		27950A5D24F80944005779B7 /* DashboardBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBuilder.swift; sourceTree = "<group>"; };
 		27950A5F24F80944005779B7 /* DashboardViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewState.swift; sourceTree = "<group>"; };
@@ -153,6 +159,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2792860524FE02E80046FDB9 /* DeepLink */ = {
+			isa = PBXGroup;
+			children = (
+				2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */,
+			);
+			path = DeepLink;
+			sourceTree = "<group>";
+		};
 		27950A5A24F80268005779B7 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -251,6 +265,7 @@
 		27FD0A8F24E0E3EB002855D6 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				2792860524FE02E80046FDB9 /* DeepLink */,
 				27CA1D4A24FB3D5600694463 /* Sections */,
 				27950A5A24F80268005779B7 /* Dashboard */,
 				27FD0AB024E0FF6F002855D6 /* Models */,
@@ -279,6 +294,8 @@
 			isa = PBXGroup;
 			children = (
 				27FD0A9E24E0EBA4002855D6 /* BoardID.swift */,
+				2792860A24FE4DA80046FDB9 /* AppMainboard.swift */,
+				2792860C24FE57A20046FDB9 /* HomeMainboard.swift */,
 			);
 			path = Board;
 			sourceTree = "<group>";
@@ -454,7 +471,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0830;
-				ORGANIZATIONNAME = CocoaPods;
+				ORGANIZATIONNAME = "[iF] Solution";
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -606,6 +623,7 @@
 				27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */,
 				27CA1D5724FB3DE300694463 /* HeadlineProtocols.swift in Sources */,
 				27FD0AAB24E0EF5F002855D6 /* MainViewController.swift in Sources */,
+				2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */,
 				27950A6224F80944005779B7 /* DashboardBuilder.swift in Sources */,
 				27FD0A8B24E0DE31002855D6 /* PlaceholderBuilder.swift in Sources */,
 				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
@@ -622,6 +640,7 @@
 				27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
 				27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */,
+				2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */,
 				27FD0A9824E0EA10002855D6 /* LoginProtocols.swift in Sources */,
 				27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */,
 				27CA1D6424FB62DF00694463 /* FeaturedBuilder.swift in Sources */,
@@ -637,6 +656,7 @@
 				27FD0AA224E0ED19002855D6 /* ServiceRegistry.swift in Sources */,
 				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,
 				27FD0A9A24E0EA2B002855D6 /* LoginBuilder.swift in Sources */,
+				2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */,
 				27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */,
 				27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */,
 				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,

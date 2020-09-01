@@ -3,27 +3,21 @@
 //  Boardy_Example
 //
 //  Created by NGUYEN CHI CONG on 8/10/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
 import Foundation
+import Resolver
 
 final class MainBoard: RIBBoard, GuaranteedBoard {
     typealias InputType = UserInfo
 
-    private let builder: MainBuildable
-    private let motherboard: FlowMotherboard
+    @LazyInjected var builder: MainBuildable
+    @LazyInjected var motherboard: HomeMotherboard
 
-    init(builder: MainBuildable, motherboard: FlowMotherboard) {
-        self.builder = builder
-        self.motherboard = motherboard
+    init() {
         super.init(identifier: .main)
-    }
-
-    convenience init(builder: MainBuildable, continuousBoards: [ActivatableBoard]) {
-        let motherboard = Motherboard(boards: continuousBoards)
-        self.init(builder: builder, motherboard: motherboard)
     }
 
     override func install(into rootViewController: UIViewController) {
@@ -37,7 +31,7 @@ final class MainBoard: RIBBoard, GuaranteedBoard {
 
         let nav = UINavigationController(rootViewController: router.viewControllable.uiviewController)
         nav.modalPresentationStyle = .fullScreen
-        
+        nav.modalTransitionStyle = .crossDissolve
         rootRouter.viewControllable.uiviewController.present(nav, animated: true)
     }
 }

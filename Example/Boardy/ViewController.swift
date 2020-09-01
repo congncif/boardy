@@ -10,14 +10,11 @@ import Boardy
 import Resolver
 import UIKit
 
-class ViewController: UIViewController {
-    @LazyInjected var motherboard: Motherboard
+final class ViewController: UIViewController {
+    @LazyInjected var motherboard: AppMotherboard
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        motherboard.registerFlowSteps(.login >=> .main >=> .login)
-        
         motherboard.install(into: self)
     }
 

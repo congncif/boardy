@@ -3,18 +3,18 @@
 //  Boardy
 //
 //  Created by NGUYEN CHI CONG on 8/30/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
 import Foundation
+import Resolver
 import UIKit
 
 final class FeaturedUIBoard: UIViewControllerOpenBoard {
-    private let builder: FeaturedBuildable
+    @LazyInjected var builder: FeaturedBuildable
 
-    init(builder: FeaturedBuildable) {
-        self.builder = builder
+    init() {
         super.init()
     }
 

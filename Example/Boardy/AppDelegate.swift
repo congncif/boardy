@@ -6,19 +6,31 @@
 //  Copyright (c) 2020 congncif. All rights reserved.
 //
 
+import Boardy
+import Resolver
 import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
+    @LazyInjected var deepLinkHandler: DeepLinkHandlingComposable
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         UIViewController.swizzling()
-        
+
         let registry = ServiceRegistry()
         registry.registerAllServices()
-        
+
+        deepLinkHandler.registerHandlerClub(DeepLinkAppClub())
+        deepLinkHandler.start(with: window!.rootViewController!)
+
+        return true
+    }
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        let link = url.absoluteString
+        deepLinkHandler.handleDeepLink(link)
         return true
     }
 

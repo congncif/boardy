@@ -3,11 +3,12 @@
 //  Boardy
 //
 //  Created by NGUYEN CHI CONG on 8/27/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
 import Foundation
+import Resolver
 import RxSwift
 import SiFUtilities
 import UIKit
@@ -15,12 +16,11 @@ import UIKit
 final class DashboardBoard: SuperBoard, GuaranteedBoard {
     typealias InputType = Any?
 
-    private let builder: DashboardBuildable
+    @LazyInjected var builder: DashboardBuildable
 
     private let disposeBag = DisposeBag()
 
-    init(builder: DashboardBuildable, elementBoards: [UIActivatableBoard]) {
-        self.builder = builder
+    init(elementBoards: [UIActivatableBoard]) {
         let uicontainerBoard = UIMotherboard(uiboards: elementBoards)
         super.init(identifier: .dashboard, uimotherboard: uicontainerBoard)
     }

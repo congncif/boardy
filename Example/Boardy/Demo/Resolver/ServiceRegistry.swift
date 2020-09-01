@@ -3,7 +3,7 @@
 //  Boardy_Example
 //
 //  Created by NGUYEN CHI CONG on 8/10/20.
-//  Copyright © 2020 CocoaPods. All rights reserved.
+//  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
 import Boardy
@@ -13,28 +13,49 @@ import Resolver
 struct ServiceRegistry: Resolving {
     func registerAllServices() {
         resolver.register { LoginBuilder() }.implements(LoginBuildable.self)
-        resolver.register { MainBuilder() }.implements(MainBuildable.self).scope(ResolverScopeCache())
+        resolver.register { MainBuilder() }.implements(MainBuildable.self)
         resolver.register { DashboardBuilder() }.implements(DashboardBuildable.self)
         resolver.register { HeadlineBuilder() }.implements(HeadlineBuildable.self)
         resolver.register { FeaturedBuilder() }.implements(FeaturedBuildable.self)
 
-        resolver.register { rsv -> Motherboard in
-            let login = LoginBoard(builder: rsv.resolve())
+        resolver.register { LoginBoard() }
+        resolver.register { HeadlineUIBoard() }
+        resolver.register { FeaturedUIBoard() }
 
-            let headline = HeadlineUIBoard(builder: rsv.resolve())
-            let featured = FeaturedUIBoard(builder: rsv.resolve())
+        resolver.register { rsv -> DashboardBoard in
+            let headline: HeadlineUIBoard = rsv.resolve()
+            let featured: FeaturedUIBoard = rsv.resolve()
 
-            let dashboard = DashboardBoard(builder: rsv.resolve(), elementBoards: [
+            return DashboardBoard(elementBoards: [
                 headline, featured
             ])
+        }
 
-            let main = MainBoard(builder: rsv.resolve(), continuousBoards: [
-                dashboard
-            ])
+        resolver.register { MainBoard() }
 
-            return Motherboard(boards: [
+        resolver.register { rsv -> AppMainboard in
+            let login: LoginBoard = rsv.resolve()
+            let main: MainBoard = rsv.resolve()
+
+            return AppMainboard(boards: [
                 login, main
             ])
         }
+        .scope(ResolverScopeCache())
+        .implements(AppMotherboard.self)
+
+        resolver.register { rsv -> HomeMainboard in
+            let dashboard: DashboardBoard = rsv.resolve()
+
+            return HomeMainboard(boards: [
+                dashboard
+            ])
+        }
+        .scope(ResolverScopeCache())
+        .implements(HomeMotherboard.self)
+
+        resolver.register { DeepLinkHandler() }
+            .implements(DeepLinkHandlingComposable.self)
+            .implements(DeepLinkHandling.self)
     }
 }

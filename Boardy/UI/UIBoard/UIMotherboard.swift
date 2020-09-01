@@ -10,7 +10,7 @@ import RxRelay
 import RxSwift
 import UIKit
 
-open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObservable, BoardDelegate, FlowManageable {
+open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObservable, BoardDelegate, FlowUIMotherboard {
     var uimainboard: [UIActivatableBoard] = [] {
         didSet {
             for var board in uiboards {

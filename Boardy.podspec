@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '0.9.9'
+    s.version          = '0.9.10'
     s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
@@ -20,6 +20,12 @@ Pod::Spec.new do |s|
     
     s.subspec 'Core' do |co|
         co.source_files = 'Boardy/Core/**/*'
+    end
+    
+    s.subspec 'DeepLink' do |co|
+        co.source_files = 'Boardy/DeepLink/**/*'
+        
+        co.dependency 'Boardy/Core'
     end
     
     s.subspec 'UI' do |co|
