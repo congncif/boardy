@@ -15,32 +15,18 @@ public protocol DeepLinkHandling {
 }
 
 public protocol DeepLinkParsing {
-    func destinationForDeepLink(_ deepLink: String) -> DeepLinkDestination?
+    func destinationForDeepLink(_ deepLink: String) -> BoardInputModel?
 }
 
 public struct DeepLinkParser: DeepLinkParsing {
-    private let handler: (String) -> DeepLinkDestination?
+    private let handler: (String) -> BoardInputModel?
 
-    public init(handler: @escaping (String) -> DeepLinkDestination?) {
+    public init(handler: @escaping (String) -> BoardInputModel?) {
         self.handler = handler
     }
 
-    public func destinationForDeepLink(_ deepLink: String) -> DeepLinkDestination? {
+    public func destinationForDeepLink(_ deepLink: String) -> BoardInputModel? {
         handler(deepLink)
-    }
-}
-
-public struct DeepLinkDestination: BoardInputModel {
-    public let identifier: BoardID
-    public let option: Any?
-
-    public init(target: BoardID, option: Any?) {
-        self.identifier = target
-        self.option = option
-    }
-
-    public init(target: BoardID) {
-        self.init(target: target, option: nil)
     }
 }
 
@@ -62,27 +48,32 @@ public typealias DeepLinkHandlingComposable = DeepLinkHandling & DeepLinkHandler
 public final class DeepLinkHandler: DeepLinkHandlingComposable {
     public init() {}
 
+    public init(handlerClubbing: DeepLinkHandlerClubbing) {
+        clubsRoom[handlerClubbing.identifier] = handlerClubbing
+    }
+
+    public init<Club: DeepLinkHandlerClubbing>(handlerClub: Club) {
+        clubsRoom[handlerClub.identifier] = handlerClub
+    }
+
     public func start(with hostingViewController: UIViewController) {
         self.hostingViewController = hostingViewController
     }
 
     public func handleDeepLink(_ deepLink: String) {
-        let destinations = parsers.compactMap { parser -> DeepLinkDestination? in
+        let destinations = parsers.compactMap { parser -> BoardInputModel? in
             parser.destinationForDeepLink(deepLink)
         }
 
-        if destinations.count > 1 {
-            assertionFailure("Multiple destinations \(destinations) for deep link \(deepLink). Please select one.")
-        }
+        assert(destinations.count < 2, "Multiple destinations \(destinations) for deep link \(deepLink). Please select one.")
+
         guard let destination = destinations.first else { return }
 
         let validBoards = mainboards.compactMap { mainboard -> ActivatableBoard? in
             mainboard.getBoard(identifier: destination.identifier)
         }
 
-        if validBoards.count > 1 {
-            assertionFailure("Multiple valid boards \(validBoards) for deep link \(deepLink). Please select one.")
-        }
+        assert(validBoards.count < 2, "Multiple valid boards \(validBoards) for deep link \(deepLink). Please select one.")
 
         guard let board = validBoards.first else { return }
         board.activate(withOption: destination.option)
@@ -90,13 +81,13 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
 
     public func registerHandlerClub(_ handlerClub: DeepLinkHandlerClubbing) {
         if let currentClub = registredHandlerClub(withIdentifier: handlerClub.identifier) {
-            assertionFailure("The club \(handlerClub) was already registered. Please remove it before.")
+            assertionFailure("The club \(currentClub) was already registered. Please remove it before.")
         }
         clubsRoom[handlerClub.identifier] = handlerClub
     }
 
     public func unregisterHandlerClub(withIdentifier identifier: String) {
-        if let _ = registredHandlerClub(withIdentifier: identifier) {
+        if registredHandlerClub(withIdentifier: identifier) != nil {
             clubsRoom.removeValue(forKey: identifier)
         } else {
             assertionFailure("The club with identifier \(identifier) was not registered.")
@@ -134,6 +125,6 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
     }
 
     private var clubs: [DeepLinkHandlerClubbing] {
-        clubsRoom.flatMap { $0.value }
+        clubsRoom.compactMap { $0.value }
     }
 }

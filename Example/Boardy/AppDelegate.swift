@@ -14,7 +14,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
-    @LazyInjected var deepLinkHandler: DeepLinkHandlingComposable
+    @LazyInjected var deepLinkHandler: DeepLinkHandling
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.swizzling()
@@ -22,7 +22,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let registry = ServiceRegistry()
         registry.registerAllServices()
 
-        deepLinkHandler.registerHandlerClub(DeepLinkAppClub())
         deepLinkHandler.start(with: window!.rootViewController!)
 
         return true

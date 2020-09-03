@@ -10,7 +10,7 @@ import Boardy
 import Foundation
 import Resolver
 
-final class DeepLinkAppClub: DeepLinkHandlerClubbing, Resolving {
+final class DeepLinkAppClub: DeepLinkHandlerClubbing {
     @LazyInjected var appMainboard: AppMotherboard
     @LazyInjected var homeMainboard: HomeMotherboard
 
@@ -23,12 +23,12 @@ final class DeepLinkAppClub: DeepLinkHandlerClubbing, Resolving {
     }
 
     var parser: DeepLinkParsing {
-        DeepLinkParser { (deepLink) -> DeepLinkDestination? in
+        DeepLinkParser { (deepLink) -> BoardIdentity? in
             switch deepLink {
             case "boardy://login":
-                return DeepLinkDestination(target: .login)
+                return .login
             case "boardy://dashboard":
-                return DeepLinkDestination(target: .dashboard)
+                return .dashboard
             default:
                 return nil
             }

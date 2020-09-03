@@ -54,8 +54,11 @@ struct ServiceRegistry: Resolving {
         .scope(ResolverScopeCache())
         .implements(HomeMotherboard.self)
 
-        resolver.register { DeepLinkHandler() }
-            .implements(DeepLinkHandlingComposable.self)
-            .implements(DeepLinkHandling.self)
+        resolver.register {
+            DeepLinkHandler(handlerClub: DeepLinkAppClub())
+        }
+        .scope(ResolverScopeApplication())
+        .implements(DeepLinkHandlingComposable.self)
+        .implements(DeepLinkHandling.self)
     }
 }

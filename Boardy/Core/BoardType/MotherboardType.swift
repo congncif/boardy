@@ -12,6 +12,16 @@ public protocol BoardInputModel {
     var option: Any? { get }
 }
 
+public struct BoardDestination: BoardInputModel {
+    public let identifier: BoardID
+    public let option: Any?
+
+    public init(target: BoardID, option: Any? = nil) {
+        self.identifier = target
+        self.option = option
+    }
+}
+
 public protocol MotherboardType: InstallableBoard {
     var boards: [ActivatableBoard] { get }
 
