@@ -37,6 +37,10 @@ extension IdentifiableBoard {
     public func sendToMotherboard() {
         delegate?.board(self, didSendData: nil)
     }
+
+    public func nextToBoard(model: BoardInputModel) {
+        sendToMotherboard(data: model)
+    }
 }
 
 public protocol ActivatableBoard: IdentifiableBoard, InstallableBoard {

@@ -41,11 +41,11 @@ extension MainBoard: MainListener {
         guard let childRouter = rootRouter.children.first(where: { $0 is MainRouting }) as? MainRouting else { return }
         rootRouter.detachChild(childRouter)
         rootRouter.viewControllable.uiviewController.dismiss(animated: true) {
-            self.sendToMotherboard()
+            self.nextToBoard(.login)
         }
     }
 
     func showDashboard() {
-        motherboard.activateBoard(identity: .dashboard)
+        motherboard.activateBoard(.dashboard)
     }
 }

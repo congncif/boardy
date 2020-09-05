@@ -29,7 +29,7 @@ final class LoginBoard: Board, ActivatableBoard {
 extension LoginBoard: LoginDelegate {
     func didLogin(userInfo: UserInfo) {
         rootViewController.dismiss(animated: true, completion: { [weak self] in
-            self?.sendToMotherboard(data: userInfo)
+            self?.nextToBoard(.main(userInfo: userInfo))
         })
     }
 }

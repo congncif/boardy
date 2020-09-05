@@ -42,7 +42,13 @@ enum BoardIdentity: BoardInputModel {
 }
 
 extension MotherboardType {
-    func activateBoard(identity: BoardIdentity) {
+    func activateBoard(_ identity: BoardIdentity) {
         activateBoard(model: identity)
+    }
+}
+
+extension IdentifiableBoard {
+    func nextToBoard(_ identity: BoardIdentity) {
+        nextToBoard(model: identity)
     }
 }

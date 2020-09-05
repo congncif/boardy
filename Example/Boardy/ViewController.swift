@@ -19,6 +19,6 @@ final class ViewController: UIViewController {
     }
 
     override func viewDidDisplay() {
-        motherboard.activateBoard(identity: .login)
+        motherboard.activateBoard(.login)
     }
 }

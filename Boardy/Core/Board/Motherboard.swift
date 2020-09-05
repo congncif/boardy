@@ -27,6 +27,13 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         for board in boards {
             addBoard(board)
         }
+
+        // Register default flow
+        let defaultFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [weak self] data in
+            guard let next = data as? BoardInputModel else { return }
+            self?.activateBoard(model: next)
+        })
+        registerFlow(defaultFlow)
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,

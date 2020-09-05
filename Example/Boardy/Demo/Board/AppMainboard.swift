@@ -14,6 +14,6 @@ protocol AppMotherboard: FlowMotherboard {}
 final class AppMainboard: Motherboard, AppMotherboard {
     init(boards: [ActivatableBoard]) {
         super.init(boards: boards)
-        registerFlowSteps(.login >=> .main >=> .login)
+//        registerFlowSteps(.login >=> .main >=> .login)
     }
 }
