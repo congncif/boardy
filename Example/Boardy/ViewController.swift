@@ -11,14 +11,14 @@ import Resolver
 import UIKit
 
 final class ViewController: UIViewController {
-    @LazyInjected var motherboard: AppMotherboard
+    @LazyInjected var appMainBoard: AppMotherboard
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        motherboard.install(into: self)
+        appMainBoard.install(into: self)
     }
 
     override func viewDidDisplay() {
-        motherboard.activateBoard(.login)
+        appMainBoard.activateBoard(.login)
     }
 }

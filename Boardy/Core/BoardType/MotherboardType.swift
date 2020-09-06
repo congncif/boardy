@@ -22,7 +22,7 @@ public struct BoardDestination: BoardInputModel {
     }
 }
 
-public protocol MotherboardType: InstallableBoard {
+public protocol MotherboardType: ActivatableBoard {
     var boards: [ActivatableBoard] { get }
 
     /// Append list of boards, this doesn't include installing board into rootViewController.

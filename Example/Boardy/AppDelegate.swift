@@ -14,22 +14,28 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
-    @LazyInjected var deepLinkHandler: DeepLinkHandling
+//    @LazyInjected var deepLinkHandler: DeepLinkHandling
+
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        let registry = ServiceRegistry()
+        registry.registerAllServices()
+        return true
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.swizzling()
 
-        let registry = ServiceRegistry()
-        registry.registerAllServices()
-
-        deepLinkHandler.start(with: window!.rootViewController!)
+//        deepLinkHandler.start(with: window!.rootViewController!)
 
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         let link = url.absoluteString
-        deepLinkHandler.handleDeepLink(link)
+//        deepLinkHandler.handleDeepLink(link)
+
+        window?.rootViewController?.handleDeepLink(link, with: DeepLinkAppClub())
+
         return true
     }
 
