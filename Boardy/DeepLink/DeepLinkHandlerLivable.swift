@@ -20,6 +20,7 @@ extension DeepLinkHandlerLivable where Self: UIViewController {
     }
 
     func setAssociatedDeepLinkHandler(_ value: DeepLinkHandlingComposable?) {
+        value?.start(with: self)
         objc_setAssociatedObject(self, &deepLinkHandlerKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -35,7 +36,6 @@ extension DeepLinkHandlerLivable where Self: UIViewController {
         }
 
         set {
-            newValue.start(with: self)
             setAssociatedDeepLinkHandler(newValue)
         }
     }

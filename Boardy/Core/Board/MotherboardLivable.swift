@@ -20,6 +20,7 @@ extension MotherboardLivable where Self: UIViewController {
     }
 
     func setAssociatedMotherboard(_ value: FlowMotherboard?) {
+        value?.install(into: self)
         objc_setAssociatedObject(self, &motherboardKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -35,7 +36,6 @@ extension MotherboardLivable where Self: UIViewController {
         }
 
         set {
-            newValue.install(into: self)
             setAssociatedMotherboard(newValue)
         }
     }
