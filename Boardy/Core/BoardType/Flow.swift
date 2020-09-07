@@ -48,6 +48,16 @@ extension FlowManageable where Self: MotherboardType {
         registerFlows(activateFlows)
         return self
     }
+
+    @discardableResult
+    public func registerGeneralFlow<Input>(nextHandler: @escaping (Input) -> Void) -> Self {
+        let generalFlow = BoardActivateFlow(matcher: { _ in true }) { data in
+            guard let input = data as? Input else { return }
+            nextHandler(input)
+        }
+        registerFlow(generalFlow)
+        return self
+    }
 }
 
 public struct BoardActivateFlow: BoardFlow {

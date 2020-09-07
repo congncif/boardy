@@ -29,11 +29,9 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         }
 
         // Register default flow
-        let defaultFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [weak self] data in
-            guard let next = data as? BoardInputModel else { return }
-            self?.activateBoard(model: next)
-        })
-        registerFlow(defaultFlow)
+        registerGeneralFlow { [weak self] in
+            self?.activateBoard(model: $0)
+        }
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,
@@ -55,7 +53,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
 extension Motherboard: GuaranteedBoard {
     public typealias InputType = BoardInputModel
-    
+
     public func activate(withGuaranteedInput input: BoardInputModel) {
         activateBoard(model: input)
     }
