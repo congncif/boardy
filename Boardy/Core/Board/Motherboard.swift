@@ -49,7 +49,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     }
 }
 
-/// A Motherboard is a special board which only accepts a BoardInputModel as input. When this func is called, the motherboard will activate a Board with identifier in list of boards it manages.
+/// A Motherboard is a special board which only accepts a BoardInputModel as input. When activate func is called, the motherboard will activate a Board with identifier in list of boards it manages.
 
 extension Motherboard: GuaranteedBoard {
     public typealias InputType = BoardInputModel
