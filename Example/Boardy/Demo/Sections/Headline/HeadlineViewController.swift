@@ -28,7 +28,9 @@ final class HeadlineViewController: UIViewController, HeadlineController {
 
     // @IBOutlet private weak var
 
-    // @IBAction private func
+    @IBAction private func returnButtonDidTap() {
+        delegate?.returnRoot()
+    }
 }
 
 // MARK: - Behaviors

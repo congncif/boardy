@@ -15,6 +15,10 @@ open class ContainerBoard: Board {
                 uimotherboard: FlowUIMotherboard = UIMotherboard()) {
         self.uimotherboard = uimotherboard
         super.init(identifier: identifier)
+
+        uimotherboard.registerGeneralFlow { [weak self] (action: BoardFlowAction) in
+            self?.sendFlowAction(action)
+        }
     }
 
     override open func install(into rootViewController: UIViewController) {

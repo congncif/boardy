@@ -51,4 +51,12 @@ extension IdentifiableBoard {
     func nextToBoard(_ identity: BoardIdentity) {
         nextToBoard(model: identity)
     }
+
+    func sendAction(_ action: BoardAction) {
+        sendFlowAction(action)
+    }
+}
+
+enum BoardAction: BoardFlowAction {
+    case `return`
 }

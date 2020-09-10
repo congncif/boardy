@@ -30,16 +30,16 @@ public protocol IdentifiableBoard {
 }
 
 extension IdentifiableBoard {
-    public func sendToMotherboard(data: Any?) {
+    public func sendToMotherboard(data: Any? = nil) {
         delegate?.board(self, didSendData: data)
-    }
-
-    public func sendToMotherboard() {
-        delegate?.board(self, didSendData: nil)
     }
 
     public func nextToBoard(model: BoardInputModel) {
         sendToMotherboard(data: model)
+    }
+
+    public func sendFlowAction(_ action: BoardFlowAction) {
+        sendToMotherboard(data: action)
     }
 }
 

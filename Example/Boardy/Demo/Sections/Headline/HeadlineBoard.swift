@@ -27,4 +27,8 @@ final class HeadlineUIBoard: UIViewControllerOpenBoard {
     }
 }
 
-extension HeadlineUIBoard: HeadlineDelegate {}
+extension HeadlineUIBoard: HeadlineDelegate {
+    func returnRoot() {
+        sendAction(.return)
+    }
+}

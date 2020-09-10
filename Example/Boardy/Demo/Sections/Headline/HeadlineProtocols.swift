@@ -12,7 +12,9 @@ protocol HeadlineController: UIViewController {
     var delegate: HeadlineDelegate? { get set }
 }
 
-protocol HeadlineDelegate: AnyObject {}
+protocol HeadlineDelegate: AnyObject {
+    func returnRoot()
+}
 
 protocol HeadlineBuildable {
     func build() -> HeadlineController

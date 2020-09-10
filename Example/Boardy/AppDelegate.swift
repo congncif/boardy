@@ -8,6 +8,8 @@
 
 import Boardy
 import Resolver
+import RxCocoa
+import RxSwift
 import UIKit
 
 @UIApplicationMain

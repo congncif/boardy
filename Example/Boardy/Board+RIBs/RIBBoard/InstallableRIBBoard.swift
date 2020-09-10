@@ -30,3 +30,9 @@ extension ViewableRouting {
         board.install(into: self)
     }
 }
+
+// Backward support to compatiate older version.
+extension InstallableRIBBoard {
+    @available(*, deprecated, message: "Use rootRouter instead")
+    public var router: ViewableRouting { rootRouter }
+}

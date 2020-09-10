@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -21,13 +22,24 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S5q-lr-pRJ">
+                                <rect key="frame" x="348" y="20" width="46" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Return"/>
+                                <connections>
+                                    <action selector="returnButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="U2J-mv-haJ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="2bq-gg-syZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="QNF-P8-irh"/>
+                            <constraint firstItem="S5q-lr-pRJ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="20" id="iUG-vA-KuE"/>
                             <constraint firstItem="2bq-gg-syZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="lEH-la-0VG"/>
+                            <constraint firstItem="qYU-Iw-BjF" firstAttribute="trailing" secondItem="S5q-lr-pRJ" secondAttribute="trailing" constant="20" id="swj-uV-Lx3"/>
                             <constraint firstAttribute="bottom" secondItem="2bq-gg-syZ" secondAttribute="bottom" constant="100" id="tV0-bN-5c9"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="qYU-Iw-BjF"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="wRP-sK-xz5">
                         <barButtonItem key="backBarButtonItem" title=" " id="Leg-EJ-Xn4"/>

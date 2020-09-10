@@ -13,7 +13,7 @@ open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
     public let identifier: String
     public weak var delegate: BoardDelegate?
 
-    private weak var router: ViewableRouting?
+    private weak var currentRouter: ViewableRouting?
     private lazy var placeholderRouter: PlaceholderRouting = PlaceholderBuilder().build()
 
     public init(identifier: String = UUID().uuidString) {
@@ -21,7 +21,7 @@ open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
     }
 
     open func install(into rootRouter: ViewableRouting) {
-        router = rootRouter
+        currentRouter = rootRouter
     }
 
     open func install(into rootViewController: UIViewController) {
@@ -29,7 +29,7 @@ open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
     }
 
     public var rootRouter: ViewableRouting {
-        guard let internalRouter = router else {
+        guard let internalRouter = currentRouter else {
             return placeholderRouter
         }
         return internalRouter
@@ -41,20 +41,20 @@ open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
 }
 
 /*
-open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
-    public let identifier: String
-    public weak var delegate: BoardDelegate?
+ open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
+     public let identifier: String
+     public weak var delegate: BoardDelegate?
 
-    private lazy var router: PlaceholderRouting = PlaceholderBuilder().build()
+     private lazy var router: PlaceholderRouting = PlaceholderBuilder().build()
 
-    public init(identifier: String = UUID().uuidString) {
-        self.identifier = identifier
-    }
+     public init(identifier: String = UUID().uuidString) {
+         self.identifier = identifier
+     }
 
-    open func install(into rootViewController: UIViewController) {
-        router.injectViewController(rootViewController)
-    }
+     open func install(into rootViewController: UIViewController) {
+         router.injectViewController(rootViewController)
+     }
 
-    public var rootRouter: ViewableRouting { router }
-}
-*/
+     public var rootRouter: ViewableRouting { router }
+ }
+ */

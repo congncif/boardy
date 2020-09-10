@@ -1,25 +1,19 @@
 //
-//  SuperBoard.swift
+//  ContainerUIBoard.swift
 //  Boardy
 //
-//  Created by NGUYEN CHI CONG on 8/27/20.
+//  Created by NGUYEN CHI CONG on 9/10/20.
 //
 
 import Foundation
 
-/// A SuperBoard contains an internal sub-motherboard and an internal sub-uimotherboard by default.
-open class SuperBoard: ContinuousBoard {
+open class ContainerUIBoard<OptionType>: UIViewControllerBoard<OptionType> {
     public let uimotherboard: FlowUIMotherboard
 
     public init(identifier: BoardID = UUID().uuidString,
-                motherboard: FlowMotherboard = Motherboard(),
                 uimotherboard: FlowUIMotherboard = UIMotherboard()) {
         self.uimotherboard = uimotherboard
-        super.init(identifier: identifier, motherboard: motherboard)
-
-        motherboard.registerGeneralFlow { [weak self] (action: BoardFlowAction) in
-            self?.sendFlowAction(action)
-        }
+        super.init(identifier: identifier)
 
         uimotherboard.registerGeneralFlow { [weak self] (action: BoardFlowAction) in
             self?.sendFlowAction(action)

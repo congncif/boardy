@@ -1,14 +1,13 @@
 //
-//  SuperBoard.swift
+//  SuperUIBoard.swift
 //  Boardy
 //
-//  Created by NGUYEN CHI CONG on 8/27/20.
+//  Created by NGUYEN CHI CONG on 9/10/20.
 //
 
 import Foundation
 
-/// A SuperBoard contains an internal sub-motherboard and an internal sub-uimotherboard by default.
-open class SuperBoard: ContinuousBoard {
+open class SuperUIBoard<OptionType>: ContinuousUIBoard<OptionType> {
     public let uimotherboard: FlowUIMotherboard
 
     public init(identifier: BoardID = UUID().uuidString,

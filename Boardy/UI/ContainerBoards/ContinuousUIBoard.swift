@@ -1,14 +1,13 @@
 //
-//  ContinuousBoard.swift
+//  ContinuousUIBoard.swift
 //  Boardy
 //
-//  Created by NGUYEN CHI CONG on 8/27/20.
+//  Created by NGUYEN CHI CONG on 9/10/20.
 //
 
 import Foundation
 
-/// A ContinuousBoard contains an internal sub-motherboard by default.
-open class ContinuousBoard: Board {
+open class ContinuousUIBoard<OptionType>: UIViewControllerBoard<OptionType> {
     public let motherboard: FlowMotherboard
 
     public init(identifier: BoardID = UUID().uuidString,

@@ -18,6 +18,10 @@ final class MainBoard: RIBBoard, GuaranteedBoard {
 
     init() {
         super.init(identifier: .main)
+
+        motherboard.registerGeneralFlow { [weak self] in
+            self?.sendAction($0)
+        }
     }
 
     override func install(into rootViewController: UIViewController) {

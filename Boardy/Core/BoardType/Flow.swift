@@ -7,6 +7,9 @@
 
 import Foundation
 
+/// Special data type which should be forwarded through all of steps of the flow.
+public protocol BoardFlowAction {}
+
 public typealias FlowID = String
 
 public protocol BoardFlow {
@@ -30,6 +33,16 @@ extension FlowManageable {
         self.flows.append(contentsOf: flows)
         return self
     }
+
+    @discardableResult
+    public func registerGeneralFlow<Input>(nextHandler: @escaping (Input) -> Void) -> Self {
+        let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
+            guard let input = data as? Input else { return }
+            nextHandler(input)
+        })
+        registerFlow(generalFlow)
+        return self
+    }
 }
 
 extension FlowManageable where Self: MotherboardType {
@@ -46,16 +59,6 @@ extension FlowManageable where Self: MotherboardType {
             )
         }
         registerFlows(activateFlows)
-        return self
-    }
-
-    @discardableResult
-    public func registerGeneralFlow<Input>(nextHandler: @escaping (Input) -> Void) -> Self {
-        let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
-            guard let input = data as? Input else { return }
-            nextHandler(input)
-        })
-        registerFlow(generalFlow)
         return self
     }
 }

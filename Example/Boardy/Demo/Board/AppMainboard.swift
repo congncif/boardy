@@ -15,5 +15,12 @@ final class AppMainboard: Motherboard, AppMotherboard {
     init(boards: [ActivatableBoard]) {
         super.init(boards: boards)
 //        registerFlowSteps(.login >=> .main >=> .login)
+
+        registerGeneralFlow { [weak self] (action: BoardAction) in
+            switch action {
+            case .return:
+                self?.rootViewController.returnHere()
+            }
+        }
     }
 }
