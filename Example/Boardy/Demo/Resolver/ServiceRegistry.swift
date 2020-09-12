@@ -21,16 +21,7 @@ struct ServiceRegistry: Resolving {
         resolver.register { LoginBoard() }
         resolver.register { HeadlineUIBoard() }
         resolver.register { FeaturedUIBoard() }
-
-        resolver.register { rsv -> DashboardBoard in
-            let headline: HeadlineUIBoard = rsv.resolve()
-            let featured: FeaturedUIBoard = rsv.resolve()
-
-            return DashboardBoard(elementBoards: [
-                headline, featured
-            ])
-        }
-
+        resolver.register { DashboardBoard() }
         resolver.register { MainBoard() }
 
         resolver.register { rsv -> AppMainboard in

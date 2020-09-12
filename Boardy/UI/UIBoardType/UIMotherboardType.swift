@@ -12,7 +12,7 @@ import UIKit
 
 public typealias FlowUIMotherboard = UIMotherboardType & FlowManageable
 
-public protocol UIMotherboardType: InstallableBoard {
+public protocol UIMotherboardType: InstallableBoard, IdentifiableBoard {
     var uiboards: [UIActivatableBoard] { get }
 
     /// Append list of boards, this doesn't include installing board into rootViewController.

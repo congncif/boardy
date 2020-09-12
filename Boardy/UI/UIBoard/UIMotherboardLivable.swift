@@ -43,11 +43,32 @@ extension UIMotherboardLivable where Self: UIViewController {
 
 // MARK: - Utility extensions
 
-extension UIViewController: UIMotherboardLivable {
+extension UIMotherboardLivable where Self: UIViewController {
     /// Install a board and keep it alive with view controller's lifecycle.
-
-    public func attachUIMotheboard(_ board: FlowUIMotherboard) {
+    public func attachUIMotherboard(_ board: FlowUIMotherboard) {
         uimotherboard = board
         install(board: board)
+    }
+}
+
+extension UIMotherboardLivable where Self: UIBoardInterface, Self: DisposeControllable, Self: UIViewController {
+    public func plugUIMotherboard(_ board: FlowUIMotherboard) {
+        board.plug(in: self, with: disposeBag)
+    }
+}
+
+extension UIViewController: UIMotherboardLivable {}
+
+extension NSObject: DisposeControllable {}
+
+extension Board: DisposeControllable {}
+
+extension Board {
+    /// Use this method to attach an UIMotherboard to guarantee default settings.
+    public func attachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewController) {
+        uimotherboard.registerGeneralFlow { [weak self] in
+            self?.sendFlowAction($0)
+        }
+        viewController.attachUIMotherboard(uimotherboard)
     }
 }

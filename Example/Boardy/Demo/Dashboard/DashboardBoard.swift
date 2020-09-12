@@ -13,24 +13,37 @@ import RxSwift
 import SiFUtilities
 import UIKit
 
-final class DashboardBoard: SuperBoard, GuaranteedBoard {
+final class DashboardBoard: ContainerBoard, GuaranteedBoard {
     typealias InputType = Any?
 
     @LazyInjected var builder: DashboardBuildable
 
+    @LazyInjected var headlineBoard: HeadlineUIBoard
+    @LazyInjected var featuredBoard: FeaturedUIBoard
+
     private let disposeBag = DisposeBag()
 
-    init(elementBoards: [UIActivatableBoard]) {
-        let uicontainerBoard = UIMotherboard(uiboards: elementBoards)
-        super.init(identifier: .dashboard, uimotherboard: uicontainerBoard)
+    init() {
+        super.init(identifier: .dashboard)
     }
 
     func activate(withGuaranteedInput input: Any?) {
         let dashboard = builder.build()
         rootViewController.topPresentedViewController.show(dashboard)
 
-        uimotherboard.activateAllUIBoards()
-        uimotherboard.plug(in: dashboard, with: disposeBag)
+        /// 4 steps to set up an UIMotherboard
+
+        // Step 1: Init UIMotherboard.
+        let drawingBoard = UIMotherboard(uiboards: [headlineBoard, featuredBoard])
+
+        // Step 2: attach & install UIMotherboard to root.
+        attachUIMotherboard(drawingBoard, untilDone: dashboard)
+
+        // Step 3: Activate all available boards in Motherboard.
+        drawingBoard.activateAllUIBoards()
+
+        // Step 4: Plug UIMotherboard to BoardInterface.
+        dashboard.plugUIMotherboard(drawingBoard)
     }
 }
 
