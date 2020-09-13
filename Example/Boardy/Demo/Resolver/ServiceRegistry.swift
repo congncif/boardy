@@ -17,12 +17,15 @@ struct ServiceRegistry: Resolving {
         resolver.register { DashboardBuilder() }.implements(DashboardBuildable.self)
         resolver.register { HeadlineBuilder() }.implements(HeadlineBuildable.self)
         resolver.register { FeaturedBuilder() }.implements(FeaturedBuildable.self)
+        resolver.register { RootBuilder() }.implements(RootBuildable.self)
 
         resolver.register { LoginBoard() }
         resolver.register { HeadlineUIBoard() }
         resolver.register { FeaturedUIBoard() }
         resolver.register { DashboardBoard() }
         resolver.register { MainBoard() }
+        
+        resolver.register { RootBoard() }
 
         resolver.register { rsv -> AppMainboard in
             let login: LoginBoard = rsv.resolve()

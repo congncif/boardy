@@ -13,15 +13,19 @@ extension BoardID {
     static let login = "login"
     static let main = "main"
     static let dashboard = "dashboard"
+    static let root = "root"
 }
 
 enum BoardIdentity: BoardInputModel {
+    case root
     case login
     case main(userInfo: UserInfo)
     case dashboard
 
     var identifier: String {
         switch self {
+        case .root:
+            return .root
         case .login:
             return .login
         case .main:

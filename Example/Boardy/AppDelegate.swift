@@ -15,6 +15,8 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    
+    @LazyInjected var rootBoard: RootBoard
 
 //    @LazyInjected var deepLinkHandler: DeepLinkHandling
 
@@ -27,6 +29,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.swizzling()
 
+        rootBoard.install(into: window)
+        rootBoard.activate(withGuaranteedInput: launchOptions)
+        
 //        deepLinkHandler.start(with: window!.rootViewController!)
 
         return true
