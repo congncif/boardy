@@ -28,7 +28,7 @@
 		27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */; };
 		27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */; };
 		27CA1D6A24FB62EB00694463 /* FeaturedUIBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */; };
-		27D665CF250D14AF008B6E48 /* ContainerRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665CE250D14AF008B6E48 /* ContainerRIBBoard.swift */; };
+		27D665CF250D14AF008B6E48 /* RIBBoard+Pair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */; };
 		27D665D1250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */; };
 		27D665DA250DC617008B6E48 /* RootBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665D5250DC617008B6E48 /* RootBuilder.swift */; };
 		27D665DB250DC617008B6E48 /* RootViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27D665D6250DC617008B6E48 /* RootViewController.storyboard */; };
@@ -103,7 +103,7 @@
 		27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedViewState.swift; sourceTree = "<group>"; };
 		27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedProtocols.swift; sourceTree = "<group>"; };
 		27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedUIBoard.swift; sourceTree = "<group>"; };
-		27D665CE250D14AF008B6E48 /* ContainerRIBBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerRIBBoard.swift; sourceTree = "<group>"; };
+		27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RIBBoard+Pair.swift"; sourceTree = "<group>"; };
 		27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuousBoardRIBBoard.swift; sourceTree = "<group>"; };
 		27D665D5250DC617008B6E48 /* RootBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootBuilder.swift; sourceTree = "<group>"; };
 		27D665D6250DC617008B6E48 /* RootViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = RootViewController.storyboard; sourceTree = "<group>"; };
@@ -235,7 +235,7 @@
 		27D665CD250D147C008B6E48 /* ContainerBoard */ = {
 			isa = PBXGroup;
 			children = (
-				27D665CE250D14AF008B6E48 /* ContainerRIBBoard.swift */,
+				27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */,
 				27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */,
 			);
 			path = ContainerBoard;
@@ -713,7 +713,7 @@
 				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */,
-				27D665CF250D14AF008B6E48 /* ContainerRIBBoard.swift in Sources */,
+				27D665CF250D14AF008B6E48 /* RIBBoard+Pair.swift in Sources */,
 				27FD0AAD24E0EF5F002855D6 /* MainInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
