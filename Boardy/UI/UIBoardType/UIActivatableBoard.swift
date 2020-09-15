@@ -10,7 +10,7 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-public protocol UIPluggableBoard {
+public protocol UIPluggableBoard: IdentifiableBoard {
     var version: Int { get }
     var isVisible: Bool { get }
     var options: Any? { get }
@@ -24,8 +24,8 @@ extension UIPluggableBoard {
     public var options: Any? { return nil }
 }
 
-public protocol UIActivatableBoard: UIPluggableBoard, ActivatableBoard {
-    var changeSequence: Observable<UIActivatableBoard> { get }
+public protocol UIChangableBoard: UIPluggableBoard {
+    var changeSequence: Observable<UIChangableBoard> { get }
 
     func reload()
 }
@@ -51,3 +51,5 @@ public struct UIBoardItem: Equatable {
 public protocol UIBoardInterface {
     var boardItems: Binder<[UIBoardItem]> { get }
 }
+
+public typealias UIActivatableBoard = UIChangableBoard & ActivatableBoard

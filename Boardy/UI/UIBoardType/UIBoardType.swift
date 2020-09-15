@@ -11,12 +11,12 @@ import UIKit
 
 // MARK: - UIViewControllerBoard
 
-public protocol UILinkableViewControllerBoard {
+public protocol UILinkableViewControllerBoard: ActivatableBoard {
     func buildInterface(withOption option: Any?) -> UIViewController?
     func linkInterface(_ viewController: UIViewController)
 }
 
-extension UILinkableViewControllerBoard where Self: ActivatableBoard {
+extension UILinkableViewControllerBoard {
     public func activate(withOption option: Any?) {
         guard let viewController = buildInterface(withOption: option) else {
             assertionFailure("Cannot build interface for \(self) with option \(String(describing: option))")

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// A ContinuousBoard contains an internal sub-motherboard by default.
 open class ContinuousBoard: Board {

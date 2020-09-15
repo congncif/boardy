@@ -11,14 +11,16 @@ import Foundation
 import Resolver
 import UIKit
 
-final class FeaturedUIBoard: UIViewControllerOpenBoard {
+final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
+    typealias InputType = Any?
+
     @LazyInjected var builder: FeaturedBuildable
 
     init() {
         super.init()
     }
 
-    override func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
+    func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
         let featured = builder.build()
         featured.delegate = self
         return featured

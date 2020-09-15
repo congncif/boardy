@@ -11,7 +11,7 @@ import RxRelay
 import RxSwift
 import UIKit
 
-open class UIRIBBoard: RIBBoard, UILinkableRIBBoard, UIActivatableBoard, UIPluggableBoard {
+open class UIRIBBoard: RIBBoard, UIChangableBoard {
     public var version: Int = 0
     public var isVisible: Bool = true
     public var options: Any?
@@ -23,9 +23,9 @@ open class UIRIBBoard: RIBBoard, UILinkableRIBBoard, UIActivatableBoard, UIPlugg
         return contentViewController ?? UIViewController()
     }
 
-    private let changeRelay = PublishRelay<UIActivatableBoard>()
+    private let changeRelay = PublishRelay<UIChangableBoard>()
 
-    open var changeSequence: Observable<UIActivatableBoard> {
+    open var changeSequence: Observable<UIChangableBoard> {
         return changeRelay.asObservable()
     }
 
@@ -33,13 +33,10 @@ open class UIRIBBoard: RIBBoard, UILinkableRIBBoard, UIActivatableBoard, UIPlugg
         version += 1
         changeRelay.accept(self)
     }
+}
 
-    open func buildInterface(withOption option: Any?) -> ViewableRouting? {
-        assertionFailure("Abstract method should be overridden in subclass")
-        return nil
-    }
-
-    open func linkInterface(_ viewRouter: ViewableRouting) {
+extension UILinkableRIBBoard where Self: UIRIBBoard {
+    public func linkInterface(_ viewRouter: ViewableRouting) {
         rootRouter.attachChild(viewRouter)
         contentViewController = viewRouter.viewControllable.uiviewController
     }

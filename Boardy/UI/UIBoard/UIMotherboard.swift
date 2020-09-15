@@ -20,7 +20,7 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
         }
     }
 
-    var visibleBoards: Observable<[UIActivatableBoard]> {
+    var visibleBoards: Observable<[UIChangableBoard]> {
         uiboardsRelay.flatMap {
             Observable.combineLatest($0.map { $0.changeSequence })
                 .map {

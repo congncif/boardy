@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
-open class ContinuousUIBoard<OptionType>: UIViewControllerBoard<OptionType> {
+open class ContinuousUIBoard: UIBoard {
     public let motherboard: FlowMotherboard
 
     public init(identifier: BoardID = UUID().uuidString,

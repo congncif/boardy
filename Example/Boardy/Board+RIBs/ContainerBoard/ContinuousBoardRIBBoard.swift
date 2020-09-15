@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import RIBs
+import UIKit
 
 open class ContinuousRIBBoard: RIBBoard {
     public let motherboard: FlowMotherboard

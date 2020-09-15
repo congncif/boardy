@@ -10,12 +10,12 @@ import RIBs
 
 // MARK: - RIBBoard
 
-public protocol UILinkableRIBBoard {
+public protocol UILinkableRIBBoard: ActivatableBoard {
     func buildInterface(withOption option: Any?) -> ViewableRouting?
     func linkInterface(_ viewRouter: ViewableRouting)
 }
 
-extension UILinkableRIBBoard where Self: ActivatableBoard {
+extension UILinkableRIBBoard {
     public func activate(withOption option: Any?) {
         guard let childRouter = buildInterface(withOption: option) else {
             assertionFailure("Cannot build interface for \(self) with option \(String(describing: option))")

@@ -95,7 +95,7 @@ extension UIMotherboardRepresentable {
 }
 
 protocol UIMotherboardObservable: UIMotherboardType {
-    var visibleBoards: Observable<[UIActivatableBoard]> { get }
+    var visibleBoards: Observable<[UIChangableBoard]> { get }
 }
 
 extension UIMotherboardObservable {

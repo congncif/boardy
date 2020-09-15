@@ -11,7 +11,7 @@ import Foundation
 import Resolver
 import UIKit
 
-final class HeadlineUIBoard: UIViewControllerOpenBoard {
+final class HeadlineUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
     typealias InputType = Any?
 
     @LazyInjected var builder: HeadlineBuildable
@@ -20,7 +20,7 @@ final class HeadlineUIBoard: UIViewControllerOpenBoard {
         super.init()
     }
 
-    override func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
+    func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
         let viewController = builder.build()
         viewController.delegate = self
         return viewController
