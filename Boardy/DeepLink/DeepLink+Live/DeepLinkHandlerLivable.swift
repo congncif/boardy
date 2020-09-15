@@ -44,14 +44,8 @@ extension DeepLinkHandlerLivable where Self: UIViewController {
 // MARK: - Utility extensions
 
 extension UIViewController: DeepLinkHandlerLivable {
-    public func registerDeepLinkHandlerClubIfNeeded(_ handlerClub: DeepLinkHandlerClubbing) {
-        if deepLinkHandler.registredHandlerClub(withIdentifier: handlerClub.identifier) == nil {
-            deepLinkHandler.registerHandlerClub(handlerClub)
-        }
-    }
-
-    public func handleDeepLink(_ deepLink: String, with handlerClub: DeepLinkHandlerClubbing) {
-        registerDeepLinkHandlerClubIfNeeded(handlerClub)
+    public func handleDeepLink(_ deepLink: String, use handlerClub: DeepLinkHandlerClubbing) {
+        deepLinkHandler.registerHandlerClubIfNeeded(handlerClub)
         deepLinkHandler.handleDeepLink(deepLink)
     }
 }

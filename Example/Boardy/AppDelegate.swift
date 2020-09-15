@@ -15,7 +15,7 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    
+
     @LazyInjected var rootBoard: RootBoard
 
 //    @LazyInjected var deepLinkHandler: DeepLinkHandling
@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         rootBoard.install(into: window)
         rootBoard.activate(withGuaranteedInput: launchOptions)
-        
+
 //        deepLinkHandler.start(with: window!.rootViewController!)
 
         return true
@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let link = url.absoluteString
 //        deepLinkHandler.handleDeepLink(link)
 
-        window?.rootViewController?.handleDeepLink(link, with: DeepLinkAppClub())
+        window?.rootViewController?.handleDeepLink(link, usePairClub: DeepLinkAppClub())
 
         return true
     }

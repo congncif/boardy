@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '0.9.16'
+    s.version          = '0.9.17'
     s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
@@ -32,6 +32,8 @@ Pod::Spec.new do |s|
         co.source_files = 'Boardy/UI/**/*'
         
         co.dependency 'Boardy/Core'
+        co.dependency 'Boardy/DeepLink'
+        
         s.dependency 'RxDataSources'
         s.dependency 'SnapKit'
     end

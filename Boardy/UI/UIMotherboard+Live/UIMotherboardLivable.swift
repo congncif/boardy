@@ -45,8 +45,6 @@ extension UIMotherboardLivable where Self: UIViewController {
 
 extension UIViewController: UIMotherboardLivable {}
 
-extension NSObject: DisposeControllable {}
-
 extension Board: DisposeControllable {}
 
 // MARK: - UIMotherboard live

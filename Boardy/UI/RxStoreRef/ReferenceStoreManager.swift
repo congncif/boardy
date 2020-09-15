@@ -53,21 +53,3 @@ extension ObjectReferenceStorable {
 // MARK: - Utility Extensions
 
 extension NSObject: ObjectReferenceStorable {}
-
-extension Board: ObjectReferenceStorable {}
-
-extension DeepLinkHandler: ObjectReferenceStorable {}
-
-// MARK: - UIMotherboard pair
-
-public typealias FlowUIMotherboardObject = FlowUIMotherboard & ObjectReferenceStorable
-
-extension Board {
-    public func pairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewController) {
-        uimotherboard.registerGeneralFlow { [weak self] in
-            self?.sendFlowAction($0)
-        }
-        uimotherboard.install(into: viewController)
-        uimotherboard.pairWith(object: viewController)
-    }
-}

@@ -39,3 +39,7 @@ extension DisposeControllable {
         }
     }
 }
+
+// MARK: - Utility extensions
+
+extension NSObject: DisposeControllable {}

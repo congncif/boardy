@@ -43,6 +43,14 @@ public protocol DeepLinkHandlerRegistering {
     func registredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing?
 }
 
+extension DeepLinkHandlerRegistering {
+    public func registerHandlerClubIfNeeded(_ handlerClub: DeepLinkHandlerClubbing) {
+        if registredHandlerClub(withIdentifier: handlerClub.identifier) == nil {
+            registerHandlerClub(handlerClub)
+        }
+    }
+}
+
 public typealias DeepLinkHandlingComposable = DeepLinkHandling & DeepLinkHandlerRegistering
 
 public final class DeepLinkHandler: DeepLinkHandlingComposable {
