@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-extension DeepLinkHandler: ObjectReferenceStorable {}
+extension DeepLinkHandler: ReferenceStorableObject {}
 
 extension UIViewController {
     public func handleDeepLink(_ deepLink: String, usePairClub handlerClub: DeepLinkHandlerClubbing) {

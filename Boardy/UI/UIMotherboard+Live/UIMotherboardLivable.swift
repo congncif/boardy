@@ -57,7 +57,7 @@ extension UIMotherboardLivable where Self: UIViewController {
     }
 }
 
-extension UIMotherboardLivable where Self: UIBoardInterface, Self: DisposeControllable, Self: UIViewController {
+extension UIMotherboardLivable where Self: UIBoardInterface, Self: DisposeControllable {
     public func plugUIMotherboard(_ board: FlowUIMotherboard) {
         board.plug(in: self, with: disposeBag)
     }
@@ -70,5 +70,17 @@ extension Board {
             self?.sendFlowAction($0)
         }
         viewController.attachUIMotherboard(uimotherboard)
+    }
+
+    public func plugAttachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewControllerBoardInterface, activateOptions: [BoardID: Any] = [:], defaultOption: Any? = nil) {
+        attachUIMotherboard(uimotherboard, to: viewController)
+        uimotherboard.activateAllUIBoards(withOptions: activateOptions, defaultOption: defaultOption)
+        viewController.plugUIMotherboard(uimotherboard)
+    }
+
+    public func plugAttachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewControllerBoardInterface, modelOptions: [BoardInputModel], defaultOption: Any? = nil) {
+        attachUIMotherboard(uimotherboard, to: viewController)
+        uimotherboard.activateAllUIBoards(models: modelOptions, defaultOption: defaultOption)
+        viewController.plugUIMotherboard(uimotherboard)
     }
 }

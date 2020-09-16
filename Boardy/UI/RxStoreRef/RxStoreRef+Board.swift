@@ -8,18 +8,44 @@
 import Foundation
 import UIKit
 
-extension Board: ObjectReferenceStorable {}
+// MARK: - Board + pair
 
-// MARK: - UIMotherboard pair
-
-public typealias FlowUIMotherboardObject = FlowUIMotherboard & ObjectReferenceStorable
+public typealias FlowUIMotherboardObject = FlowUIMotherboard & ReferenceStorableObject
 
 extension Board {
-    public func pairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewController) {
+    public func pairInstallUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewController) {
         uimotherboard.registerGeneralFlow { [weak self] in
             self?.sendFlowAction($0)
         }
         uimotherboard.install(into: viewController)
         uimotherboard.pairWith(object: viewController)
     }
+
+    public func plugPairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewControllerBoardInterface, activateOptions: [BoardID: Any] = [:], defaultOption: Any? = nil) {
+        pairInstallUIMotherboard(uimotherboard, with: viewController)
+        uimotherboard.activateAllUIBoards(withOptions: activateOptions, defaultOption: defaultOption)
+        viewController.justPlugUIMotherboard(uimotherboard)
+    }
+
+    public func plugPairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewControllerBoardInterface, modelOptions: [BoardInputModel], defaultOption: Any? = nil) {
+        pairInstallUIMotherboard(uimotherboard, with: viewController)
+        uimotherboard.activateAllUIBoards(models: modelOptions, defaultOption: defaultOption)
+        viewController.justPlugUIMotherboard(uimotherboard)
+    }
 }
+
+extension UIBoardInterface where Self: ReactiveDisposableObject {
+    public func justPlugUIMotherboard(_ board: UIMotherboardType) {
+        board.plug(in: self, with: freshDisposeBag)
+    }
+}
+
+// MARK: - Board + Compatible
+
+import RxSwift
+
+extension Board: ReferenceStorableObject {}
+
+extension Board: ReactiveCompatible {}
+
+extension Board: ReactiveDisposableObject {}

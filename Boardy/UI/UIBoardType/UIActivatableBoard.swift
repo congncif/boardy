@@ -53,3 +53,4 @@ public protocol UIBoardInterface {
 }
 
 public typealias UIActivatableBoard = UIChangableBoard & ActivatableBoard
+public typealias UIViewControllerBoardInterface = UIViewController & UIBoardInterface

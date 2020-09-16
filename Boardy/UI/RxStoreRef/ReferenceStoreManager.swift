@@ -9,6 +9,8 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+// MARK: - ObjectReferenceStorable
+
 public final class ReferenceStoreManager {
     private var storage: [AnyHashable: AnyObject] = [:]
     private var disposeBags: [AnyHashable: DisposeBag] = [:]
@@ -34,15 +36,13 @@ public final class ReferenceStoreManager {
     }
 }
 
-// MARK: - ObjectReferenceStorable
-
-public protocol ObjectReferenceStorable: AnyObject {
+public protocol ReferenceStorableObject: AnyObject {
     var referenceStoreManager: ReferenceStoreManager { get }
 
     func pairWith<Object>(object: Object) where Object: ReactiveCompatible, Object: AnyObject
 }
 
-extension ObjectReferenceStorable {
+extension ReferenceStorableObject {
     public var referenceStoreManager: ReferenceStoreManager { .shared }
 
     public func pairWith<Object>(object: Object) where Object: ReactiveCompatible, Object: AnyObject {
@@ -50,6 +50,42 @@ extension ObjectReferenceStorable {
     }
 }
 
+// MARK: - ReactiveDisposableObject
+
+public final class DisposeContainer {
+    private var disposeBags: [AnyHashable: DisposeBag] = [:]
+
+    public static let shared = DisposeContainer()
+
+    public func generateDisposeBag<Object>(for object: Object) -> DisposeBag where Object: ReactiveCompatible, Object: AnyObject {
+        let key = ObjectIdentifier(object)
+        let disposeBag = DisposeBag()
+        disposeBags[key] = disposeBag
+
+        let disposable = object.rx.deallocated
+            .subscribe(onNext: { [weak self] in
+                self?.disposeBags.removeValue(forKey: key)
+            })
+            .disposed(by: disposeBag)
+
+        return disposeBag
+    }
+}
+
+public protocol ReactiveDisposableObject: AnyObject {
+    var disposeContainer: DisposeContainer { get }
+    var freshDisposeBag: DisposeBag { get }
+}
+
+extension ReactiveDisposableObject where Self: ReactiveCompatible {
+    public var disposeContainer: DisposeContainer { .shared }
+
+    public var freshDisposeBag: DisposeBag {
+        disposeContainer.generateDisposeBag(for: self)
+    }
+}
+
 // MARK: - Utility Extensions
 
-extension NSObject: ObjectReferenceStorable {}
+extension NSObject: ReferenceStorableObject {}
+extension NSObject: ReactiveDisposableObject {}

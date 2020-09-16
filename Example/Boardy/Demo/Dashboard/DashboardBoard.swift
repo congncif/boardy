@@ -13,7 +13,7 @@ import RxSwift
 import SiFUtilities
 import UIKit
 
-final class DashboardBoard: ContinuousRIBBoard, GuaranteedBoard {
+final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = Any?
 
     @LazyInjected var builder: DashboardBuildable
@@ -37,13 +37,16 @@ final class DashboardBoard: ContinuousRIBBoard, GuaranteedBoard {
         let drawingBoard = UIMotherboard(uiboards: [headlineBoard, featuredBoard])
 
         // Step 2: attach & install UIMotherboard to root.
-        pairUIMotherboard(drawingBoard, with: dashboard)
+        pairInstallUIMotherboard(drawingBoard, with: dashboard)
 
         // Step 3: Activate all available boards in Motherboard.
         drawingBoard.activateAllUIBoards()
 
         // Step 4: Plug UIMotherboard to BoardInterface.
-        dashboard.plugUIMotherboard(drawingBoard)
+        dashboard.justPlugUIMotherboard(drawingBoard)
+
+        // Or use single line setup below 😂
+        // plugAttachUIMotherboard(drawingBoard, to: dashboard)
     }
 }
 

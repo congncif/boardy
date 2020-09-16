@@ -6,14 +6,18 @@
 //  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
+import RIBs
+import RxSwift
 import UIKit
 
+// MARK: - RIBBoard + Extensions
+
 extension RIBBoard {
-    public func pairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewController) {
+    public func pairInstallUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with router: ViewableRouting) {
         uimotherboard.registerGeneralFlow { [weak self] in
             self?.sendFlowAction($0)
         }
-        uimotherboard.install(into: viewController)
-        uimotherboard.pairWith(object: viewController)
+        uimotherboard.install(into: router)
+        uimotherboard.pairWith(object: router.viewControllable.uiviewController)
     }
 }
