@@ -18,10 +18,10 @@ public protocol BoardDelegate: AnyObject {
 
 // MARK: - Board
 
-public protocol InstallableBoard {
-    var rootViewController: UIViewController { get }
+public protocol OriginalBoard {
+    var root: AnyObject? { get }
 
-    func install(into rootViewController: UIViewController)
+    func installIntoRoot(_ rootObject: AnyObject)
 }
 
 public protocol IdentifiableBoard {
@@ -43,14 +43,14 @@ extension IdentifiableBoard {
     }
 }
 
-public protocol ActivatableBoard: IdentifiableBoard, InstallableBoard {
+public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard {
     func activate(withOption option: Any?)
 }
 
 // MARK: - Utility extensions
 
-extension UIViewController {
-    public func install(board: InstallableBoard) {
-        board.install(into: self)
+extension NSObject {
+    public func install(board: OriginalBoard) {
+        board.installIntoRoot(self)
     }
 }

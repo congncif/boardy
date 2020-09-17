@@ -52,7 +52,9 @@ extension MotherboardType {
     /// Install additional a board after its Motherboard was installed.
     public func installBoard(_ board: ActivatableBoard) {
         addBoard(board)
-        board.install(into: rootViewController)
+        if let root = self.root {
+            board.installIntoRoot(root)
+        }
     }
 }
 

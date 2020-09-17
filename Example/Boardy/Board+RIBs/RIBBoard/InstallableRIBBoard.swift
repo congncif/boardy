@@ -9,26 +9,10 @@ import Foundation
 import RIBs
 import UIKit
 
-public protocol InstallableRIBBoard: InstallableBoard {
+public protocol InstallableRIBBoard: OriginalBoard {
     var rootRouter: ViewableRouting { get }
 
-    func install(into rootRouter: ViewableRouting)
-}
-
-extension InstallableRIBBoard {
-    public var rootViewController: UIViewController {
-        rootRouter.viewControllable.uiviewController
-    }
-
-    public func install(into rootRouter: ViewableRouting) {
-        install(into: rootRouter.viewControllable.uiviewController)
-    }
-}
-
-extension ViewableRouting {
-    public func install(board: InstallableRIBBoard) {
-        board.install(into: self)
-    }
+    func installRootRouter(_ rootRouter: ViewableRouting)
 }
 
 // Backward support to compatiate older version.

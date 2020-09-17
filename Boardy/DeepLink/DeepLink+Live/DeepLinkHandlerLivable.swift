@@ -14,7 +14,7 @@ public protocol DeepLinkHandlerLivable: AnyObject {
 
 private var deepLinkHandlerKey: UInt8 = 106
 
-extension DeepLinkHandlerLivable where Self: UIViewController {
+extension DeepLinkHandlerLivable where Self: AnyObject {
     func getAssociatedDeepLinkHandler() -> DeepLinkHandlingComposable? {
         return objc_getAssociatedObject(self, &deepLinkHandlerKey) as? DeepLinkHandlingComposable
     }
@@ -43,7 +43,7 @@ extension DeepLinkHandlerLivable where Self: UIViewController {
 
 // MARK: - Utility extensions
 
-extension UIViewController: DeepLinkHandlerLivable {
+extension NSObject: DeepLinkHandlerLivable {
     public func handleDeepLink(_ deepLink: String, use handlerClub: DeepLinkHandlerClubbing) {
         deepLinkHandler.registerHandlerClubIfNeeded(handlerClub)
         deepLinkHandler.handleDeepLink(deepLink)

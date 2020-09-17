@@ -8,25 +8,23 @@
 import Foundation
 import UIKit
 
-open class Board: InstallableBoard, IdentifiableBoard {
+open class Board: IdentifiableBoard, OriginalBoard {
     public let identifier: BoardID
     public weak var delegate: BoardDelegate?
 
-    private weak var hostingViewController: UIViewController?
+    private weak var rootObject: AnyObject?
 
     public init(identifier: BoardID = UUID().uuidString) {
         self.identifier = identifier
     }
 
-    public var rootViewController: UIViewController {
-        guard let viewController = hostingViewController else {
-            assertionFailure("Board was not installed. Install \(self) into a rootViewController before activating it.")
-            return UIViewController()
-        }
-        return viewController
-    }
+    public var root: AnyObject? { rootObject }
 
-    open func install(into rootViewController: UIViewController) {
-        hostingViewController = rootViewController
+    open func installIntoRoot(_ rootObject: AnyObject) {
+        self.rootObject = rootObject
     }
 }
+
+extension Board: InstallableBoard {}
+
+extension Board: WindowInstallableBoard {}

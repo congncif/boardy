@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 public protocol DeepLinkHandling {
-    func start(with hostingViewController: UIViewController)
+    func start(with hostingObject: AnyObject)
     func handleDeepLink(_ deepLink: String)
 }
 
@@ -64,8 +64,8 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
         clubsRoom[handlerClub.identifier] = handlerClub
     }
 
-    public func start(with hostingViewController: UIViewController) {
-        self.hostingViewController = hostingViewController
+    public func start(with hostingObject: AnyObject) {
+        self.hostingObject = hostingObject
     }
 
     public func handleDeepLink(_ deepLink: String) {
@@ -106,7 +106,7 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
         clubsRoom[identifier]
     }
 
-    private weak var hostingViewController: UIViewController? {
+    private weak var hostingObject: AnyObject? {
         didSet { forwardHosting() }
     }
 
@@ -115,8 +115,8 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
     }
 
     private func forwardHosting() {
-        if let rootViewController = hostingViewController {
-            mainboards.forEach { $0.install(into: rootViewController) }
+        if let rootObject = hostingObject {
+            mainboards.forEach { $0.installIntoRoot(rootObject) }
         }
     }
 

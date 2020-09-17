@@ -22,8 +22,8 @@ open class ContinuousBoard: Board {
         }
     }
 
-    override open func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
-        motherboard.install(into: rootViewController)
+    override open func installIntoRoot(_ rootObject: AnyObject) {
+        super.installIntoRoot(rootObject)
+        motherboard.installIntoRoot(rootObject)
     }
 }

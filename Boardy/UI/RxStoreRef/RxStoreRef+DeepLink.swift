@@ -10,7 +10,7 @@ import UIKit
 
 extension DeepLinkHandler: ReferenceStorableObject {}
 
-extension UIViewController {
+extension NSObject {
     public func handleDeepLink(_ deepLink: String, usePairClub handlerClub: DeepLinkHandlerClubbing) {
         let deepLinkHandler = DeepLinkHandler(handlerClubbing: handlerClub)
         deepLinkHandler.pairWith(object: self)

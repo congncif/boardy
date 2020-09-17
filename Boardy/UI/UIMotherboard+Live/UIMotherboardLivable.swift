@@ -14,13 +14,13 @@ public protocol UIMotherboardLivable: AnyObject {
 
 private var uimotherboardKey: UInt8 = 107
 
-extension UIMotherboardLivable where Self: UIViewController {
+extension UIMotherboardLivable where Self: AnyObject {
     func getAssociatedUIMotherboard() -> FlowUIMotherboard? {
         return objc_getAssociatedObject(self, &uimotherboardKey) as? FlowUIMotherboard
     }
 
     func setAssociatedUIMotherboard(_ value: FlowUIMotherboard?) {
-        value?.install(into: self)
+        value?.installIntoRoot(self)
         objc_setAssociatedObject(self, &uimotherboardKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -43,7 +43,7 @@ extension UIMotherboardLivable where Self: UIViewController {
 
 // MARK: - Utility extensions
 
-extension UIViewController: UIMotherboardLivable {}
+extension NSObject: UIMotherboardLivable {}
 
 extension Board: DisposeControllable {}
 

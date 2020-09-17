@@ -23,7 +23,7 @@ struct ServiceRegistry: Resolving {
         resolver.register { HeadlineUIBoard() }
         resolver.register { FeaturedUIBoard() }
         resolver.register { DashboardBoard() }
-        resolver.register { MainBoard() }
+        resolver.register { MainBoard(homeBoard: $0.resolve()) }
         
         resolver.register { RootBoard() }
 

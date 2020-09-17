@@ -44,15 +44,15 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
 
     public convenience init(identifier: BoardID = UUID().uuidString,
                             uiboards: [UIActivatableBoard] = [],
-                            rootViewController: UIViewController) {
+                            rootObject: AnyObject) {
         self.init(identifier: identifier, uiboards: uiboards)
-        install(into: rootViewController)
+        installIntoRoot(rootObject)
     }
 
-    override open func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
+    override open func installIntoRoot(_ rootObject: AnyObject) {
+        super.installIntoRoot(rootObject)
         for board in uiboards {
-            board.install(into: rootViewController)
+            board.installIntoRoot(rootObject)
         }
     }
 }

@@ -18,12 +18,6 @@ final class RootBoard: Board, GuaranteedBoard {
     @LazyInjected var appMainBoard: AppMotherboard
     @LazyInjected var builder: RootBuildable
 
-    private weak var window: UIWindow?
-
-    func install(into newWindow: UIWindow?) {
-        window = newWindow
-    }
-
     init() {
         super.init(identifier: .root)
     }
@@ -34,17 +28,7 @@ final class RootBoard: Board, GuaranteedBoard {
 
         viewController.attachMotheboard(appMainBoard)
 
-        activeWindow.setRootViewController(viewController)
-    }
-}
-
-extension RootBoard {
-    private var activeWindow: UIWindow {
-        if let window = self.window {
-            return window
-        } else {
-            return rootViewController.view.window!
-        }
+        window.setRootViewController(viewController)
     }
 }
 

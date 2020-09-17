@@ -17,7 +17,7 @@ extension RIBBoard {
         uimotherboard.registerGeneralFlow { [weak self] in
             self?.sendFlowAction($0)
         }
-        uimotherboard.install(into: router)
+        uimotherboard.installIntoRoot(router)
         uimotherboard.pairWith(object: router.viewControllable.uiviewController)
     }
 }

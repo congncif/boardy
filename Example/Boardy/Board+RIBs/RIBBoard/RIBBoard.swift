@@ -9,33 +9,29 @@ import Foundation
 import RIBs
 import UIKit
 
-open class RIBBoard: IdentifiableBoard, InstallableRIBBoard {
-    public let identifier: String
-    public weak var delegate: BoardDelegate?
-
-    private weak var currentRouter: ViewableRouting?
+open class RIBBoard: Board, InstallableRIBBoard {
     private lazy var placeholderRouter: PlaceholderRouting = PlaceholderBuilder().build()
 
-    public init(identifier: String = UUID().uuidString) {
-        self.identifier = identifier
-    }
-
-    open func install(into rootRouter: ViewableRouting) {
-        currentRouter = rootRouter
-    }
-
-    open func install(into rootViewController: UIViewController) {
-        placeholderRouter.injectViewController(rootViewController)
-    }
-
     public var rootRouter: ViewableRouting {
-        guard let internalRouter = currentRouter else {
-            return placeholderRouter
+        if let internalRouter = root as? ViewableRouting {
+            return internalRouter
+        } else if let viewController = root as? UIViewController {
+            placeholderRouter.injectViewController(viewController)
+
+        } else if let window = root as? UIWindow, let rootViewController = window.rootViewController {
+            placeholderRouter.injectViewController(rootViewController)
+
+        } else {
+            assertionFailure("💔 Board was not installed. Install \(self) into a rootRouter before activating it.")
         }
-        return internalRouter
+        return placeholderRouter
     }
 
     public var rootViewController: UIViewController {
         rootRouter.viewControllable.uiviewController
+    }
+
+    open func installRootRouter(_ rootRouter: ViewableRouting) {
+        installIntoRoot(rootRouter)
     }
 }

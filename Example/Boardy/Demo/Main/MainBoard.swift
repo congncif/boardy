@@ -10,23 +10,17 @@ import Boardy
 import Foundation
 import Resolver
 
-final class MainBoard: RIBBoard, GuaranteedBoard {
+final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
     typealias InputType = UserInfo
 
     @LazyInjected var builder: MainBuildable
-    @LazyInjected var motherboard: HomeMotherboard
 
-    init() {
-        super.init(identifier: .main)
+    init(homeBoard: HomeMotherboard) {
+        super.init(identifier: .main, motherboard: homeBoard)
 
         motherboard.registerGeneralFlow { [weak self] in
             self?.sendAction($0)
         }
-    }
-
-    override func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
-        motherboard.install(into: rootViewController)
     }
 
     func activate(withGuaranteedInput input: UserInfo) {

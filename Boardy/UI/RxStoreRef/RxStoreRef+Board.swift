@@ -13,12 +13,12 @@ import UIKit
 public typealias FlowUIMotherboardObject = FlowUIMotherboard & ReferenceStorableObject
 
 extension Board {
-    public func pairInstallUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewController) {
+    public func pairInstallUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with other: NSObject) {
         uimotherboard.registerGeneralFlow { [weak self] in
             self?.sendFlowAction($0)
         }
-        uimotherboard.install(into: viewController)
-        uimotherboard.pairWith(object: viewController)
+        uimotherboard.installIntoRoot(other)
+        uimotherboard.pairWith(object: other)
     }
 
     public func plugPairUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with viewController: UIViewControllerBoardInterface, activateOptions: [BoardID: Any] = [:], defaultOption: Any? = nil) {

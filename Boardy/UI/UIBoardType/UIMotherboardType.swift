@@ -12,7 +12,7 @@ import UIKit
 
 public typealias FlowUIMotherboard = UIMotherboardType & FlowManageable
 
-public protocol UIMotherboardType: InstallableBoard, IdentifiableBoard {
+public protocol UIMotherboardType: OriginalBoard, IdentifiableBoard {
     var uiboards: [UIActivatableBoard] { get }
 
     /// Append list of boards, this doesn't include installing board into rootViewController.
@@ -66,7 +66,9 @@ extension UIMotherboardType {
     /// Install additional a board after its Motherboard was installed.
     public func installUIBoard(_ board: UIActivatableBoard) {
         addUIBoard(board)
-        board.install(into: rootViewController)
+        if let root = self.root {
+            board.installIntoRoot(root)
+        }
     }
 }
 

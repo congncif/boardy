@@ -23,9 +23,9 @@ open class ContinuousRIBBoard: RIBBoard {
         }
     }
 
-    override open func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
-        motherboard.install(into: rootViewController)
+    override open func installIntoRoot(_ rootObject: AnyObject) {
+        super.installIntoRoot(rootObject)
+        motherboard.installIntoRoot(rootObject)
     }
 }
 
@@ -42,8 +42,8 @@ open class ContinuousUIRIBBoard: UIRIBBoard {
         }
     }
 
-    override open func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
-        motherboard.install(into: rootViewController)
+    override open func installIntoRoot(_ rootObject: AnyObject) {
+        super.installIntoRoot(rootObject)
+        motherboard.installIntoRoot(rootObject)
     }
 }

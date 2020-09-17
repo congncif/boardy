@@ -36,15 +36,15 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     public convenience init(identifier: BoardID = UUID().uuidString,
                             boards: [ActivatableBoard] = [],
-                            rootViewController: UIViewController) {
+                            rootObject: AnyObject) {
         self.init(identifier: identifier, boards: boards)
-        install(into: rootViewController)
+        installIntoRoot(rootObject)
     }
 
-    override open func install(into rootViewController: UIViewController) {
-        super.install(into: rootViewController)
+    override open func installIntoRoot(_ rootObject: AnyObject) {
+        super.installIntoRoot(rootObject)
         for board in boards {
-            board.install(into: rootViewController)
+            board.installIntoRoot(rootObject)
         }
     }
 }

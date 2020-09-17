@@ -29,7 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.swizzling()
 
-        rootBoard.install(into: window)
+        guard let window = self.window else { return false }
+        rootBoard.installIntoWindow(window)
         rootBoard.activate(withGuaranteedInput: launchOptions)
 
 //        deepLinkHandler.start(with: window!.rootViewController!)
