@@ -12,7 +12,8 @@ import Foundation
 protocol HomeMotherboard: FlowMotherboard {}
 
 final class HomeMainboard: Motherboard, HomeMotherboard {
-    init(boards: [ActivatableBoard]) {
-        super.init(boards: boards)
+    init() {
+        super.init()
+        // register extra flows if needed
     }
 }

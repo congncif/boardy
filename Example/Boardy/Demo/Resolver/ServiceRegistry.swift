@@ -24,29 +24,23 @@ struct ServiceRegistry: Resolving {
         resolver.register { FeaturedUIBoard() }
         resolver.register { DashboardBoard() }
         resolver.register { MainBoard(homeBoard: $0.resolve()) }
-        
-        resolver.register { RootBoard() }
 
-        resolver.register { rsv -> AppMainboard in
+        resolver.register { RootBoard(motherboard: $0.resolve()) }
+
+        resolver.register { AppMainboard() }.implements(AppMotherboard.self)
+
+        resolver.register { rsv -> RootBoardCollection in
             let login: LoginBoard = rsv.resolve()
             let main: MainBoard = rsv.resolve()
-
-            return AppMainboard(boards: [
-                login, main
-            ])
+            return RootBoardCollection(boards: [login, main])
         }
-        .scope(ResolverScopeCache())
-        .implements(AppMotherboard.self)
 
-        resolver.register { rsv -> HomeMainboard in
+        resolver.register { HomeMainboard() }.implements(HomeMotherboard.self)
+
+        resolver.register { rsv -> MainBoardCollection in
             let dashboard: DashboardBoard = rsv.resolve()
-
-            return HomeMainboard(boards: [
-                dashboard
-            ])
+            return MainBoardCollection(boards: [dashboard])
         }
-        .scope(ResolverScopeCache())
-        .implements(HomeMotherboard.self)
 
         resolver.register {
             DeepLinkHandler(handlerClub: DeepLinkAppClub())

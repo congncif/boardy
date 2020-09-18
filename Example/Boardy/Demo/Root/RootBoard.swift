@@ -12,32 +12,39 @@ import Resolver
 import SiFUtilities
 import UIKit
 
-final class RootBoard: Board, GuaranteedBoard {
+// Wrap an array to pass LazyInjected convention of Resolver.
+struct RootBoardCollection {
+    let boards: [ActivatableBoard]
+}
+
+final class RootBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = [UIApplication.LaunchOptionsKey: Any]?
 
-    @LazyInjected var appMainBoard: AppMotherboard
     @LazyInjected var builder: RootBuildable
+    @LazyInjected var boardCollection: RootBoardCollection
 
-    init() {
-        super.init(identifier: .root)
+    // To defer initializing sub-boards, use mainboard instead of motherboard (default) for activation related activities.
+    private lazy var mainboard: FlowMotherboard = {
+        motherboard.extended(boards: boardCollection.boards)
+    }()
+
+    init(motherboard: AppMotherboard) {
+        super.init(identifier: .root, motherboard: motherboard)
     }
 
     func activate(withGuaranteedInput input: [UIApplication.LaunchOptionsKey: Any]?) {
         let viewController = builder.build()
         viewController.delegate = self
-
-        viewController.attachMotheboard(appMainBoard)
-
         window.setRootViewController(viewController)
     }
 }
 
 extension RootBoard: RootDelegate {
     func didReadyToShow() {
-        appMainBoard.activateBoard(.login)
+        mainboard.activateBoard(.login)
     }
 
     func startApplication() {
-        appMainBoard.activateBoard(.login)
+        mainboard.activateBoard(.login)
     }
 }

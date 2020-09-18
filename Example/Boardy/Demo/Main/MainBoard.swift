@@ -10,17 +10,24 @@ import Boardy
 import Foundation
 import Resolver
 
+// Wrap an array to pass LazyInjected convention of Resolver.
+struct MainBoardCollection {
+    let boards: [ActivatableBoard]
+}
+
 final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
     typealias InputType = UserInfo
 
     @LazyInjected var builder: MainBuildable
+    @LazyInjected var boardCollection: MainBoardCollection
+
+    // To defer initializing sub-boards, use mainboard instead of motherboard (default) for activation related activities.
+    private lazy var mainboard: FlowMotherboard = {
+        motherboard.extended(boards: boardCollection.boards)
+    }()
 
     init(homeBoard: HomeMotherboard) {
         super.init(identifier: .main, motherboard: homeBoard)
-
-        motherboard.registerGeneralFlow { [weak self] in
-            self?.sendAction($0)
-        }
     }
 
     func activate(withGuaranteedInput input: UserInfo) {
@@ -44,6 +51,6 @@ extension MainBoard: MainListener {
     }
 
     func showDashboard() {
-        motherboard.activateBoard(.dashboard)
+        mainboard.activateBoard(.dashboard)
     }
 }

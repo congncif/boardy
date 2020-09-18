@@ -25,7 +25,7 @@ public struct BoardDestination: BoardInputModel {
 public protocol MotherboardType: ActivatableBoard {
     var boards: [ActivatableBoard] { get }
 
-    /// Append list of boards, this doesn't include installing board into rootViewController.
+    /// Append list of boards, this doesn't include installing board into rootObject.
     func addBoard(_ board: ActivatableBoard)
     func removeBoard(withIdentifier identifier: BoardID)
 
@@ -55,6 +55,11 @@ extension MotherboardType {
         if let root = self.root {
             board.installIntoRoot(root)
         }
+    }
+
+    public func extended(boards: [ActivatableBoard]) -> Self {
+        boards.forEach { self.installBoard($0) }
+        return self
     }
 }
 

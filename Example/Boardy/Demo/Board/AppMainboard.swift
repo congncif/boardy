@@ -12,8 +12,8 @@ import Foundation
 protocol AppMotherboard: FlowMotherboard {}
 
 final class AppMainboard: Motherboard, AppMotherboard {
-    init(boards: [ActivatableBoard]) {
-        super.init(boards: boards)
+    init() {
+        super.init()
 //        registerFlowSteps(.login >=> .main >=> .login)
 
         registerGeneralFlow { [weak self] (action: BoardAction) in

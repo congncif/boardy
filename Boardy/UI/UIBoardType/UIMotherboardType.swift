@@ -15,7 +15,7 @@ public typealias FlowUIMotherboard = UIMotherboardType & FlowManageable
 public protocol UIMotherboardType: OriginalBoard, IdentifiableBoard {
     var uiboards: [UIActivatableBoard] { get }
 
-    /// Append list of boards, this doesn't include installing board into rootViewController.
+    /// Append list of boards, this doesn't include installing board into rootObject.
     func addUIBoard(_ board: UIActivatableBoard)
     func removeUIBoard(withIdentifier identifier: BoardID)
 
@@ -69,6 +69,11 @@ extension UIMotherboardType {
         if let root = self.root {
             board.installIntoRoot(root)
         }
+    }
+
+    public func extended(uiboards: [UIActivatableBoard]) -> Self {
+        uiboards.forEach { self.installUIBoard($0) }
+        return self
     }
 }
 
