@@ -44,7 +44,7 @@ extension MotherboardLivable where Self: AnyObject {
 // MARK: - Utility extensions
 
 extension NSObject: MotherboardLivable {
-    /// Install a board and keep it alive with view controller's lifecycle.
+    /// Install a board and keep it alive with rootObject's lifecycle.
 
     public func attachMotheboard(_ board: FlowMotherboard) {
         motherboard = board

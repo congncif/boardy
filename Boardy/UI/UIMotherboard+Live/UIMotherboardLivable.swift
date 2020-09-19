@@ -50,7 +50,7 @@ extension Board: DisposeControllable {}
 // MARK: - UIMotherboard live
 
 extension UIMotherboardLivable where Self: UIViewController {
-    /// Install a board and keep it alive with view controller's lifecycle.
+    /// Install a board and keep it alive with rootObject's lifecycle.
     public func attachUIMotherboard(_ board: FlowUIMotherboard) {
         uimotherboard = board
         install(board: board)
