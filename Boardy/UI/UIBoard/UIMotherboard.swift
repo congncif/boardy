@@ -40,6 +40,11 @@ open class UIMotherboard: Board, UIMotherboardRepresentable, UIMotherboardObserv
         for board in uiboards {
             addUIBoard(board)
         }
+
+        // Register default flow
+        registerGeneralFlow { [weak self] in
+            self?.sendFlowAction($0)
+        }
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,

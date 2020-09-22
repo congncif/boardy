@@ -32,6 +32,10 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         registerGeneralFlow { [weak self] in
             self?.activateBoard(model: $0)
         }
+        
+        registerGeneralFlow { [weak self] in
+            self?.sendFlowAction($0)
+        }
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,
