@@ -12,7 +12,7 @@ import RxSwift
 // MARK: - ObjectReferenceStorable
 
 public final class ReferenceStoreManager {
-    private var storage: [AnyHashable: AnyObject] = [:]
+    private var storage: [AnyHashable: [AnyObject]] = [:]
     private var disposeBags: [AnyHashable: DisposeBag] = [:]
 
     public init() {}
@@ -22,12 +22,17 @@ public final class ReferenceStoreManager {
     public func storeObject<Object>(_ object: AnyObject, untilObjectKilled pairObject: Object) where Object: ReactiveCompatible, Object: AnyObject {
         let key = ObjectIdentifier(pairObject)
 
-        storage[key] = object
+        if var objects = storage[key] {
+            objects.append(object)
+            storage[key] = objects
+        } else {
+            storage[key] = [object]
+        }
 
-        let disposeBag = DisposeBag()
+        let disposeBag = disposeBags[key] ?? DisposeBag()
         disposeBags[key] = disposeBag
 
-        let disposable = pairObject.rx.deallocated
+        pairObject.rx.deallocated
             .subscribe(onNext: { [weak self] in
                 self?.storage.removeValue(forKey: key)
                 self?.disposeBags.removeValue(forKey: key)
@@ -59,10 +64,10 @@ public final class DisposeContainer {
 
     public func generateDisposeBag<Object>(for object: Object) -> DisposeBag where Object: ReactiveCompatible, Object: AnyObject {
         let key = ObjectIdentifier(object)
-        let disposeBag = DisposeBag()
+        let disposeBag = disposeBags[key] ?? DisposeBag()
         disposeBags[key] = disposeBag
 
-        let disposable = object.rx.deallocated
+        object.rx.deallocated
             .subscribe(onNext: { [weak self] in
                 self?.disposeBags.removeValue(forKey: key)
             })

@@ -13,6 +13,11 @@ import UIKit
 public typealias FlowUIMotherboardObject = FlowUIMotherboard & ReferenceStorableObject
 
 extension Board {
+    public func pairInstallWith(object: NSObject) {
+        installIntoRoot(object)
+        pairWith(object: object)
+    }
+
     public func pairInstallUIMotherboard(_ uimotherboard: FlowUIMotherboardObject, with other: NSObject) {
         uimotherboard.registerGeneralFlow { [weak self] in
             self?.sendFlowAction($0)
