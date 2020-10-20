@@ -13,13 +13,15 @@ import RxSwift
 import SiFUtilities
 import UIKit
 
+protocol DashboardElementManufacturing {
+    func getElementBoards() -> [UIActivatableBoard]
+}
+
 final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = Any?
 
     @LazyInjected var builder: DashboardBuildable
-
-    @LazyInjected var headlineBoard: HeadlineUIBoard
-    @LazyInjected var featuredBoard: FeaturedUIBoard
+    @LazyInjected var elementFactory: DashboardElementManufacturing
 
     private let disposeBag = DisposeBag()
 
@@ -34,19 +36,16 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
         /// 4 steps to set up an UIMotherboard
 
         // Step 1: Init UIMotherboard.
-        let drawingBoard = UIMotherboard(uiboards: [headlineBoard, featuredBoard])
+        let drawingBoard = getUIMotherboard(elementBoards: elementFactory.getElementBoards())
 
         // Step 2: attach & install UIMotherboard to root.
-        pairInstallUIMotherboard(drawingBoard, with: dashboard)
+        drawingBoard.pairInstallWith(object: dashboard)
 
         // Step 3: Activate all available boards in Motherboard.
         drawingBoard.activateAllUIBoards()
 
         // Step 4: Plug UIMotherboard to BoardInterface.
-        dashboard.justPlugUIMotherboard(drawingBoard)
-
-        // Or use single line setup below 😂
-        // plugAttachUIMotherboard(drawingBoard, to: dashboard)
+        drawingBoard.justPlug(in: dashboard)
     }
 }
 

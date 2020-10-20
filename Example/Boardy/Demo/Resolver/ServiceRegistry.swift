@@ -48,5 +48,8 @@ struct ServiceRegistry: Resolving {
         .scope(ResolverScopeApplication())
         .implements(DeepLinkHandlingComposable.self)
         .implements(DeepLinkHandling.self)
+
+        resolver.register { DashboardElementFactory() }
+            .implements(DashboardElementManufacturing.self)
     }
 }

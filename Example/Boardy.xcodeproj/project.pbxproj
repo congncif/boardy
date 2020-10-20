@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		2721A447253E95B300EAE0EE /* DashboardElementFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */; };
 		2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */; };
 		2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860A24FE4DA80046FDB9 /* AppMainboard.swift */; };
 		2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860C24FE57A20046FDB9 /* HomeMainboard.swift */; };
@@ -82,6 +83,7 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardElementFactory.swift; sourceTree = "<group>"; };
 		2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkAppClub.swift; sourceTree = "<group>"; };
 		2792860A24FE4DA80046FDB9 /* AppMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMainboard.swift; sourceTree = "<group>"; };
 		2792860C24FE57A20046FDB9 /* HomeMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMainboard.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 		27950A5A24F80268005779B7 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
+				2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */,
 				27950A6024F80944005779B7 /* DashboardBoard.swift */,
 				27950A5D24F80944005779B7 /* DashboardBuilder.swift */,
 				27950A6124F80944005779B7 /* DashboardProtocols.swift */,
@@ -682,6 +685,7 @@
 				27D665DA250DC617008B6E48 /* RootBuilder.swift in Sources */,
 				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
 				27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */,
+				2721A447253E95B300EAE0EE /* DashboardElementFactory.swift in Sources */,
 				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,
 				27CA1D5524FB3DE300694463 /* HeadlineViewState.swift in Sources */,
 				27FD0A9624E0E430002855D6 /* LoginViewState.swift in Sources */,

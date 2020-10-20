@@ -49,7 +49,7 @@ extension Board: DisposeControllable {}
 
 // MARK: - UIMotherboard live
 
-extension UIMotherboardLivable where Self: UIViewController {
+extension UIMotherboardLivable where Self: NSObject {
     /// Install a board and keep it alive with rootObject's lifecycle.
     public func attachUIMotherboard(_ board: FlowUIMotherboard) {
         uimotherboard = board
@@ -63,24 +63,8 @@ extension UIMotherboardLivable where Self: UIBoardInterface, Self: DisposeContro
     }
 }
 
-extension Board {
-    /// Use this method to attach an UIMotherboard to guarantee default settings.
-    public func attachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewController) {
-        uimotherboard.registerGeneralFlow { [weak self] in
-            self?.sendFlowAction($0)
-        }
-        viewController.attachUIMotherboard(uimotherboard)
-    }
-
-    public func plugAttachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewControllerBoardInterface, activateOptions: [BoardID: Any] = [:], defaultOption: Any? = nil) {
-        attachUIMotherboard(uimotherboard, to: viewController)
-        uimotherboard.activateAllUIBoards(withOptions: activateOptions, defaultOption: defaultOption)
-        viewController.plugUIMotherboard(uimotherboard)
-    }
-
-    public func plugAttachUIMotherboard(_ uimotherboard: FlowUIMotherboard, to viewController: UIViewControllerBoardInterface, modelOptions: [BoardInputModel], defaultOption: Any? = nil) {
-        attachUIMotherboard(uimotherboard, to: viewController)
-        uimotherboard.activateAllUIBoards(models: modelOptions, defaultOption: defaultOption)
-        viewController.plugUIMotherboard(uimotherboard)
+extension UIMotherboardType where Self: DisposeControllable {
+    public func plug(in interface: UIBoardInterface) {
+        plug(in: interface, with: disposeBag)
     }
 }

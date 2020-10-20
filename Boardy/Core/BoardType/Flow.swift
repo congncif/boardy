@@ -145,3 +145,19 @@ extension BoardDelegate where Self: FlowManageable {
 }
 
 public typealias FlowMotherboard = MotherboardType & FlowManageable
+
+// MARK: - Forward functions
+
+extension FlowManageable {
+    public func forwardActionFlow(to board: IdentifiableBoard) {
+        registerGeneralFlow {
+            board.sendFlowAction($0)
+        }
+    }
+
+    public func forwardActivationFlow(to board: IdentifiableBoard) {
+        registerGeneralFlow {
+            board.nextToBoard(model: $0)
+        }
+    }
+}

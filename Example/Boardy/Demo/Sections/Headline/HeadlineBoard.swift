@@ -31,4 +31,8 @@ extension HeadlineUIBoard: HeadlineDelegate {
     func returnRoot() {
         sendAction(.return)
     }
+
+    func gotoNext() {
+        nextToBoard(.dashboard)
+    }
 }

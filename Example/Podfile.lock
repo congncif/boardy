@@ -1,26 +1,31 @@
 PODS:
-  - Boardy (0.9.17):
-    - Boardy/Default (= 0.9.17)
+  - Boardy (0.9.24):
+    - Boardy/Default (= 0.9.24)
     - RxDataSources
     - SnapKit
-  - Boardy/Core (0.9.17):
+  - Boardy/Core (0.9.24):
     - RxDataSources
     - SnapKit
-  - Boardy/DeepLink (0.9.17):
+  - Boardy/DeepLink (0.9.24):
     - Boardy/Core
     - RxDataSources
     - SnapKit
-  - Boardy/Default (0.9.17):
+  - Boardy/Default (0.9.24):
     - Boardy/Core
     - RxDataSources
     - SnapKit
-  - Boardy/UI (0.9.17):
+  - Boardy/UI (0.9.24):
     - Boardy/Core
     - Boardy/DeepLink
     - RxDataSources
     - SnapKit
   - Differentiator (4.0.1)
-  - Localize-Swift (3.1.0)
+  - Localize-Swift (3.2.0):
+    - Localize-Swift/LocalizeSwiftCore (= 3.2.0)
+    - Localize-Swift/UIKit (= 3.2.0)
+  - Localize-Swift/LocalizeSwiftCore (3.2.0)
+  - Localize-Swift/UIKit (3.2.0):
+    - Localize-Swift/LocalizeSwiftCore
   - Resolver (1.1.4)
   - RIBs (0.9.3):
     - RxRelay (~> 5.1)
@@ -35,10 +40,10 @@ PODS:
   - RxRelay (5.1.1):
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
-  - SiFUtilities (4.9.12):
-    - SiFUtilities/Default (= 4.9.12)
-  - SiFUtilities/Core (4.9.12)
-  - SiFUtilities/Default (4.9.12):
+  - SiFUtilities (4.9.13):
+    - SiFUtilities/Default (= 4.9.13)
+  - SiFUtilities/Core (4.9.13)
+  - SiFUtilities/Default (4.9.13):
     - SiFUtilities/Core
     - SiFUtilities/Endpoint
     - SiFUtilities/Helpers
@@ -50,23 +55,23 @@ PODS:
     - SiFUtilities/Runtime
     - SiFUtilities/Show
     - SiFUtilities/WeakObject
-  - SiFUtilities/Endpoint (4.9.12)
-  - SiFUtilities/Helpers (4.9.12)
-  - SiFUtilities/IBDesignable (4.9.12):
+  - SiFUtilities/Endpoint (4.9.13)
+  - SiFUtilities/Helpers (4.9.13)
+  - SiFUtilities/IBDesignable (4.9.13):
     - SiFUtilities/Core
-  - SiFUtilities/KeyValue (4.9.12)
-  - SiFUtilities/Loading (4.9.12)
-  - SiFUtilities/Localize (4.9.12):
+  - SiFUtilities/KeyValue (4.9.13)
+  - SiFUtilities/Loading (4.9.13)
+  - SiFUtilities/Localize (4.9.13):
     - Localize-Swift
     - SiFUtilities/Core
     - SiFUtilities/Runtime
-  - SiFUtilities/Nib (4.9.12):
+  - SiFUtilities/Nib (4.9.13):
     - SiFUtilities/Core
-  - SiFUtilities/Runtime (4.9.12)
-  - SiFUtilities/Show (4.9.12):
+  - SiFUtilities/Runtime (4.9.13)
+  - SiFUtilities/Show (4.9.13):
     - SiFUtilities/Core
     - SiFUtilities/Localize
-  - SiFUtilities/WeakObject (4.9.12)
+  - SiFUtilities/WeakObject (4.9.13)
   - SnapKit (5.0.1)
   - ViewStateCore (1.7.0)
 
@@ -105,16 +110,16 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: 9a8967b52f738d2c98ebfc03ac02fb977495d44e
+  Boardy: 56b38c39112688d94f785f326d06e4bd81715854
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
-  Localize-Swift: 4bed4f0ccac8be2ec3517ee359da80ba2adb0fae
+  Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
   RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
-  SiFUtilities: face68fdbdf54e062a016f5ca652cd2dbbf8b6f8
+  SiFUtilities: cd38de725d6ca440c7b15f5007dd89256d16fb5f
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 

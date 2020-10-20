@@ -14,6 +14,7 @@ protocol HeadlineController: UIViewController {
 
 protocol HeadlineDelegate: AnyObject {
     func returnRoot()
+    func gotoNext()
 }
 
 protocol HeadlineBuildable {

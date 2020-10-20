@@ -28,14 +28,8 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
             addBoard(board)
         }
 
-        // Register default flow
-        registerGeneralFlow { [weak self] in
-            self?.activateBoard(model: $0)
-        }
-        
-        registerGeneralFlow { [weak self] in
-            self?.sendFlowAction($0)
-        }
+        forwardActivationFlow(to: self)
+        forwardActionFlow(to: self)
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,

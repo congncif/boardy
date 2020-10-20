@@ -26,3 +26,13 @@ open class ContinuousUIBoard: UIBoard {
         motherboard.installIntoRoot(rootObject)
     }
 }
+
+extension Board {
+    /// Create a new UIMotherboard which use internal a board. Chain of action will be set up.
+    public func getUIMotherboard(identifier: BoardID = UUID().uuidString, elementBoards: [UIActivatableBoard] = []) -> UIMotherboard {
+        let motherboard = UIMotherboard(identifier: identifier, uiboards: elementBoards)
+        motherboard.forwardActionFlow(to: self)
+        motherboard.forwardActivationFlow(to: self)
+        return motherboard
+    }
+}

@@ -26,10 +26,12 @@ final class HeadlineViewController: UIViewController, HeadlineController {
 
     // MARK: Privates
 
-    // @IBOutlet private weak var
-
     @IBAction private func returnButtonDidTap() {
         delegate?.returnRoot()
+    }
+    
+    @IBAction private func nextButtonDidTap() {
+        delegate?.gotoNext()
     }
 }
 
