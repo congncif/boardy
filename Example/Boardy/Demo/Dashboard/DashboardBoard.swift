@@ -33,19 +33,31 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
         let dashboard = builder.build()
         rootViewController.topPresentedViewController.show(dashboard)
 
-        /// 4 steps to set up an UIMotherboard
+        /*
+         /// 4 steps to set up an UIMotherboard
 
-        // Step 1: Init UIMotherboard.
-        let drawingBoard = getUIMotherboard(elementBoards: elementFactory.getElementBoards())
+         // Step 1: Init UIMotherboard.
+         let drawingBoard = getUIMotherboard(elementBoards: elementFactory.getElementBoards())
 
-        // Step 2: attach & install UIMotherboard to root.
-        drawingBoard.pairInstallWith(object: dashboard)
+         // Step 2: attach & install UIMotherboard to root.
+         drawingBoard.pairInstallWith(object: dashboard)
 
-        // Step 3: Activate all available boards in Motherboard.
-        drawingBoard.activateAllUIBoards()
+         // Step 3: Activate all available boards in Motherboard.
+         drawingBoard.activateAllUIBoards()
 
-        // Step 4: Plug UIMotherboard to BoardInterface.
-        drawingBoard.justPlug(in: dashboard)
+         // Step 4: Plug UIMotherboard to BoardInterface.
+         drawingBoard.justPlug(in: dashboard)
+         */
+
+        let headline = HeadlineBoard()
+        let featured = FeaturedBoard()
+        let board = getComposingMotherboard(elementBoards: [headline, featured])
+        
+        board.connect(to: dashboard)
+
+        board.attach(to: dashboard)
+
+        board.activateAllBoards()
     }
 }
 

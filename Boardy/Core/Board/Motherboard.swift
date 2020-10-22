@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMotherboard {
-    var mainboard: [BoardID: ActivatableBoard] = [:] {
+    var mainboard: [ActivatableBoard] = [] {
         didSet {
             for var board in boards {
                 board.delegate = self
@@ -28,8 +28,12 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
             addBoard(board)
         }
 
-        forwardActivationFlow(to: self)
         forwardActionFlow(to: self)
+
+        // Register default flow
+        registerGeneralFlow { [weak self] in
+            self?.activateBoard(model: $0)
+        }
     }
 
     public convenience init(identifier: BoardID = UUID().uuidString,

@@ -66,25 +66,25 @@ extension MotherboardType {
 // MARK: - Internal
 
 protocol MotherboardRepresentable: AnyObject, MotherboardType {
-    var mainboard: [BoardID: ActivatableBoard] { get set }
+    var mainboard: [ActivatableBoard] { get set }
 }
 
 extension MotherboardRepresentable {
     public var boards: [ActivatableBoard] {
-        mainboard.map { $0.value }
+        mainboard
     }
 
     public func getBoard(identifier: BoardID) -> ActivatableBoard? {
-        return mainboard[identifier]
+        return mainboard.first { $0.identifier == identifier }
     }
 
     public func addBoard(_ board: ActivatableBoard) {
-        assert(mainboard[board.identifier] == nil, " 💔 Board with identifier \(board.identifier) was already added to motherboard \(self).")
-        mainboard[board.identifier] = board
+        assert(getBoard(identifier: board.identifier) == nil, " 💔 Board with identifier \(board.identifier) was already added to motherboard \(self).")
+        mainboard.append(board)
     }
 
     public func removeBoard(withIdentifier identifier: BoardID) {
-        assert(mainboard[identifier] != nil, " 💔 Board with identifier \(identifier) was not in motherboard \(self).")
-        mainboard[identifier] = nil
+        assert(getBoard(identifier: identifier) != nil, " 💔 Board with identifier \(identifier) was not in motherboard \(self).")
+        mainboard.removeAll { $0.identifier == identifier }
     }
 }

@@ -14,9 +14,13 @@ final class HeadlineViewController: UIViewController, HeadlineController {
 
     weak var delegate: HeadlineDelegate?
 
-    lazy var state: HeadlineViewState = HeadlineViewState()
+    lazy var state = HeadlineViewState()
 
     // MARK: LifeCycle
+
+    deinit {
+        print("👉 \(String(describing: self)) 👉 \(#function)")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +33,7 @@ final class HeadlineViewController: UIViewController, HeadlineController {
     @IBAction private func returnButtonDidTap() {
         delegate?.returnRoot()
     }
-    
+
     @IBAction private func nextButtonDidTap() {
         delegate?.gotoNext()
     }

@@ -1,8 +1,8 @@
 //
-//  Headline2Board.swift
+//  HeadlineBoard.swift
 //  Boardy
 //
-//  Created by NGUYEN CHI CONG on 10/22/20.
+//  Created by NGUYEN CHI CONG on 8/30/20.
 //  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
@@ -11,8 +11,8 @@ import Foundation
 import Resolver
 import UIKit
 
-final class HeadlineBoard: Board, GuaranteedBoard {
-    typealias InputType = Any
+final class HeadlineUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
+    typealias InputType = Any?
 
     @LazyInjected var builder: HeadlineBuildable
 
@@ -20,16 +20,14 @@ final class HeadlineBoard: Board, GuaranteedBoard {
         super.init()
     }
 
-    func activate(withGuaranteedInput input: Any) {
+    func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
         let viewController = builder.build()
         viewController.delegate = self
-
-        let element = UIElement(identifier: identifier, contentViewController: viewController)
-        putToComposer(elementAction: .update(element: element))
+        return viewController
     }
 }
 
-extension HeadlineBoard: HeadlineDelegate {
+extension HeadlineUIBoard: HeadlineDelegate {
     func returnRoot() {
         sendAction(.return)
     }

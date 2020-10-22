@@ -15,11 +15,11 @@ public protocol MotherboardLivable: AnyObject {
 private var motherboardKey: UInt8 = 105
 
 extension MotherboardLivable where Self: AnyObject {
-    func getAssociatedMotherboard() -> FlowMotherboard? {
+    private func getAssociatedMotherboard() -> FlowMotherboard? {
         return objc_getAssociatedObject(self, &motherboardKey) as? FlowMotherboard
     }
 
-    func setAssociatedMotherboard(_ value: FlowMotherboard?) {
+    private func setAssociatedMotherboard(_ value: FlowMotherboard?) {
         value?.installIntoRoot(self)
         objc_setAssociatedObject(self, &motherboardKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
@@ -45,8 +45,14 @@ extension MotherboardLivable where Self: AnyObject {
 
 extension NSObject: MotherboardLivable {
     /// Install a board and keep it alive with rootObject's lifecycle.
-    public func attachMotheboard(_ board: FlowMotherboard) {
-        motherboard = board
-        install(board: board)
+    public func attachMotheboard(_ motherboard: FlowMotherboard) {
+        self.motherboard = motherboard
+        install(board: motherboard)
+    }
+}
+
+extension MotherboardType where Self: FlowManageable {
+    public func attach(to object: NSObject) {
+        object.attachMotheboard(self)
     }
 }

@@ -10,8 +10,6 @@ import UIKit
 
 // MARK: - Board + pair
 
-public typealias FlowUIMotherboardObject = FlowUIMotherboard & ReferenceStorableObject
-
 extension Board {
     public func pairInstallWith(object: NSObject) {
         installIntoRoot(object)

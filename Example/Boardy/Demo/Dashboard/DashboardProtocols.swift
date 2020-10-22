@@ -9,7 +9,7 @@
 import Boardy
 import UIKit
 
-protocol DashboardController: UIViewController, UIBoardInterface {
+protocol DashboardController: UIViewController, UIBoardInterface, ComposableInterface {
     var delegate: DashboardDelegate? { get set }
 }
 

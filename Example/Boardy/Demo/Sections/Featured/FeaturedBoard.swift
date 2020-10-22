@@ -1,5 +1,5 @@
 //
-//  Headline2Board.swift
+//  FeaturedBoard.swift
 //  Boardy
 //
 //  Created by NGUYEN CHI CONG on 10/22/20.
@@ -11,16 +11,16 @@ import Foundation
 import Resolver
 import UIKit
 
-final class HeadlineBoard: Board, GuaranteedBoard {
-    typealias InputType = Any
+final class FeaturedBoard: Board, GuaranteedBoard {
+    typealias InputType = Any?
 
-    @LazyInjected var builder: HeadlineBuildable
+    @LazyInjected var builder: FeaturedBuildable
 
     init() {
         super.init()
     }
 
-    func activate(withGuaranteedInput input: Any) {
+    func activate(withGuaranteedInput input: Any?) {
         let viewController = builder.build()
         viewController.delegate = self
 
@@ -29,12 +29,4 @@ final class HeadlineBoard: Board, GuaranteedBoard {
     }
 }
 
-extension HeadlineBoard: HeadlineDelegate {
-    func returnRoot() {
-        sendAction(.return)
-    }
-
-    func gotoNext() {
-        nextToBoard(.dashboard)
-    }
-}
+extension FeaturedBoard: FeaturedDelegate {}

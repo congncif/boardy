@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
 		2721A447253E95B300EAE0EE /* DashboardElementFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */; };
+		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
+		27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FD12541571C005C9027 /* FeaturedBoard.swift */; };
 		2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */; };
 		2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860A24FE4DA80046FDB9 /* AppMainboard.swift */; };
 		2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860C24FE57A20046FDB9 /* HomeMainboard.swift */; };
@@ -21,7 +23,7 @@
 		27CA1D5324FB3DE300694463 /* HeadlineViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */; };
 		27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */; };
 		27CA1D5524FB3DE300694463 /* HeadlineViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4F24FB3DE300694463 /* HeadlineViewState.swift */; };
-		27CA1D5624FB3DE300694463 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */; };
+		27CA1D5624FB3DE300694463 /* HeadlineUIBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5024FB3DE300694463 /* HeadlineUIBoard.swift */; };
 		27CA1D5724FB3DE300694463 /* HeadlineProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */; };
 		27CA1D6424FB62DF00694463 /* FeaturedBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */; };
 		27CA1D6524FB62DF00694463 /* FeaturedViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */; };
@@ -29,7 +31,6 @@
 		27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */; };
 		27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */; };
 		27CA1D6A24FB62EB00694463 /* FeaturedUIBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */; };
-		27D665CF250D14AF008B6E48 /* RIBBoard+Pair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */; };
 		27D665D1250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */; };
 		27D665DA250DC617008B6E48 /* RootBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665D5250DC617008B6E48 /* RootBuilder.swift */; };
 		27D665DB250DC617008B6E48 /* RootViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27D665D6250DC617008B6E48 /* RootViewController.storyboard */; };
@@ -84,6 +85,8 @@
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardElementFactory.swift; sourceTree = "<group>"; };
+		27547FCD25415640005C9027 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
+		27547FD12541571C005C9027 /* FeaturedBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBoard.swift; sourceTree = "<group>"; };
 		2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkAppClub.swift; sourceTree = "<group>"; };
 		2792860A24FE4DA80046FDB9 /* AppMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMainboard.swift; sourceTree = "<group>"; };
 		2792860C24FE57A20046FDB9 /* HomeMainboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMainboard.swift; sourceTree = "<group>"; };
@@ -96,7 +99,7 @@
 		27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = HeadlineViewController.storyboard; sourceTree = "<group>"; };
 		27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineViewController.swift; sourceTree = "<group>"; };
 		27CA1D4F24FB3DE300694463 /* HeadlineViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineViewState.swift; sourceTree = "<group>"; };
-		27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
+		27CA1D5024FB3DE300694463 /* HeadlineUIBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineUIBoard.swift; sourceTree = "<group>"; };
 		27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineProtocols.swift; sourceTree = "<group>"; };
 		27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBuilder.swift; sourceTree = "<group>"; };
 		27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FeaturedViewController.storyboard; sourceTree = "<group>"; };
@@ -104,7 +107,6 @@
 		27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedViewState.swift; sourceTree = "<group>"; };
 		27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedProtocols.swift; sourceTree = "<group>"; };
 		27CA1D6924FB62EB00694463 /* FeaturedUIBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedUIBoard.swift; sourceTree = "<group>"; };
-		27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RIBBoard+Pair.swift"; sourceTree = "<group>"; };
 		27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuousBoardRIBBoard.swift; sourceTree = "<group>"; };
 		27D665D5250DC617008B6E48 /* RootBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootBuilder.swift; sourceTree = "<group>"; };
 		27D665D6250DC617008B6E48 /* RootViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = RootViewController.storyboard; sourceTree = "<group>"; };
@@ -210,7 +212,8 @@
 		27CA1D4B24FB3D6200694463 /* Headline */ = {
 			isa = PBXGroup;
 			children = (
-				27CA1D5024FB3DE300694463 /* HeadlineBoard.swift */,
+				27CA1D5024FB3DE300694463 /* HeadlineUIBoard.swift */,
+				27547FCD25415640005C9027 /* HeadlineBoard.swift */,
 				27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */,
 				27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */,
 				27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */,
@@ -229,6 +232,7 @@
 				27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */,
 				27CA1D6124FB62DF00694463 /* FeaturedViewController.swift */,
 				27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */,
+				27547FD12541571C005C9027 /* FeaturedBoard.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -236,7 +240,6 @@
 		27D665CD250D147C008B6E48 /* ContainerBoard */ = {
 			isa = PBXGroup;
 			children = (
-				27D665CE250D14AF008B6E48 /* RIBBoard+Pair.swift */,
 				27D665D0250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift */,
 			);
 			path = ContainerBoard;
@@ -666,14 +669,16 @@
 				27FD0A8D24E0DE31002855D6 /* PlaceholderViewController.swift in Sources */,
 				27FD0AB224E0FF7F002855D6 /* UserInfo.swift in Sources */,
 				27CA1D6624FB62DF00694463 /* FeaturedViewController.swift in Sources */,
+				27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */,
 				27D665DD250DC617008B6E48 /* RootViewState.swift in Sources */,
 				27FD0A8724E0DE31002855D6 /* UILinkableRIBBoard.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */,
 				27950A5C24F80296005779B7 /* DashboardViewController.swift in Sources */,
 				27FD0AA924E0EF5F002855D6 /* MainRouter.swift in Sources */,
 				27D665D1250D14E3008B6E48 /* ContinuousBoardRIBBoard.swift in Sources */,
 				27FD0AAF24E0F007002855D6 /* MainBoard.swift in Sources */,
-				27CA1D5624FB3DE300694463 /* HeadlineBoard.swift in Sources */,
+				27CA1D5624FB3DE300694463 /* HeadlineUIBoard.swift in Sources */,
 				27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */,
 				27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
@@ -705,7 +710,6 @@
 				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */,
-				27D665CF250D14AF008B6E48 /* RIBBoard+Pair.swift in Sources */,
 				27FD0AAD24E0EF5F002855D6 /* MainInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
