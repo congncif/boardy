@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIComposable
 
 public protocol ComposingMotherboardType: MotherboardType {
     func connect(to interface: ComposableInterface)

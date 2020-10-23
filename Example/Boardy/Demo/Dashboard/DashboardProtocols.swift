@@ -7,13 +7,16 @@
 //
 
 import Boardy
+import UIComposable
 import UIKit
 
 protocol DashboardController: UIViewController, UIBoardInterface, ComposableInterface {
     var delegate: DashboardDelegate? { get set }
 }
 
-protocol DashboardDelegate: AnyObject {}
+protocol DashboardDelegate: AnyObject {
+    func changePlugins(viewController: UIViewController)
+}
 
 protocol DashboardBuildable {
     func build() -> DashboardController

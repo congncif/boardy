@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kOx-7S-liq">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kOx-7S-liq">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -16,8 +17,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="300"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pl9-6l-tfZ">
-                                <rect key="frame" x="143.5" y="100" width="127" height="100"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pl9-6l-tfZ">
+                                <rect key="frame" x="143" y="100" width="128" height="100"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <state key="normal" title="Adjust content">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -26,14 +27,24 @@
                                     <action selector="goButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="x4w-Ip-MnB"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FqO-Yp-QW5">
+                                <rect key="frame" x="16" y="250" width="55" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Remove"/>
+                                <connections>
+                                    <action selector="removeButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="u2R-M1-b2j"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <viewLayoutGuide key="safeArea" id="K48-Om-wnK"/>
+                        <color key="backgroundColor" systemColor="systemPinkColor"/>
                         <constraints>
+                            <constraint firstItem="K48-Om-wnK" firstAttribute="bottom" secondItem="FqO-Yp-QW5" secondAttribute="bottom" constant="20" id="Do4-CW-82S"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="UaH-z3-1uQ"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="gPF-mA-i99"/>
+                            <constraint firstItem="FqO-Yp-QW5" firstAttribute="leading" secondItem="K48-Om-wnK" secondAttribute="leading" constant="16" id="h9n-uQ-dMk"/>
                             <constraint firstAttribute="bottom" secondItem="pl9-6l-tfZ" secondAttribute="bottom" constant="100" id="hXg-3W-p0v"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="K48-Om-wnK"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="wRP-sK-xz5">
                         <barButtonItem key="backBarButtonItem" title=" " id="Leg-EJ-Xn4"/>
@@ -50,4 +61,9 @@
             <point key="canvasLocation" x="139" y="84"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemPinkColor">
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

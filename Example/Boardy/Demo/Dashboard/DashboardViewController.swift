@@ -8,13 +8,15 @@
 
 import Boardy
 import RxSwift
+import UIComposable
 import UIKit
 
 final class DashboardViewController: ListViewController, DashboardController {
     private(set) var composedElements: [UIElement] = [] {
         didSet {
-            let items = composedElements.map {
-                UIBoardItem(identifier: $0.identifier, version: Int.random(in: 1 ... 1000), viewController: $0.contentViewController ?? UIViewController())
+            let items: [UIBoardItem] = composedElements.compactMap {
+                guard let content = $0.contentViewController else { return nil }
+                return UIBoardItem(identifier: $0.identifier, version: Int($0.version), viewController: content)
             }
             boardItems.onNext(items)
         }
@@ -29,9 +31,16 @@ final class DashboardViewController: ListViewController, DashboardController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let rightBarItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(changeButtonDidTap))
+        navigationItem.rightBarButtonItem = rightBarItem
     }
-    
+
     deinit {
         print("👉 \(String(describing: self)) 👉 \(#function)")
+    }
+
+    @IBAction private func changeButtonDidTap() {
+        delegate?.changePlugins(viewController: self)
     }
 }

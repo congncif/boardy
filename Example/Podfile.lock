@@ -1,22 +1,21 @@
 PODS:
-  - Boardy (0.9.24):
-    - Boardy/Default (= 0.9.24)
-    - RxDataSources
-    - SnapKit
-  - Boardy/Core (0.9.24):
-    - RxDataSources
-    - SnapKit
-  - Boardy/DeepLink (0.9.24):
+  - Boardy (0.9.25):
+    - Boardy/Default (= 0.9.25)
+  - Boardy/Core (0.9.25)
+  - Boardy/CoreUI (0.9.25):
     - Boardy/Core
-    - RxDataSources
-    - SnapKit
-  - Boardy/Default (0.9.24):
+    - UIComposable
+  - Boardy/DeepLink (0.9.25):
     - Boardy/Core
-    - RxDataSources
-    - SnapKit
-  - Boardy/UI (0.9.24):
+  - Boardy/Default (0.9.25):
+    - Boardy/Core
+  - Boardy/RxStoreRef (0.9.25):
+    - Boardy/Core
+    - RxSwift
+  - Boardy/UI (0.9.25):
     - Boardy/Core
     - Boardy/DeepLink
+    - Boardy/RxStoreRef
     - RxDataSources
     - SnapKit
   - Differentiator (4.0.1)
@@ -73,10 +72,12 @@ PODS:
     - SiFUtilities/Localize
   - SiFUtilities/WeakObject (4.9.13)
   - SnapKit (5.0.1)
+  - UIComposable (0.1.1)
   - ViewStateCore (1.7.0)
 
 DEPENDENCIES:
   - Boardy (from `../`)
+  - Boardy/CoreUI (from `../`)
   - Boardy/DeepLink (from `../`)
   - Boardy/UI (from `../`)
   - Resolver (~> 1.1)
@@ -95,6 +96,7 @@ SPEC REPOS:
     - RxSwift
     - SiFUtilities
     - SnapKit
+    - UIComposable
     - ViewStateCore
 
 EXTERNAL SOURCES:
@@ -110,7 +112,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: 56b38c39112688d94f785f326d06e4bd81715854
+  Boardy: ffab760df733b89fb44ba56c575a804348e1dbc4
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
@@ -121,8 +123,9 @@ SPEC CHECKSUMS:
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SiFUtilities: cd38de725d6ca440c7b15f5007dd89256d16fb5f
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  UIComposable: 1c378d8703e00358919a032f5b078b1705df29b1
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: b1b42eadc58d2244f17838a3a74350b8570af2aa
+PODFILE CHECKSUM: fc8158495fd04c2dfa28952ae1dea89d33218e7c
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

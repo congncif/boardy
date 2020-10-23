@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '0.9.24'
+    s.version          = '0.9.25'
     s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
@@ -28,13 +28,32 @@ Pod::Spec.new do |s|
         co.dependency 'Boardy/Core'
     end
     
+    s.subspec 'RxStoreRef' do |co|
+        co.source_files = 'Boardy/RxStoreRef/**/*'
+        
+        co.dependency 'Boardy/Core'
+        co.dependency 'Boardy/DeepLink'
+        
+        co.dependency 'RxSwift'
+        co.dependency 'RxCocoa'
+    end
+    
+    s.subspec 'CoreUI' do |co|
+        co.source_files = 'Boardy/CoreUI/**/*'
+        
+        co.dependency 'Boardy/Core'
+        co.dependency 'UIComposable'
+    end
+    
+    # Deprecated
     s.subspec 'UI' do |co|
         co.source_files = 'Boardy/UI/**/*'
         
         co.dependency 'Boardy/Core'
         co.dependency 'Boardy/DeepLink'
+        co.dependency 'Boardy/RxStoreRef'
         
-        s.dependency 'RxDataSources'
-        s.dependency 'SnapKit'
+        co.dependency 'RxDataSources'
+        co.dependency 'SnapKit'
     end
 end

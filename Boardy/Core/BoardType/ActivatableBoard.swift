@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import RxCocoa
-import RxSwift
 import UIKit
 
 public typealias BoardID = String
@@ -45,6 +43,12 @@ extension IdentifiableBoard {
 
 public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard {
     func activate(withOption option: Any?)
+}
+
+extension ActivatableBoard {
+    public func activate() {
+        activate(withOption: nil)
+    }
 }
 
 // MARK: - Utility extensions

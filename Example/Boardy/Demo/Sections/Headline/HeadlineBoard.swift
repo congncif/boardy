@@ -9,6 +9,7 @@
 import Boardy
 import Foundation
 import Resolver
+import UIComposable
 import UIKit
 
 final class HeadlineBoard: Board, GuaranteedBoard {
@@ -17,7 +18,7 @@ final class HeadlineBoard: Board, GuaranteedBoard {
     @LazyInjected var builder: HeadlineBuildable
 
     init() {
-        super.init()
+        super.init(identifier: .headline)
     }
 
     func activate(withGuaranteedInput input: Any) {

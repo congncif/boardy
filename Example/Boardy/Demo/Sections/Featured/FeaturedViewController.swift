@@ -39,6 +39,10 @@ final class FeaturedViewController: UIViewController, FeaturedController {
 
         self.view.closestContainerTableView?.performUpdates()
     }
+    
+    @IBAction private func removeButtonDidTap() {
+        delegate?.removeFeaturedContent()
+    }
 }
 
 // MARK: - Behaviors

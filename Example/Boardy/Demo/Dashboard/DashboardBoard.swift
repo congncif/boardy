@@ -31,6 +31,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
     func activate(withGuaranteedInput input: Any?) {
         let dashboard = builder.build()
+        dashboard.delegate = self
         rootViewController.topPresentedViewController.show(dashboard)
 
         /*
@@ -50,15 +51,25 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
          */
 
         let headline = HeadlineBoard()
-        let featured = FeaturedBoard()
-        let board = getComposingMotherboard(elementBoards: [headline, featured])
         
-        board.connect(to: dashboard)
+        let board = getComposingMotherboard(elementBoards: [headline])
 
         board.attach(to: dashboard)
+
+        board.connect(to: dashboard)
 
         board.activateAllBoards()
     }
 }
 
-extension DashboardBoard: DashboardDelegate {}
+extension DashboardBoard: DashboardDelegate {
+    func changePlugins(viewController: UIViewController) {
+        let composingBoard = viewController.composingMotherboard
+        
+        let featured = FeaturedBoard()
+        
+        composingBoard.addBoard(featured)
+        
+        featured.activate(withOption: nil)
+    }
+}

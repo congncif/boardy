@@ -17,7 +17,7 @@ final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
     @LazyInjected var builder: FeaturedBuildable
 
     init() {
-        super.init()
+        super.init(identifier: .featured)
     }
 
     func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
@@ -27,4 +27,8 @@ final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
     }
 }
 
-extension FeaturedUIBoard: FeaturedDelegate {}
+extension FeaturedUIBoard: FeaturedDelegate {
+    func removeFeaturedContent() {
+        // 
+    }
+}

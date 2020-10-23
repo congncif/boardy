@@ -9,6 +9,7 @@
 import Boardy
 import Foundation
 import Resolver
+import UIComposable
 import UIKit
 
 final class FeaturedBoard: Board, GuaranteedBoard {
@@ -29,4 +30,8 @@ final class FeaturedBoard: Board, GuaranteedBoard {
     }
 }
 
-extension FeaturedBoard: FeaturedDelegate {}
+extension FeaturedBoard: FeaturedDelegate {
+    func removeFeaturedContent() {
+        putToComposer(elementAction: .removeContent(identifier: identifier))
+    }
+}
