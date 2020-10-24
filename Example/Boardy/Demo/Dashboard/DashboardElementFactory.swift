@@ -9,7 +9,7 @@
 import Foundation
 import Resolver
 
-// UIBoard is deprecated, use normal Board & ComposingMotherboard instead.
+// UIBoard is deprecated, use normal Board & ComposableMotherboard instead.
 struct DashboardElementFactory: DashboardElementManufacturing, Resolving {
     func getElementBoards() -> [UIActivatableBoard] {
         let headlineBoard: HeadlineUIBoard = resolver.resolve()

@@ -51,25 +51,25 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
          */
 
         let headline = HeadlineBoard()
-        
-        let board = getComposingMotherboard(elementBoards: [headline])
 
-        board.attach(to: dashboard)
+        let contentBoard = getComposableMotherboard(elementBoards: [headline])
 
-        board.connect(to: dashboard)
+        contentBoard.attach(to: dashboard)
 
-        board.activateAllBoards()
+        contentBoard.connect(to: dashboard)
+
+        contentBoard.activateAllBoards()
     }
 }
 
 extension DashboardBoard: DashboardDelegate {
     func changePlugins(viewController: UIViewController) {
-        let composingBoard = viewController.composingMotherboard
-        
+        let contentBoard = viewController.composableMotherboard
+
         let featured = FeaturedBoard()
-        
-        composingBoard.addBoard(featured)
-        
+
+        contentBoard.addBoard(featured)
+
         featured.activate()
     }
 }

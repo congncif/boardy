@@ -3,7 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -35,15 +35,25 @@
                                     <action selector="removeButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="u2R-M1-b2j"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hiF-iH-35q">
+                                <rect key="frame" x="281" y="250" width="117" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Refresh Headline"/>
+                                <connections>
+                                    <action selector="refreshButtonDidTap" destination="kOx-7S-liq" eventType="touchUpInside" id="q3I-Kf-EDn"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="K48-Om-wnK"/>
                         <color key="backgroundColor" systemColor="systemPinkColor"/>
                         <constraints>
+                            <constraint firstItem="K48-Om-wnK" firstAttribute="bottom" secondItem="hiF-iH-35q" secondAttribute="bottom" constant="20" id="CKy-6q-WHp"/>
                             <constraint firstItem="K48-Om-wnK" firstAttribute="bottom" secondItem="FqO-Yp-QW5" secondAttribute="bottom" constant="20" id="Do4-CW-82S"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="top" secondItem="bSZ-gG-gj5" secondAttribute="top" constant="100" id="UaH-z3-1uQ"/>
                             <constraint firstItem="pl9-6l-tfZ" firstAttribute="centerX" secondItem="bSZ-gG-gj5" secondAttribute="centerX" id="gPF-mA-i99"/>
                             <constraint firstItem="FqO-Yp-QW5" firstAttribute="leading" secondItem="K48-Om-wnK" secondAttribute="leading" constant="16" id="h9n-uQ-dMk"/>
                             <constraint firstAttribute="bottom" secondItem="pl9-6l-tfZ" secondAttribute="bottom" constant="100" id="hXg-3W-p0v"/>
+                            <constraint firstAttribute="trailing" secondItem="hiF-iH-35q" secondAttribute="trailing" constant="16" id="jvP-hq-yrD"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="wRP-sK-xz5">

@@ -16,7 +16,7 @@ final class DashboardViewController: RxComposableListViewController, DashboardCo
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let rightBarItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(changeButtonDidTap))
+        let rightBarItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(changeButtonDidTap))
         navigationItem.rightBarButtonItem = rightBarItem
     }
 

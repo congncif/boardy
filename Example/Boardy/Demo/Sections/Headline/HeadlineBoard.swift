@@ -12,10 +12,17 @@ import Resolver
 import UIComposable
 import UIKit
 
-final class HeadlineBoard: Board, GuaranteedBoard {
+protocol HeadlineBoardOutput: AnyObject {
+    func receive(label: String)
+}
+
+final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
     typealias InputType = Any
+    typealias Command = HeadlineCommand
 
     @LazyInjected var builder: HeadlineBuildable
+
+    private lazy var adapter = HeadlineBoardOutputAdapter()
 
     init() {
         super.init(identifier: .headline)
@@ -25,8 +32,18 @@ final class HeadlineBoard: Board, GuaranteedBoard {
         let viewController = builder.build()
         viewController.delegate = self
 
+        let contentAdapter = HeadlineInputAdapter(target: viewController)
+        adapter.connect(adapter: contentAdapter)
+
         let element = UIElement(identifier: identifier, contentViewController: viewController)
         putToComposer(elementAction: .update(element: element))
+    }
+
+    func interact(guaranteedCommand: HeadlineCommand) {
+        switch guaranteedCommand {
+        case let .refresh(label: value):
+            adapter.receive(label: value)
+        }
     }
 }
 

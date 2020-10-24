@@ -10,6 +10,7 @@ import UIKit
 import ViewStateCore
 
 final class HeadlineViewController: UIViewController, HeadlineController {
+
     // MARK: Dependencies
 
     weak var delegate: HeadlineDelegate?
@@ -26,6 +27,10 @@ final class HeadlineViewController: UIViewController, HeadlineController {
         super.viewDidLoad()
 
         state.register(subscriberObject: self)
+    }
+
+    func accept(label: String) {
+        print("Accept a input: \(label)")
     }
 
     // MARK: Privates

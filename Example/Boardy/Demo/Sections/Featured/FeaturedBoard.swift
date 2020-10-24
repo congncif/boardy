@@ -34,4 +34,8 @@ extension FeaturedBoard: FeaturedDelegate {
     func removeFeaturedContent() {
         putToComposer(elementAction: .removeContent(identifier: identifier))
     }
+
+    func refreshHeadline() {
+        interactWithOtherBoard(command: HeadlineCommand.refresh(label: "BOARDY!!"))
+    }
 }

@@ -1,20 +1,20 @@
 PODS:
-  - Boardy (0.9.25):
-    - Boardy/Default (= 0.9.25)
-  - Boardy/Core (0.9.25)
-  - Boardy/CoreUI (0.9.25):
+  - Boardy (0.9.26):
+    - Boardy/Default (= 0.9.26)
+  - Boardy/Core (0.9.26)
+  - Boardy/CoreUI (0.9.26):
     - Boardy/Core
     - UIComposable
-  - Boardy/DeepLink (0.9.25):
+  - Boardy/DeepLink (0.9.26):
     - Boardy/Core
-  - Boardy/Default (0.9.25):
+  - Boardy/Default (0.9.26):
     - Boardy/Core
-  - Boardy/RxStoreRef (0.9.25):
+  - Boardy/RxStoreRef (0.9.26):
     - Boardy/Core
     - Boardy/DeepLink
     - RxCocoa
     - RxSwift
-  - Boardy/UI (0.9.25):
+  - Boardy/UI (0.9.26):
     - Boardy/Core
     - Boardy/DeepLink
     - Boardy/RxStoreRef
@@ -123,7 +123,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: bdf71438329b503937777a17642c88e1ebe28cbd
+  Boardy: 36a676e4de0f75e986b54e88199864c632c62c70
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f

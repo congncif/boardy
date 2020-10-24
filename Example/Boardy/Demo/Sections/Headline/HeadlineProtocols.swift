@@ -8,7 +8,11 @@
 
 import UIKit
 
-protocol HeadlineController: UIViewController {
+protocol HeadlineInput: AnyObject {
+    func accept(label: String)
+}
+
+protocol HeadlineController: UIViewController, HeadlineInput {
     var delegate: HeadlineDelegate? { get set }
 }
 

@@ -14,6 +14,7 @@ protocol FeaturedController: UIViewController {
 
 protocol FeaturedDelegate: AnyObject {
     func removeFeaturedContent()
+    func refreshHeadline()
 }
 
 protocol FeaturedBuildable {

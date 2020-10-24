@@ -39,6 +39,10 @@ extension IdentifiableBoard {
     public func sendFlowAction(_ action: BoardFlowAction) {
         sendToMotherboard(data: action)
     }
+
+    public func interactWithOtherBoard(command: BoardCommandModel) {
+        sendToMotherboard(data: command)
+    }
 }
 
 public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard {

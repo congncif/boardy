@@ -21,6 +21,7 @@ final class FeaturedViewController: UIViewController, FeaturedController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .random()
 
         state.register(subscriberObject: self)
     }
@@ -42,6 +43,10 @@ final class FeaturedViewController: UIViewController, FeaturedController {
     
     @IBAction private func removeButtonDidTap() {
         delegate?.removeFeaturedContent()
+    }
+    
+    @IBAction private func refreshButtonDidTap() {
+        delegate?.refreshHeadline()
     }
 }
 

@@ -11,7 +11,7 @@ import Foundation
 import Resolver
 import UIKit
 
-// UIBoard is deprecated, use normal Board & ComposingMotherboard instead.
+// UIBoard is deprecated, use normal Board & ComposableMotherboard instead.
 final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
     typealias InputType = Any?
 
@@ -29,7 +29,11 @@ final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
 }
 
 extension FeaturedUIBoard: FeaturedDelegate {
+    func refreshHeadline() {
+        // code
+    }
+
     func removeFeaturedContent() {
-        // 
+        // code
     }
 }

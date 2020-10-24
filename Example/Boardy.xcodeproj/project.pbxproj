@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		20F21131254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */; };
+		20F2115725447C2E00C0D1AC /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F2115625447C2E00C0D1AC /* UIColor+Random.swift */; };
 		2721A447253E95B300EAE0EE /* DashboardElementFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */; };
 		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
 		27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FD12541571C005C9027 /* FeaturedBoard.swift */; };
@@ -84,6 +86,8 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoardOutputAdapter.swift; sourceTree = "<group>"; };
+		20F2115625447C2E00C0D1AC /* UIColor+Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
 		2721A446253E95B200EAE0EE /* DashboardElementFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardElementFactory.swift; sourceTree = "<group>"; };
 		27547FCD25415640005C9027 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
 		27547FD12541571C005C9027 /* FeaturedBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBoard.swift; sourceTree = "<group>"; };
@@ -214,6 +218,7 @@
 			children = (
 				27CA1D5024FB3DE300694463 /* HeadlineUIBoard.swift */,
 				27547FCD25415640005C9027 /* HeadlineBoard.swift */,
+				20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */,
 				27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */,
 				27CA1D5124FB3DE300694463 /* HeadlineProtocols.swift */,
 				27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */,
@@ -411,6 +416,7 @@
 				27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */,
 				27FD0A7724E0DE31002855D6 /* Board+RIBs */,
 				27D665E1250DCB10008B6E48 /* UIViewController+Visible.swift */,
+				20F2115625447C2E00C0D1AC /* UIColor+Random.swift */,
 			);
 			name = "Example for Boardy";
 			path = Boardy;
@@ -683,6 +689,7 @@
 				27CA1D5624FB3DE300694463 /* HeadlineUIBoard.swift in Sources */,
 				27FD0A9F24E0EBA4002855D6 /* BoardID.swift in Sources */,
 				27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */,
+				20F2115725447C2E00C0D1AC /* UIColor+Random.swift in Sources */,
 				27FD0A8C24E0DE31002855D6 /* PlaceholderInteractor.swift in Sources */,
 				27CA1D6724FB62DF00694463 /* FeaturedViewState.swift in Sources */,
 				2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */,
@@ -709,6 +716,7 @@
 				2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */,
 				27CA1D6824FB62DF00694463 /* FeaturedProtocols.swift in Sources */,
 				27FD0A9524E0E430002855D6 /* LoginViewController.swift in Sources */,
+				20F21131254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift in Sources */,
 				27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				27FD0A9C24E0EB17002855D6 /* LoginBoard.swift in Sources */,

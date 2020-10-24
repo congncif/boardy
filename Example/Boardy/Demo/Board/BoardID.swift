@@ -47,6 +47,19 @@ enum BoardIdentity: BoardInputModel {
     }
 }
 
+enum HeadlineCommand: BoardCommandModel {
+    case refresh(label: String)
+
+    var identifier: BoardID { .headline }
+
+    var data: Any? {
+        switch self {
+        case let .refresh(label: value):
+            return value
+        }
+    }
+}
+
 extension MotherboardType {
     func activateBoard(_ identity: BoardIdentity) {
         activateBoard(model: identity)

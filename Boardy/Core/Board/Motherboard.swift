@@ -28,7 +28,15 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
             addBoard(board)
         }
 
+        registerDefaultFlows()
+    }
+
+    func registerDefaultFlows() {
         forwardActionFlow(to: self)
+
+        registerGeneralFlow { [weak self] in
+            self?.interactWithBoard(command: $0)
+        }
 
         // Register default flow
         registerGeneralFlow { [weak self] in
@@ -43,7 +51,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         installIntoRoot(rootObject)
     }
 
-    override open func installIntoRoot(_ rootObject: AnyObject) {
+    open override func installIntoRoot(_ rootObject: AnyObject) {
         super.installIntoRoot(rootObject)
         for board in boards {
             board.installIntoRoot(rootObject)
@@ -56,7 +64,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 extension Motherboard: GuaranteedBoard {
     public typealias InputType = BoardInputModel
 
-    public func activate(withGuaranteedInput input: BoardInputModel) {
+    open func activate(withGuaranteedInput input: BoardInputModel) {
         activateBoard(model: input)
     }
 }

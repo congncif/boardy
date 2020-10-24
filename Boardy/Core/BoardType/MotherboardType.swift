@@ -17,7 +17,7 @@ public struct BoardDestination: BoardInputModel {
     public let option: Any?
 
     public init(target: BoardID, option: Any? = nil) {
-        self.identifier = target
+        identifier = target
         self.option = option
     }
 }
@@ -33,18 +33,6 @@ public protocol MotherboardType: ActivatableBoard {
 }
 
 extension MotherboardType {
-    public func activateBoard(identifier: BoardID, withOption option: Any? = nil) {
-        guard let board = getBoard(identifier: identifier) else {
-            assertionFailure("Board with identifier \(identifier) was not found in mother board \(self)")
-            return
-        }
-        board.activate(withOption: option)
-    }
-
-    public func activateBoard(model: BoardInputModel) {
-        activateBoard(identifier: model.identifier, withOption: model.option)
-    }
-
     public func removeBoard(_ board: ActivatableBoard) {
         removeBoard(withIdentifier: board.identifier)
     }
