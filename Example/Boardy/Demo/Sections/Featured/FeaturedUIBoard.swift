@@ -11,6 +11,7 @@ import Foundation
 import Resolver
 import UIKit
 
+// UIBoard is deprecated, use normal Board & ComposingMotherboard instead.
 final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
     typealias InputType = Any?
 

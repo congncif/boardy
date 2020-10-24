@@ -70,6 +70,6 @@ extension DashboardBoard: DashboardDelegate {
         
         composingBoard.addBoard(featured)
         
-        featured.activate(withOption: nil)
+        featured.activate()
     }
 }

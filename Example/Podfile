@@ -9,6 +9,7 @@ target 'Boardy_Example' do
   pod 'Boardy/UI', :path => '../'
   pod 'Boardy/DeepLink', :path => '../'
   pod 'Boardy/CoreUI', :path => '../'
+  pod 'UIComposable/RxUI'
   
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
   pod 'ViewStateCore'

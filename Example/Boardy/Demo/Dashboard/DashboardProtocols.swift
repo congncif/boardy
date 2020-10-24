@@ -10,7 +10,7 @@ import Boardy
 import UIComposable
 import UIKit
 
-protocol DashboardController: UIViewController, UIBoardInterface, ComposableInterface {
+protocol DashboardController: UIViewController, ComposableInterface {
     var delegate: DashboardDelegate? { get set }
 }
 
