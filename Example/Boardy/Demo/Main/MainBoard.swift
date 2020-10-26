@@ -37,6 +37,12 @@ final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
         let nav = UINavigationController(rootViewController: router.viewControllable.uiviewController)
         nav.modalPresentationStyle = .fullScreen
         nav.modalTransitionStyle = .crossDissolve
+
+        let rootViewController = rootRouter.viewControllable.uiviewController
+        if rootViewController.presentedViewController != nil {
+            rootViewController.dismiss(animated: false)
+        }
+
         rootRouter.viewControllable.uiviewController.present(nav, animated: true)
     }
 }

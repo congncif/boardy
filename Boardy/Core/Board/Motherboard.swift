@@ -38,7 +38,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
             self?.interactWithBoard(command: $0)
         }
 
-        // Register default flow
+        // Register activation flow
         registerGeneralFlow { [weak self] in
             self?.activateBoard(model: $0)
         }
@@ -51,7 +51,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         installIntoRoot(rootObject)
     }
 
-    open override func installIntoRoot(_ rootObject: AnyObject) {
+    override open func installIntoRoot(_ rootObject: AnyObject) {
         super.installIntoRoot(rootObject)
         for board in boards {
             board.installIntoRoot(rootObject)

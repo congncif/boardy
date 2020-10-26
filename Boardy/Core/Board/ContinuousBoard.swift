@@ -17,9 +17,7 @@ open class ContinuousBoard: Board {
         self.motherboard = motherboard
         super.init(identifier: identifier)
 
-        motherboard.registerGeneralFlow { [weak self] (action: BoardFlowAction) in
-            self?.sendFlowAction(action)
-        }
+        motherboard.forwardActionFlow(to: self)
     }
 
     override open func installIntoRoot(_ rootObject: AnyObject) {

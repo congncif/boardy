@@ -32,6 +32,8 @@ open class ComposableMotherboard: Motherboard, ComposableMotherboardType {
             self?.interactWithBoard(command: $0)
         }
 
+        // ComposableMotherboard should forward activation flow to previous Motherboard, so skip register activation flow here. Will setup this flow in getComposableMotherboard function.
+
         registerGeneralFlow { [weak self] in
             self?.handleUIElementAction($0)
         }
@@ -39,21 +41,5 @@ open class ComposableMotherboard: Motherboard, ComposableMotherboardType {
 
     func handleUIElementAction(_ action: UIElementAction) {
         composableInterface?.putUIElementAction(action)
-    }
-}
-
-extension IdentifiableBoard {
-    public func putToComposer(elementAction: UIElementAction) {
-        sendToMotherboard(data: elementAction)
-    }
-}
-
-extension Board {
-    /// Create a new ComposableMotherboard which use internal a board. Chain of action will be set up.
-    public func getComposableMotherboard(identifier: BoardID = UUID().uuidString, elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
-        let motherboard = ComposableMotherboard(identifier: identifier, boards: elementBoards)
-        motherboard.forwardActionFlow(to: self)
-        motherboard.forwardActivationFlow(to: self)
-        return motherboard
     }
 }

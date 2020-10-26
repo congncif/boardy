@@ -13,15 +13,15 @@ import RxSwift
 import SiFUtilities
 import UIKit
 
-protocol DashboardElementManufacturing {
-    func getElementBoards() -> [UIActivatableBoard]
-}
+//protocol DashboardElementManufacturing {
+//    func getElementBoards() -> [UIActivatableBoard]
+//}
 
 final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = Any?
 
     @LazyInjected var builder: DashboardBuildable
-    @LazyInjected var elementFactory: DashboardElementManufacturing
+//    @LazyInjected var elementFactory: DashboardElementManufacturing
 
     private let disposeBag = DisposeBag()
 

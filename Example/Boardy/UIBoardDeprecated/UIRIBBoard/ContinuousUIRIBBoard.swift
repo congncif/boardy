@@ -1,16 +1,13 @@
 //
-//  ContinuousBoardRIBBoard.swift
-//  Boardy_Example
+//  ContinuousUIRIBBoard.swift
+//  Boardy
 //
-//  Created by NGUYEN CHI CONG on 9/12/20.
-//  Copyright © 2020 [iF] Solution. All rights reserved.
+//  Created by NGUYEN CHI CONG on 8/8/20.
 //
 
 import Foundation
-import RIBs
-import UIKit
 
-open class ContinuousRIBBoard: RIBBoard {
+open class ContinuousUIRIBBoard: UIRIBBoard {
     public let motherboard: FlowMotherboard
 
     public init(identifier: BoardID = UUID().uuidString,

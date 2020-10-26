@@ -20,8 +20,8 @@ struct ServiceRegistry: Resolving {
         resolver.register { RootBuilder() }.implements(RootBuildable.self)
 
         resolver.register { LoginBoard() }
-        resolver.register { HeadlineUIBoard() }
-        resolver.register { FeaturedUIBoard() }
+//        resolver.register { HeadlineUIBoard() }
+//        resolver.register { FeaturedUIBoard() }
         resolver.register { DashboardBoard() }
         resolver.register { MainBoard(homeBoard: $0.resolve()) }
 
@@ -49,7 +49,14 @@ struct ServiceRegistry: Resolving {
         .implements(DeepLinkHandlingComposable.self)
         .implements(DeepLinkHandling.self)
 
-        resolver.register { DashboardElementFactory() }
-            .implements(DashboardElementManufacturing.self)
+        resolver.register { rsv -> DeepLinkBoardCollection in
+            let login: LoginBoard = rsv.resolve()
+            let main: MainBoard = rsv.resolve()
+            let dashboard: DashboardBoard = rsv.resolve()
+            return DeepLinkBoardCollection(boards: [login, main, dashboard])
+        }
+
+//        resolver.register { DashboardElementFactory() }
+//            .implements(DashboardElementManufacturing.self)
     }
 }

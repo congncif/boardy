@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let link = url.absoluteString
 //        deepLinkHandler.handleDeepLink(link)
 
-        window?.rootViewController?.handleDeepLink(link, usePairClub: DeepLinkAppClub())
+        window?.rootViewController?.handleDeepLink(link, use: DeepLinkAppClub())
 
         return true
     }

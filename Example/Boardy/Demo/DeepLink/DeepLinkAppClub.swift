@@ -10,17 +10,23 @@ import Boardy
 import Foundation
 import Resolver
 
+// Wrap an array to pass LazyInjected convention of Resolver.
+struct DeepLinkBoardCollection {
+    let boards: [ActivatableBoard]
+}
+
 final class DeepLinkAppClub: DeepLinkHandlerClubbing {
     @LazyInjected var appMainboard: AppMotherboard
-    @LazyInjected var homeMainboard: HomeMotherboard
+
+    @LazyInjected var boardCollection: DeepLinkBoardCollection
+
+    private lazy var mainboard: FlowMotherboard = {
+        appMainboard.extended(boards: boardCollection.boards)
+    }()
 
     var identifier: String { String(describing: self) }
 
-    var workflowMainboards: [FlowMotherboard] {
-        [
-            appMainboard, homeMainboard
-        ]
-    }
+    var workflowMainboards: [FlowMotherboard] { [mainboard] }
 
     var parser: DeepLinkParsing {
         DeepLinkParser { (deepLink) -> BoardIdentity? in
@@ -29,6 +35,8 @@ final class DeepLinkAppClub: DeepLinkHandlerClubbing {
                 return .login
             case "boardy://dashboard":
                 return .dashboard
+            case "boardy://main":
+                return .main(userInfo: UserInfo(username: "DeepLink", password: ""))
             default:
                 return nil
             }

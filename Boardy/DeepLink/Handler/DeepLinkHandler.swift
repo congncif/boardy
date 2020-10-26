@@ -81,6 +81,8 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
             mainboard.getBoard(identifier: destination.identifier)
         }
 
+        assert(!validBoards.isEmpty, "No valid boards for deep link \(deepLink). Please add board with identifier \(destination.identifier) to motherboard of deep link.")
+
         assert(validBoards.count < 2, "Multiple valid boards \(validBoards) for deep link \(deepLink). Please select one.")
 
         guard let board = validBoards.first else { return }
