@@ -20,6 +20,12 @@ open class ContinuousBoard: Board {
         motherboard.forwardActionFlow(to: self)
     }
 
+    public convenience init(identifier: BoardID = UUID().uuidString,
+                            boardProducer: ActivableBoardProducer) {
+        let motherboard = Motherboard(boardProducer: boardProducer)
+        self.init(identifier: identifier, motherboard: motherboard)
+    }
+
     override open func installIntoRoot(_ rootObject: AnyObject) {
         super.installIntoRoot(rootObject)
         motherboard.installIntoRoot(rootObject)

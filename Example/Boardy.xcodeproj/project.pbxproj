@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA3E23CB05B885CC6E500BF4 /* Pods_Boardy_Tests.framework */; };
+		205221CD256EAFA10049E3FA /* BoardProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205221CC256EAFA10049E3FA /* BoardProducer.swift */; };
 		20F21131254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */; };
 		20F2115725447C2E00C0D1AC /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F2115625447C2E00C0D1AC /* UIColor+Random.swift */; };
 		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
@@ -81,6 +82,7 @@
 
 /* Begin PBXFileReference section */
 		0223BEAB17654F44CD87C09D /* Boardy.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Boardy.podspec; path = ../Boardy.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		205221CC256EAFA10049E3FA /* BoardProducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardProducer.swift; sourceTree = "<group>"; };
 		20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoardOutputAdapter.swift; sourceTree = "<group>"; };
 		20F2115625447C2E00C0D1AC /* UIColor+Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
 		27547FCD25415640005C9027 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 			isa = PBXGroup;
 			children = (
 				27FD0AA124E0ED19002855D6 /* ServiceRegistry.swift */,
+				205221CC256EAFA10049E3FA /* BoardProducer.swift */,
 			);
 			path = Resolver;
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */,
 				27CA1D6424FB62DF00694463 /* FeaturedBuilder.swift in Sources */,
 				27D665DA250DC617008B6E48 /* RootBuilder.swift in Sources */,
+				205221CD256EAFA10049E3FA /* BoardProducer.swift in Sources */,
 				27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */,
 				27950A6424F80944005779B7 /* DashboardViewState.swift in Sources */,
 				27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */,

@@ -32,22 +32,47 @@ public protocol MotherboardType: ActivatableBoard {
     func getBoard(identifier: BoardID) -> ActivatableBoard?
 }
 
-extension MotherboardType {
-    public func removeBoard(_ board: ActivatableBoard) {
+public extension MotherboardType {
+    func removeBoard(_ board: ActivatableBoard) {
         removeBoard(withIdentifier: board.identifier)
     }
 
     /// Install additional a board after its Motherboard was installed.
-    public func installBoard(_ board: ActivatableBoard) {
+    func installBoard(_ board: ActivatableBoard) {
         addBoard(board)
         if let root = self.root {
             board.installIntoRoot(root)
         }
     }
 
-    public func extended(boards: [ActivatableBoard]) -> Self {
+    func extended(boards: [ActivatableBoard]) -> Self {
         boards.forEach { self.installBoard($0) }
         return self
+    }
+
+    func installedBoard(identifier: BoardID) -> ActivatableBoard? {
+        boards.first(where: { $0.identifier == identifier })
+    }
+}
+
+public protocol ActivableBoardProducer {
+    func produceBoard(identifier: BoardID) -> ActivatableBoard?
+}
+
+protocol LazyMotherboard: MotherboardType {
+    var boardProducer: ActivableBoardProducer { get }
+}
+
+extension LazyMotherboard {
+    public func getBoard(identifier: BoardID) -> ActivatableBoard? {
+        if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
+            return installedBoard
+        }
+        guard let newBoard = boardProducer.produceBoard(identifier: identifier) else {
+            return nil
+        }
+        installBoard(newBoard)
+        return newBoard
     }
 }
 
@@ -58,21 +83,15 @@ protocol MotherboardRepresentable: AnyObject, MotherboardType {
 }
 
 extension MotherboardRepresentable {
-    public var boards: [ActivatableBoard] {
-        mainboard
-    }
-
-    public func getBoard(identifier: BoardID) -> ActivatableBoard? {
-        return mainboard.first { $0.identifier == identifier }
-    }
+    public var boards: [ActivatableBoard] { mainboard }
 
     public func addBoard(_ board: ActivatableBoard) {
-        assert(getBoard(identifier: board.identifier) == nil, " 💔 Board with identifier \(board.identifier) was already added to motherboard \(self).")
+        assert(installedBoard(identifier: board.identifier) == nil, " 💔 Board with identifier \(board.identifier) was already added to motherboard \(self).")
         mainboard.append(board)
     }
 
     public func removeBoard(withIdentifier identifier: BoardID) {
-        assert(getBoard(identifier: identifier) != nil, " 💔 Board with identifier \(identifier) was not in motherboard \(self).")
+        assert(installedBoard(identifier: identifier) != nil, " 💔 Board with identifier \(identifier) was not in motherboard \(self).")
         mainboard.removeAll { $0.identifier == identifier }
     }
 }

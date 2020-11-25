@@ -27,13 +27,7 @@ struct ServiceRegistry: Resolving {
 
         resolver.register { RootBoard(motherboard: $0.resolve()) }
 
-        resolver.register { AppMainboard() }.implements(AppMotherboard.self)
-
-        resolver.register { rsv -> RootBoardCollection in
-            let login: LoginBoard = rsv.resolve()
-            let main: MainBoard = rsv.resolve()
-            return RootBoardCollection(boards: [login, main])
-        }
+        resolver.register { AppMainboard(boardProducer: BoardProducer()) }.implements(AppMotherboard.self)
 
         resolver.register { HomeMainboard() }.implements(HomeMotherboard.self)
 
