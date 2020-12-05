@@ -13,9 +13,9 @@ import RxSwift
 import SiFUtilities
 import UIKit
 
-//protocol DashboardElementManufacturing {
+// protocol DashboardElementManufacturing {
 //    func getElementBoards() -> [UIActivatableBoard]
-//}
+// }
 
 final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = Any?
@@ -54,7 +54,8 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
         let contentBoard = getComposableMotherboard(elementBoards: [headline])
 
-        contentBoard.attach(to: dashboard)
+        contentBoard.pairInstallWith(object: dashboard)
+//        contentBoard.attach(to: dashboard)
 
         contentBoard.connect(to: dashboard)
 
@@ -64,7 +65,9 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
 extension DashboardBoard: DashboardDelegate {
     func changePlugins(viewController: UIViewController) {
-        let contentBoard = viewController.composableMotherboard
+        guard let contentBoard: FlowComposableMotherboard = viewController.pairedObject() else {
+            return
+        }
 
         let featured = FeaturedBoard()
 

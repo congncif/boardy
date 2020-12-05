@@ -34,7 +34,7 @@ extension GuaranteedInteractableBoard {
     public func interact(command: BoardCommandModel) {
         guard let dedicatedCommand = command as? Command else {
             #if DEBUG
-            print("\(String(describing: self)) has called \(#function) with \(command) while expected model type is \(Command.self)")
+            print("⚠️ The command was not sent. \(String(describing: self)) has called \(#function) with \(command) while expected model type is \(Command.self)")
             #endif
             return
         }

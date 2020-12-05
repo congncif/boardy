@@ -23,13 +23,18 @@ public final class ReferenceStoreManager {
         let key = ObjectIdentifier(pairObject)
 
         if var objects = storage[key] {
+            if objects.contains(where: { $0 === object }) {
+                return
+            }
             objects.append(object)
             storage[key] = objects
         } else {
             storage[key] = [object]
         }
 
-        let disposeBag = disposeBags[key] ?? DisposeBag()
+        if let disposeBag = disposeBags[key] { return }
+
+        let disposeBag = DisposeBag()
         disposeBags[key] = disposeBag
 
         pairObject.rx.deallocated
@@ -38,6 +43,11 @@ public final class ReferenceStoreManager {
                 self?.disposeBags.removeValue(forKey: key)
             })
             .disposed(by: disposeBag)
+    }
+
+    public func storedObjects(pairedWith object: AnyObject) -> [AnyObject] {
+        let key = ObjectIdentifier(object)
+        return storage[key] ?? []
     }
 }
 
@@ -51,7 +61,17 @@ extension ReferenceStorableObject {
     public var referenceStoreManager: ReferenceStoreManager { .shared }
 
     public func pairWith<Object>(object: Object) where Object: ReactiveCompatible, Object: AnyObject {
-        ReferenceStoreManager.shared.storeObject(self, untilObjectKilled: object)
+        referenceStoreManager.storeObject(self, untilObjectKilled: object)
+    }
+
+    public func pairedObjects<Object>() -> [Object] {
+        referenceStoreManager.storedObjects(pairedWith: self).compactMap {
+            $0 as? Object
+        }
+    }
+
+    public func pairedObject<Object>() -> Object? {
+        pairedObjects().first
     }
 }
 
@@ -64,7 +84,11 @@ public final class DisposeContainer {
 
     public func generateDisposeBag<Object>(for object: Object) -> DisposeBag where Object: ReactiveCompatible, Object: AnyObject {
         let key = ObjectIdentifier(object)
-        let disposeBag = disposeBags[key] ?? DisposeBag()
+        if let disposeBag = disposeBags[key] {
+            return disposeBag
+        }
+
+        let disposeBag = DisposeBag()
         disposeBags[key] = disposeBag
 
         object.rx.deallocated

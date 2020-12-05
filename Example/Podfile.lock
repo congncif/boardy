@@ -1,14 +1,19 @@
 PODS:
-  - Boardy (1.0.1):
-    - Boardy/Default (= 1.0.1)
-  - Boardy/Core (1.0.1)
-  - Boardy/CoreUI (1.0.1):
+  - Boardy (1.1.1):
+    - Boardy/Default (= 1.1.1)
+  - Boardy/Core (1.1.1)
+  - Boardy/CoreUI (1.1.1):
     - Boardy/Core
     - UIComposable
-  - Boardy/DeepLink (1.0.1):
+  - Boardy/DeepLink (1.1.1):
     - Boardy/Core
-  - Boardy/Default (1.0.1):
+  - Boardy/Default (1.1.1):
     - Boardy/Core
+  - Boardy/RxStoreRef (1.1.1):
+    - Boardy/Core
+    - Boardy/DeepLink
+    - RxCocoa
+    - RxSwift
   - Differentiator (4.0.1)
   - Localize-Swift (3.2.0):
     - Localize-Swift/LocalizeSwiftCore (= 3.2.0)
@@ -78,6 +83,7 @@ DEPENDENCIES:
   - Boardy (from `../`)
   - Boardy/CoreUI (from `../`)
   - Boardy/DeepLink (from `../`)
+  - Boardy/RxStoreRef (from `../`)
   - Resolver (~> 1.1)
   - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
   - SiFUtilities
@@ -111,7 +117,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: 2f8a901ecef0e1ba2f9ca782c51c7edc1372d80e
+  Boardy: fd8fa334341f160fc1239e8502c36ffe4b0d2898
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
@@ -125,6 +131,6 @@ SPEC CHECKSUMS:
   UIComposable: 0c670115d86e6ee132d4c33b5137c02abad704c2
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: 5fb12d024f1f7c91a514cc7f199a26a98bfd40ba
+PODFILE CHECKSUM: 1d3ab899b1a4a48a8f5065e2f08872278cb158e8
 
 COCOAPODS: 1.10.0

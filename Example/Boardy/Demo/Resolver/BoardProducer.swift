@@ -14,7 +14,7 @@ struct BoardProducer: ActivableBoardProducer {
     func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         switch identifier {
         case .login:
-            return NoBoard(identifier: identifier)
+            return LoginBoard()
         case .main:
             return MainBoard(homeBoard: HomeMainboard())
         default:

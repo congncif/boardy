@@ -26,6 +26,32 @@ extension InstallableBoard {
     public func installIntoRootViewController(_ rootViewController: UIViewController) {
         installIntoRoot(rootViewController)
     }
+
+    public var navigationController: UINavigationController {
+        if let controller = rootViewController as? UINavigationController {
+            return controller
+        } else if let controller = rootViewController.navigationController {
+            return controller
+        } else if let tabBarController = rootViewController as? UITabBarController, let controller = tabBarController.selectedViewController as? UINavigationController {
+            return controller
+        } else {
+            assertionFailure("💔 No UINavigationController. Install \(self) into a rootViewController which based on UINavigationController before activating it.")
+            return UINavigationController()
+        }
+    }
+
+    public var tabBarController: UITabBarController {
+        if let controller = rootViewController as? UITabBarController {
+            return controller
+        } else if let controller = rootViewController.tabBarController {
+            return controller
+        } else if let navigationController = rootViewController as? UINavigationController, let controller = navigationController.tabBarController as? UITabBarController {
+            return controller
+        } else {
+            assertionFailure("💔 No UITabBarController. Install \(self) into a rootViewController which based on UITabBarController before activating it.")
+            return UITabBarController()
+        }
+    }
 }
 
 public protocol WindowInstallableBoard: OriginalBoard {
