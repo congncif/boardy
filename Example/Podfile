@@ -10,7 +10,7 @@ target 'Boardy_Example' do
   pod 'Boardy/DeepLink', :path => '../'
   pod 'Boardy/CoreUI', :path => '../'
   pod 'Boardy/RxStoreRef', :path => '../'
-  pod 'UIComposable/RxUI'
+  pod 'UIComposable/DiffUI' #, :git => 'https://github.com/congncif/UIComposable.git', :branch => 'master'
   
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
   pod 'ViewStateCore'

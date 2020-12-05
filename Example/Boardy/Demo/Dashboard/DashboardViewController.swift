@@ -10,7 +10,7 @@ import RxSwift
 import UIComposable
 import UIKit
 
-final class DashboardViewController: RxComposableListViewController, DashboardController {
+final class DashboardViewController: DiffComposableListViewController, DashboardController {
     weak var delegate: DashboardDelegate?
 
     override func viewDidLoad() {
