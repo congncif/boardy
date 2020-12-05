@@ -15,4 +15,11 @@ extension Board {
         motherboard.forwardActionFlow(to: self)
         return motherboard
     }
+
+    public func getMotherboard(identifier: BoardID = UUID().uuidString, boardProducer: ActivableBoardProducer) -> Motherboard {
+        let motherboard = Motherboard(identifier: identifier, boardProducer: boardProducer)
+        // Setup chain of actions.
+        motherboard.forwardActionFlow(to: self)
+        return motherboard
+    }
 }
