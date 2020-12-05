@@ -41,3 +41,13 @@ extension GuaranteedInteractableBoard {
         interact(guaranteedCommand: dedicatedCommand)
     }
 }
+
+public struct BoardCommand: BoardCommandModel {
+    public let identifier: BoardID
+    public let data: Any?
+
+    public init(identifier: BoardID, data: Any? = nil) {
+        self.identifier = identifier
+        self.data = data
+    }
+}

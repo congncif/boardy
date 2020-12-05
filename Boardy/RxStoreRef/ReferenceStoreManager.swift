@@ -32,7 +32,7 @@ public final class ReferenceStoreManager {
             storage[key] = [object]
         }
 
-        if let disposeBag = disposeBags[key] { return }
+        if disposeBags[key] != nil { return }
 
         let disposeBag = DisposeBag()
         disposeBags[key] = disposeBag
