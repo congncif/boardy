@@ -12,7 +12,7 @@ target 'Boardy_Example' do
   pod 'Boardy/RxStoreRef', :path => '../'
   pod 'UIComposable/DiffUI' #, :git => 'https://github.com/congncif/UIComposable.git', :branch => 'master'
   
-  pod 'ReferenceStoreManager', :git => 'https://github.com/congncif/RxReferenceStoreManager.git'
+#  pod 'ReferenceStoreManager', :git => 'https://github.com/congncif/RxReferenceStoreManager.git'
   
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
   pod 'ViewStateCore'

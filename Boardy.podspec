@@ -43,16 +43,4 @@ Pod::Spec.new do |s|
         co.dependency 'Boardy/Core'
         co.dependency 'UIComposable'
     end
-    
-    # Deprecated
-    s.subspec 'UI' do |co|
-        co.source_files = 'Boardy/UI/**/*'
-        
-        co.dependency 'Boardy/Core'
-        co.dependency 'Boardy/DeepLink'
-        co.dependency 'Boardy/RxStoreRef'
-        
-        co.dependency 'RxDataSources'
-        co.dependency 'SnapKit'
-    end
 end

@@ -28,7 +28,7 @@ PODS:
   - ReferenceStoreManager (0.1.0):
     - RxCocoa
     - RxSwift
-  - Resolver (1.1.4)
+  - Resolver (1.2.1)
   - RIBs (0.9.3):
     - RxRelay (~> 5.1)
     - RxSwift (~> 5.1)
@@ -84,7 +84,6 @@ DEPENDENCIES:
   - Boardy/Composable (from `../`)
   - Boardy/DeepLink (from `../`)
   - Boardy/RxStoreRef (from `../`)
-  - ReferenceStoreManager (from `https://github.com/congncif/RxReferenceStoreManager.git`)
   - Resolver (~> 1.1)
   - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
   - SiFUtilities
@@ -96,6 +95,7 @@ SPEC REPOS:
     - DiffableDataSources
     - DifferenceKit
     - Localize-Swift
+    - ReferenceStoreManager
     - Resolver
     - RxCocoa
     - RxRelay
@@ -107,16 +107,11 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Boardy:
     :path: "../"
-  ReferenceStoreManager:
-    :git: https://github.com/congncif/RxReferenceStoreManager.git
   RIBs:
     :branch: master
     :git: https://github.com/uber/RIBs.git
 
 CHECKOUT OPTIONS:
-  ReferenceStoreManager:
-    :commit: 7ef38348ae43fe0431410d24acbbafb45d786ac7
-    :git: https://github.com/congncif/RxReferenceStoreManager.git
   RIBs:
     :commit: ffc489f00db785c8c0051678393f7aba0d52f1a4
     :git: https://github.com/uber/RIBs.git
@@ -127,7 +122,7 @@ SPEC CHECKSUMS:
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   ReferenceStoreManager: d75475546e58778e68fed4c0aa5eb6253b68dfc5
-  Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
+  Resolver: 764e380b2ddb26bba48c6e45ab393c968894a156
   RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
@@ -136,6 +131,6 @@ SPEC CHECKSUMS:
   UIComposable: 784ec93c37caa67ae8145f4f57764b1cca314353
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: 5dadc91f8a1a248463f66b133141291767c08273
+PODFILE CHECKSUM: 95af7b8df34688e229a87db7dc002d6baa5ae146
 
 COCOAPODS: 1.10.0
