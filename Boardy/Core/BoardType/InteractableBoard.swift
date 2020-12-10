@@ -42,12 +42,14 @@ extension GuaranteedInteractableBoard {
     }
 }
 
-public struct BoardCommand: BoardCommandModel {
+public struct BoardCommand<Input>: BoardCommandModel {
     public let identifier: BoardID
-    public let data: Any?
+    public let input: Input
 
-    public init(identifier: BoardID, data: Any? = nil) {
+    public var data: Any? { input }
+
+    public init(identifier: BoardID, input: Input) {
         self.identifier = identifier
-        self.data = data
+        self.input = input
     }
 }

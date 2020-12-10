@@ -12,13 +12,15 @@ public protocol BoardInputModel {
     var option: Any? { get }
 }
 
-public struct BoardDestination: BoardInputModel {
+public struct BoardModel<Input>: BoardInputModel {
     public let identifier: BoardID
-    public let option: Any?
+    public let input: Input
 
-    public init(target: BoardID, option: Any? = nil) {
+    public var option: Any? { input }
+
+    public init(target: BoardID, input: Input) {
         identifier = target
-        self.option = option
+        self.input = input
     }
 }
 
