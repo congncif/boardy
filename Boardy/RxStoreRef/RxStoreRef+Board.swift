@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ReferenceStoreManager
 
 // MARK: - Board + pair
 
@@ -20,8 +21,10 @@ extension Board {
 
 import RxSwift
 
-extension Board: ReferenceStorableObject {}
+extension Board: PairableObject {}
 
 extension Board: ReactiveCompatible {}
 
 extension Board: ReactiveDisposableObject {}
+
+extension Board: SelfStorableObject {}

@@ -8,9 +8,11 @@ target 'Boardy_Example' do
   pod 'Boardy', :path => '../'
 #  pod 'Boardy/UI', :path => '../'
   pod 'Boardy/DeepLink', :path => '../'
-  pod 'Boardy/CoreUI', :path => '../'
+  pod 'Boardy/Composable', :path => '../'
   pod 'Boardy/RxStoreRef', :path => '../'
   pod 'UIComposable/DiffUI' #, :git => 'https://github.com/congncif/UIComposable.git', :branch => 'master'
+  
+  pod 'ReferenceStoreManager', :git => 'https://github.com/congncif/RxReferenceStoreManager.git'
   
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
   pod 'ViewStateCore'

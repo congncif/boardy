@@ -1,19 +1,18 @@
 PODS:
-  - Boardy (1.1.3):
-    - Boardy/Default (= 1.1.3)
-  - Boardy/Core (1.1.3)
-  - Boardy/CoreUI (1.1.3):
+  - Boardy (1.2.0):
+    - Boardy/Default (= 1.2.0)
+  - Boardy/Composable (1.2.0):
     - Boardy/Core
     - UIComposable
-  - Boardy/DeepLink (1.1.3):
+  - Boardy/Core (1.2.0)
+  - Boardy/DeepLink (1.2.0):
     - Boardy/Core
-  - Boardy/Default (1.1.3):
+  - Boardy/Default (1.2.0):
     - Boardy/Core
-  - Boardy/RxStoreRef (1.1.3):
+  - Boardy/RxStoreRef (1.2.0):
     - Boardy/Core
     - Boardy/DeepLink
-    - RxCocoa
-    - RxSwift
+    - ReferenceStoreManager
   - DiffableDataSources (0.4.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
     - DifferenceKit/UIKitExtension (~> 1.1)
@@ -26,6 +25,9 @@ PODS:
   - Localize-Swift/LocalizeSwiftCore (3.2.0)
   - Localize-Swift/UIKit (3.2.0):
     - Localize-Swift/LocalizeSwiftCore
+  - ReferenceStoreManager (0.1.0):
+    - RxCocoa
+    - RxSwift
   - Resolver (1.1.4)
   - RIBs (0.9.3):
     - RxRelay (~> 5.1)
@@ -79,13 +81,14 @@ PODS:
 
 DEPENDENCIES:
   - Boardy (from `../`)
-  - Boardy/CoreUI (from `../`)
+  - Boardy/Composable (from `../`)
   - Boardy/DeepLink (from `../`)
   - Boardy/RxStoreRef (from `../`)
+  - ReferenceStoreManager (from `https://github.com/congncif/RxReferenceStoreManager.git`)
   - Resolver (~> 1.1)
   - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
   - SiFUtilities
-  - UIComposable/DiffUI (from `https://github.com/congncif/UIComposable.git`, branch `master`)
+  - UIComposable/DiffUI
   - ViewStateCore
 
 SPEC REPOS:
@@ -98,31 +101,32 @@ SPEC REPOS:
     - RxRelay
     - RxSwift
     - SiFUtilities
+    - UIComposable
     - ViewStateCore
 
 EXTERNAL SOURCES:
   Boardy:
     :path: "../"
+  ReferenceStoreManager:
+    :git: https://github.com/congncif/RxReferenceStoreManager.git
   RIBs:
     :branch: master
     :git: https://github.com/uber/RIBs.git
-  UIComposable:
-    :branch: master
-    :git: https://github.com/congncif/UIComposable.git
 
 CHECKOUT OPTIONS:
+  ReferenceStoreManager:
+    :commit: 7ef38348ae43fe0431410d24acbbafb45d786ac7
+    :git: https://github.com/congncif/RxReferenceStoreManager.git
   RIBs:
     :commit: ffc489f00db785c8c0051678393f7aba0d52f1a4
     :git: https://github.com/uber/RIBs.git
-  UIComposable:
-    :commit: 0182e26e73ca2c7a1e98bacff53ddad0b76d783a
-    :git: https://github.com/congncif/UIComposable.git
 
 SPEC CHECKSUMS:
-  Boardy: 071e40ecad31ff02e400654d079ff58a10cdba83
+  Boardy: bf786346b44d5cdc0ba9a05f24e1c2ddb242e355
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
+  ReferenceStoreManager: d75475546e58778e68fed4c0aa5eb6253b68dfc5
   Resolver: 1f4c046255cbadfa97094692e16e940d4329779f
   RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
@@ -132,6 +136,6 @@ SPEC CHECKSUMS:
   UIComposable: 784ec93c37caa67ae8145f4f57764b1cca314353
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: 54b51bcd55b2ce4e350b21f156a2b0e5b35f37e9
+PODFILE CHECKSUM: 5dadc91f8a1a248463f66b133141291767c08273
 
 COCOAPODS: 1.10.0

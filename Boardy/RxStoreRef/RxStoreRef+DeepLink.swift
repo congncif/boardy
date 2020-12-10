@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import ReferenceStoreManager
 import UIKit
 
-extension DeepLinkHandler: ReferenceStorableObject {}
+extension DeepLinkHandler: PairableObject, SelfStorableObject {}
 
 extension NSObject {
     public func handleDeepLink(_ deepLink: String, usePairClub handlerClub: DeepLinkHandlerClubbing) {
