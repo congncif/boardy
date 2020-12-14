@@ -19,4 +19,8 @@ extension MotherboardType {
     public func activateBoard(model: BoardInputModel) {
         activateBoard(identifier: model.identifier, withOption: model.option)
     }
+
+    public func activateBoard<Input>(input: BoardInput<Input>) {
+        activateBoard(model: input)
+    }
 }

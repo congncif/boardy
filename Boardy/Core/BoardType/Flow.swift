@@ -13,7 +13,7 @@ public protocol BoardFlowAction {}
 public typealias FlowID = String
 
 public protocol BoardFlow {
-    func matchWithBoard(_ board: IdentifiableBoard) -> Bool
+    func matchWithOutput(_ output: BoardOutputModel) -> Bool
     func doNext(_ data: Any?)
 }
 
@@ -35,11 +35,18 @@ extension FlowManageable {
     }
 
     @discardableResult
-    public func registerGeneralFlow<Input>(nextHandler: @escaping (Input) -> Void) -> Self {
+    public func registerGeneralFlow<Output>(nextHandler: @escaping (Output) -> Void) -> Self {
         let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
-            guard let input = data as? Input else { return }
-            nextHandler(input)
+            guard let output = data as? Output else { return }
+            nextHandler(output)
         })
+        registerFlow(generalFlow)
+        return self
+    }
+
+    @discardableResult
+    public func registerFlow<Output>(matchedIdentifiers: [FlowID], nextHandler: @escaping (Output) -> Void) -> Self {
+        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: nextHandler)
         registerFlow(generalFlow)
         return self
     }
@@ -64,28 +71,28 @@ extension FlowManageable where Self: MotherboardType {
 }
 
 public struct BoardActivateFlow: BoardFlow {
-    private let matcher: (IdentifiableBoard) -> Bool
+    private let matcher: (BoardOutputModel) -> Bool
     private let nextHandler: (Any?) -> Void
 
-    public init(matcher: @escaping (IdentifiableBoard) -> Bool,
+    public init(matcher: @escaping (BoardOutputModel) -> Bool,
                 nextHandler: @escaping (Any?) -> Void) {
         self.matcher = matcher
         self.nextHandler = nextHandler
     }
 
-    public init<Input>(matcher: @escaping (IdentifiableBoard) -> Bool,
-                       guaranteedNextHandler: @escaping (Input) -> Void) {
+    public init<Ouput>(matcher: @escaping (BoardOutputModel) -> Bool,
+                       guaranteedNextHandler: @escaping (Ouput) -> Void) {
         self.matcher = matcher
-        self.nextHandler = { input in
-            guard let data = input as? Input else {
-                assertionFailure("Cannot convert input from \(String(describing: input)) to type \(Input.self)")
+        self.nextHandler = { output in
+            guard let data = output as? Ouput else {
+                assertionFailure("Cannot convert output from \(String(describing: output)) to type \(Ouput.self)")
                 return
             }
             guaranteedNextHandler(data)
         }
     }
 
-    public init<Input>(matcher: @escaping (IdentifiableBoard) -> Bool,
+    public init<Input>(matcher: @escaping (BoardOutputModel) -> Bool,
                        dedicatedNextHandler: @escaping (Input?) -> Void) {
         self.matcher = matcher
         self.nextHandler = { input in
@@ -98,16 +105,16 @@ public struct BoardActivateFlow: BoardFlow {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, nextHandler: nextHandler)
     }
 
-    public init<Input>(matchedIdentifiers: [FlowID], dedicatedNextHandler: @escaping (Input?) -> Void) {
+    public init<Output>(matchedIdentifiers: [FlowID], dedicatedNextHandler: @escaping (Output?) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, dedicatedNextHandler: dedicatedNextHandler)
     }
 
-    public init<Input>(matchedIdentifiers: [FlowID], guaranteedNextHandler: @escaping (Input) -> Void) {
+    public init<Output>(matchedIdentifiers: [FlowID], guaranteedNextHandler: @escaping (Output) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, guaranteedNextHandler: guaranteedNextHandler)
     }
 
-    public func matchWithBoard(_ board: IdentifiableBoard) -> Bool {
-        return matcher(board)
+    public func matchWithOutput(_ output: BoardOutputModel) -> Bool {
+        return matcher(output)
     }
 
     public func doNext(_ data: Any?) {
@@ -140,7 +147,8 @@ public func ->>> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
 
 extension BoardDelegate where Self: FlowManageable {
     public func board(_ board: IdentifiableBoard, didSendData data: Any?) {
-        flows.filter { $0.matchWithBoard(board) }.forEach { $0.doNext(data) }
+        let output = OutputModel(identifier: board.identifier, data: data)
+        flows.filter { $0.matchWithOutput(output) }.forEach { $0.doNext(data) }
     }
 }
 
@@ -160,4 +168,9 @@ extension FlowManageable {
             board.nextToBoard(model: $0)
         }
     }
+}
+
+struct OutputModel: BoardOutputModel {
+    let identifier: BoardID
+    let data: Any?
 }

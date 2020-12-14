@@ -7,23 +7,6 @@
 
 import Foundation
 
-public protocol BoardInputModel {
-    var identifier: BoardID { get }
-    var option: Any? { get }
-}
-
-public struct BoardModel<Input>: BoardInputModel {
-    public let identifier: BoardID
-    public let input: Input
-
-    public var option: Any? { input }
-
-    public init(target: BoardID, input: Input) {
-        identifier = target
-        self.input = input
-    }
-}
-
 public protocol MotherboardType: ActivatableBoard {
     var boards: [ActivatableBoard] { get }
 
