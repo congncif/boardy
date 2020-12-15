@@ -53,3 +53,9 @@ public struct BoardCommand<Input>: BoardCommandModel {
         self.input = input
     }
 }
+
+extension BoardCommand {
+    public func withIdentifier(_ identifier: BoardID) -> BoardCommand {
+        BoardCommand(identifier: identifier, input: input)
+    }
+}
