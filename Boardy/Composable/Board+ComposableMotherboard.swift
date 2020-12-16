@@ -8,7 +8,7 @@
 import Foundation
 
 extension Board {
-    /// Create a new ComposableMotherboard which use internal a board. Chain of actions will be set up.
+    /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
     public func getComposableMotherboard(identifier: BoardID = UUID().uuidString, elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
         let motherboard = ComposableMotherboard(identifier: identifier, boards: elementBoards)
         // Setup chain of actions.
@@ -19,6 +19,7 @@ extension Board {
         return motherboard
     }
 
+    /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
     public func getComposableMotherboard(identifier: BoardID = UUID().uuidString, boardProducer: ActivableBoardProducer) -> ComposableMotherboard {
         let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer)
         // Setup chain of actions.

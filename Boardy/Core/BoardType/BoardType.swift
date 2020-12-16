@@ -28,18 +28,22 @@ public protocol IdentifiableBoard {
 }
 
 extension IdentifiableBoard {
+    /// Send a message with data attached (if available) to the motherboard.
     public func sendToMotherboard(data: Any? = nil) {
         delegate?.board(self, didSendData: data)
     }
 
+    /// Request the motherboard to activate another board.
     public func nextToBoard(model: BoardInputModel) {
         sendToMotherboard(data: model)
     }
 
+    /// Broadcast an action to all older motherboars in chain.
     public func sendFlowAction(_ action: BoardFlowAction) {
         sendToMotherboard(data: action)
     }
 
+    /// Interact with a brotherhood relationship board in same Motherboard.
     public func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
     }
