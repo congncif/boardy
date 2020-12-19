@@ -38,7 +38,7 @@ extension IdentifiableBoard {
         sendToMotherboard(data: model)
     }
 
-    /// Broadcast an action to all older motherboars in chain.
+    /// Send a Broadcast action to all older motherboards in chain.
     public func sendFlowAction(_ action: BoardFlowAction) {
         sendToMotherboard(data: action)
     }
@@ -46,6 +46,11 @@ extension IdentifiableBoard {
     /// Interact with a brotherhood relationship board in same Motherboard.
     public func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
+    }
+
+    /// Complete this board & ask to be removed.
+    public func complete() {
+        sendToMotherboard(data: CompleteAction(identifier: identifier))
     }
 }
 
@@ -55,4 +60,11 @@ extension NSObject {
     public func install(board: OriginalBoard) {
         board.installIntoRoot(self)
     }
+}
+
+// MARK: - CompleteAction
+
+// Special action to indicate the board completed & should be removed.
+struct CompleteAction {
+    let identifier: BoardID
 }

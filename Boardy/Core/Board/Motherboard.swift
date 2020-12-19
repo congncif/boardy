@@ -32,8 +32,10 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     }
 
     func registerDefaultFlows() {
+        // Forward action through chain
         forwardActionFlow(to: self)
 
+        // Register Interaction flow
         registerGeneralFlow { [weak self] in
             self?.interactWithBoard(command: $0)
         }
@@ -41,6 +43,11 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         // Register activation flow
         registerGeneralFlow { [weak self] in
             self?.activateBoard(model: $0)
+        }
+
+        // Register complete flow
+        registerGeneralFlow { [weak self] (action: CompleteAction) in
+            self?.removeBoard(withIdentifier: action.identifier)
         }
     }
 
