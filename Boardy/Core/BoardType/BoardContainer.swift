@@ -16,7 +16,7 @@ public final class BoardContainer: ActivableBoardProducer {
         self.externalProducer = externalProducer
     }
 
-    public func register(_ boardFactory: @autoclosure @escaping () -> ActivatableBoard, forId boardId: BoardID) {
+    public func register(_ boardFactory: @escaping () -> ActivatableBoard, forId boardId: BoardID) {
         container[boardId] = boardFactory
     }
 
