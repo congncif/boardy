@@ -85,28 +85,3 @@ extension Motherboard: GuaranteedBoard {
         activateBoard(model: input)
     }
 }
-
-// MARK: - NoBoard
-
-public final class NoBoard: Board, ActivatableBoard {
-    private let handler: ((Any?) -> Void)?
-
-    public init(identifier: BoardID = UUID().uuidString, handler: ((Any?) -> Void)? = nil) {
-        self.handler = handler
-        super.init(identifier: identifier)
-    }
-
-    public func activate(withOption option: Any?) {
-        let alert = UIAlertController(title: "Feature is coming", message: "Board with identifier \(identifier) was not installed", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Got it!", style: .cancel, handler: { [weak self] _ in
-            self?.handler?(option)
-        }))
-        rootViewController.present(alert, animated: true)
-    }
-}
-
-final class NoBoardProducer: ActivableBoardProducer {
-    func produceBoard(identifier: BoardID) -> ActivatableBoard? {
-        NoBoard(identifier: identifier)
-    }
-}
