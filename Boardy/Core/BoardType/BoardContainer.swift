@@ -10,20 +10,19 @@ import Foundation
 public final class BoardContainer: ActivableBoardProducer {
     private var externalProducer: ActivableBoardProducer?
 
-    private var container: [BoardID: ActivatableBoard] = [:]
+    private var container: [BoardID: () -> ActivatableBoard] = [:]
 
     public init(externalProducer: ActivableBoardProducer? = nil) {
         self.externalProducer = externalProducer
     }
 
-    public func register(_ boardFactory: @autoclosure () -> ActivatableBoard) {
-        let board = boardFactory()
-        container[board.identifier] = board
+    public func register(_ boardFactory: @autoclosure @escaping () -> ActivatableBoard, forId boardId: BoardID) {
+        container[boardId] = boardFactory
     }
 
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
-        if let board = container[identifier] {
-            return board
+        if let boardFactory = container[identifier] {
+            return boardFactory()
         } else if let board = externalProducer?.produceBoard(identifier: identifier) {
             return board
         } else {
