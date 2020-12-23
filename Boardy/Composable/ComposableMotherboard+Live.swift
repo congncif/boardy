@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 public protocol ComposableMotherboardLivable: AnyObject {
-    var composableMotherboard: FlowComposableMotherboard { get set }
+    var composableMotherboard: FlowComposableMotherboard? { get set }
+    var lazyComposableMotherboard: FlowComposableMotherboard { get }
 }
 
 private var composableMotherboardKey: UInt8 = 109
@@ -24,19 +25,23 @@ extension ComposableMotherboardLivable where Self: AnyObject {
         objc_setAssociatedObject(self, &composableMotherboardKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
-    public var composableMotherboard: FlowComposableMotherboard {
+    public var composableMotherboard: FlowComposableMotherboard? {
         get {
-            if let board = getAssociatedComposableMotherboard() {
-                return board
-            } else {
-                let newBoard = ComposableMotherboard()
-                setAssociatedComposableMotherboard(newBoard)
-                return newBoard
-            }
+            getAssociatedComposableMotherboard()
         }
 
         set {
             setAssociatedComposableMotherboard(newValue)
+        }
+    }
+
+    public var lazyComposableMotherboard: FlowComposableMotherboard {
+        if let board = getAssociatedComposableMotherboard() {
+            return board
+        } else {
+            let newBoard = ComposableMotherboard()
+            setAssociatedComposableMotherboard(newBoard)
+            return newBoard
         }
     }
 }

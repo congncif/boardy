@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 public protocol DeepLinkHandlerLivable: AnyObject {
-    var deepLinkHandler: DeepLinkHandlingComposable { get set }
+    var deepLinkHandler: DeepLinkHandlingComposable? { get set }
+    var lazyDeepLinkHandler: DeepLinkHandlingComposable { get }
 }
 
 private var deepLinkHandlerKey: UInt8 = 106
@@ -24,19 +25,23 @@ extension DeepLinkHandlerLivable where Self: AnyObject {
         objc_setAssociatedObject(self, &deepLinkHandlerKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
-    public var deepLinkHandler: DeepLinkHandlingComposable {
+    public var deepLinkHandler: DeepLinkHandlingComposable? {
         get {
-            if let handler = getAssociatedDeepLinkHandler() {
-                return handler
-            } else {
-                let newHandler = DeepLinkHandler()
-                setAssociatedDeepLinkHandler(newHandler)
-                return newHandler
-            }
+            getAssociatedDeepLinkHandler()
         }
 
         set {
             setAssociatedDeepLinkHandler(newValue)
+        }
+    }
+
+    public var lazyDeepLinkHandler: DeepLinkHandlingComposable {
+        if let handler = getAssociatedDeepLinkHandler() {
+            return handler
+        } else {
+            let newHandler = DeepLinkHandler()
+            setAssociatedDeepLinkHandler(newHandler)
+            return newHandler
         }
     }
 }
@@ -45,7 +50,7 @@ extension DeepLinkHandlerLivable where Self: AnyObject {
 
 extension NSObject: DeepLinkHandlerLivable {
     public func handleDeepLink(_ deepLink: String, use handlerClub: DeepLinkHandlerClubbing) {
-        deepLinkHandler.registerHandlerClubIfNeeded(handlerClub)
-        deepLinkHandler.handleDeepLink(deepLink)
+        lazyDeepLinkHandler.registerHandlerClubIfNeeded(handlerClub)
+        lazyDeepLinkHandler.handleDeepLink(deepLink)
     }
 }
