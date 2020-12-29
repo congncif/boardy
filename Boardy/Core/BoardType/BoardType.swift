@@ -38,6 +38,10 @@ extension IdentifiableBoard {
         sendToMotherboard(data: model)
     }
 
+    public func nextToBoard<Input>(_ input: BoardInput<Input>) {
+        nextToBoard(model: input)
+    }
+
     /// Send a Broadcast action to all older motherboards in chain.
     public func sendFlowAction(_ action: BoardFlowAction) {
         sendToMotherboard(data: action)
