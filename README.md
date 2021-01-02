@@ -1,4 +1,6 @@
-<img src="https://i.imgur.com/d6RaK5a.png"/>
+<p align="center">
+  <img src="https://i.imgur.com/d6RaK5a.png"/>
+</p>
 
 # Boardy
 
