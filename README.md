@@ -1,3 +1,5 @@
+<img src="https://i.imgur.com/d6RaK5a.png"/>
+
 # Boardy
 
 [![Version](https://img.shields.io/cocoapods/v/Boardy.svg?style=flat)](https://cocoapods.org/pods/Boardy)
