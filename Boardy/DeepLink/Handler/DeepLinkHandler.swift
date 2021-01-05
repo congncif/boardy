@@ -73,7 +73,7 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
             parser.destinationForDeepLink(deepLink)
         }
 
-        assert(destinations.count < 2, "Multiple destinations \(destinations) for deep link \(deepLink). Please select one.")
+        assert(destinations.count < 2, "⛈ [\(String(describing: self))] Multiple destinations \(destinations) for deep link \(deepLink). Please select one.")
 
         guard let destination = destinations.first else { return }
 
@@ -81,9 +81,9 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
             mainboard.getBoard(identifier: destination.identifier)
         }
 
-        assert(!validBoards.isEmpty, "No valid boards for deep link \(deepLink). Please add board with identifier \(destination.identifier) to motherboard of deep link.")
+        assert(!validBoards.isEmpty, "⛈ [\(String(describing: self))] No valid boards for deep link \(deepLink). Please add board with identifier \(destination.identifier) to motherboard of deep link.")
 
-        assert(validBoards.count < 2, "Multiple valid boards \(validBoards) for deep link \(deepLink). Please select one.")
+        assert(validBoards.count < 2, "⛈ [\(String(describing: self))] Multiple valid boards \(validBoards) for deep link \(deepLink). Please select one.")
 
         guard let board = validBoards.first else { return }
         board.activate(withOption: destination.option)
@@ -91,7 +91,7 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
 
     public func registerHandlerClub(_ handlerClub: DeepLinkHandlerClubbing) {
         if let currentClub = registredHandlerClub(withIdentifier: handlerClub.identifier) {
-            assertionFailure("The club \(currentClub) was already registered. Please remove it before.")
+            assertionFailure("⛈ [\(String(describing: self))] The club \(currentClub) was already registered. Please remove it before.")
         }
         clubsRoom[handlerClub.identifier] = handlerClub
     }
@@ -100,7 +100,7 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
         if registredHandlerClub(withIdentifier: identifier) != nil {
             clubsRoom.removeValue(forKey: identifier)
         } else {
-            assertionFailure("The club with identifier \(identifier) was not registered.")
+            assertionFailure("⛈ [\(String(describing: self))] The club with identifier \(identifier) was not registered.")
         }
     }
 

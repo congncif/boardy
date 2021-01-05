@@ -19,7 +19,7 @@ public protocol InteractableBoard: ActivatableBoard {
 extension InteractableBoard {
     public func interact(command: BoardCommandModel) {
         #if DEBUG
-        print("\(String(describing: self)) has called \(#function) with \(command)")
+        print("⚠️ \(String(describing: self)) has called \(#function) with \(command)")
         #endif
     }
 }

@@ -54,7 +54,7 @@ public protocol GuaranteedBoard: AdaptableBoard, ActivatableBoard {
 extension GuaranteedBoard {
     public func activate(withOption option: Any?) {
         guard let input = convertOptionToInput(option) else {
-            assertionFailure("Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
+            assertionFailure("⛈ [\(String(describing: self))] Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
             return
         }
         activate(withGuaranteedInput: input)

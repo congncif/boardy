@@ -43,7 +43,7 @@ final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
             rootViewController.dismiss(animated: false)
         }
 
-        rootRouter.viewControllable.uiviewController.present(nav, animated: true)
+        rootRouter.viewControllable.uiviewController.topPresentedViewController.present(nav, animated: true)
     }
 }
 

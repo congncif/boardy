@@ -10,7 +10,7 @@ import Foundation
 extension MotherboardType {
     public func activateBoard(identifier: BoardID, withOption option: Any? = nil) {
         guard let board = getBoard(identifier: identifier) else {
-            assertionFailure("Board with identifier \(identifier) was not found in mother board \(self)")
+            assertionFailure("⛈ [\(String(describing: self))] Board with identifier \(identifier) was not found in mother board \(self)")
             return
         }
         board.activate(withOption: option)
