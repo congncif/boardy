@@ -114,17 +114,6 @@ public struct BoardActivateFlow: BoardFlow {
     }
 
     public func matchWithOutput(_ output: BoardOutputModel) -> Bool {
-        #if DEBUG
-        if matcher(output) {
-            print(
-                """
-                🤝 [\(String(describing: self))] Matched a flow!!!
-                ✦ Board: \(output.identifier)
-                ✦ Data: \(output.data)
-                """
-            )
-        }
-        #endif
         return matcher(output)
     }
 
