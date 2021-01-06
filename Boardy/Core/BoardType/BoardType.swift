@@ -51,6 +51,10 @@ extension IdentifiableBoard {
     public func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
     }
+    
+    public func interactWithOtherBoard<Input>(_ input: BoardCommand<Input>) {
+        interactWithOtherBoard(command: input)
+    }
 
     /// Complete this board & ask to be removed.
     public func complete() {

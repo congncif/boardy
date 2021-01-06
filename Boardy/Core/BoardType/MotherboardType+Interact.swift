@@ -18,4 +18,8 @@ extension MotherboardType {
         }
         interactBoard.interact(command: command)
     }
+
+    public func interactWithBoard<Input>(_ input: BoardCommand<Input>) {
+        interactWithBoard(command: input)
+    }
 }
