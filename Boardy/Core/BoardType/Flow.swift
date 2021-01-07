@@ -7,6 +7,14 @@
 
 import Foundation
 
+/// Silent Data Types is pre-defined types (`BoardFlowAction`, `BoardInputModel`, `BoardCommandModel`, `CompleteAction`) for the certain purpose of the board activities. They should be excluded from type checking to avoid raising unnecessary problems.
+private func isSilentData(_ data: Any?) -> Bool {
+    if data is BoardFlowAction || data is BoardInputModel || data is BoardCommandModel || data is CompleteAction {
+        return true
+    }
+    return false
+}
+
 /// Special data type which should be forwarded through all of steps of the flow.
 public protocol BoardFlowAction {}
 
@@ -53,6 +61,7 @@ extension FlowManageable {
 }
 
 extension FlowManageable where Self: MotherboardType {
+    /// Flow Steps will skip Silent Data Types (`BoardFlowAction`, `BoardInputModel`, `BoardCommandModel`, `CompleteAction`). So to register Flow Steps, the Board InputType can't be Silent Data Types. If you still want to handle Silent Data Types as Input of your board, you must register by regular `BoardActivateFlow`.
     @discardableResult
     public func registerFlowSteps(_ flowSteps: [IDFlowStep]) -> Self {
         let activateFlows = flowSteps.map { flowStep in
@@ -61,6 +70,8 @@ extension FlowManageable where Self: MotherboardType {
                     flowStep.source == board.identifier
                 },
                 nextHandler: { [weak self] data in
+                    // Guaranteed data is not Slient Data Types otherwise skip handling.
+                    guard !isSilentData(data) else { return }
                     self?.activateBoard(identifier: flowStep.destination, withOption: data)
                 }
             )
@@ -85,18 +96,22 @@ public struct BoardActivateFlow: BoardFlow {
         self.matcher = matcher
         self.nextHandler = { output in
             guard let data = output as? Ouput else {
-                assertionFailure("⛈ Cannot convert output from \(String(describing: output)) to type \(Ouput.self)")
+                // Guaranteed output is Silent Data Types otherwise raise an assertion.
+                guard isSilentData(output) else {
+                    assertionFailure("⛈ Cannot convert output from \(String(describing: output)) to type \(Ouput.self)")
+                    return
+                }
                 return
             }
             guaranteedNextHandler(data)
         }
     }
 
-    public init<Input>(matcher: @escaping (BoardOutputModel) -> Bool,
-                       dedicatedNextHandler: @escaping (Input?) -> Void) {
+    public init<Ouput>(matcher: @escaping (BoardOutputModel) -> Bool,
+                       dedicatedNextHandler: @escaping (Ouput?) -> Void) {
         self.matcher = matcher
-        self.nextHandler = { input in
-            let data = input as? Input
+        self.nextHandler = { output in
+            let data = output as? Ouput
             dedicatedNextHandler(data)
         }
     }
@@ -145,14 +160,15 @@ public func ->>> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
     return left + [IDFlowStep(source: lastLeft.destination, destination: right)]
 }
 
+public typealias FlowMotherboard = MotherboardType & FlowManageable
+
 extension BoardDelegate where Self: FlowManageable {
     public func board(_ board: IdentifiableBoard, didSendData data: Any?) {
+        // Handle dedicated flow actions
         let output = OutputModel(identifier: board.identifier, data: data)
         flows.filter { $0.matchWithOutput(output) }.forEach { $0.doNext(data) }
     }
 }
-
-public typealias FlowMotherboard = MotherboardType & FlowManageable
 
 // MARK: - Forward functions
 
