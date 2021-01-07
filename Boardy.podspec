@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '1.5.0'
+    s.version          = '1.6.0'
     s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
@@ -19,17 +19,17 @@ Pod::Spec.new do |s|
     end
     
     s.subspec 'Core' do |co|
-        co.source_files = 'Boardy/Core/**/*'
+        co.source_files = 'Boardy/Core/**/*.swift'
     end
     
     s.subspec 'DeepLink' do |co|
-        co.source_files = 'Boardy/DeepLink/**/*'
+        co.source_files = 'Boardy/DeepLink/**/*.swift'
         
         co.dependency 'Boardy/Core'
     end
     
     s.subspec 'RxStoreRef' do |co|
-        co.source_files = 'Boardy/RxStoreRef/**/*'
+        co.source_files = 'Boardy/RxStoreRef/**/*.swift'
         
         co.dependency 'Boardy/Core'
         co.dependency 'Boardy/DeepLink'
@@ -38,9 +38,15 @@ Pod::Spec.new do |s|
     end
     
     s.subspec 'Composable' do |co|
-        co.source_files = 'Boardy/Composable/**/*'
+        co.source_files = 'Boardy/Composable/**/*.swift'
         
         co.dependency 'Boardy/Core'
         co.dependency 'UIComposable'
+    end
+    
+    s.subspec 'ComponentKit' do |co|
+        co.source_files = 'Boardy/ComponentKit/**/*.swift'
+        
+        co.dependency 'Boardy/Core'
     end
 end

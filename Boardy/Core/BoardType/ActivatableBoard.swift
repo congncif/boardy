@@ -17,3 +17,5 @@ extension ActivatableBoard {
         activate(withOption: nil)
     }
 }
+
+public typealias NormalBoard = InstallableBoard & ActivatableBoard

@@ -6,7 +6,7 @@ inhibit_all_warnings!
 
 target 'Boardy_Example' do
   pod 'Boardy', :path => '../'
-#  pod 'Boardy/UI', :path => '../'
+  pod 'Boardy/ComponentKit', :path => '../'
   pod 'Boardy/DeepLink', :path => '../'
   pod 'Boardy/Composable', :path => '../'
   pod 'Boardy/RxStoreRef', :path => '../'

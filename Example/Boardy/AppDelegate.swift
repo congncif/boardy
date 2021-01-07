@@ -10,6 +10,7 @@ import Boardy
 import Resolver
 import RxCocoa
 import RxSwift
+import SiFUtilities
 import UIKit
 
 @UIApplicationMain
@@ -17,6 +18,66 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     @LazyInjected var rootBoard: RootBoard
+
+    lazy var mainboard: Motherboard = {
+        let task1 = TaskBoard<String, Int>(identifier: "1", executor: { board, input, completion in
+            print("👉 Task \(board.identifier) activated: \(input)")
+            print("👉 \(type(of: input)) \(input) will be converted to Int")
+
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                if let result = Int(input) {
+                    DispatchQueue.main.async {
+                        completion(.success(result))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(.failure(NSError(domain: "error.no-value", code: 1, userInfo: nil)))
+                    }
+                }
+            }
+        }, processingHandler: {
+            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+        }, errorHandler: {
+            $0.sendToMotherboard(data: $1)
+        })
+
+        let task2 = TaskBoard<Int, String>(identifier: "2", executor: { board, input, completion in
+            print("👉 Task \(board.identifier) activated: \(input)")
+            print("👉 \(type(of: input)) \(input) will be converted to String")
+
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                let result = String(input)
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            }
+        }, processingHandler: {
+            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+        })
+
+        let task3 = TaskBoard<String, String>(identifier: "3", executor: { board, input, completion in
+            print("👉 Task \(board.identifier) activated: \(input)")
+            print("👉 \(type(of: input)) \(input) will be returned with tick mark")
+
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.async {
+                    completion(.success("✅ " + input))
+                }
+            }
+        }, processingHandler: {
+            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+        })
+
+        let motherboard = Motherboard(boards: [task1, task2, task3])
+
+        motherboard.registerFlowSteps("1" ->>> "2" ->>> "3")
+
+        motherboard.registerFlow(BoardActivateFlow(matchedIdentifiers: ["3"], nextHandler: { text in
+            print("🏁 " + String(describing: text))
+        }))
+
+        return motherboard
+    }()
 
 //    @LazyInjected var deepLinkHandler: DeepLinkHandling
 
@@ -32,6 +93,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard let window = self.window else { return false }
         rootBoard.installIntoWindow(window)
         rootBoard.activate(withGuaranteedInput: launchOptions)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.mainboard.installIntoRootViewController(window.rootViewController!.presentedViewController!)
+            let text = "a" //String(Int.random(in: 0 ... 999))
+            self.mainboard.activateBoard(identifier: "1", withOption: text)
+        }
 
 //        deepLinkHandler.start(with: window!.rootViewController!)
 
