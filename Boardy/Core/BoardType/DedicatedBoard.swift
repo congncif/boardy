@@ -49,12 +49,27 @@ extension DedicatedBoard {
 
 public protocol GuaranteedBoard: AdaptableBoard, ActivatableBoard {
     func activate(withGuaranteedInput input: InputType)
+
+    var silentInputWhiteList: [(_ input: Any?) -> Bool] { get }
 }
 
 extension GuaranteedBoard {
+    private func isSilent(input: Any?) -> Bool {
+        let listCheckers = [isSilentData] + silentInputWhiteList
+        for checker in listCheckers {
+            if checker(input) { return true }
+        }
+        return false
+    }
+
+    public var silentInputWhiteList: [(_ input: Any?) -> Bool] { [] }
+
     public func activate(withOption option: Any?) {
         guard let input = convertOptionToInput(option) else {
-            assertionFailure("⛈ [\(String(describing: self))] Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
+            guard isSilent(input: option) else {
+                assertionFailure("⛈ [\(String(describing: self))] Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
+                return
+            }
             return
         }
         activate(withGuaranteedInput: input)

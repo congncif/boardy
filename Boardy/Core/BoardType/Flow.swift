@@ -8,7 +8,7 @@
 import Foundation
 
 /// Silent Data Types is pre-defined types (`BoardFlowAction`, `BoardInputModel`, `BoardCommandModel`, `CompleteAction`) for the certain purpose of the board activities. They should be excluded from type checking to avoid raising unnecessary problems.
-private func isSilentData(_ data: Any?) -> Bool {
+func isSilentData(_ data: Any?) -> Bool {
     if data is BoardFlowAction || data is BoardInputModel || data is BoardCommandModel || data is CompleteAction {
         return true
     }
@@ -173,6 +173,8 @@ extension BoardDelegate where Self: FlowManageable {
 // MARK: - Forward functions
 
 extension FlowManageable {
+    public func resetFlows() { flows = [] }
+
     public func forwardActionFlow(to board: IdentifiableBoard) {
         registerGeneralFlow {
             board.sendFlowAction($0)
