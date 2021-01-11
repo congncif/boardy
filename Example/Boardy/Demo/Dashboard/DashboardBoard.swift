@@ -27,6 +27,18 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
     init() {
         super.init(identifier: .dashboard)
+
+        motherboard.registerChainFlow(matchedIdentifiers: [.headline], target: self)
+            .handle(outputType: Int.self) { _, output in
+                print(output)
+            }
+            .eventuallyHandle { _, _ in
+                print("Xong")
+            }
+        
+        motherboard.registerGuaranteedFlow(matchedIdentifiers: [.headline], target: self, uniqueOutputType: String.self) { (target, output) in
+            print(output)
+        }
     }
 
     func activate(withGuaranteedInput input: Any?) {
