@@ -150,8 +150,11 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
     }
 
     @discardableResult
-    public func eventuallyHandle(handler: @escaping (Target, Any?) -> Void) -> FlowManageable {
+    public func eventuallyHandle(skipSilentData: Bool = true, handler: @escaping (Target, Any?) -> Void) -> FlowManageable {
         let matcher = HandlerInfo { (object: Target, data) in
+            if skipSilentData, isSilentData(data) {
+                return true
+            }
             handler(object, data)
             return true
         }
