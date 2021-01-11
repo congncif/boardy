@@ -159,6 +159,11 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
         return manager
     }
 
+    @discardableResult
+    public func eventuallySkipHandling() -> FlowManageable {
+        return eventuallyHandle { _, _ in }
+    }
+
     public func matchWithOutput(_ output: BoardOutputModel) -> Bool {
         return matcher(output)
     }

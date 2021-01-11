@@ -32,9 +32,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
             .handle(outputType: Int.self) { _, output in
                 print(output)
             }
-            .eventuallyHandle { _, _ in
-                print("Xong")
-            }
+            .eventuallySkipHandling()
         
         motherboard.registerGuaranteedFlow(matchedIdentifiers: [.headline], target: self, uniqueOutputType: String.self) { (target, output) in
             print(output)
