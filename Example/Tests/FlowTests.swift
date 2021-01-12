@@ -53,7 +53,7 @@ final class FlowTests: XCTestCase {
         XCTAssertNil(voidResult?.1)
     }
     
-    func testGuaranteedFlow() {
+    func testGuaranteedFlow() throws {
         var result: (FlowTests, String)?
         
         motherboard.registerGuaranteedFlow(matchedIdentifiers: [testId], target: self, uniqueOutputType: String.self) {
@@ -61,8 +61,10 @@ final class FlowTests: XCTestCase {
         }
         
         testBoard.sendToMotherboard(data: "text")
-        XCTAssertEqual(result?.0, self)
-        XCTAssertEqual(result?.1, "text")
+        
+        let validResult = try XCTUnwrap(result)
+        XCTAssertEqual(validResult.0, self)
+        XCTAssertEqual(validResult.1, "text")
         
         var assertionCalled: Bool = false
         var assertionPassed: Bool = false
