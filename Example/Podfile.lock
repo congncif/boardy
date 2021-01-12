@@ -1,17 +1,17 @@
 PODS:
-  - Boardy (1.6.1):
-    - Boardy/Default (= 1.6.1)
-  - Boardy/ComponentKit (1.6.1):
+  - Boardy (1.7.0):
+    - Boardy/Default (= 1.7.0)
+  - Boardy/ComponentKit (1.7.0):
     - Boardy/Core
-  - Boardy/Composable (1.6.1):
+  - Boardy/Composable (1.7.0):
     - Boardy/Core
     - UIComposable
-  - Boardy/Core (1.6.1)
-  - Boardy/DeepLink (1.6.1):
+  - Boardy/Core (1.7.0)
+  - Boardy/DeepLink (1.7.0):
     - Boardy/Core
-  - Boardy/Default (1.6.1):
+  - Boardy/Default (1.7.0):
     - Boardy/Core
-  - Boardy/RxStoreRef (1.6.1):
+  - Boardy/RxStoreRef (1.7.0):
     - Boardy/Core
     - Boardy/DeepLink
     - ReferenceStoreManager
@@ -120,7 +120,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: b7772311b52bb0f72d2346b90f3420990cbc2f43
+  Boardy: 040682079b4cd08b2ee46c8973bf4db0820910f5
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
@@ -136,4 +136,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 2cc79ee774477fe8947ae9964dbb44f490a20871
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1

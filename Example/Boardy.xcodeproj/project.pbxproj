@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,8 @@
 		20F2115725447C2E00C0D1AC /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F2115625447C2E00C0D1AC /* UIColor+Random.swift */; };
 		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
 		27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FD12541571C005C9027 /* FeaturedBoard.swift */; };
+		278F26CD25AD4271005BD3EC /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */; };
+		278F26CF25AD4271005BD3EC /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */; };
 		2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */; };
 		2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860A24FE4DA80046FDB9 /* AppMainboard.swift */; };
 		2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860C24FE57A20046FDB9 /* HomeMainboard.swift */; };
@@ -66,7 +68,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		607FACEC1AFB9204008FA782 /* FlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* FlowTests.swift */; };
 		A653AF4FA28B9EDDA23CC75C /* Pods_Boardy_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 332F4C45DEAAF8E1227D9F45 /* Pods_Boardy_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -146,7 +148,7 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* Boardy_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Boardy_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		607FACEB1AFB9204008FA782 /* FlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowTests.swift; sourceTree = "<group>"; };
 		A3F3EFDB8C97D43BCBEFBF53 /* Pods-Boardy_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Boardy_Tests.release.xcconfig"; path = "Target Support Files/Pods-Boardy_Tests/Pods-Boardy_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		A822C48314F8709050510197 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		CD6975A05E011FC51CAA37B5 /* Pods-Boardy_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Boardy_Example.debug.xcconfig"; path = "Target Support Files/Pods-Boardy_Example/Pods-Boardy_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -168,7 +170,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				278F26CD25AD4271005BD3EC /* CwlPosixPreconditionTesting in Frameworks */,
 				1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */,
+				278F26CF25AD4271005BD3EC /* CwlPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,7 +417,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				607FACEB1AFB9204008FA782 /* Tests.swift */,
+				607FACEB1AFB9204008FA782 /* FlowTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -483,6 +487,10 @@
 				607FACE71AFB9204008FA782 /* PBXTargetDependency */,
 			);
 			name = Boardy_Tests;
+			packageProductDependencies = (
+				278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */,
+				278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */,
+			);
 			productName = Tests;
 			productReference = 607FACE51AFB9204008FA782 /* Boardy_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -518,6 +526,9 @@
 				Base,
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
+			packageReferences = (
+				278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */,
+			);
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -704,7 +715,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+				607FACEC1AFB9204008FA782 /* FlowTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -832,7 +843,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -844,7 +856,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Boardy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -860,7 +875,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Boardy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -883,7 +901,11 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -902,7 +924,11 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -942,6 +968,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattgallagher/CwlPreconditionTesting.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPosixPreconditionTesting;
+		};
+		278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPreconditionTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 607FACC81AFB9204008FA782 /* Project object */;
 }
