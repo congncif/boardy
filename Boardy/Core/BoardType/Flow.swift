@@ -146,7 +146,7 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
             return true
         }
         handlers.append(matcher)
-        return manager
+        return manager.registerFlow(self)
     }
 
     @discardableResult
@@ -159,7 +159,7 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
             return true
         }
         handlers.append(matcher)
-        return manager
+        return manager.registerFlow(self)
     }
 
     @discardableResult
