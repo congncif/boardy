@@ -96,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.mainboard.installIntoRootViewController(window.rootViewController!.presentedViewController!)
-            let text = "a" //String(Int.random(in: 0 ... 999))
+            let text = String(Int.random(in: 0 ... 999))
             self.mainboard.activateBoard(identifier: "1", withOption: text)
         }
 

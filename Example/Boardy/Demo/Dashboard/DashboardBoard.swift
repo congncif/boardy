@@ -75,16 +75,16 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
 extension DashboardBoard: DashboardDelegate {
     func changePlugins(viewController: UIViewController) {
-        rootViewController.returnHere()
-        complete()
-//        guard let contentBoard: FlowComposableMotherboard = viewController.pairedObject() else {
-//            return
-//        }
-//
-//        let featured = FeaturedBoard()
-//
-//        contentBoard.addBoard(featured)
-//
-//        featured.activate()
+//        rootViewController.returnHere()
+//        complete()
+        guard let contentBoard: FlowComposableMotherboard = viewController.pairedObject() else {
+            return
+        }
+
+        let featured = FeaturedBoard()
+
+        contentBoard.addBoard(featured)
+
+        featured.activate()
     }
 }

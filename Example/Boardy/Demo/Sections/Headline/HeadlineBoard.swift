@@ -22,7 +22,9 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
 
     @LazyInjected var builder: HeadlineBuildable
 
-    private lazy var adapter = HeadlineBoardOutputAdapter()
+//    private lazy var adapter = HeadlineBoardOutputAdapter()
+
+    private lazy var refreshBus = Bus<String>()
 
     init() {
         super.init(identifier: .headline)
@@ -32,8 +34,13 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
         let viewController = builder.build()
         viewController.delegate = self
 
-        let contentAdapter = HeadlineInputAdapter(target: viewController)
-        adapter.connect(adapter: contentAdapter)
+//        let contentAdapter = HeadlineInputAdapter(target: viewController)
+//        adapter.connect(adapter: contentAdapter)
+
+        let cable = TargetBusCable(target: viewController) { text, target in
+            target.accept(label: text)
+        }
+        refreshBus.connect(cable)
 
         let element = UIElement(identifier: identifier, contentViewController: viewController)
         putToComposer(elementAction: .update(element: element))
@@ -42,7 +49,8 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
     func interact(guaranteedCommand: HeadlineCommand) {
         switch guaranteedCommand {
         case let .refresh(label: value):
-            adapter.receive(label: value)
+            refreshBus.transport(input: value)
+//            adapter.receive(label: value)
         }
     }
 }

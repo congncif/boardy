@@ -31,6 +31,13 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         registerDefaultFlows()
     }
 
+    public convenience init(identifier: BoardID = UUID().uuidString, boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
+        self.init(identifier: identifier, boardProducer: boardProducer)
+        for board in boards {
+            addBoard(board)
+        }
+    }
+
     func registerDefaultFlows() {
         // Forward action through chain
         forwardActionFlow(to: self)
