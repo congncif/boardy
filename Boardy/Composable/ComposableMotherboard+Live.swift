@@ -50,14 +50,14 @@ extension ComposableMotherboardLivable where Self: AnyObject {
 
 extension NSObject: ComposableMotherboardLivable {
     /// Install a board and keep it alive with rootObject's lifecycle.
-    public func attachComposableMotheboard(_ motherboard: FlowComposableMotherboard) {
-        composableMotherboard = motherboard
-        install(board: motherboard)
+    public func associate(composableMotherboard: FlowComposableMotherboard) {
+        self.composableMotherboard = composableMotherboard
+        install(board: composableMotherboard)
     }
 }
 
 extension ComposableMotherboardType where Self: FlowManageable {
-    public func attach(to object: NSObject) {
-        object.attachComposableMotheboard(self)
+    public func associate(to object: NSObject) {
+        object.associate(composableMotherboard: self)
     }
 }
