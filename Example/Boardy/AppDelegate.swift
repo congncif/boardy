@@ -8,8 +8,6 @@
 
 import Boardy
 import Resolver
-import RxCocoa
-import RxSwift
 import SiFUtilities
 import UIKit
 
@@ -109,7 +107,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let link = url.absoluteString
 //        deepLinkHandler.handleDeepLink(link)
 
-        window?.rootViewController?.handleDeepLink(link, use: DeepLinkAppClub())
+        window?.rootViewController?.handleDeepLink(link, handlerClub: DeepLinkAppClub())
 
         return true
     }

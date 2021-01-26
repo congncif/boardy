@@ -9,7 +9,6 @@
 import Boardy
 import Foundation
 import Resolver
-import RxSwift
 import SiFUtilities
 import UIKit
 
@@ -22,8 +21,6 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
     @LazyInjected var builder: DashboardBuildable
 //    @LazyInjected var elementFactory: DashboardElementManufacturing
-
-    private let disposeBag = DisposeBag()
 
     init() {
         super.init(identifier: .dashboard)
@@ -64,7 +61,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
         let contentBoard = getComposableMotherboard(elementBoards: [headline])
 
-        contentBoard.pairInstall(to: dashboard)
+        contentBoard.attachInstall(to: dashboard)
 //        contentBoard.attach(to: dashboard)
 
         contentBoard.connect(to: dashboard)
@@ -77,7 +74,7 @@ extension DashboardBoard: DashboardDelegate {
     func changePlugins(viewController: UIViewController) {
 //        rootViewController.returnHere()
 //        complete()
-        guard let contentBoard: FlowComposableMotherboard = viewController.pairedObject() else {
+        guard let contentBoard: FlowComposableMotherboard = viewController.firstAttachedObject() else {
             return
         }
 

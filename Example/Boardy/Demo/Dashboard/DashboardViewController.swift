@@ -6,7 +6,6 @@
 //  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
-import RxSwift
 import UIComposable
 import UIKit
 

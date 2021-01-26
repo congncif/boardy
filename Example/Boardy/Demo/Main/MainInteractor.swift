@@ -7,8 +7,6 @@
 //
 
 import RIBs
-import RxCocoa
-import RxSwift
 
 protocol MainRouting: ViewableRouting {}
 

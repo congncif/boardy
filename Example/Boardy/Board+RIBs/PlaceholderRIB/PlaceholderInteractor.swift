@@ -6,8 +6,6 @@
 //
 
 import RIBs
-import RxCocoa
-import RxSwift
 import UIKit
 
 public protocol PlaceholderRouting: ViewableRouting {

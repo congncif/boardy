@@ -7,8 +7,6 @@
 //
 
 import RIBs
-import RxCocoa
-import RxSwift
 import UIKit
 
 protocol MainPresentableListener: AnyObject {
@@ -22,8 +20,6 @@ final class MainViewController: UIViewController, MainPresentable, MainViewContr
     @IBOutlet private var nameLabel: UILabel!
 
     private var userInfoHandler: (() -> Void)?
-
-    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
