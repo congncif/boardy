@@ -43,6 +43,7 @@ Pod::Spec.new do |s|
         
         co.dependency 'Boardy/Core'
         co.dependency 'Boardy/DeepLink'
+        co.dependency 'Boardy/Composable'
     end
     
     s.subspec 'Attachable' do |co|
