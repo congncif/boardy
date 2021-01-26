@@ -40,8 +40,8 @@ public final class TargetBusCable<Input, Target>: BusCable<Input> {
     var box = ObjectBox()
 
     public init(target: Target, handler: @escaping (Input, Target) -> Void) {
-        if let object = target as? AnyObject {
-            box.object = object
+        if type(of: target as Any) is AnyClass {
+            box.object = target as AnyObject
         } else {
             box.value = target
         }

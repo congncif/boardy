@@ -45,7 +45,7 @@ extension InstallableBoard {
             return controller
         } else if let controller = rootViewController.tabBarController {
             return controller
-        } else if let navigationController = rootViewController as? UINavigationController, let controller = navigationController.tabBarController as? UITabBarController {
+        } else if let navigationController = rootViewController as? UINavigationController, let controller = navigationController.tabBarController {
             return controller
         } else {
             assertionFailure("⛈ [\(String(describing: self))] No UITabBarController. Install \(self) into a rootViewController which based on UITabBarController before activating it.")
