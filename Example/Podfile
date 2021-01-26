@@ -10,6 +10,7 @@ target 'Boardy_Example' do
   pod 'Boardy/DeepLink', :path => '../'
   pod 'Boardy/Composable', :path => '../'
   pod 'Boardy/RxStoreRef', :path => '../'
+  pod 'Boardy/Runtime', :path => '../'
   pod 'UIComposable/DiffUI' #, :git => 'https://github.com/congncif/UIComposable.git', :branch => 'master'
   
 #  pod 'ReferenceStoreManager', :git => 'https://github.com/congncif/RxReferenceStoreManager.git'

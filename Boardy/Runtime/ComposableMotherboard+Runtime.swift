@@ -52,12 +52,12 @@ extension NSObject: ComposableMotherboardLivable {
     /// Install a board and keep it alive with rootObject's lifecycle.
     public func associate(composableMotherboard: FlowComposableMotherboard) {
         self.composableMotherboard = composableMotherboard
-        install(board: composableMotherboard)
     }
 }
 
 extension ComposableMotherboardType where Self: FlowManageable {
-    public func associate(to object: NSObject) {
+    public func associateInstall(to object: NSObject) {
         object.associate(composableMotherboard: self)
+        object.install(board: self)
     }
 }

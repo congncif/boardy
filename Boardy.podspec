@@ -16,6 +16,7 @@ Pod::Spec.new do |s|
     
     s.subspec 'Default' do |co|
         co.dependency 'Boardy/Core'
+        co.dependency 'Boardy/Attachable'
     end
     
     s.subspec 'Core' do |co|
@@ -35,6 +36,20 @@ Pod::Spec.new do |s|
         co.dependency 'Boardy/DeepLink'
         
         co.dependency 'ReferenceStoreManager'
+    end
+    
+    s.subspec 'Runtime' do |co|
+        co.source_files = 'Boardy/Runtime/**/*.swift'
+        
+        co.dependency 'Boardy/Core'
+    end
+    
+    s.subspec 'Attachable' do |co|
+        co.source_files = 'Boardy/Attachable/**/*.swift'
+        
+        co.dependency 'Boardy/Core'
+        
+        co.dependency 'AttachExtensions'
     end
     
     s.subspec 'Composable' do |co|

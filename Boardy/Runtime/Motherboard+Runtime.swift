@@ -52,12 +52,12 @@ extension NSObject: MotherboardLivable {
     /// Install a board and keep it alive with rootObject's lifecycle.
     public func associate(motherboard: FlowMotherboard) {
         self.motherboard = motherboard
-        install(board: motherboard)
     }
 }
 
 extension MotherboardType where Self: FlowManageable {
-    public func associate(to object: NSObject) {
+    public func associateInstall(to object: NSObject) {
         object.associate(motherboard: self)
+        object.install(board: self)
     }
 }

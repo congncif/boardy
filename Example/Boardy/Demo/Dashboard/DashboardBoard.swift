@@ -64,7 +64,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 
         let contentBoard = getComposableMotherboard(elementBoards: [headline])
 
-        contentBoard.pairInstallWith(object: dashboard)
+        contentBoard.pairInstall(to: dashboard)
 //        contentBoard.attach(to: dashboard)
 
         contentBoard.connect(to: dashboard)

@@ -11,7 +11,7 @@ import ReferenceStoreManager
 // MARK: - Board + pair
 
 extension Board {
-    public func pairInstallWith(object: NSObject) {
+    public func pairInstall(to object: NSObject) {
         installIntoRoot(object)
         pairWith(object: object)
     }
