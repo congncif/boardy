@@ -42,12 +42,14 @@ Pod::Spec.new do |s|
         co.source_files = 'Boardy/Runtime/**/*.swift'
         
         co.dependency 'Boardy/Core'
+        co.dependency 'Boardy/DeepLink'
     end
     
     s.subspec 'Attachable' do |co|
         co.source_files = 'Boardy/Attachable/**/*.swift'
         
         co.dependency 'Boardy/Core'
+        co.dependency 'Boardy/DeepLink'
         
         co.dependency 'AttachExtensions'
     end

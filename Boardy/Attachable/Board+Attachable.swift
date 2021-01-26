@@ -33,3 +33,19 @@ extension Board {
         object.attach(board: self)
     }
 }
+
+extension UIViewController {
+    public func handleDeepLink(_ deepLink: String, handlerClub: DeepLinkHandlerClubbing) {
+        let deepLinkHandler: DeepLinkHandlingComposable
+        if let handler: DeepLinkHandlingComposable = self.firstAttachedObject() {
+            handler.registerHandlerClubIfNeeded(handlerClub)
+            deepLinkHandler = handler
+        } else {
+            let handler = DeepLinkHandler(handlerClubbing: handlerClub)
+            attachObject(handler)
+            deepLinkHandler = handler
+        }
+        deepLinkHandler.start(with: self)
+        deepLinkHandler.handleDeepLink(deepLink)
+    }
+}
