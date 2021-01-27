@@ -28,3 +28,13 @@ extension Board: ReactiveCompatible {}
 extension Board: ReactiveDisposableObject {}
 
 extension Board: SelfStorableObject {}
+
+// MARK: - Deprecated
+
+extension Board {
+    @available(*, deprecated, message: "Use pairInstall(to:) instead")
+    public func pairInstallWith(object: NSObject) {
+        installIntoRoot(object)
+        pairWith(object: object)
+    }
+}

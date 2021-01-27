@@ -17,6 +17,10 @@ PODS:
   - Boardy/Default (1.9.0):
     - Boardy/Attachable
     - Boardy/Core
+  - Boardy/RxStoreRef (1.9.0):
+    - Boardy/Core
+    - Boardy/DeepLink
+    - ReferenceStoreManager
   - DiffableDataSources (0.4.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
     - DifferenceKit/UIKitExtension (~> 1.1)
@@ -29,10 +33,16 @@ PODS:
   - Localize-Swift/LocalizeSwiftCore (3.2.0)
   - Localize-Swift/UIKit (3.2.0):
     - Localize-Swift/LocalizeSwiftCore
+  - ReferenceStoreManager (0.2.0):
+    - RxCocoa
+    - RxSwift
   - Resolver (1.2.1)
   - RIBs (0.9.3):
     - RxRelay (~> 5.1)
     - RxSwift (~> 5.1)
+  - RxCocoa (5.1.1):
+    - RxRelay (~> 5)
+    - RxSwift (~> 5)
   - RxRelay (5.1.1):
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
@@ -82,6 +92,7 @@ DEPENDENCIES:
   - Boardy/ComponentKit (from `../`)
   - Boardy/Composable (from `../`)
   - Boardy/DeepLink (from `../`)
+  - Boardy/RxStoreRef (from `../`)
   - Resolver (~> 1.1)
   - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
   - SiFUtilities
@@ -94,7 +105,9 @@ SPEC REPOS:
     - DiffableDataSources
     - DifferenceKit
     - Localize-Swift
+    - ReferenceStoreManager
     - Resolver
+    - RxCocoa
     - RxRelay
     - RxSwift
     - SiFUtilities
@@ -119,14 +132,16 @@ SPEC CHECKSUMS:
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
+  ReferenceStoreManager: f9b56c7eb783179e92ba39393fff362ca4937f10
   Resolver: 764e380b2ddb26bba48c6e45ab393c968894a156
   RIBs: d4c4c7e7e4580f0bbe88bdc88b6c11704a738b7f
+  RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SiFUtilities: 34bf71c7f74942d70ce20498dd2d9f2308fd0dff
   UIComposable: 784ec93c37caa67ae8145f4f57764b1cca314353
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: ec6bebff20eae9154e83fe06770c68ed5a699860
+PODFILE CHECKSUM: 22a85f280f23c7b36b593534739d39c598aba408
 
 COCOAPODS: 1.10.1
