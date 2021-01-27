@@ -53,6 +53,16 @@ extension FlowManageable {
     }
 
     @discardableResult
+    public func registerGeneralFlow<Target: AnyObject, Output>(target: Target, nextHandler: @escaping (Target, Output) -> Void) -> Self {
+        let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [weak target] data in
+            guard let output = data as? Output, let target = target else { return }
+            nextHandler(target, output)
+        })
+        registerFlow(generalFlow)
+        return self
+    }
+
+    @discardableResult
     public func registerFlow<Output>(matchedIdentifiers: [FlowID], nextHandler: @escaping (Output) -> Void) -> Self {
         let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: nextHandler)
         registerFlow(generalFlow)
