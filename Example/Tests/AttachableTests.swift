@@ -6,21 +6,23 @@
 //  Copyright © 2021 [iF] Solution. All rights reserved.
 //
 
-import Boardy
+@testable import Boardy
 import XCTest
 
-class MainObject: AttachableObject {}
+class MainObject: AttachableObject {
+    deinit {
+        print("deinit")
+    }
+}
 
 class SomeObject: AttachableObject {}
 
 class OtherObject: AttachableObject {}
 
 class AttachableTests: XCTestCase {
-    var mainObject: MainObject!
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        mainObject = MainObject()
+        StaticStorage.mapTable.removeAllObjects()
 
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
@@ -32,11 +34,13 @@ class AttachableTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        mainObject = nil
+        
     }
 
     func testAttachObject() throws {
         let some = SomeObject()
+        let mainObject = MainObject()
+        
         mainObject.attachObject(some)
 
         let attachedObjects = mainObject.attachedObjects()
@@ -52,11 +56,31 @@ class AttachableTests: XCTestCase {
         XCTAssertNotNil(lastAttached)
         XCTAssertTrue(some === lastAttached)
     }
-    
+
+    func testAttachTo() {
+        let some = SomeObject()
+        let mainObject = MainObject()
+        
+        some.attach(to: mainObject)
+
+        let attachedObjects = mainObject.attachedObjects()
+        XCTAssertFalse(attachedObjects.isEmpty)
+
+        let firstAttached: SomeObject? = mainObject.firstAttachedObject()
+
+        XCTAssertNotNil(firstAttached)
+        XCTAssertTrue(some === firstAttached)
+    }
+
     func testMultipleAttach() {
         let some = SomeObject()
         let other = OtherObject()
-        
-        
+        let mainObject = MainObject()
+
+        mainObject.attachObject(some)
+        mainObject.attachObject(other)
+
+        let attachedObjects = mainObject.attachedObjects()
+        XCTAssertEqual(attachedObjects.count, 2)
     }
 }
