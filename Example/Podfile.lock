@@ -1,23 +1,21 @@
 PODS:
-  - AttachExtensions (0.1.0)
-  - Boardy (1.9.0):
-    - Boardy/Default (= 1.9.0)
-  - Boardy/Attachable (1.9.0):
-    - AttachExtensions
+  - Boardy (1.9.2):
+    - Boardy/Default (= 1.9.2)
+  - Boardy/Attachable (1.9.2):
     - Boardy/Core
     - Boardy/DeepLink
-  - Boardy/ComponentKit (1.9.0):
+  - Boardy/ComponentKit (1.9.2):
     - Boardy/Core
-  - Boardy/Composable (1.9.0):
+  - Boardy/Composable (1.9.2):
     - Boardy/Core
     - UIComposable
-  - Boardy/Core (1.9.0)
-  - Boardy/DeepLink (1.9.0):
+  - Boardy/Core (1.9.2)
+  - Boardy/DeepLink (1.9.2):
     - Boardy/Core
-  - Boardy/Default (1.9.0):
+  - Boardy/Default (1.9.2):
     - Boardy/Attachable
     - Boardy/Core
-  - Boardy/RxStoreRef (1.9.0):
+  - Boardy/RxStoreRef (1.9.2):
     - Boardy/Core
     - Boardy/DeepLink
     - ReferenceStoreManager
@@ -101,7 +99,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - AttachExtensions
     - DiffableDataSources
     - DifferenceKit
     - Localize-Swift
@@ -127,8 +124,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  AttachExtensions: 239466400f97138a727bccd0a287cc7feb9b0ae2
-  Boardy: 6a699906090387b745f183dbe4134b10fd8e2e55
+  Boardy: 432ec6a3acbcb259a1f0000080429bcfd0c9515c
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232

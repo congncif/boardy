@@ -1,4 +1,4 @@
-@testable import Boardy
+import Boardy
 import CwlPreconditionTesting
 import XCTest
 

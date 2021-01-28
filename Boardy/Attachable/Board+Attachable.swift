@@ -5,19 +5,22 @@
 //  Created by FOLY on 1/26/21.
 //
 
-import AttachExtensions
+// import AttachExtensions
 import Foundation
+
+extension NSObject: AttachableObject {}
+extension Board: AttachableObject {}
 
 // MARK: - Utility extensions
 
 extension UIViewController {
     /// Install a board and keep it alive with rootObject's lifecycle.
     public func attach(motherboard: FlowMotherboard) {
-        self.attachObject(motherboard)
+        attachObject(motherboard)
     }
 
     public func attach(board: Board) {
-        self.attachObject(board)
+        attachObject(board)
     }
 }
 
@@ -37,7 +40,7 @@ extension Board {
 extension UIViewController {
     public func handleDeepLink(_ deepLink: String, handlerClub: DeepLinkHandlerClubbing) {
         let deepLinkHandler: DeepLinkHandlingComposable
-        if let handler: DeepLinkHandlingComposable = self.firstAttachedObject() {
+        if let handler: DeepLinkHandlingComposable = firstAttachedObject() {
             handler.registerHandlerClubIfNeeded(handlerClub)
             deepLinkHandler = handler
         } else {
