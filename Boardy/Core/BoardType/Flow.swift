@@ -21,8 +21,8 @@ public protocol BoardFlowAction {}
 public typealias FlowID = String
 
 public protocol BoardFlow {
-    func matchWithOutput(_ output: BoardOutputModel) -> Bool
-    func doNext(_ data: Any?)
+    func match(with output: BoardOutputModel) -> Bool
+    func doNext(with output: BoardOutputModel)
 }
 
 public protocol FlowManageable: AnyObject {
@@ -115,9 +115,9 @@ extension FlowManageable where Self: MotherboardType {
 }
 
 private final class HandlerInfo<Target: AnyObject> {
-    let handler: (Target, Any?) -> Bool
+    let handler: (Target, BoardOutputModel) -> Bool
 
-    init(handler: @escaping (Target, Any?) -> Bool) {
+    init(handler: @escaping (Target, BoardOutputModel) -> Bool) {
         self.handler = handler
     }
 }
@@ -136,7 +136,8 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
     }
 
     public func handle<Output>(outputType: Output.Type, handler: @escaping (Target, Output) -> Void) -> Self {
-        let matcher = HandlerInfo { (object: Target, data) in
+        let matcher = HandlerInfo { (object: Target, output) in
+            let data = output.data
             if let output = data as? Output {
                 handler(object, output)
                 return true
@@ -150,7 +151,8 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
 
     @discardableResult
     public func eventuallyHandle<Output>(outputType: Output.Type, handler: @escaping (Target, Output?) -> Void) -> FlowManageable {
-        let matcher = HandlerInfo { (object: Target, data) in
+        let matcher = HandlerInfo { (object: Target, output) in
+            let data = output.data
             let output = data as? Output
             handler(object, output)
             return true
@@ -161,7 +163,8 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
 
     @discardableResult
     public func eventuallyHandle(skipSilentData: Bool = true, handler: @escaping (Target, Any?) -> Void) -> FlowManageable {
-        let matcher = HandlerInfo { (object: Target, data) in
+        let matcher = HandlerInfo { (object: Target, output) in
+            let data = output.data
             if skipSilentData, isSilentData(data) {
                 return true
             }
@@ -177,14 +180,14 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
         return eventuallyHandle { _, _ in }
     }
 
-    public func matchWithOutput(_ output: BoardOutputModel) -> Bool {
+    public func match(with output: BoardOutputModel) -> Bool {
         return matcher(output)
     }
 
-    public func doNext(_ data: Any?) {
+    public func doNext(with output: BoardOutputModel) {
         guard let target = target else { return }
         for matcher in handlers {
-            if matcher.handler(target, data) {
+            if matcher.handler(target, output) {
                 return
             }
         }
@@ -193,31 +196,23 @@ public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
 
 public struct BoardActivateFlow: BoardFlow {
     private let matcher: (BoardOutputModel) -> Bool
-    private let nextHandler: (Any?) -> Void
+    private let outputNextHandler: (BoardOutputModel) -> Void
+
+    public init(
+        matcher: @escaping (BoardOutputModel) -> Bool,
+        outputNextHandler: @escaping (BoardOutputModel) -> Void
+    ) {
+        self.matcher = matcher
+        self.outputNextHandler = outputNextHandler
+    }
 
     public init(
         matcher: @escaping (BoardOutputModel) -> Bool,
         nextHandler: @escaping (Any?) -> Void
     ) {
         self.matcher = matcher
-        self.nextHandler = nextHandler
-    }
-
-    public init<Ouput>(
-        matcher: @escaping (BoardOutputModel) -> Bool,
-        guaranteedNextHandler: @escaping (Ouput) -> Void
-    ) {
-        self.matcher = matcher
-        nextHandler = { output in
-            guard let data = output as? Ouput else {
-                // Guaranteed output is Silent Data Types otherwise raise an assertion.
-                guard isSilentData(output) else {
-                    assertionFailure("⛈ Cannot convert output from \(String(describing: output)) to type \(Ouput.self)")
-                    return
-                }
-                return
-            }
-            guaranteedNextHandler(data)
+        outputNextHandler = {
+            nextHandler($0.data)
         }
     }
 
@@ -226,10 +221,32 @@ public struct BoardActivateFlow: BoardFlow {
         dedicatedNextHandler: @escaping (Ouput?) -> Void
     ) {
         self.matcher = matcher
-        nextHandler = { output in
-            let data = output as? Ouput
+        outputNextHandler = { output in
+            let data = output.data as? Ouput
             dedicatedNextHandler(data)
         }
+    }
+
+    public init<Ouput>(
+        matcher: @escaping (BoardOutputModel) -> Bool,
+        guaranteedNextHandler: @escaping (Ouput) -> Void
+    ) {
+        self.matcher = matcher
+        outputNextHandler = { output in
+            guard let data = output.data as? Ouput else {
+                // Guaranteed output is Silent Data Types otherwise raise an assertion.
+                guard isSilentData(output.data) else {
+                    assertionFailure("⛈ Cannot convert output of board \(output.identifier) from type \(String(describing: output.data)) to type \(Ouput.self)")
+                    return
+                }
+                return
+            }
+            guaranteedNextHandler(data)
+        }
+    }
+
+    public init(matchedIdentifiers: [FlowID], outputNextHandler: @escaping (BoardOutputModel) -> Void) {
+        self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, outputNextHandler: outputNextHandler)
     }
 
     public init(matchedIdentifiers: [FlowID], nextHandler: @escaping (Any?) -> Void) {
@@ -244,12 +261,12 @@ public struct BoardActivateFlow: BoardFlow {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, guaranteedNextHandler: guaranteedNextHandler)
     }
 
-    public func matchWithOutput(_ output: BoardOutputModel) -> Bool {
+    public func match(with output: BoardOutputModel) -> Bool {
         return matcher(output)
     }
 
-    public func doNext(_ data: Any?) {
-        nextHandler(data)
+    public func doNext(with output: BoardOutputModel) {
+        outputNextHandler(output)
     }
 }
 
@@ -282,7 +299,7 @@ extension BoardDelegate where Self: FlowManageable {
     public func board(_ board: IdentifiableBoard, didSendData data: Any?) {
         // Handle dedicated flow actions
         let output = OutputModel(identifier: board.identifier, data: data)
-        flows.filter { $0.matchWithOutput(output) }.forEach { $0.doNext(data) }
+        flows.filter { $0.match(with: output) }.forEach { $0.doNext(with: output) }
     }
 }
 

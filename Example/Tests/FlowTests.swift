@@ -3,11 +3,28 @@ import CwlPreconditionTesting
 import XCTest
 
 final class TestBoard: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {}
+    func activate(withOption option: Any?) {
+        sendToMotherboard()
+    }
+}
+
+final class Test2Board: Board, ActivatableBoard {
+    func activate(withOption option: Any?) {
+        sendToMotherboard()
+    }
+}
+
+final class Test3Board: Board, ActivatableBoard {
+    var activatedCount: Int = 0
+    func activate(withOption option: Any?) {
+        activatedCount += 1
+    }
 }
 
 final class FlowTests: XCTestCase {
     private let testId = "test"
+    private let testId2 = "test2"
+    private let testId3 = "test3"
     
     var testBoard: TestBoard!
     var motherboard: Motherboard!
@@ -86,5 +103,22 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(motherboard.boards.count, 1)
         testBoard.complete()
         XCTAssertEqual(motherboard.boards.count, 0)
+    }
+    
+    func testFlowSteps() {
+        let testBoard2 = Test2Board(identifier: testId2)
+        let testBoard3 = Test3Board(identifier: testId3)
+        
+        motherboard.addBoard(testBoard2)
+        motherboard.addBoard(testBoard3)
+        
+        XCTAssertEqual(motherboard.boards.count, 3)
+        
+        let beforeFlowsNumber = motherboard.flows.count
+        motherboard.registerFlowSteps(testId ->>> testId2 ->>> testId3)
+        XCTAssertEqual(motherboard.flows.count, beforeFlowsNumber + 2)
+        
+        testBoard.activate()
+        XCTAssertEqual(testBoard3.activatedCount, 1)
     }
 }
