@@ -66,11 +66,9 @@ public extension AttachableObject {
     }
 
     func detachObjects<ObjectType: AnyObject>(_ objectType: ObjectType.Type) {
-        if let value = storage.object(forKey: self) {
-            let objects: [ObjectType] = attachedObjects()
-            objects.forEach {
-                detachObject($0)
-            }
+        let objects: [ObjectType] = attachedObjects()
+        objects.forEach {
+            detachObject($0)
         }
     }
 
