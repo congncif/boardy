@@ -22,6 +22,10 @@ In a mobile application development environment, it is difficult to properly imp
 
 **Boardy** helps to build mobile app microsystems like in a simple way. Inspired by computer motherboards. Boardy builds a system of microsystems based on Boards. Each Board corresponds to a microsystems contained within it is a component of the mobile application, which will perform a specific task. All boards are then integrated together into one motherboard to form complete systems. The components do not interact directly with each other, but through the standard Boardy protocol suite. The core business logic is protected from change and external impact. Just changing how boards can be integrated can create a new business so changes or scaling are made easy, ensuring both maintenance and development requirements at the same time.
 
+<p align="center">
+  <img src="https://i.imgur.com/K3P7G3f.jpg"/>
+</p>
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
@@ -51,12 +55,6 @@ pod 'Boardy/DeepLink'
 ```ruby
 # Build a complex UI using Boardy
 pod 'Boardy/Composable'
-```
-
-If you are a fan of `RxSwift`, you should install subspec `RxStoreRef`. This tiny library will help you to manage instance reference dynamically.
-
-```ruby
-pod 'Boardy/RxStoreRef'
 ```
 
 ## Author
