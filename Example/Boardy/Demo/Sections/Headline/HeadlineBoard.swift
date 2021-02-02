@@ -37,7 +37,7 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
 //        let contentAdapter = HeadlineInputAdapter(target: viewController)
 //        adapter.connect(adapter: contentAdapter)
 
-        let cable = TargetBusCable(target: viewController) { text, target in
+        let cable = TargetBusCable(target: viewController) { target, text in
             target.accept(label: text)
         }
         refreshBus.connect(cable)

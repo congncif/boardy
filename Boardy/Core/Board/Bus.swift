@@ -39,7 +39,7 @@ final class ObjectBox {
 public final class TargetBusCable<Input, Target>: BusCable<Input> {
     var box = ObjectBox()
 
-    public init(target: Target, handler: @escaping (Input, Target) -> Void) {
+    public init(target: Target, handler: @escaping (Target, Input) -> Void) {
         if type(of: target as Any) is AnyClass {
             box.object = target as AnyObject
         } else {
@@ -47,7 +47,7 @@ public final class TargetBusCable<Input, Target>: BusCable<Input> {
         }
         super.init(transportHandler: { [weak box] input in
             guard let destination = box?.unboxed(Target.self) else { return }
-            handler(input, destination)
+            handler(destination, input)
         })
     }
 
