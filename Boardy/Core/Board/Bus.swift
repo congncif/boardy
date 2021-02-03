@@ -36,7 +36,7 @@ final class ObjectBox {
     }
 }
 
-public final class TargetBusCable<Input, Target>: BusCable<Input> {
+public final class TargetBusCable<Target, Input>: BusCable<Input> {
     var box = ObjectBox()
 
     public init(target: Target, handler: @escaping (Target, Input) -> Void) {
@@ -76,5 +76,12 @@ public final class Bus<Input> {
         cables.forEach {
             $0.transport(input: input)
         }
+    }
+}
+
+public extension Bus {
+    func connect<Target>(target: Target, handler: @escaping (Target, Input) -> Void) {
+        let cable = TargetBusCable<Target, Input>(target: target, handler: handler)
+        connect(cable)
     }
 }
