@@ -25,6 +25,12 @@ final class LoginViewController: UIViewController, LoginController {
 
         usernameField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         passwordField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        
+        usernameField.text = "username"
+        passwordField.text = "pwd"
+        
+        usernameField.sendActions(for: .editingChanged)
+        passwordField.sendActions(for: .editingChanged)
     }
 
     // MARK: Privates

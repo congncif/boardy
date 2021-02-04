@@ -92,11 +92,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootBoard.installIntoWindow(window)
         rootBoard.activate(withGuaranteedInput: launchOptions)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.mainboard.installIntoRootViewController(window.rootViewController!.presentedViewController!)
-            let text = String(Int.random(in: 0 ... 999))
-            self.mainboard.activateBoard(identifier: "1", withOption: text)
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            self.mainboard.installIntoRootViewController(window.rootViewController!.presentedViewController!)
+//            let text = String(Int.random(in: 0 ... 999))
+//            self.mainboard.activateBoard(identifier: "1", withOption: text)
+//        }
 
         mainboard.registerFlow(matchedIdentifiers: "1", target: self) { (_, output: Int) in
             print("😍 DEFAULT FLOW \(output)")

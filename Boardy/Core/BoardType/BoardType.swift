@@ -22,7 +22,7 @@ public protocol OriginalBoard {
     func installIntoRoot(_ rootObject: AnyObject)
 }
 
-public protocol IdentifiableBoard {
+public protocol IdentifiableBoard: AnyObject {
     var delegate: BoardDelegate? { get set }
     var identifier: BoardID { get }
 }
@@ -51,7 +51,7 @@ extension IdentifiableBoard {
     public func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
     }
-    
+
     public func interactWithOtherBoard<Input>(_ input: BoardCommand<Input>) {
         interactWithOtherBoard(command: input)
     }

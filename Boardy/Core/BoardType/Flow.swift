@@ -320,14 +320,14 @@ extension FlowManageable {
     public func resetFlows() { flows = [] }
 
     public func forwardActionFlow(to board: IdentifiableBoard) {
-        registerGeneralFlow {
-            board.sendFlowAction($0)
+        registerGeneralFlow { [weak board] in
+            board?.sendFlowAction($0)
         }
     }
 
     public func forwardActivationFlow(to board: IdentifiableBoard) {
-        registerGeneralFlow {
-            board.nextToBoard(model: $0)
+        registerGeneralFlow { [weak board] in
+            board?.nextToBoard(model: $0)
         }
     }
 }
