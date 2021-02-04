@@ -8,13 +8,14 @@
 import Foundation
 
 extension FlowManageable {
+    /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Output>(matchedIdentifiers: FlowID..., nextHandler: @escaping (Output) -> Void) -> Self {
-        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: nextHandler)
-        registerFlow(generalFlow)
-        return self
+    public func registerFlow<Target: AnyObject, Output>(matchedIdentifiers: FlowID..., target: Target, nextHandler: @escaping (Target, Output) -> Void) -> Self {
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerFlow(matchedIdentifiers: listIds, target: target, nextHandler: nextHandler)
     }
 
+    /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
     public func registerGuaranteedFlow<Target: AnyObject, Output>(
         matchedIdentifiers: FlowID...,
@@ -22,19 +23,13 @@ extension FlowManageable {
         uniqueOutputType: Output.Type = Output.self,
         handler: @escaping (Target, Output) -> Void
     ) -> Self {
-        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: { [weak target] (ouput: Output) in
-            if let target = target {
-                handler(target, ouput)
-            }
-        })
-        registerFlow(generalFlow)
-        return self
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: target, uniqueOutputType: uniqueOutputType, handler: handler)
     }
 
+    /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
     public func registerChainFlow<Target: AnyObject>(matchedIdentifiers: FlowID..., target: Target) -> ChainBoardFlow<Target> {
-        let flow = ChainBoardFlow(manager: self, target: target) {
-            matchedIdentifiers.contains($0.identifier)
-        }
-        return flow
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerChainFlow(matchedIdentifiers: listIds, target: target)
     }
 }

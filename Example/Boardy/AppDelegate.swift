@@ -98,6 +98,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.mainboard.activateBoard(identifier: "1", withOption: text)
         }
 
+        mainboard.registerFlow(matchedIdentifiers: "1", target: self) { (_, output: Int) in
+            print("😍 DEFAULT FLOW \(output)")
+        }
+
+        mainboard.registerGuaranteedFlow(matchedIdentifiers: "1", target: self, uniqueOutputType: Int.self) { _, output in
+            print("😍 GUARANTEED FLOW \(output)")
+        }
+
+        mainboard.registerChainFlow(matchedIdentifiers: "1", target: self)
+            .handle(outputType: Int.self) { _, output in
+                print("😍 CHAIN FLOW \(output)")
+            }
+            .eventuallySkipHandling()
+
 //        deepLinkHandler.start(with: window!.rootViewController!)
 
         return true
