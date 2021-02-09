@@ -31,3 +31,13 @@ open class ContinuousBoard: Board {
         motherboard.installIntoRoot(rootObject)
     }
 }
+
+extension ContinuousBoard {
+    public func continueBoard<Input>(_ input: BoardInput<Input>) {
+        motherboard.activateBoard(input)
+    }
+
+    public func continueBoard(model: BoardInputModel) {
+        motherboard.activateBoard(model: model)
+    }
+}
