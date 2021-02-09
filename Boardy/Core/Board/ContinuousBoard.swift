@@ -40,4 +40,12 @@ extension ContinuousBoard {
     public func continueBoard(model: BoardInputModel) {
         motherboard.activateBoard(model: model)
     }
+
+    public func continueInteractWithBoard<Input>(_ input: BoardCommand<Input>) {
+        motherboard.interactWithBoard(input)
+    }
+
+    public func continueInteractWithBoard(command: BoardCommandModel) {
+        motherboard.interactWithBoard(command: command)
+    }
 }
