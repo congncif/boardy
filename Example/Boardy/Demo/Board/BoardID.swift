@@ -10,12 +10,12 @@ import Boardy
 import Foundation
 
 extension BoardID {
-    static let login = "login"
-    static let main = "main"
-    static let dashboard = "dashboard"
-    static let root = "root"
-    static let headline = "headline"
-    static let featured = "featured"
+    static let login: BoardID = "login"
+    static let main: BoardID = "main"
+    static let dashboard: BoardID = "dashboard"
+    static let root: BoardID = "root"
+    static let headline: BoardID = "headline"
+    static let featured: BoardID = "featured"
 }
 
 enum BoardIdentity: BoardInputModel {
@@ -24,7 +24,7 @@ enum BoardIdentity: BoardInputModel {
     case main(userInfo: UserInfo)
     case dashboard
 
-    var identifier: String {
+    var identifier: BoardID {
         switch self {
         case .root:
             return .root

@@ -12,7 +12,7 @@ import UIKit
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMotherboard, LazyMotherboard {
     public var flows: [BoardFlow] = []
 
-    public init(identifier: BoardID = UUID().uuidString,
+    public init(identifier: BoardID = .randomUnique(),
                 boards: [ActivatableBoard] = []) {
         boardProducer = NoBoardProducer()
         super.init(identifier: identifier)
@@ -24,14 +24,14 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         registerDefaultFlows()
     }
 
-    public init(identifier: BoardID = UUID().uuidString,
+    public init(identifier: BoardID = .randomUnique(),
                 boardProducer: ActivableBoardProducer) {
         self.boardProducer = boardProducer
         super.init(identifier: identifier)
         registerDefaultFlows()
     }
 
-    public convenience init(identifier: BoardID = UUID().uuidString, boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
+    public convenience init(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
         self.init(identifier: identifier, boardProducer: boardProducer)
         for board in boards {
             addBoard(board)

@@ -22,9 +22,9 @@ final class Test3Board: Board, ActivatableBoard {
 }
 
 final class FlowTests: XCTestCase {
-    private let testId = "test"
-    private let testId2 = "test2"
-    private let testId3 = "test3"
+    private let testId: BoardID = "test"
+    private let testId2: BoardID = "test2"
+    private let testId3: BoardID = "test3"
     
     var testBoard: TestBoard!
     var motherboard: Motherboard!

@@ -36,7 +36,7 @@ public final class BoardContainer: ActivableBoardProducer {
 public final class NoBoard: Board, ActivatableBoard {
     private let handler: ((Any?) -> Void)?
 
-    public init(identifier: BoardID = UUID().uuidString, handler: ((Any?) -> Void)? = nil) {
+    public init(identifier: BoardID = .randomUnique(), handler: ((Any?) -> Void)? = nil) {
         self.handler = handler
         super.init(identifier: identifier)
     }

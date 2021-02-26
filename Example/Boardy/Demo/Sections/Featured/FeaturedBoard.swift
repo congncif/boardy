@@ -32,7 +32,7 @@ final class FeaturedBoard: Board, GuaranteedBoard {
 
 extension FeaturedBoard: FeaturedDelegate {
     func removeFeaturedContent() {
-        putToComposer(elementAction: .removeContent(identifier: identifier))
+        putToComposer(elementAction: .removeContent(identifier: identifier.rawValue))
     }
 
     func refreshHeadline() {

@@ -12,7 +12,7 @@ import UIKit
 open class ContinuousBoard: Board {
     public let motherboard: FlowMotherboard
 
-    public init(identifier: BoardID = UUID().uuidString,
+    public init(identifier: BoardID = .randomUnique(),
                 motherboard: FlowMotherboard = Motherboard()) {
         self.motherboard = motherboard
         super.init(identifier: identifier)
@@ -20,7 +20,7 @@ open class ContinuousBoard: Board {
         motherboard.forwardActionFlow(to: self)
     }
 
-    public convenience init(identifier: BoardID = UUID().uuidString,
+    public convenience init(identifier: BoardID = .randomUnique(),
                             boardProducer: ActivableBoardProducer) {
         let motherboard = Motherboard(boardProducer: boardProducer)
         self.init(identifier: identifier, motherboard: motherboard)

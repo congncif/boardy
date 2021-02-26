@@ -10,7 +10,7 @@ import Foundation
 /// Special data type which should be forwarded through all of steps of the flow.
 public protocol BoardFlowAction {}
 
-public typealias FlowID = String
+public typealias FlowID = BoardID
 
 public protocol BoardFlow {
     func match(with output: BoardOutputModel) -> Bool

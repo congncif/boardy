@@ -13,7 +13,7 @@ import UIKit
 open class ContinuousRIBBoard: RIBBoard {
     public let motherboard: FlowMotherboard
 
-    public init(identifier: BoardID = UUID().uuidString,
+    public init(identifier: BoardID = .randomUnique(),
                 motherboard: FlowMotherboard = Motherboard()) {
         self.motherboard = motherboard
         super.init(identifier: identifier)

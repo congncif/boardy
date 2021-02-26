@@ -8,8 +8,6 @@
 import Foundation
 import UIKit
 
-public typealias BoardID = String
-
 public protocol BoardDelegate: AnyObject {
     func board(_ board: IdentifiableBoard, didSendData data: Any?)
 }

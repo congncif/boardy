@@ -14,7 +14,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
 
     private weak var rootObject: AnyObject?
 
-    public init(identifier: BoardID = UUID().uuidString) {
+    public init(identifier: BoardID = .randomUnique()) {
         self.identifier = identifier
     }
 
