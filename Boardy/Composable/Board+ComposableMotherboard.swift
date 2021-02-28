@@ -20,8 +20,8 @@ extension Board {
     }
 
     /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
-    public func getComposableMotherboard(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer) -> ComposableMotherboard {
-        let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer)
+    public func getComposableMotherboard(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer, elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
+        let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer, boards: elementBoards)
         // Setup chain of actions.
         motherboard.forwardActionFlow(to: self)
 

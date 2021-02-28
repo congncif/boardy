@@ -17,8 +17,8 @@ extension Board {
     }
 
     /// Create a new Motherboard which uses internally by a board. Chain of actions will be set up.
-    public func getMotherboard(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer) -> Motherboard {
-        let motherboard = Motherboard(identifier: identifier, boardProducer: boardProducer)
+    public func getMotherboard(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer, elementBoards: [ActivatableBoard] = []) -> Motherboard {
+        let motherboard = Motherboard(identifier: identifier, boardProducer: boardProducer, boards: elementBoards)
         // Setup chain of actions.
         motherboard.forwardActionFlow(to: self)
         return motherboard
