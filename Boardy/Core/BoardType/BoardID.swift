@@ -39,24 +39,6 @@ extension BoardID: Equatable {
     }
 }
 
-extension BoardID: Comparable {
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-
-    public static func <= (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue <= rhs.rawValue
-    }
-
-    public static func >= (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue >= rhs.rawValue
-    }
-
-    public static func > (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue > rhs.rawValue
-    }
-}
-
 // Overload the ~= operator to match a BoardID with a string.
 public func ~= (pattern: BoardID, value: String) -> Bool {
     return pattern.rawValue == value
