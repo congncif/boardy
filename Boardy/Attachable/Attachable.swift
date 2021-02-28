@@ -65,8 +65,11 @@ public extension AttachableObject {
         }
     }
 
-    func detachObjects<ObjectType: AnyObject>(_ objectType: ObjectType.Type, where condition: (ObjectType) -> Bool = { _ in true }) {
-        let objects: [ObjectType] = attachedObjects().filter(condition)
+    func detachObjects<ObjectType>(_ objectType: ObjectType.Type, where condition: (ObjectType) -> Bool = { _ in true }) {
+        let objects: [AnyObject] = attachedObjects().filter {
+            guard let object = $0 as? ObjectType else { return false }
+            return condition(object)
+        }
         objects.forEach {
             detachObject($0)
         }
