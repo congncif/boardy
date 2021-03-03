@@ -84,4 +84,28 @@ public extension Bus {
         let cable = TargetBusCable<Target, Input>(target: target, handler: handler)
         connect(cable)
     }
+
+    func connect<Target>(target: Target, handler: @escaping (Target) -> Void) {
+        connect(target: target) { target, _ in
+            handler(target)
+        }
+    }
+}
+
+public extension Bus where Input == Void {
+    func transport() {
+        transport(input: ())
+    }
+}
+
+public extension Bus where Input == Any? {
+    func transport() {
+        transport(input: nil)
+    }
+}
+
+public extension Bus where Input == Any {
+    func transport() {
+        transport(input: Optional<Any>.none)
+    }
 }
