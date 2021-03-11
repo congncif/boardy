@@ -59,6 +59,35 @@ open class Board: IdentifiableBoard, OriginalBoard {
         contentBoxes.removeAll()
     }
 
+    /**
+     Give list of watched contents which is still available.
+     */
+    public func availableWatchedContents() -> [AnyObject] {
+        cleanBoxesIfNeeded()
+        return contentBoxes.compactMap { $0.content }
+    }
+
+    /**
+     Give list of available watched contents with object type specified.
+     */
+    public func availableWatchedContents<Object>(_ contentType: Object.Type = Object.self) -> [Object] {
+        availableWatchedContents().compactMap { $0 as? Object }
+    }
+
+    /**
+     Shorthand of availableWatchedContents(_:) returns first object.
+     */
+    public func firstAvailableWatchedContent<Object>(_ contentType: Object.Type = Object.self) -> Object? {
+        availableWatchedContents(contentType).first
+    }
+
+    /**
+     Shorthand of availableWatchedContents(_:) returns last object.
+     */
+    public func lastAvailableWatchedContent<Object>(_ contentType: Object.Type = Object.self) -> Object? {
+        availableWatchedContents(contentType).last
+    }
+
     // MARK: Private properties
 
     private weak var rootObject: AnyObject?
