@@ -45,6 +45,11 @@ extension IdentifiableBoard {
         sendToMotherboard(data: action)
     }
 
+    /// Send a Broadcast action with generic type. See more sendFlowAction(_:).
+    public func broadcastAction<Action: BoardFlowAction>(_ action: Action) {
+        sendFlowAction(action)
+    }
+
     /// Interact with a brotherhood relationship board in same Motherboard.
     public func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
