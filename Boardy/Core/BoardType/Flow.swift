@@ -36,7 +36,7 @@ extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    public func registerGeneralFlow<Output>(nextHandler: @escaping (Output) -> Void) -> Self {
+    public func registerGeneralFlow<Output>(uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Output) -> Void) -> Self {
         let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
             guard let output = data as? Output else { return }
             nextHandler(output)
@@ -47,7 +47,11 @@ extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    public func registerGeneralFlow<Target: AnyObject, Output>(target: Target, nextHandler: @escaping (Target, Output) -> Void) -> Self {
+    public func registerGeneralFlow<Target: AnyObject, Output>(
+        target: Target,
+        uniqueOutputType: Output.Type = Output.self,
+        nextHandler: @escaping (Target, Output) -> Void
+    ) -> Self {
         let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [weak target] data in
             guard let output = data as? Output, let target = target else { return }
             nextHandler(target, output)
@@ -58,7 +62,11 @@ extension FlowManageable {
 
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Output>(matchedIdentifiers: [FlowID], nextHandler: @escaping (Output) -> Void) -> Self {
+    public func registerFlow<Output>(
+        matchedIdentifiers: [FlowID],
+        uniqueOutputType: Output.Type = Output.self,
+        nextHandler: @escaping (Output) -> Void
+    ) -> Self {
         let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, dedicatedNextHandler: { (output: Output?) in
             guard let output = output else { return }
             nextHandler(output)
@@ -69,7 +77,12 @@ extension FlowManageable {
 
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Target: AnyObject, Output>(matchedIdentifiers: [FlowID], target: Target, nextHandler: @escaping (Target, Output) -> Void) -> Self {
+    public func registerFlow<Target: AnyObject, Output>(
+        matchedIdentifiers: [FlowID],
+        target: Target,
+        uniqueOutputType: Output.Type = Output.self,
+        nextHandler: @escaping (Target, Output) -> Void
+    ) -> Self {
         let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, dedicatedNextHandler: { [weak target] (output: Output?) in
             guard let output = output, let target = target else { return }
             nextHandler(target, output)
