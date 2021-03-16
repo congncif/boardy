@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = 'Boardy'
-    s.version          = '1.13.1'
-    s.swift_versions    = ['5.0', '5.1', '5.2', '5.3']
+    s.version          = '1.14.0'
+    s.swift_versions    = ['5.0', '5.1', '5.2', '5.3', '5.4']
     s.summary          = 'A mediator interface to integrate multiple mobile architectures.'
     s.description      = <<-DESC
   Integrate components which was developed using different architecures.

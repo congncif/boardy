@@ -18,19 +18,20 @@ public protocol BoardFlow {
 }
 
 public protocol FlowManageable: AnyObject {
-    var flows: [BoardFlow] { get set }
+    var flows: [BoardFlow] { get }
+
+    @discardableResult
+    func registerFlow(_ flow: BoardFlow) -> Self
+
+    func resetFlows()
 }
 
 extension FlowManageable {
     @discardableResult
-    public func registerFlow(_ flow: BoardFlow) -> Self {
-        flows.append(flow)
-        return self
-    }
-
-    @discardableResult
     public func registerFlows(_ flows: [BoardFlow]) -> Self {
-        self.flows.append(contentsOf: flows)
+        flows.forEach { [unowned self] in
+            self.registerFlow($0)
+        }
         return self
     }
 
@@ -330,8 +331,6 @@ extension BoardDelegate where Self: FlowManageable {
 // MARK: - Forward functions
 
 extension FlowManageable {
-    public func resetFlows() { flows = [] }
-
     public func forwardActionFlow(to board: IdentifiableBoard) {
         registerGeneralFlow { [weak board] in
             board?.sendFlowAction($0)

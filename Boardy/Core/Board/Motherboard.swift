@@ -65,6 +65,17 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         }
     }
 
+    @discardableResult
+    public func registerFlow(_ flow: BoardFlow) -> Self {
+        flows.append(flow)
+        return self
+    }
+
+    public func resetFlows() {
+        flows = []
+        registerDefaultFlows()
+    }
+
     // MARK: - MotherboardRepresentable
 
     var mainboard: [ActivatableBoard] = [] {
