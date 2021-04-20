@@ -106,6 +106,6 @@ public extension Bus where Input == Any? {
 
 public extension Bus where Input == Any {
     func transport() {
-        transport(input: Optional<Any>.none)
+        transport(input: Optional<Any>.none as Any)
     }
 }

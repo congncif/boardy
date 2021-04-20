@@ -80,7 +80,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     var mainboard: [ActivatableBoard] = [] {
         didSet {
-            for var board in boards {
+            for board in boards {
                 board.delegate = self
                 if board.root == nil, let root = self.root {
                     board.installIntoRoot(root)

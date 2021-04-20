@@ -63,7 +63,7 @@ extension LazyMotherboard {
 
 // MARK: - Internal
 
-protocol MotherboardRepresentable: AnyObject, MotherboardType {
+protocol MotherboardRepresentable: MotherboardType {
     var mainboard: [ActivatableBoard] { get set }
 }
 
