@@ -18,7 +18,7 @@ target 'Boardy_Example' do
   pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
   pod 'ViewStateCore'
   pod 'SiFUtilities'
-  pod 'Resolver' , '~> 1.1'
+  pod 'Resolver' , '1.2.1'
 
   target 'Boardy_Tests' do
     inherit! :search_paths
