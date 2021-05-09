@@ -36,6 +36,15 @@ extension FeaturedBoard: FeaturedDelegate {
     }
 
     func refreshHeadline() {
-        interactWithOtherBoard(command: HeadlineCommand.refresh(label: "BOARDY!!"))
+//        interactWithOtherBoard(command: HeadlineCommand.refresh(label: "BOARDY!!"))
+        headline.refresh(label: "Board!!")
+    }
+}
+
+// MARK: - Define in scope
+
+extension ActivatableBoard {
+    var headline: HeadlineActivatable {
+        return headline(identifier: .headline)
     }
 }

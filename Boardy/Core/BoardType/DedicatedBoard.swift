@@ -75,3 +75,15 @@ extension GuaranteedBoard {
         activate(withGuaranteedInput: input)
     }
 }
+
+// MARK: - Board sending a type safe Output data
+
+public protocol GuaranteedOutputSendingBoard: IdentifiableBoard {
+    associatedtype Output
+}
+
+extension GuaranteedOutputSendingBoard {
+    public func sendOutput(_ data: Output) {
+        sendToMotherboard(data: data)
+    }
+}

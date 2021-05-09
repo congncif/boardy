@@ -25,6 +25,7 @@
 		27950A6524F80944005779B7 /* DashboardBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6024F80944005779B7 /* DashboardBoard.swift */; };
 		27950A6624F80944005779B7 /* DashboardProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27950A6124F80944005779B7 /* DashboardProtocols.swift */; };
 		279F720C25CBC8E9000160C6 /* LifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279F720B25CBC8E9000160C6 /* LifecycleTests.swift */; };
+		27C5C2702648EC5F00EA3491 /* HeadlineIOInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C5C26D2648EC5F00EA3491 /* HeadlineIOInterface.swift */; };
 		27CA1D5224FB3DE300694463 /* HeadlineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */; };
 		27CA1D5324FB3DE300694463 /* HeadlineViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */; };
 		27CA1D5424FB3DE300694463 /* HeadlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */; };
@@ -101,6 +102,7 @@
 		27950A6024F80944005779B7 /* DashboardBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBoard.swift; sourceTree = "<group>"; };
 		27950A6124F80944005779B7 /* DashboardProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardProtocols.swift; sourceTree = "<group>"; };
 		279F720B25CBC8E9000160C6 /* LifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleTests.swift; sourceTree = "<group>"; };
+		27C5C26D2648EC5F00EA3491 /* HeadlineIOInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeadlineIOInterface.swift; sourceTree = "<group>"; };
 		27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBuilder.swift; sourceTree = "<group>"; };
 		27CA1D4D24FB3DE300694463 /* HeadlineViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = HeadlineViewController.storyboard; sourceTree = "<group>"; };
 		27CA1D4E24FB3DE300694463 /* HeadlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineViewController.swift; sourceTree = "<group>"; };
@@ -203,6 +205,14 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
+		27C5C26C2648EC5F00EA3491 /* IO */ = {
+			isa = PBXGroup;
+			children = (
+				27C5C26D2648EC5F00EA3491 /* HeadlineIOInterface.swift */,
+			);
+			path = IO;
+			sourceTree = "<group>";
+		};
 		27CA1D4A24FB3D5600694463 /* Sections */ = {
 			isa = PBXGroup;
 			children = (
@@ -215,6 +225,7 @@
 		27CA1D4B24FB3D6200694463 /* Headline */ = {
 			isa = PBXGroup;
 			children = (
+				27C5C26C2648EC5F00EA3491 /* IO */,
 				27547FCD25415640005C9027 /* HeadlineBoard.swift */,
 				20F21130254475A000C0D1AC /* HeadlineBoardOutputAdapter.swift */,
 				27CA1D4C24FB3DE300694463 /* HeadlineBuilder.swift */,
@@ -229,12 +240,12 @@
 		27CA1D5E24FB62CA00694463 /* Featured */ = {
 			isa = PBXGroup;
 			children = (
+				27547FD12541571C005C9027 /* FeaturedBoard.swift */,
 				27CA1D5F24FB62DF00694463 /* FeaturedBuilder.swift */,
 				27CA1D6324FB62DF00694463 /* FeaturedProtocols.swift */,
 				27CA1D6024FB62DF00694463 /* FeaturedViewController.storyboard */,
 				27CA1D6124FB62DF00694463 /* FeaturedViewController.swift */,
 				27CA1D6224FB62DF00694463 /* FeaturedViewState.swift */,
-				27547FD12541571C005C9027 /* FeaturedBoard.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -701,6 +712,7 @@
 				27D665DE250DC617008B6E48 /* RootProtocols.swift in Sources */,
 				27D665E0250DC629008B6E48 /* RootBoard.swift in Sources */,
 				27FD0AAC24E0EF5F002855D6 /* MainBuilder.swift in Sources */,
+				27C5C2702648EC5F00EA3491 /* HeadlineIOInterface.swift in Sources */,
 				27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */,
 				27FD0AA224E0ED19002855D6 /* ServiceRegistry.swift in Sources */,
 				27FD0A8E24E0DE31002855D6 /* PlaceholderRouter.swift in Sources */,

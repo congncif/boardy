@@ -25,8 +25,10 @@ extension InteractableBoard {
 }
 
 public protocol GuaranteedInteractableBoard: InteractableBoard {
+    /// Incoming Command type
     associatedtype Command: BoardCommandModel
 
+    /// Implement the function `interact(guaranteedCommand:)` to react with a received Command
     func interact(guaranteedCommand: Command)
 }
 
@@ -41,6 +43,8 @@ extension GuaranteedInteractableBoard {
         interact(guaranteedCommand: dedicatedCommand)
     }
 }
+
+// MARK: - BoardCommand with Input
 
 public struct BoardCommand<Input>: BoardCommandModel {
     public let identifier: BoardID
@@ -59,3 +63,18 @@ extension BoardCommand {
         BoardCommand(identifier: identifier, input: input)
     }
 }
+
+/*
+ // MARK: - InteractableBoard sending a type safe command
+
+ /// For Sender Board who want to guarantee always sending a type safe command
+ public protocol GuaranteedCommandSendingBoard: IdentifiableBoard {
+     associatedtype OutgoingCommand: BoardCommandModel
+ }
+
+ extension GuaranteedCommandSendingBoard {
+     public func sendCommand(_ command: OutgoingCommand) {
+         interactWithOtherBoard(command: command)
+     }
+ }
+  */
