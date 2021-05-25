@@ -29,4 +29,22 @@ extension BoardInput where Input == Void {
         identifier = target
         input = ()
     }
+
+    public static func target(_ id: BoardID) -> BoardInput<Void> {
+        BoardInput<Void>(target: id)
+    }
+
+    public static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
+        BoardInput<Input>(target: id, input: input)
+    }
+}
+
+public extension BoardID {
+    func with<Input>(input: Input) -> BoardInput<Input> {
+        BoardInput<Input>(target: self, input: input)
+    }
+
+    var withoutInput: BoardInput<Void> {
+        BoardInput<Void>(target: self)
+    }
 }
