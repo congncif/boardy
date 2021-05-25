@@ -24,6 +24,12 @@ public struct BoardInput<Input>: BoardInputModel {
     }
 }
 
+extension BoardInput {
+    public static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
+        BoardInput<Input>(target: id, input: input)
+    }
+}
+
 extension BoardInput where Input == Void {
     public init(target: BoardID) {
         identifier = target
@@ -32,10 +38,6 @@ extension BoardInput where Input == Void {
 
     public static func target(_ id: BoardID) -> BoardInput<Void> {
         BoardInput<Void>(target: id)
-    }
-
-    public static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
-        BoardInput<Input>(target: id, input: input)
     }
 }
 
