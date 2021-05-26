@@ -16,6 +16,7 @@ extension MotherboardType {
             assertionFailure("⛈ [\(String(describing: self)) with identifier: \(identifier)] Board with identifier \(identifier) must conforms \(InteractableBoard.self) but \(String(describing: board))")
             return
         }
+        DebugLog.logActivation(icon: "🚚 [Interaction]", source: self, destination: interactBoard, data: command.data)
         interactBoard.interact(command: command)
     }
 

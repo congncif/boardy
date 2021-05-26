@@ -13,6 +13,7 @@ extension MotherboardType {
             assertionFailure("⛈ [\(String(describing: self)) with identifier: \(identifier)] Board with identifier \(identifier) was not found in mother board \(self)")
             return
         }
+        DebugLog.logActivation(source: self, destination: board, data: option)
         board.activate(withOption: option)
     }
 

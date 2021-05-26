@@ -12,6 +12,7 @@ extension MotherboardType {
     public func activateAllBoards(withOptions options: [BoardID: Any] = [:], defaultOption: Any? = nil) {
         for board in boards {
             let option = options[board.identifier] ?? defaultOption
+            DebugLog.logActivation(source: self, destination: board, data: option)
             board.activate(withOption: option)
         }
     }
