@@ -84,6 +84,11 @@ public protocol GuaranteedOutputSendingBoard: IdentifiableBoard {
 
 extension GuaranteedOutputSendingBoard {
     public func sendOutput(_ data: OutputType) {
+        #if DEBUG
+        if isSilentData(data) {
+            print("⚠️ Sending a special Data Type might lead unexpected behaviours!\n👉 You should wrap \(data) in custom Output Type.")
+        }
+        #endif
         sendToMotherboard(data: data)
     }
 }
