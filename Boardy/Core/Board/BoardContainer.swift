@@ -7,12 +7,17 @@
 
 import Foundation
 
-public final class BoardContainer: ActivableBoardProducer {
-    private var externalContainer: BoardContainer?
+public protocol BoardDynamicProducer: ActivableBoardProducer {
+    func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
+    func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard?
+}
+
+public final class BoardContainer: BoardDynamicProducer {
+    private var externalContainer: BoardDynamicProducer?
 
     private var container: [BoardID: (BoardID) -> ActivatableBoard] = [:]
 
-    public init(externalContainer: BoardContainer? = nil) {
+    public init(externalContainer: BoardDynamicProducer? = nil) {
         self.externalContainer = externalContainer
     }
 
