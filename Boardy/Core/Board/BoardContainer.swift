@@ -8,25 +8,35 @@
 import Foundation
 
 public final class BoardContainer: ActivableBoardProducer {
-    private var externalProducer: ActivableBoardProducer?
+    private var externalContainer: BoardContainer?
 
-    private var container: [BoardID: () -> ActivatableBoard] = [:]
+    private var container: [BoardID: (BoardID) -> ActivatableBoard] = [:]
 
-    public init(externalProducer: ActivableBoardProducer? = nil) {
-        self.externalProducer = externalProducer
+    public init(externalContainer: BoardContainer? = nil) {
+        self.externalContainer = externalContainer
     }
 
-    public func register(_ boardFactory: @escaping () -> ActivatableBoard, forId boardId: BoardID) {
-        container[boardId] = boardFactory
+    public func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard) {
+        container[identifier] = factory
     }
 
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         if let boardFactory = container[identifier] {
-            return boardFactory()
-        } else if let board = externalProducer?.produceBoard(identifier: identifier) {
+            return boardFactory(identifier)
+        } else if let board = externalContainer?.produceBoard(identifier: identifier) {
             return board
         } else {
-            return NoBoard(identifier: identifier)
+            return nil
+        }
+    }
+
+    public func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+        if let boardFactory = container[identifier] {
+            return boardFactory(anotherIdentifier)
+        } else if let board = externalContainer?.matchBoard(withIdentifier: identifier, to: anotherIdentifier) {
+            return board
+        } else {
+            return nil
         }
     }
 }
@@ -35,14 +45,17 @@ public final class BoardContainer: ActivableBoardProducer {
 
 public final class NoBoard: Board, ActivatableBoard {
     private let handler: ((Any?) -> Void)?
+    private let message: String?
 
-    public init(identifier: BoardID = .randomUnique(), handler: ((Any?) -> Void)? = nil) {
+    public init(identifier: BoardID = .randomUnique(), message: String? = nil, handler: ((Any?) -> Void)? = nil) {
         self.handler = handler
+        self.message = message
         super.init(identifier: identifier)
     }
 
     public func activate(withOption option: Any?) {
-        let alert = UIAlertController(title: "Feature is coming", message: "Board with identifier \(identifier) was not installed", preferredStyle: .alert)
+        let msg = message ?? "Board with identifier \(identifier) was not registered yet!!!"
+        let alert = UIAlertController(title: "Feature Not Found", message: msg, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Got it!", style: .cancel, handler: { [weak self] _ in
             self?.handler?(option)
         }))
