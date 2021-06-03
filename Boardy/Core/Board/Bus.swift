@@ -24,8 +24,16 @@ open class BusCable<Input> {
 }
 
 final class ObjectBox {
-    weak var object: AnyObject?
-    var value: Any?
+    private weak var object: AnyObject?
+    private var value: Any?
+
+    func setObject(_ object: Any) {
+        if type(of: object as Any) is AnyClass {
+            self.object = object as AnyObject
+        } else {
+            value = object
+        }
+    }
 
     func unboxed<Object>(_ objectType: Object.Type = Object.self) -> Object? {
         object as? Object ?? value as? Object
@@ -37,14 +45,10 @@ final class ObjectBox {
 }
 
 public final class TargetBusCable<Target, Input>: BusCable<Input> {
-    var box = ObjectBox()
+    private let box = ObjectBox()
 
     public init(target: Target, handler: @escaping (Target, Input) -> Void) {
-        if type(of: target as Any) is AnyClass {
-            box.object = target as AnyObject
-        } else {
-            box.value = target
-        }
+        box.setObject(target)
         super.init(transportHandler: { [weak box] input in
             guard let destination = box?.unboxed(Target.self) else { return }
             handler(destination, input)

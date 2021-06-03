@@ -48,13 +48,15 @@ extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    public func registerGeneralFlow<Target: AnyObject, Output>(
+    public func registerGeneralFlow<Target, Output>(
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
     ) -> Self {
-        let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [weak target] data in
-            guard let output = data as? Output, let target = target else { return }
+        let box = ObjectBox()
+        box.setObject(target)
+        let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { [box] data in
+            guard let output = data as? Output, let target = box.unboxed(Target.self) else { return }
             nextHandler(target, output)
         })
         registerFlow(generalFlow)
@@ -78,14 +80,16 @@ extension FlowManageable {
 
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Target: AnyObject, Output>(
+    public func registerFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
     ) -> Self {
-        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, dedicatedNextHandler: { [weak target] (output: Output?) in
-            guard let output = output, let target = target else { return }
+        let box = ObjectBox()
+        box.setObject(target)
+        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, dedicatedNextHandler: { [box] (output: Output?) in
+            guard let output = output, let target = box.unboxed(Target.self) else { return }
             nextHandler(target, output)
         })
         registerFlow(generalFlow)
@@ -94,14 +98,16 @@ extension FlowManageable {
 
     /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
-    public func registerGuaranteedFlow<Target: AnyObject, Output>(
+    public func registerGuaranteedFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
         handler: @escaping (Target, Output) -> Void
     ) -> Self {
-        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: { [weak target] (ouput: Output) in
-            if let target = target {
+        let box = ObjectBox()
+        box.setObject(target)
+        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: { [box] (ouput: Output) in
+            if let target = box.unboxed(Target.self) {
                 handler(target, ouput)
             }
         })
@@ -110,7 +116,7 @@ extension FlowManageable {
     }
 
     /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
-    public func registerChainFlow<Target: AnyObject>(matchedIdentifiers: [FlowID], target: Target) -> ChainBoardFlow<Target> {
+    public func registerChainFlow<Target>(matchedIdentifiers: [FlowID], target: Target) -> ChainBoardFlow<Target> {
         let flow = ChainBoardFlow(manager: self, target: target) {
             matchedIdentifiers.contains($0.identifier)
         }
@@ -139,7 +145,7 @@ extension FlowManageable where Self: MotherboardType {
     }
 }
 
-private final class HandlerInfo<Target: AnyObject> {
+private final class HandlerInfo<Target> {
     let handler: (Target, BoardOutputModel) -> Bool
 
     init(handler: @escaping (Target, BoardOutputModel) -> Bool) {
@@ -147,17 +153,21 @@ private final class HandlerInfo<Target: AnyObject> {
     }
 }
 
-public final class ChainBoardFlow<Target: AnyObject>: BoardFlow {
+public final class ChainBoardFlow<Target>: BoardFlow {
     private var handlers: [HandlerInfo<Target>] = []
     private let matcher: (BoardOutputModel) -> Bool
 
     private unowned let manager: FlowManageable
-    private weak var target: Target?
+    private let box = ObjectBox()
+
+    private var target: Target? {
+        return box.unboxed(Target.self)
+    }
 
     init(manager: FlowManageable, target: Target, matcher: @escaping (BoardOutputModel) -> Bool) {
         self.manager = manager
         self.matcher = matcher
-        self.target = target
+        box.setObject(target)
     }
 
     public func handle<Output>(outputType: Output.Type, handler: @escaping (Target, Output) -> Void) -> Self {

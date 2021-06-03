@@ -15,6 +15,9 @@ public protocol MotherboardType: ActivatableBoard {
     func removeBoard(withIdentifier identifier: BoardID)
 
     func getBoard(identifier: BoardID) -> ActivatableBoard?
+
+    /// Remove all active boards at once
+    func clearActiveBoards()
 }
 
 public extension MotherboardType {
@@ -78,5 +81,9 @@ extension MotherboardRepresentable {
     public func removeBoard(withIdentifier identifier: BoardID) {
         assert(installedBoard(identifier: identifier) != nil, "⛈ [\(String(describing: self))] Board with identifier \(identifier) was not in motherboard \(self).")
         mainboard.removeAll { $0.identifier == identifier }
+    }
+
+    public func clearActiveBoards() {
+        mainboard.removeAll()
     }
 }

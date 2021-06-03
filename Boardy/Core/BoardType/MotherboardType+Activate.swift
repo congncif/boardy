@@ -24,4 +24,9 @@ extension MotherboardType {
     public func activateBoard<Input>(_ input: BoardInput<Input>) {
         activateBoard(model: input)
     }
+
+    /// Alias for the removeBoard(withIdentifier:) method. The board with identifier will be removed from active list.
+    public func deactivateBoard(identifier: BoardID) {
+        removeBoard(withIdentifier: identifier)
+    }
 }
