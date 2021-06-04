@@ -64,6 +64,22 @@ extension BoardCommand {
     }
 }
 
+extension BoardCommand {
+    public static func target<Input>(_ id: BoardID, _ input: Input) -> BoardCommand<Input> {
+        BoardCommand<Input>(identifier: id, input: input)
+    }
+}
+
+extension BoardCommand where Input == Void {
+    public init(identifier: BoardID) {
+        self.init(identifier: identifier, input: ())
+    }
+
+    public static func target(_ id: BoardID) -> BoardCommand<Input> {
+        BoardCommand<Input>(identifier: id, input: ())
+    }
+}
+
 /*
  // MARK: - InteractableBoard sending a type safe command
 
