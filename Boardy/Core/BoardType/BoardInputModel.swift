@@ -41,6 +41,17 @@ extension BoardInput where Input == Void {
     }
 }
 
+extension BoardInput where Input: ExpressibleByNilLiteral {
+    public init(target: BoardID) {
+        identifier = target
+        input = nil
+    }
+
+    public static func target(_ id: BoardID) -> BoardInput<Input> {
+        BoardInput<Input>(target: id)
+    }
+}
+
 public extension BoardID {
     func with<Input>(input: Input) -> BoardInput<Input> {
         BoardInput<Input>(target: self, input: input)

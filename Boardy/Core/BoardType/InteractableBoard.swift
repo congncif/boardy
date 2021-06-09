@@ -76,7 +76,17 @@ extension BoardCommand where Input == Void {
     }
 
     public static func target(_ id: BoardID) -> BoardCommand<Input> {
-        BoardCommand<Input>(identifier: id, input: ())
+        BoardCommand<Input>(identifier: id)
+    }
+}
+
+extension BoardCommand where Input: ExpressibleByNilLiteral {
+    public init(identifier: BoardID) {
+        self.init(identifier: identifier, input: nil)
+    }
+
+    public static func target(_ id: BoardID) -> BoardCommand<Input> {
+        BoardCommand<Input>(identifier: id)
     }
 }
 

@@ -42,8 +42,16 @@ final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
         if rootViewController.presentedViewController != nil {
             rootViewController.dismiss(animated: false)
         }
+        
+        motherboard.registerGeneralFlow(target: self, uniqueOutputType: Any.self) { target, out in
+            print("AAA")
+        }
 
         rootRouter.viewControllable.uiviewController.topPresentedViewController.present(nav, animated: true)
+    }
+    
+    deinit {
+        print("XXX")
     }
 }
 
