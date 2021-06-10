@@ -67,7 +67,7 @@ extension GuaranteedBoard {
     public func activate(withOption option: Any?) {
         guard let input = convertOptionToInput(option) else {
             guard isSilent(input: option) else {
-                assertionFailure("⛈ [\(String(describing: self)) with identifier: \(identifier)] Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
+                assertionFailure("🔥 [\(String(describing: self))] [\(#function)] [\(identifier)] Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
                 return
             }
             return
@@ -86,7 +86,7 @@ extension GuaranteedOutputSendingBoard {
     public func sendOutput(_ data: OutputType) {
         #if DEBUG
         if isSilentData(data) {
-            print("⚠️ Sending a special Data Type might lead unexpected behaviours!\n👉 You should wrap \(data) in custom Output Type.")
+            print("⚠️ [\(String(describing: self))] [\(#function)] [\(identifier)] Sending a special Data Type might lead unexpected behaviours!\n👉 You should wrap \(data) in custom Output Type.")
         }
         #endif
         sendToMotherboard(data: data)

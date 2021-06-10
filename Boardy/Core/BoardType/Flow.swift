@@ -271,7 +271,7 @@ public struct BoardActivateFlow: BoardFlow {
             guard let data = output.data as? Ouput else {
                 // Guaranteed output is Silent Data Types otherwise raise an assertion.
                 guard isSilentData(output.data) else {
-                    assertionFailure("⛈ Cannot convert output of board \(output.identifier) from type \(String(describing: output.data)) to type \(Ouput.self)")
+                    assertionFailure("🔥 [Flow with mismatch data type] [\(output.identifier)]  Cannot convert output of board \(output.identifier) from type \(String(describing: output.data)) to type \(Ouput.self)")
                     return
                 }
                 return

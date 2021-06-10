@@ -13,7 +13,7 @@ extension MotherboardType {
         let identifier = command.identifier
         let board = getBoard(identifier: identifier)
         guard let interactBoard = board as? InteractableBoard else {
-            assertionFailure("⛈ [\(String(describing: self)) with identifier: \(identifier)] Board with identifier \(identifier) must conforms \(InteractableBoard.self) but \(String(describing: board))")
+            assertionFailure("🔥 [\(String(describing: self)) with identifier: \(identifier)] Board with identifier \(identifier) must conforms \(InteractableBoard.self) but \(String(describing: board))")
             return
         }
         DebugLog.logActivation(icon: "🚚 [Interaction]", source: self, destination: interactBoard, data: command.data)

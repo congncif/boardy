@@ -17,7 +17,7 @@ public protocol InstallableBoard: OriginalBoard {
 extension InstallableBoard {
     public var rootViewController: UIViewController {
         guard let viewController = root as? UIViewController else {
-            assertionFailure("⛈ [\(String(describing: self))] Board was not installed. Install \(self) into a rootViewController before activating it.")
+            assertionFailure("🔥 [\(String(describing: self))] Board was not installed. Install \(self) into a rootViewController before activating it.")
             return UIViewController()
         }
         return viewController
@@ -35,7 +35,7 @@ extension InstallableBoard {
         } else if let tabBarController = rootViewController as? UITabBarController, let controller = tabBarController.selectedViewController as? UINavigationController {
             return controller
         } else {
-            assertionFailure("⛈ [\(String(describing: self))] No UINavigationController. Install \(self) into a rootViewController which based on UINavigationController before activating it.")
+            assertionFailure("🔥 [\(String(describing: self))] No UINavigationController. Install \(self) into a rootViewController which based on UINavigationController before activating it.")
             return UINavigationController()
         }
     }
@@ -48,7 +48,7 @@ extension InstallableBoard {
         } else if let navigationController = rootViewController as? UINavigationController, let controller = navigationController.tabBarController {
             return controller
         } else {
-            assertionFailure("⛈ [\(String(describing: self))] No UITabBarController. Install \(self) into a rootViewController which based on UITabBarController before activating it.")
+            assertionFailure("🔥 [\(String(describing: self))] No UITabBarController. Install \(self) into a rootViewController which based on UITabBarController before activating it.")
             return UITabBarController()
         }
     }
@@ -63,7 +63,7 @@ public protocol WindowInstallableBoard: OriginalBoard {
 extension WindowInstallableBoard {
     public var window: UIWindow {
         guard let current = root as? UIWindow else {
-            assertionFailure("⛈ [\(String(describing: self))] Board was not installed. Install \(self) into a window before activating it.")
+            assertionFailure("🔥 [\(String(describing: self))] Board was not installed. Install \(self) into a window before activating it.")
             return UIWindow()
         }
         return current
