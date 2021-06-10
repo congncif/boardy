@@ -9,26 +9,26 @@ import Foundation
 
 // MARK: - Activate
 
-public protocol BoardActivatable {
+public protocol BoardActivating {
     associatedtype Input
 
     func activate(with input: Input)
 }
 
-extension BoardActivatable where Input: ExpressibleByNilLiteral {
+extension BoardActivating where Input: ExpressibleByNilLiteral {
     public func activate() {
         activate(with: nil)
     }
 }
 
-extension BoardActivatable where Input == Void {
+extension BoardActivating where Input == Void {
     public func activate() {
         activate(with: ())
     }
 }
 
 // iOS 13+ internal
-public struct MainboardActivation<Input>: BoardActivatable {
+public struct MainboardActivation<Input>: BoardActivating {
     let destinationID: BoardID
     let mainboard: MotherboardType
 
@@ -38,7 +38,7 @@ public struct MainboardActivation<Input>: BoardActivatable {
 }
 
 // iOS 13+ internal
-public struct BoardActivation<Input>: BoardActivatable {
+public struct BoardActivation<Input>: BoardActivating {
     let destinationID: BoardID
     let source: ActivatableBoard
 
@@ -106,5 +106,54 @@ extension FlowManageable {
 
     public func matchedFlow(_ identifier: BoardID) -> FlowHandler<Any> {
         matchedFlow(identifier, with: Any.self)
+    }
+}
+
+// MARK: - Interaction
+
+public protocol BoardInteracting {
+    associatedtype IncomeCommand
+
+    func send(command: IncomeCommand)
+}
+
+// iOS 13+ internal
+public struct MainboardInteraction<Input>: BoardInteracting {
+    let destinationID: BoardID
+    let mainboard: MotherboardType
+
+    public func send(command: Input) {
+        mainboard.interactWithOtherBoard(.target(destinationID, command))
+    }
+}
+
+// iOS 13+ internal
+public struct BoardInteraction<Input>: BoardInteracting {
+    let destinationID: BoardID
+    let source: ActivatableBoard
+
+    public func send(command: Input) {
+        source.interactWithOtherBoard(.target(destinationID, command))
+    }
+}
+
+extension ActivatableBoard {
+    // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
+    public func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardInteraction<Input> {
+        BoardInteraction(destinationID: destinationID, source: self)
+    }
+
+    public func interaction(_ destinationID: BoardID) -> BoardInteraction<Any> {
+        interaction(destinationID, with: Any.self)
+    }
+}
+
+extension MotherboardType {
+    public func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardInteraction<Input> {
+        MainboardInteraction(destinationID: destinationID, mainboard: self)
+    }
+
+    public func interaction(_ destinationID: BoardID) -> MainboardInteraction<Any> {
+        interaction(destinationID, with: Any.self)
     }
 }
