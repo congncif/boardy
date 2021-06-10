@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol MotherboardType: ActivatableBoard {
+public protocol MotherboardType: IdentifiableBoard, OriginalBoard {
     var boards: [ActivatableBoard] { get }
 
     /// Append list of boards, this doesn't include installing board into rootObject.
