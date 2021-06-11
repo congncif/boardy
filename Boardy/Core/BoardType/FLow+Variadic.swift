@@ -31,6 +31,18 @@ extension FlowManageable {
         })
     }
 
+    @discardableResult
+    public func registerFlow<Output, OutBoard>(
+        matchedIdentifiers: FlowID...,
+        uniqueOutputType: Output.Type = Output.self,
+        sendOutputThrough board: OutBoard
+    ) -> Self where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, nextHandler: { target, data in
+            target.sendOutput(data)
+        })
+    }
+
     /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
     public func registerGuaranteedFlow<Target, Output>(
@@ -51,6 +63,18 @@ extension FlowManageable {
         let listIds: [FlowID] = matchedIdentifiers
         return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: bus, uniqueOutputType: Output.self, handler: { target, data in
             target.transport(input: data)
+        })
+    }
+
+    @discardableResult
+    public func registerGuaranteedFlow<Output, OutBoard>(
+        matchedIdentifiers: FlowID...,
+        uniqueOutputType: Output.Type = Output.self,
+        sendOutputThrough board: OutBoard
+    ) -> Self where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, handler: { target, data in
+            target.sendOutput(data)
         })
     }
 
