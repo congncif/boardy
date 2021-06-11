@@ -75,6 +75,7 @@ public protocol FlowHandling {
 
     func addTarget<Target>(_ target: Target, action: @escaping (Target, Output) -> Void)
     func bind(to bus: Bus<Output>)
+    func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output
 }
 
 extension FlowHandling where Output == Void {
@@ -91,11 +92,15 @@ public struct FlowHandler<Output>: FlowHandling {
     let manager: FlowManageable
 
     public func addTarget<Target>(_ target: Target, action: @escaping (Target, Output) -> Void) {
-        manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, target: target, uniqueOutputType: Output.self, handler: action)
+        manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, target: target, handler: action)
     }
 
     public func bind(to bus: Bus<Output>) {
         manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, bindToBus: bus)
+    }
+
+    public func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
+        manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, sendOutputThrough: board)
     }
 }
 
