@@ -12,7 +12,7 @@ import UIKit
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMotherboard, LazyMotherboard {
     public var flows: [BoardFlow] = []
 
-    public init(identifier: BoardID = .randomUnique(),
+    public init(identifier: BoardID = .random(),
                 boards: [ActivatableBoard] = []) {
         boardProducer = NoBoardProducer()
         super.init(identifier: identifier)
@@ -24,14 +24,14 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         registerDefaultFlows()
     }
 
-    public init(identifier: BoardID = .randomUnique(),
+    public init(identifier: BoardID = .random(),
                 boardProducer: ActivableBoardProducer) {
         self.boardProducer = boardProducer
         super.init(identifier: identifier)
         registerDefaultFlows()
     }
 
-    public convenience init(identifier: BoardID = .randomUnique(), boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
+    public convenience init(identifier: BoardID = .random(), boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
         self.init(identifier: identifier, boardProducer: boardProducer)
         for board in boards {
             addBoard(board)
@@ -91,7 +91,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     // MARK: - LazyMotherboard
 
-    var boardProducer: ActivableBoardProducer
+    public private(set) var boardProducer: ActivableBoardProducer
 }
 
 /// A Motherboard is a special board which only accepts a BoardInputModel as input. When activate func is called, the motherboard will activate a Board with identifier in list of boards it manages.

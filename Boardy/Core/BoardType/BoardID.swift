@@ -28,7 +28,7 @@ public struct BoardID: LosslessStringConvertible, ExpressibleByStringLiteral, Ha
         rawValue
     }
 
-    public static func randomUnique() -> BoardID {
+    public static func random() -> BoardID {
         BoardID(UUID().uuidString)
     }
 }

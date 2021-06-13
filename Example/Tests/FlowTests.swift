@@ -118,7 +118,7 @@ final class FlowTests: XCTestCase {
         motherboard.registerFlowSteps(testId ->>> testId2 ->>> testId3)
         XCTAssertEqual(motherboard.flows.count, beforeFlowsNumber + 2)
         
-        testBoard.activate()
+        testBoard.activate(withOption: nil)
         XCTAssertEqual(testBoard3.activatedCount, 1)
     }
 }

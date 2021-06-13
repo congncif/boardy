@@ -43,10 +43,6 @@ public extension MotherboardType {
     }
 }
 
-public protocol ActivableBoardProducer {
-    func produceBoard(identifier: BoardID) -> ActivatableBoard?
-}
-
 protocol LazyMotherboard: MotherboardType {
     var boardProducer: ActivableBoardProducer { get }
 }

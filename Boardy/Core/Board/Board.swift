@@ -12,7 +12,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
     public let identifier: BoardID
     public weak var delegate: BoardDelegate?
 
-    public init(identifier: BoardID = .randomUnique()) {
+    public init(identifier: BoardID) {
         self.identifier = identifier
     }
 

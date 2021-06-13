@@ -29,11 +29,7 @@ final class LoginBoard: Board, ActivatableBoard {
 extension LoginBoard: LoginDelegate {
     func didLogin(userInfo: UserInfo) {
         rootViewController.dismiss(animated: true, completion: { [weak self] in
-
             self?.nextToBoard(.main(userInfo: userInfo))
-
-            let main = self?.delegate as? MotherboardType
-            main?.clearActiveBoards()
         })
     }
 }

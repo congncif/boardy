@@ -18,7 +18,7 @@ final class FeaturedBoard: Board, GuaranteedBoard {
     @LazyInjected var builder: FeaturedBuildable
 
     init() {
-        super.init()
+        super.init(identifier: .random())
     }
 
     func activate(withGuaranteedInput input: Any?) {

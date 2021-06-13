@@ -82,6 +82,6 @@ extension DashboardBoard: DashboardDelegate {
 
         contentBoard.addBoard(featured)
 
-        featured.activate()
+        featured.activate(withGuaranteedInput: nil)
     }
 }

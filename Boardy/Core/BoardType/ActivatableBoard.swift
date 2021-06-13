@@ -8,8 +8,14 @@
 import Foundation
 import UIKit
 
-public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard {
+public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard, BoardRegistrationsConvertible {
     func activate(withOption option: Any?)
+}
+
+extension ActivatableBoard {
+    public func asBoardRegistrations() -> [BoardRegistration] {
+        [BoardRegistration(identifier) { _ in self }]
+    }
 }
 
 extension ActivatableBoard {
