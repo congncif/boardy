@@ -19,8 +19,15 @@ extension Array: BoardRegistrationsConvertible where Element == BoardRegistratio
     public func asBoardRegistrations() -> [BoardRegistration] { self }
 }
 
-public protocol BoardDynamicProducer: ActivableBoardProducer {
+public protocol BoardDynamicProducer: AnyObject, ActivableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
+}
+
+extension BoardDynamicProducer {
+    /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
+    public var boxed: ActivableBoardProducer {
+        return BoardProducerBox(producer: self)
+    }
 }
 
 public final class BoardProducer: BoardDynamicProducer {
@@ -73,7 +80,7 @@ public final class BoardProducer: BoardDynamicProducer {
 }
 
 struct BoardProducerBox: ActivableBoardProducer {
-    weak var producer: BoardProducer?
+    weak var producer: BoardDynamicProducer?
 
     func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         producer?.produceBoard(identifier: identifier)

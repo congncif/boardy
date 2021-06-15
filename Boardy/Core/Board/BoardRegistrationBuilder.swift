@@ -71,7 +71,7 @@ extension BoardProducer {
 
 internal func createProducer(from externalProducer: ActivableBoardProducer, @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> ActivableBoardProducer {
     let producer = BoardProducer(externalProducer: externalProducer, registrations: [])
-    let registrations = registrationsBuilder(BoardProducerBox(producer: producer))
+    let registrations = registrationsBuilder(producer.boxed)
     for registration in registrations {
         producer.add(registration: registration)
     }
