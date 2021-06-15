@@ -12,9 +12,9 @@ import Foundation
 extension Board {
     public func produceComposableMotherboard(identifier: BoardID = .random(),
                                              externalProducer: ActivableBoardProducer = NoBoardProducer(),
-                                             @BoardRegistrationBuilder registrationsBuilder: (_ externalProducer: ActivableBoardProducer) -> [BoardRegistration]) -> ComposableMotherboard {
-        let registrations = registrationsBuilder(externalProducer)
-        return produceComposableMotherboard(identifier: identifier, boardProducer: BoardProducer(registrations: registrations), elementBoards: [])
+                                             @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> ComposableMotherboard {
+        let producer = createProducer(from: externalProducer, registrationsBuilder: registrationsBuilder)
+        return produceComposableMotherboard(identifier: identifier, boardProducer: producer, elementBoards: [])
     }
 }
 

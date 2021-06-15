@@ -44,21 +44,38 @@ public struct BoardRegistrationBuilder {
 extension Motherboard {
     public convenience init(identifier: BoardID = .random(),
                             externalProducer: ActivableBoardProducer = NoBoardProducer(),
-                            @BoardRegistrationBuilder registrationsBuilder: (_ externalProducer: ActivableBoardProducer) -> [BoardRegistration]) {
-        let registrations = registrationsBuilder(externalProducer)
-        self.init(identifier: identifier, boardProducer: BoardProducer(registrations: registrations))
+                            @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
+        let producer = createProducer(from: externalProducer, registrationsBuilder: registrationsBuilder)
+        self.init(identifier: identifier, boardProducer: producer)
     }
 }
 
 extension Board {
     public func produceContinuousMotherboard(identifier: BoardID = .random(),
                                              externalProducer: ActivableBoardProducer = NoBoardProducer(),
-                                             @BoardRegistrationBuilder registrationsBuilder: (_ externalProducer: ActivableBoardProducer) -> [BoardRegistration]) -> Motherboard {
-        let registrations = registrationsBuilder(externalProducer)
-        return produceContinuousMotherboard(identifier: identifier, boardProducer: BoardProducer(registrations: registrations), elementBoards: [])
+                                             @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> Motherboard {
+        let producer = createProducer(from: externalProducer, registrationsBuilder: registrationsBuilder)
+        return produceContinuousMotherboard(identifier: identifier, boardProducer: producer, elementBoards: [])
     }
+}
 
-    
+extension BoardProducer {
+    public convenience init(externalProducer: ActivableBoardProducer = NoBoardProducer(), @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
+        self.init(externalProducer: externalProducer, registrations: [])
+        let registrations = registrationsBuilder(BoardProducerBox(producer: self))
+        for registration in registrations {
+            add(registration: registration)
+        }
+    }
+}
+
+internal func createProducer(from externalProducer: ActivableBoardProducer, @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> ActivableBoardProducer {
+    let producer = BoardProducer(externalProducer: externalProducer, registrations: [])
+    let registrations = registrationsBuilder(BoardProducerBox(producer: producer))
+    for registration in registrations {
+        producer.add(registration: registration)
+    }
+    return producer
 }
 
 #endif

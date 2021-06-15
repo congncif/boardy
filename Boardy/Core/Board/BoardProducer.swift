@@ -42,6 +42,15 @@ public final class BoardProducer: BoardDynamicProducer {
         return true
     }
 
+    @discardableResult
+    public func remove(registration: BoardRegistration) -> Bool {
+        guard registrations.contains(registration) else {
+            return false
+        }
+        registrations.remove(registration)
+        return true
+    }
+
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         let registration = registrations.first { $0.identifier == identifier }
         return registration?.constructor(identifier)
@@ -60,5 +69,17 @@ public final class BoardProducer: BoardDynamicProducer {
         } else {
             return nil
         }
+    }
+}
+
+struct BoardProducerBox: ActivableBoardProducer {
+    weak var producer: BoardProducer?
+
+    func produceBoard(identifier: BoardID) -> ActivatableBoard? {
+        producer?.produceBoard(identifier: identifier)
+    }
+
+    func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+        producer?.matchBoard(withIdentifier: identifier, to: anotherIdentifier)
     }
 }
