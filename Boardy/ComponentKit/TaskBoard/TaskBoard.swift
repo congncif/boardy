@@ -45,7 +45,7 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
                 processingHandler: @escaping ProcessingHandler = { _ in },
                 errorHandler: @escaping ErrorHandler = {
                     let alert = UIAlertController(title: nil, message: $1.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: nil))
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
                     let viewController = $0.rootViewController.presentedViewController ?? $0.rootViewController
                     viewController.present(alert, animated: true)
                 },
