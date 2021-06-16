@@ -8,14 +8,19 @@
 import Foundation
 import UIKit
 
-public final class TaskBoard<Input, Output>: Board, GuaranteedBoard {
-    public typealias ExcutorCompletion = (Result<Output, Error>) -> Void
-    public typealias Executor = (NormalBoard, Input, @escaping ExcutorCompletion) -> Void
+public protocol TaskingBoard: NormalBoard {
+    var isCompleted: Bool { get }
+    var isProcessing: Bool { get }
+}
 
-    public typealias SuccessHandler = (NormalBoard, Output) -> Void
-    public typealias ProcessingHandler = (NormalBoard, Bool) -> Void
-    public typealias ErrorHandler = (NormalBoard, Error) -> Void
-    public typealias CompletionHandler = (NormalBoard) -> Void
+public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard {
+    public typealias ExcutorCompletion = (Result<Output, Error>) -> Void
+    public typealias Executor = (TaskingBoard, Input, @escaping ExcutorCompletion) -> Void
+
+    public typealias SuccessHandler = (TaskingBoard, Output) -> Void
+    public typealias ProcessingHandler = (TaskingBoard) -> Void
+    public typealias ErrorHandler = (TaskingBoard, Error) -> Void
+    public typealias CompletionHandler = (TaskingBoard) -> Void
 
     public typealias InputType = Input
 
@@ -25,17 +30,28 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard {
     private let errorHandler: ErrorHandler
     private let completionHandler: CompletionHandler
 
+    @Atomic
+    private var activateCount = 0
+
+    private func increaseActivateCount() { activateCount += 1 }
+    private func decreaseActivateCount() { activateCount -= 1 }
+
+    public var isCompleted: Bool { activateCount == 0 }
+    public var isProcessing: Bool { activateCount != 0 }
+
     public init(identifier: BoardID,
                 executor: @escaping Executor,
                 successHandler: @escaping SuccessHandler = { $0.sendToMotherboard(data: $1) },
-                processingHandler: @escaping ProcessingHandler = { _, _ in },
+                processingHandler: @escaping ProcessingHandler = { _ in },
                 errorHandler: @escaping ErrorHandler = {
                     let alert = UIAlertController(title: nil, message: $1.localizedDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: nil))
                     let viewController = $0.rootViewController.presentedViewController ?? $0.rootViewController
                     viewController.present(alert, animated: true)
                 },
-                completionHandler: @escaping CompletionHandler = { $0.complete() }) {
+                completionHandler: @escaping CompletionHandler = {
+                    if $0.isCompleted { $0.complete() }
+                }) {
         self.executor = executor
         self.successHandler = successHandler
         self.processingHandler = processingHandler
@@ -45,16 +61,17 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard {
     }
 
     public func activate(withGuaranteedInput input: Input) {
-        processingHandler(self, true)
+        increaseActivateCount()
+        processingHandler(self)
 
         execute(input: input) { [weak self] result in
             guard let self = self else { return }
 
             defer {
+                self.decreaseActivateCount()
+                self.processingHandler(self)
                 self.completionHandler(self)
             }
-
-            self.processingHandler(self, false)
 
             switch result {
             case let .success(output):

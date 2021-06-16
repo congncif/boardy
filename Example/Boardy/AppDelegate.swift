@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }, processingHandler: {
-            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+            $0.isProcessing ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
         }, errorHandler: {
             $0.sendToMotherboard(data: $1)
         })
@@ -121,7 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }, processingHandler: {
-            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+            $0.isProcessing ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
         })
 
         let task3 = TaskBoard<String, String>(identifier: "3", executor: { board, input, completion in
@@ -134,7 +134,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }, processingHandler: {
-            $1 ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
+            $0.isProcessing ? $0.rootViewController.view.showLoading(animated: false) : $0.rootViewController.view.hideLoading(animated: false)
         })
 
         let motherboard = Motherboard(boards: [task1, task2, task3])
