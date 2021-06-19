@@ -70,12 +70,12 @@ extension MotherboardRepresentable {
     public var boards: [ActivatableBoard] { mainboard }
 
     public func addBoard(_ board: ActivatableBoard) {
-        assert(installedBoard(identifier: board.identifier) == nil, "🔥 [\(String(describing: self))] Board with identifier \(board.identifier) was already added to motherboard \(self).")
+        assert(installedBoard(identifier: board.identifier) == nil, "\(String(describing: self)) \n🔥 Board with identifier \(board.identifier) was already added to motherboard \(self).")
         mainboard.append(board)
     }
 
     public func removeBoard(withIdentifier identifier: BoardID) {
-        assert(installedBoard(identifier: identifier) != nil, "🔥 [\(String(describing: self))] Board with identifier \(identifier) was not in motherboard \(self).")
+        assert(installedBoard(identifier: identifier) != nil, "\(String(describing: self)) \n🔥 Board with identifier \(identifier) was not in motherboard \(self).")
         mainboard.removeAll { $0.identifier == identifier }
     }
 

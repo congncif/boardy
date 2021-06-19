@@ -19,7 +19,7 @@ public protocol InteractableBoard: ActivatableBoard {
 extension InteractableBoard {
     public func interact(command: BoardCommandModel) {
         #if DEBUG
-        print("⚠️ \(String(describing: self)) has called \(#function) with \(command)")
+        print("\(String(describing: self)) \n⚠️ Has called \(#function) with \(command)")
         #endif
     }
 }
@@ -36,7 +36,7 @@ extension GuaranteedInteractableBoard {
     public func interact(command: BoardCommandModel) {
         guard let dedicatedCommand = command as? Command else {
             #if DEBUG
-            print("⚠️ The command was not sent. \(String(describing: self)) has called \(#function) with \(command) while expected model type is \(Command.self)")
+            print("\(String(describing: self)) \n⚠️ Has sent command \(command) while expected model type is \(Command.self)")
             #endif
             return
         }

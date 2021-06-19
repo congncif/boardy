@@ -16,6 +16,15 @@ open class Board: IdentifiableBoard, OriginalBoard {
         self.identifier = identifier
     }
 
+    public var debugDescription: String {
+        """
+        🍌 [Debug Description]
+            ● [Board] ➤ \(String(describing: type(of: self)))
+            ● [ID] ➤ \(String(describing: identifier))
+            ● [Motherboard] ➤ \(String(describing: (delegate as? IdentifiableBoard)?.identifier))
+        """
+    }
+
     /**
      Give root object which associated with Board.
      */

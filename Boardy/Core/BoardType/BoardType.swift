@@ -20,7 +20,7 @@ public protocol OriginalBoard {
     func installIntoRoot(_ rootObject: AnyObject)
 }
 
-public protocol IdentifiableBoard: AnyObject {
+public protocol IdentifiableBoard: AnyObject, CustomDebugStringConvertible {
     var delegate: BoardDelegate? { get set }
     var identifier: BoardID { get }
 }
@@ -32,7 +32,7 @@ extension IdentifiableBoard {
 
         #if DEBUG
         if delegate == nil {
-            print("⚠️ [\(String(describing: self))] [\(#function)] [\(identifier)] sent a message with data \(String(describing: data)) to its Motherboard but it seems to have no Motherboards.")
+            print("⚠️ [\(String(describing: type(of: self)))] [\(#function)] [\(identifier)] sent a message with data \(String(describing: data)) to its Motherboard but it seems to have no Motherboards.")
         }
         #endif
 

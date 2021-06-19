@@ -12,6 +12,15 @@ import UIKit
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMotherboard, LazyMotherboard {
     public var flows: [BoardFlow] = []
 
+    override public var debugDescription: String {
+        let superDesc = super.debugDescription
+        return superDesc + "\n" + """
+            ● [Children] ➤ \(String(describing: boards.map { $0.identifier }))
+            ● [Flows] ➤ \(String(describing: flows.count))
+            ● [Producer] ➤ \(String(describing: boardProducer))
+        """
+    }
+
     public init(identifier: BoardID = .random(),
                 boards: [ActivatableBoard] = []) {
         boardProducer = NoBoardProducer()
