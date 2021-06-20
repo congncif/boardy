@@ -23,7 +23,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
 //    @LazyInjected var elementFactory: DashboardElementManufacturing
 
     init() {
-        super.init(identifier: .dashboard)
+        super.init(identifier: .dashboard, motherboard: Motherboard())
 
         motherboard.registerChainFlow(matchedIdentifiers: [.headline], target: self)
             .handle(outputType: Int.self) { _, output in

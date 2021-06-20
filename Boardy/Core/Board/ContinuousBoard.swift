@@ -13,7 +13,7 @@ open class ContinuousBoard: Board {
     public let motherboard: FlowMotherboard
 
     public init(identifier: BoardID = .random(),
-                motherboard: FlowMotherboard = Motherboard()) {
+                motherboard: FlowMotherboard) {
         self.motherboard = motherboard
         super.init(identifier: identifier)
 
@@ -22,7 +22,7 @@ open class ContinuousBoard: Board {
 
     public convenience init(identifier: BoardID = .random(),
                             boardProducer: ActivableBoardProducer) {
-        let motherboard = Motherboard(boardProducer: boardProducer)
+        let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
         self.init(identifier: identifier, motherboard: motherboard)
     }
 

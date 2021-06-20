@@ -21,12 +21,20 @@ public final class FlowBoard<Input, Output>: ContinuousBoard, GuaranteedBoard, F
     private let flowActivation: FlowActivation
 
     public init(identifier: BoardID = .random(),
-                motherboard: FlowMotherboard = Motherboard(),
+                motherboard: FlowMotherboard,
                 flowRegistration: FlowRegistration,
                 flowActivation: @escaping FlowActivation) {
         self.flowActivation = flowActivation
         super.init(identifier: identifier, motherboard: motherboard)
         flowRegistration(self)
+    }
+
+    public convenience init(identifier: BoardID = .random(),
+                            boardProducer: ActivableBoardProducer,
+                            flowRegistration: FlowRegistration,
+                            flowActivation: @escaping FlowActivation) {
+        let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
+        self.init(identifier: identifier, motherboard: motherboard, flowRegistration: flowRegistration, flowActivation: flowActivation)
     }
 
     public func activate(withGuaranteedInput input: InputType) {
