@@ -13,16 +13,17 @@ public protocol TaskingBoard: NormalBoard {
     var isProcessing: Bool { get }
 }
 
-public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard {
+public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, GuaranteedOutputSendingBoard {
     public typealias ExcutorCompletion = (Result<Output, Error>) -> Void
     public typealias Executor = (TaskingBoard, Input, @escaping ExcutorCompletion) -> Void
 
-    public typealias SuccessHandler = (TaskingBoard, Output) -> Void
+    public typealias SuccessHandler = (TaskBoard<Input, Output>, Output) -> Void
     public typealias ProcessingHandler = (TaskingBoard) -> Void
     public typealias ErrorHandler = (TaskingBoard, Error) -> Void
     public typealias CompletionHandler = (TaskingBoard) -> Void
 
     public typealias InputType = Input
+    public typealias OutputType = Output
 
     private let executor: Executor
     private let successHandler: SuccessHandler
@@ -41,13 +42,15 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
 
     public init(identifier: BoardID,
                 executor: @escaping Executor,
-                successHandler: @escaping SuccessHandler = { $0.sendToMotherboard(data: $1) },
+                successHandler: @escaping SuccessHandler = { $0.sendOutput($1) },
                 processingHandler: @escaping ProcessingHandler = { _ in },
-                errorHandler: @escaping ErrorHandler = {
-                    let alert = UIAlertController(title: nil, message: $1.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
-                    let viewController = $0.rootViewController.presentedViewController ?? $0.rootViewController
-                    viewController.present(alert, animated: true)
+                errorHandler: @escaping ErrorHandler = { board, error in
+                    DispatchQueue.main.async { [weak board] in
+                        guard let viewController = board?.rootViewController.presentedViewController ?? board?.rootViewController else { return }
+                        let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
+                        viewController.present(alert, animated: true)
+                    }
                 },
                 completionHandler: @escaping CompletionHandler = {
                     if $0.isCompleted { $0.complete() }
