@@ -57,6 +57,10 @@ pod 'Boardy/DeepLink'
 pod 'Boardy/Composable'
 ```
 
+## Reference
+
+* [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
+
 ## Author
 
 congncif, congnc.if@gmail.com
