@@ -139,7 +139,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let motherboard = Motherboard(boards: [task1, task2, task3])
 
-        motherboard.registerFlowSteps("1" ->>> "2" ->>> "3")
+        motherboard.registerFlowSteps("1" ->> "2" ->> "3")
 
         motherboard.registerFlow(BoardActivateFlow(matchedIdentifiers: ["3"], nextHandler: { text in
             print("🏁 " + String(describing: text))

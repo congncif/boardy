@@ -46,7 +46,7 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
                 processingHandler: @escaping ProcessingHandler = { _ in },
                 errorHandler: @escaping ErrorHandler = { board, error in
                     DispatchQueue.main.async { [weak board] in
-                        guard let viewController = board?.rootViewController.presentedViewController ?? board?.rootViewController else { return }
+                        guard let board = board, let viewController = board.rootViewController.presentedViewController else { return }
                         let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
                         viewController.present(alert, animated: true)

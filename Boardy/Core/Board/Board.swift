@@ -18,7 +18,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
 
     public var debugDescription: String {
         """
-        🍌 [Debug Description]
+        ⛵️ [Debug Description]
             ● [Board] ➤ \(String(describing: type(of: self)))
             ● [ID] ➤ \(String(describing: identifier))
             ● [Motherboard] ➤ \(String(describing: (delegate as? IdentifiableBoard)?.identifier))
