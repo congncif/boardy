@@ -43,3 +43,9 @@ extension BoardID: Equatable {
 public func ~= (pattern: BoardID, value: String) -> Bool {
     return pattern.rawValue == value
 }
+
+public extension BoardID {
+    func appending(_ tail: String, separator: String = ".") -> BoardID {
+        return BoardID(rawValue + separator + tail)
+    }
+}
