@@ -28,8 +28,10 @@ extension Board {
 ///
 public extension ActivableBoardProducer {
     /// Create a new Motherboard which uses internally by a board. Chain of actions will be set up to parent.
-    func produceContinuousMotherboard(identifier: BoardID = .random(), from parent: IdentifiableBoard? = nil) -> FlowMotherboard {
-        let motherboard = Motherboard(identifier: identifier, boardProducer: self, boards: [])
+    func produceContinuousMotherboard(identifier: BoardID = .random(),
+                                      from parent: IdentifiableBoard? = nil,
+                                      elementsBuilder: (ActivableBoardProducer) -> [ActivatableBoard] = { _ in [] }) -> FlowMotherboard {
+        let motherboard = Motherboard(identifier: identifier, boardProducer: self, boards: elementsBuilder(self))
 
         if let parent = parent {
             // Setup chain of actions.

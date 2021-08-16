@@ -14,7 +14,9 @@ extension Board {
     }
 
     /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
-    public func produceComposableMotherboard(identifier: BoardID = .random(), boardProducer: ActivableBoardProducer = NoBoardProducer(), elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
+    public func produceComposableMotherboard(identifier: BoardID = .random(),
+                                             boardProducer: ActivableBoardProducer = NoBoardProducer(),
+                                             elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
         let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer, boards: elementBoards)
         // Setup chain of actions.
         motherboard.forwardActionFlow(to: self)
@@ -29,8 +31,10 @@ extension Board {
 ///
 public extension ActivableBoardProducer {
     /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up to parent.
-    func produceComposableMotherboard(identifier: BoardID = .random(), from parent: IdentifiableBoard? = nil) -> FlowComposableMotherboard {
-        let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: self, boards: [])
+    func produceComposableMotherboard(identifier: BoardID = .random(),
+                                      from parent: IdentifiableBoard? = nil,
+                                      elementsBuilder: (ActivableBoardProducer) -> [ActivatableBoard] = { _ in [] }) -> FlowComposableMotherboard {
+        let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: self, boards: elementsBuilder(self))
 
         if let parent = parent {
             // Setup chain of actions.
