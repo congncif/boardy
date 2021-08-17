@@ -60,7 +60,7 @@ public final class BoardProducer: BoardDynamicProducer {
 
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         let registration = registrations.first { $0.identifier == identifier }
-        return registration?.constructor(identifier)
+        return registration?.constructor(identifier) ?? externalProducer.produceBoard(identifier: identifier)
     }
 
     public func registerBoard(_ identifier: BoardID, factory: @escaping BoardConstructor) {
