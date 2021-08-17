@@ -17,7 +17,7 @@ public protocol InstallableBoard: OriginalBoard {
 extension InstallableBoard {
     public var rootViewController: UIViewController {
         guard let viewController = root as? UIViewController else {
-            assertionFailure("\(String(describing: self)) \n🔥 Board was not installed. Install \(self) into a rootViewController before activating it.")
+            assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `rootViewController` because it is not set or deallocated. Make sure install \(self) into a `rootViewController` before accessing it.")
             return UIViewController()
         }
         return viewController
@@ -35,7 +35,7 @@ extension InstallableBoard {
         } else if let tabBarController = rootViewController as? UITabBarController, let controller = tabBarController.selectedViewController as? UINavigationController {
             return controller
         } else {
-            assertionFailure("\(String(describing: self)) \n🔥 No UINavigationController. Install \(self) into a rootViewController which based on UINavigationController before activating it.")
+            assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `navigationController` because it is not set or deallocated or `rootViewController` doesn't have `UINavigationController`. Make sure install \(self) into a `rootViewController` which based on `UINavigationController` before accessing it.")
             return UINavigationController()
         }
     }
@@ -48,7 +48,7 @@ extension InstallableBoard {
         } else if let navigationController = rootViewController as? UINavigationController, let controller = navigationController.tabBarController {
             return controller
         } else {
-            assertionFailure("\(String(describing: self)) \n🔥 No UITabBarController. Install \(self) into a rootViewController which based on UITabBarController before activating it.")
+            assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `tabBarController` because it is not set or deallocated or `rootViewController` doesn't have `UITabBarController`. Make sure install \(self) into a `rootViewController` which based on `UITabBarController` before accessing it.")
             return UITabBarController()
         }
     }
@@ -63,7 +63,7 @@ public protocol WindowInstallableBoard: OriginalBoard {
 extension WindowInstallableBoard {
     public var window: UIWindow {
         guard let current = root as? UIWindow else {
-            assertionFailure("\(String(describing: self)) \n🔥 Board was not installed. Install \(self) into a window before activating it.")
+            assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `window` because it is not set or deallocated. Make sure install \(self) into a `window` before accessing it.")
             return UIWindow()
         }
         return current
@@ -81,7 +81,7 @@ extension InstallableBoard where Self: WindowInstallableBoard {
         } else if let viewController = root as? UIViewController {
             return viewController
         } else {
-            assertionFailure("\(String(describing: self)) \n🔥 Board was not installed. Install \(self) into a rootViewController before activating it.")
+            assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `rootViewController` because it is not set or deallocated. Make sure install \(self) into a `rootViewController` before accessing it.")
             return UIViewController()
         }
     }

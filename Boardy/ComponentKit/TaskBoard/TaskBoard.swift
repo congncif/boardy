@@ -14,8 +14,8 @@ public protocol TaskingBoard: NormalBoard {
 }
 
 public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, GuaranteedOutputSendingBoard {
-    public typealias ExcutorCompletion = (Result<Output, Error>) -> Void
-    public typealias Executor = (TaskingBoard, Input, @escaping ExcutorCompletion) -> Void
+    public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
+    public typealias Executor = (TaskingBoard, Input, @escaping ExecutorCompletion) -> Void
 
     public typealias SuccessHandler = (TaskBoard<Input, Output>, Output) -> Void
     public typealias ProcessingHandler = (TaskingBoard) -> Void

@@ -15,8 +15,10 @@ public protocol BoardDelegate: AnyObject {
 // MARK: - Board
 
 public protocol OriginalBoard {
+    /// System context which helps this Board access current state of system.
     var root: AnyObject? { get }
 
+    /// Set context for this Board
     func installIntoRoot(_ rootObject: AnyObject)
 }
 

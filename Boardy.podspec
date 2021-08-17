@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.23.3"
+  s.version = "1.23.4"
   s.swift_versions = ["5.3", "5.4"]
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
   s.description = <<-DESC
-  Integrate components which was developed using different architecures.
+  Integrate components which was developed using different architectures.
   DESC
 
   s.homepage = "https://github.com/congncif"
