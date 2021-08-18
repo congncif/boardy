@@ -18,9 +18,9 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
     public typealias Executor = (TaskingBoard, Input, @escaping ExecutorCompletion) -> Void
 
     public typealias SuccessHandler = (TaskBoard<Input, Output>, Output) -> Void
-    public typealias ProcessingHandler = (TaskingBoard) -> Void
-    public typealias ErrorHandler = (TaskingBoard, Error) -> Void
-    public typealias CompletionHandler = (TaskingBoard) -> Void
+    public typealias ProcessingHandler = (TaskBoard<Input, Output>) -> Void
+    public typealias ErrorHandler = (TaskBoard<Input, Output>, Error) -> Void
+    public typealias CompletionHandler = (TaskBoard<Input, Output>) -> Void
 
     public typealias InputType = Input
     public typealias OutputType = Output
