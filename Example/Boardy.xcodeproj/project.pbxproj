@@ -44,6 +44,7 @@
 		27D665DE250DC617008B6E48 /* RootProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665D9250DC617008B6E48 /* RootProtocols.swift */; };
 		27D665E0250DC629008B6E48 /* RootBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665DF250DC629008B6E48 /* RootBoard.swift */; };
 		27D665E2250DCB10008B6E48 /* UIViewController+Visible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D665E1250DCB10008B6E48 /* UIViewController+Visible.swift */; };
+		27E40B9226CF533D00A0F634 /* BlockTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E40B9126CF533D00A0F634 /* BlockTaskTests.swift */; };
 		27FD0A7624E0DDF8002855D6 /* ModuleImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */; };
 		27FD0A8924E0DE31002855D6 /* InstallableRIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A7F24E0DE31002855D6 /* InstallableRIBBoard.swift */; };
 		27FD0A8A24E0DE31002855D6 /* RIBBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD0A8024E0DE31002855D6 /* RIBBoard.swift */; };
@@ -121,6 +122,7 @@
 		27D665D9250DC617008B6E48 /* RootProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootProtocols.swift; sourceTree = "<group>"; };
 		27D665DF250DC629008B6E48 /* RootBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootBoard.swift; sourceTree = "<group>"; };
 		27D665E1250DCB10008B6E48 /* UIViewController+Visible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Visible.swift"; sourceTree = "<group>"; };
+		27E40B9126CF533D00A0F634 /* BlockTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockTaskTests.swift; sourceTree = "<group>"; };
 		27FD0A7524E0DDF8002855D6 /* ModuleImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleImport.swift; sourceTree = "<group>"; };
 		27FD0A7F24E0DE31002855D6 /* InstallableRIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstallableRIBBoard.swift; sourceTree = "<group>"; };
 		27FD0A8024E0DE31002855D6 /* RIBBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RIBBoard.swift; sourceTree = "<group>"; };
@@ -436,6 +438,7 @@
 				270351C025C2BD26007AF693 /* AttachableTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 				279F720B25CBC8E9000160C6 /* LifecycleTests.swift */,
+				27E40B9126CF533D00A0F634 /* BlockTaskTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -733,6 +736,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27E40B9226CF533D00A0F634 /* BlockTaskTests.swift in Sources */,
 				270351C125C2BD26007AF693 /* AttachableTests.swift in Sources */,
 				279F720C25CBC8E9000160C6 /* LifecycleTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* FlowTests.swift in Sources */,
