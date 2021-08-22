@@ -105,7 +105,7 @@ enum LatestProductsFetchTaskBoardFactory {
 
 ```
 
-> `TaskBoard` could be activated many times, by the way, each activation will perform separated executor so many output values (corresponding to the number of activations) will be sent to its `Motherboard`.
+> `TaskBoard` could be activated many times and so each activation will perform separated executor so many output values (corresponding to the number of activations) will be sent to its `Motherboard`.
 
 ### **Use `BlockTaskBoard` for single completable activation**
 
@@ -113,7 +113,7 @@ enum LatestProductsFetchTaskBoardFactory {
 
 > `BlockTaskBoard` accepts `BlockTaskParameter` instead of `Input` plain value. `BlockTaskParameter` bundles `input`, `onSuccess` handler, `onProgress` handler, `onError` handler.
 
-By that way, an activation with `BlockTaskBoard` can handle result separating with other other activations on same `BlockTaskBoard` corresponding to activation's input.
+By that way, an activation with `BlockTaskBoard` can handle result separating with other activations on same `BlockTaskBoard` corresponding to activation's input.
 
 ```swift
 enum GetLocalProductBlockTaskBoardFactory {
@@ -134,6 +134,91 @@ func getProducts(by categoryID: String) {
             target.handle(result)
         }
     mainboard.ioGetLocalProduct().activation.activate(with: parameter)
+}
+```
+
+## Install template to develop feature
+
+* Clone [module template](https://github.com/congncif/module-template.git) repo
+* Run `./install-template.sh`
+* Restart **Xcode**
+
+
+## Add a new feature
+
+Right click in **Xcode** to add *New File...* then choose `Boardy` template, enter `name` and press *Next*, choose file location and *Create*.
+
+New feature component will be created, contains a *Board*, an *IOInterface*, a *View Controller or Viewless Controller* with *Builder* pattern.
+
+**Boardy 1.19+** introduces `IOInterface` to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***interact in type safety***.
+
+> Note: You need to check and update correct Input & Output Type you would like to use for Your Component in `YourInOut.swift` *(by default the Input Ouput is Optional Any)*.
+
+***☞ If you are using [DadFoundation](https://github.com/ifsolution/father-foundation) & [DadSDK](https://github.com/ifsolution/father-sdk) for module integration***
+
+*You might need to add a `BoardRegistration` for `Your Board` to right place in `Integration/YourModulePlugin.swift`. The place depends on your flow structure. A `Motherboard` manages a business flow, a `continuousBoard` manages a child flow.*
+
+***☞ Otherwise, you need to add registration to BoardProducer to provide YourBoard constructor***
+
+*`BoardProducer` is factory which helps `Motherboard` lazy initialize a child Board on the first activation. This is useful when the `Motherboard` doesn't need initialize all of its Boards at once that might cause some performace issues in case too many children.*
+
+```swift
+BoardRegistration(.yourFeature) { identifier in
+    YourBoard(identifier: identifier,
+              builder: YourBuilder(),
+              continuousBoard: Motherboard(identifier: identifier.appending("main")))
+}
+```
+
+### **You use the `Board` to communicate with other feature components:**
+
+* To activate `OtherFeature` as child flow, use `activation` in `IOInterface`:
+```swift
+func openOtherFeature() {
+    motherboard.ioOtherFeature().activation.activate()
+}
+```
+* To handle callback from `Other Feature`, register a flow, use `flow` handler in `IOInterface`:
+```swift
+func registerFlows() {
+    motherboard.ioOtherFeature().flow.addTarget(self) { target, output in
+        target.handleOutput(output)
+    }
+}
+```
+* To send a output data to `Motherboard`, use `sendOutput` method:
+```swift
+func yourFeatureDidComplete() {
+    self.sendOutput("Output data")
+}
+```
+* To interact with *Internal Controller*, use **Event Bus**:
+```swift
+...
+// Declare bus with data type String for example
+private let eventBus = Bus<String>()
+...
+
+// Bind the bus to Controller to get data
+func activate(withGuaranteedInput input: InputType) {
+    let component = builder.build(withDelegate: self)
+    let viewController = component.userInterface
+    motherboard.installIntoRoot(viewController)
+    rootViewController.show(viewController)
+        
+    eventBus.connect(target: component.controller) { controller, data in
+        controller.bindSomething(data)
+    }
+}
+
+// Transport data to bus, for example from OtherFeature callback
+func registerFlows() {
+    motherboard.ioOtherFeature().flow.bind(to: eventBus)
+}
+
+// Or send a custom event
+func sendCustomEvent(value: String) {
+    eventBus.transport(value)
 }
 ```
 
