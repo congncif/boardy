@@ -17,9 +17,43 @@ public final class BlockTaskParameter<Input, Output> {
         return self
     }
 
+    public func onSuccess(_ handler: ((Output) -> Void)?) -> Self {
+        successHandler = { _, output in
+            handler?(output)
+        }
+        return self
+    }
+
+    public func onSuccess<Target>(target: Target, action: ((Target, Output) -> Void)?) -> Self {
+        let box = ObjectBox()
+        box.setObject(target)
+
+        return onSuccess { [box] output in
+            guard let action = action, let target = box.unboxed(Target.self) else { return }
+            action(target, output)
+        }
+    }
+
     public func onProcessing(_ handler: BlockTaskBoard<Input, Output>.ProcessingHandler?) -> Self {
         processingHandler = handler
         return self
+    }
+
+    public func onProcessing(_ handler: ((Bool) -> Void)?) -> Self {
+        processingHandler = { _, inProgress in
+            handler?(inProgress)
+        }
+        return self
+    }
+
+    public func onProcessing<Target>(target: Target, action: ((Target, Bool) -> Void)?) -> Self {
+        let box = ObjectBox()
+        box.setObject(target)
+
+        return onProcessing { [box] output in
+            guard let action = action, let target = box.unboxed(Target.self) else { return }
+            action(target, output)
+        }
     }
 
     public func onError(_ handler: BlockTaskBoard<Input, Output>.ErrorHandler?) -> Self {
@@ -27,9 +61,41 @@ public final class BlockTaskParameter<Input, Output> {
         return self
     }
 
+    public func onError(_ handler: ((Error) -> Void)?) -> Self {
+        errorHandler = { _, error in
+            handler?(error)
+        }
+        return self
+    }
+
+    public func onError<Target>(target: Target, action: ((Target, Error) -> Void)?) -> Self {
+        let box = ObjectBox()
+        box.setObject(target)
+
+        return onError { [box] output in
+            guard let action = action, let target = box.unboxed(Target.self) else { return }
+            action(target, output)
+        }
+    }
+
     public func onCompletion(_ handler: BlockTaskBoard<Input, Output>.CompletionHandler?) -> Self {
         completionHandler = handler
         return self
+    }
+
+    public func onCompletion(_ handler: (() -> Void)?) -> Self {
+        completionHandler = { _ in handler?() }
+        return self
+    }
+
+    public func onCompletion<Target>(target: Target, action: ((Target) -> Void)?) -> Self {
+        let box = ObjectBox()
+        box.setObject(target)
+
+        return onCompletion { [box] in
+            guard let action = action, let target = box.unboxed(Target.self) else { return }
+            action(target)
+        }
     }
 
     let input: Input
@@ -38,6 +104,12 @@ public final class BlockTaskParameter<Input, Output> {
     var processingHandler: BlockTaskBoard<Input, Output>.ProcessingHandler?
     var errorHandler: BlockTaskBoard<Input, Output>.ErrorHandler?
     var completionHandler: BlockTaskBoard<Input, Output>.CompletionHandler?
+}
+
+extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
+    public convenience init() {
+        self.init(input: nil)
+    }
 }
 
 struct BlockHandler<Input, Output> {
