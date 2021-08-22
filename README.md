@@ -57,6 +57,86 @@ pod 'Boardy/DeepLink'
 pod 'Boardy/Composable'
 ```
 
+```ruby
+# Utilities toolkit
+pod 'Boardy/ComponentKit'
+```
+
+## Some useful components in Kit
+
+### **Use `TaskBoard` for a Business-Logic-Only micro-service**
+
+`TaskBoard` is a *Board* which perform a logic task only such as request an `URLSession` then get response, query database, update shared values, etc. These jobs usually doesn't relate UI and could be executed in background. The result after that will be sent out to its `Motherboard` to continue flow.
+
+`TaskBoard`'s initializer requires an `executor block` which performs the task, once the task has done, the executor should full fill the result by calling `completion` statement. By default, `TaskBoard` will `complete()` after all tasks finished and no more tasks activated, this will remove `TaskBoard` from `Motherboard`. Optionally, you can custom `successHandler`, `processingHandler` or `errorHandler` of `TaskBoard` via initializer's parameters.
+
+```swift
+enum LatestProductsFetchTaskBoardFactory {
+    static func get(identifier: BoardID) -> ActivatableBoard {
+        TaskBoard<LatestProductsFetchInput, LatestProductsFetchOutput>(identifier: identifier) { _, input, completion in
+            let database = ...
+
+            var query: Query = ...
+
+            switch input {
+            case let .limit(value):
+                if value > 0 {
+                    query = query.limit(to: value.intValue)
+                }
+            case let .lastUpdated(at: lastDate):
+                let timestamp = Timestamp(date: lastDate)
+                query = query.whereField(.updatedAt, isGreaterThan: timestamp)
+            }
+
+            query.getDocuments { snapshot, error in
+                if let err = error {
+                    completion(.failure(err))
+                } else {
+                    let decoder = ...
+                    let products = decoder...
+                    completion(.success(.done(products)))
+                }
+            }
+        }
+        processingHandler: { $0.showDefaultLoading($0.isProcessing) }
+        errorHandler: { $0.showErrorAlert($1) }
+    }
+}
+
+```
+
+> `TaskBoard` could be activated many times, by the way, each activation will perform separated executor so many output values (corresponding to the number of activations) will be sent to its `Motherboard`.
+
+### **Use `BlockTaskBoard` for single completable activation**
+
+`BlockTaskBoard` is very similar `TaskBoard`, it's for business logic task only. The difference is:
+
+> `BlockTaskBoard` accepts `BlockTaskParameter` instead of `Input` plain value. `BlockTaskParameter` bundles `input`, `onSuccess` handler, `onProgress` handler, `onError` handler.
+
+By that way, an activation with `BlockTaskBoard` can handle result separating with other other activations on same `BlockTaskBoard` corresponding to activation's input.
+
+```swift
+enum GetLocalProductBlockTaskBoardFactory {
+    static func get(identifier: BoardID) -> ActivatableBoard {
+        BlockTaskBoard<GetLocalProductInput, GetLocalProductOutput>(identifier: identifier) { board, input, completion in
+            let database ...
+            let products = database.getProducts()
+            completion(.success(products))
+        }
+    }
+}
+```
+
+```swift
+func getProducts(by categoryID: String) {
+    let parameter = GetLocalProductTaskParameter(input: categoryID)
+        .onSuccess(target: self) { target, result in
+            target.handle(result)
+        }
+    mainboard.ioGetLocalProduct().activation.activate(with: parameter)
+}
+```
+
 ## Reference
 
 * [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
