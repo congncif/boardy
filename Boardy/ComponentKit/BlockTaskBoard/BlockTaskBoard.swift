@@ -147,10 +147,13 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         /// Tasks run independently
         case `default`
 
-        /// Only latest task will be observed, all previous pending tasks will be cancelled.
+        /// Only one latest task will be observed, all previous pending tasks will be cancelled.
         case latest
 
-        /// The first result will be returned for all pending tasks, the input of pending tasks may be not used.
+        /// Only one task run at the moment, all tasks activate while current task incomplete will be cancelled intermediately.
+        case only
+
+        /// The first result will be returned for all pending tasks, the input of the pending tasks after current task may be not used.
         case onlyResult
 
         /// Tasks run under FIFO
@@ -183,6 +186,11 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
                 // Add to pending tasks & wait current task complete
                 saveHandler(of: input, to: taskID)
                 startProgressIfNeeded(with: taskID)
+                return
+            }
+        case .only:
+            if !isCompleted {
+                input.completionHandler?(self, .cancelled)
                 return
             }
         case .default:
@@ -261,7 +269,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
                 handleResult(result, with: key)
                 completeTask(key)
             }
-        case .default, .latest:
+        case .default, .latest, .only:
             handleResult(result, with: taskID)
             completeTask(taskID)
         case .queue:
