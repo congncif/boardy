@@ -128,6 +128,8 @@ struct BlockHandler<Input, Output> {
     typealias ErrorHandler = BlockTaskParameter<Input, Output>.ErrorHandler
     typealias CompletionHandler = BlockTaskParameter<Input, Output>.CompletionHandler
 
+    let input: Input
+
     let successHandler: SuccessHandler?
     let processingHandler: ProcessingHandler?
     let errorHandler: ErrorHandler?
@@ -150,6 +152,9 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
         /// The first result will be returned for all pending tasks, the input of pending tasks may be not used.
         case onlyResult
+
+        /// Tasks run under FIFO
+        case queue
     }
 
     private let executor: Executor
@@ -173,7 +178,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         switch executingType {
         case .latest:
             cancelPendingTasksIfNeeded()
-        case .onlyResult:
+        case .onlyResult, .queue:
             if !isCompleted {
                 // Add to pending tasks & wait current task complete
                 saveHandler(of: input, to: taskID)
@@ -193,8 +198,8 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private func saveHandler(of input: InputType, to taskID: String) {
-        let handler = BlockHandler<Input, Output>(successHandler: input.successHandler, processingHandler: input.processingHandler, errorHandler: input.errorHandler, completionHandler: input.completionHandler)
-        setHandler(handler, forKey: taskID)
+        let handler = BlockHandler<Input, Output>(input: input.input, successHandler: input.successHandler, processingHandler: input.processingHandler, errorHandler: input.errorHandler, completionHandler: input.completionHandler)
+        appendNewTask(taskID: taskID, handler: handler)
     }
 
     private func startProgressIfNeeded(with taskID: String) {
@@ -226,7 +231,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         }
 
         if getHandler(forKey: taskID) != nil {
-            setHandler(nil, forKey: taskID)
+            removeTask(taskID: taskID)
         }
     }
 
@@ -259,10 +264,25 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         case .default, .latest:
             handleResult(result, with: taskID)
             completeTask(taskID)
+        case .queue:
+            handleResult(result, with: taskID)
+            completeTask(taskID)
+
+            guard let info = getFirstTaskInfo() else {
+                return // All tasks done
+            }
+
+            let nextID = info.taskID
+            let nextInput = info.handler.input
+            execute(input: nextInput) { [unowned self] nextResult in
+                self.finishExecuting(taskID: nextID, result: nextResult)
+            }
         }
 
-        if isCompleted {
-            complete()
+        defer {
+            if isCompleted {
+                complete()
+            }
         }
     }
 
@@ -273,17 +293,38 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     // MARK: - Access shared data
 
     private var completions: [String: BlockHandler<Input, Output>] = [:]
+    private var taskIDs: [String] = []
+
     private let completionQueue = DispatchQueue(label: "boardy.block-task-board.queue", attributes: .concurrent)
 
-    private func setHandler(_ handler: BlockHandler<Input, Output>?, forKey key: String) {
-        completionQueue.async(flags: .barrier) { [unowned self] in
-            self.completions[key] = handler
+    private func removeTask(taskID: String) {
+        completionQueue.sync { [weak self] in
+            guard let self = self else { return }
+            self.taskIDs.removeAll { $0 == taskID }
+            self.completions.removeValue(forKey: taskID)
+        }
+    }
+
+    private func appendNewTask(taskID: String, handler: BlockHandler<Input, Output>) {
+        completionQueue.sync { [weak self] in
+            guard let self = self else { return }
+            self.taskIDs.append(taskID)
+            self.completions[taskID] = handler
         }
     }
 
     private func getHandler(forKey key: String) -> BlockHandler<Input, Output>? {
         completionQueue.sync {
             completions[key]
+        }
+    }
+
+    private func getFirstTaskInfo() -> (taskID: String, handler: BlockHandler<Input, Output>)? {
+        completionQueue.sync {
+            guard let firstID = taskIDs.first, let handler = completions[firstID] else {
+                return nil
+            }
+            return (firstID, handler)
         }
     }
 
