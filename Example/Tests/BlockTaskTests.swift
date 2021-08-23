@@ -21,7 +21,7 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testBlockTask() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task") { _, input, completion in
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .onlyResult) { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
@@ -32,24 +32,28 @@ class BlockTaskTests: XCTestCase {
         let expectation = self.expectation(description: "block-task-expectation")
         var result: String?
         let input: String = "ABC"
+        var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
             .onSuccess { _, output in
                 result = output
             }
-            .onCompletion { _ in
+            .onCompletion { newStatus in
+                status = newStatus
                 expectation.fulfill()
             }
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
         let input2: String = "ABC2"
+        var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
             .onSuccess { _, output in
                 result2 = output
             }
-            .onCompletion { _ in
+            .onCompletion { newStatus in
+                status2 = newStatus
                 expectation2.fulfill()
             }
 
@@ -58,7 +62,108 @@ class BlockTaskTests: XCTestCase {
 
         waitForExpectations(timeout: 3, handler: nil)
 
+        XCTAssertEqual(status, .done)
         XCTAssertEqual(result, input)
+        
+        XCTAssertEqual(status2, .done)
+        XCTAssertEqual(result2, input)
+    }
+    
+    func testBlockTaskLatest() throws {
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .latest) { _, input, completion in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                completion(.success(input))
+            }
+        }
+
+        motherboard.installBoard(blockTask)
+
+        let expectation = self.expectation(description: "block-task-expectation")
+        var result: String?
+        let input: String = "ABC"
+        var status: TaskCompletionStatus?
+
+        let parameter = BlockTaskParameter<String, String>(input: input)
+            .onSuccess { _, output in
+                result = output
+            }
+            .onCompletion { newStatus in
+                status = newStatus
+                expectation.fulfill()
+            }
+
+        let expectation2 = self.expectation(description: "block-task-expectation-2")
+        var result2: String?
+        let input2: String = "ABC2"
+        var status2: TaskCompletionStatus?
+
+        let parameter2 = BlockTaskParameter<String, String>(input: input2)
+            .onSuccess { _, output in
+                result2 = output
+            }
+            .onCompletion { newStatus in
+                status2 = newStatus
+                expectation2.fulfill()
+            }
+
+        motherboard.activateBoard(.target("block-task", parameter))
+        motherboard.activateBoard(.target("block-task", parameter2))
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertEqual(status, .cancelled)
+        XCTAssertNil(result)
+        
+        XCTAssertEqual(status2, .done)
+        XCTAssertEqual(result2, input2)
+    }
+    
+    func testBlockTaskDefault() throws {
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default) { _, input, completion in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                completion(.success(input))
+            }
+        }
+
+        motherboard.installBoard(blockTask)
+
+        let expectation = self.expectation(description: "block-task-expectation")
+        var result: String?
+        let input: String = "ABC"
+        var status: TaskCompletionStatus?
+
+        let parameter = BlockTaskParameter<String, String>(input: input)
+            .onSuccess { _, output in
+                result = output
+            }
+            .onCompletion { newStatus in
+                status = newStatus
+                expectation.fulfill()
+            }
+
+        let expectation2 = self.expectation(description: "block-task-expectation-2")
+        var result2: String?
+        let input2: String = "ABC2"
+        var status2: TaskCompletionStatus?
+
+        let parameter2 = BlockTaskParameter<String, String>(input: input2)
+            .onSuccess { _, output in
+                result2 = output
+            }
+            .onCompletion { newStatus in
+                status2 = newStatus
+                expectation2.fulfill()
+            }
+
+        motherboard.activateBoard(.target("block-task", parameter))
+        motherboard.activateBoard(.target("block-task", parameter2))
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertEqual(status, .done)
+        XCTAssertEqual(result, input)
+        
+        XCTAssertEqual(status2, .done)
         XCTAssertEqual(result2, input2)
     }
 }

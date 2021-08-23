@@ -12,7 +12,7 @@ public final class BlockTaskParameter<Input, Output> {
         self.input = input
     }
 
-    public func onSuccess(_ handler: BlockTaskBoard<Input, Output>.SuccessHandler?) -> Self {
+    public func onSuccess(_ handler: SuccessHandler?) -> Self {
         successHandler = handler
         return self
     }
@@ -34,7 +34,7 @@ public final class BlockTaskParameter<Input, Output> {
         }
     }
 
-    public func onProcessing(_ handler: BlockTaskBoard<Input, Output>.ProcessingHandler?) -> Self {
+    public func onProcessing(_ handler: ProcessingHandler?) -> Self {
         processingHandler = handler
         return self
     }
@@ -56,7 +56,7 @@ public final class BlockTaskParameter<Input, Output> {
         }
     }
 
-    public func onError(_ handler: BlockTaskBoard<Input, Output>.ErrorHandler?) -> Self {
+    public func onError(_ handler: ErrorHandler?) -> Self {
         errorHandler = handler
         return self
     }
@@ -78,32 +78,42 @@ public final class BlockTaskParameter<Input, Output> {
         }
     }
 
-    public func onCompletion(_ handler: BlockTaskBoard<Input, Output>.CompletionHandler?) -> Self {
+    public func onCompletion(_ handler: CompletionHandler?) -> Self {
         completionHandler = handler
         return self
     }
 
-    public func onCompletion(_ handler: (() -> Void)?) -> Self {
-        completionHandler = { _ in handler?() }
+    public func onCompletion(_ handler: ((TaskCompletionStatus) -> Void)?) -> Self {
+        completionHandler = { _, status in handler?(status) }
         return self
     }
 
-    public func onCompletion<Target>(target: Target, action: ((Target) -> Void)?) -> Self {
+    public func onCompletion<Target>(target: Target, action: ((Target, TaskCompletionStatus) -> Void)?) -> Self {
         let box = ObjectBox()
         box.setObject(target)
 
-        return onCompletion { [box] in
+        return onCompletion { [box] status in
             guard let action = action, let target = box.unboxed(Target.self) else { return }
-            action(target)
+            action(target, status)
         }
     }
 
     let input: Input
 
-    var successHandler: BlockTaskBoard<Input, Output>.SuccessHandler?
-    var processingHandler: BlockTaskBoard<Input, Output>.ProcessingHandler?
-    var errorHandler: BlockTaskBoard<Input, Output>.ErrorHandler?
-    var completionHandler: BlockTaskBoard<Input, Output>.CompletionHandler?
+    var successHandler: SuccessHandler?
+    var processingHandler: ProcessingHandler?
+    var errorHandler: ErrorHandler?
+    var completionHandler: CompletionHandler?
+
+    public typealias SuccessHandler = (ActivatableBoard, Output) -> Void
+    public typealias ProcessingHandler = (ActivatableBoard, Bool) -> Void
+    public typealias ErrorHandler = (ActivatableBoard, Error) -> Void
+    public typealias CompletionHandler = (ActivatableBoard, TaskCompletionStatus) -> Void
+}
+
+public enum TaskCompletionStatus {
+    case done
+    case cancelled
 }
 
 extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
@@ -113,10 +123,15 @@ extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
 }
 
 struct BlockHandler<Input, Output> {
-    let successHandler: BlockTaskBoard<Input, Output>.SuccessHandler?
-    let processingHandler: BlockTaskBoard<Input, Output>.ProcessingHandler?
-    let errorHandler: BlockTaskBoard<Input, Output>.ErrorHandler?
-    let completionHandler: BlockTaskBoard<Input, Output>.CompletionHandler?
+    typealias SuccessHandler = BlockTaskParameter<Input, Output>.SuccessHandler
+    typealias ProcessingHandler = BlockTaskParameter<Input, Output>.ProcessingHandler
+    typealias ErrorHandler = BlockTaskParameter<Input, Output>.ErrorHandler
+    typealias CompletionHandler = BlockTaskParameter<Input, Output>.CompletionHandler
+
+    let successHandler: SuccessHandler?
+    let processingHandler: ProcessingHandler?
+    let errorHandler: ErrorHandler?
+    let completionHandler: CompletionHandler?
 }
 
 public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
@@ -126,60 +141,128 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
     public typealias Executor = (BlockTaskBoard<Input, Output>, Input, @escaping ExecutorCompletion) -> Void
 
-    public typealias SuccessHandler = (BlockTaskBoard<Input, Output>, Output) -> Void
-    public typealias ProcessingHandler = (BlockTaskBoard<Input, Output>, Bool) -> Void
-    public typealias ErrorHandler = (BlockTaskBoard<Input, Output>, Error) -> Void
-    public typealias CompletionHandler = (BlockTaskBoard<Input, Output>) -> Void
+    public enum ExecutingType {
+        /// Tasks run independently
+        case `default`
+
+        /// Only latest task will be observed, all previous pending tasks will be cancelled.
+        case latest
+
+        /// The first result will be returned for all pending tasks, the input of pending tasks may be not used.
+        case onlyResult
+    }
 
     private let executor: Executor
+    private let executingType: ExecutingType
 
     public init(identifier: BoardID,
+                executingType: ExecutingType = .default,
                 executor: @escaping Executor) {
         self.executor = executor
+        self.executingType = executingType
         super.init(identifier: identifier)
+    }
+
+    deinit {
+        cancelPendingTasksIfNeeded()
     }
 
     public func activate(withGuaranteedInput input: InputType) {
         let taskID = UUID().uuidString
 
+        switch executingType {
+        case .latest:
+            cancelPendingTasksIfNeeded()
+        case .onlyResult:
+            if !isCompleted {
+                // Add to pending tasks & wait current task complete
+                saveHandler(of: input, to: taskID)
+                startProgressIfNeeded(with: taskID)
+                return
+            }
+        case .default:
+            break
+        }
+
+        saveHandler(of: input, to: taskID)
+        startProgressIfNeeded(with: taskID)
+
+        execute(input: input.input) { [unowned self] result in
+            self.finishExecuting(taskID: taskID, result: result)
+        }
+    }
+
+    private func saveHandler(of input: InputType, to taskID: String) {
         let handler = BlockHandler<Input, Output>(successHandler: input.successHandler, processingHandler: input.processingHandler, errorHandler: input.errorHandler, completionHandler: input.completionHandler)
-
         setHandler(handler, forKey: taskID)
+    }
 
+    private func startProgressIfNeeded(with taskID: String) {
         if let processHandler = getHandler(forKey: taskID)?.processingHandler {
             processHandler(self, true)
         }
+    }
 
-        execute(input: input.input) { [unowned self] result in
-            defer {
-                if let processHandler = self.getHandler(forKey: taskID)?.processingHandler {
-                    processHandler(self, false)
-                }
-                if let completionHandler = self.getHandler(forKey: taskID)?.completionHandler {
-                    completionHandler(self)
-                }
+    private func endProgressIfNeeded(with taskID: String) {
+        if let processHandler = getHandler(forKey: taskID)?.processingHandler {
+            processHandler(self, false)
+        }
+    }
 
-                if self.getHandler(forKey: taskID) != nil {
-                    self.setHandler(nil, forKey: taskID)
-                }
+    private func cancelPendingTasksIfNeeded() {
+        // Cancel pending tasks
+        if !isCompleted {
+            for (key, value) in completions {
+                completeTask(key, status: .cancelled)
+            }
+        }
+    }
 
-                if self.isCompleted {
-                    self.complete()
-                }
+    private func completeTask(_ taskID: String, status: TaskCompletionStatus = .done) {
+        endProgressIfNeeded(with: taskID)
+
+        if let completionHandler = getHandler(forKey: taskID)?.completionHandler {
+            completionHandler(self, status)
+        }
+
+        if getHandler(forKey: taskID) != nil {
+            setHandler(nil, forKey: taskID)
+        }
+    }
+
+    private func handleResult(_ result: Result<Output, Error>, with taskID: String) {
+        switch result {
+        case let .success(output):
+            if let successHandler = getHandler(forKey: taskID)?.successHandler {
+                successHandler(self, output)
             }
 
-            switch result {
-            case let .success(output):
-                if let successHandler = self.getHandler(forKey: taskID)?.successHandler {
-                    successHandler(self, output)
-                }
-
-                self.sendOutput(output)
-            case let .failure(error):
-                if let errorHandler = self.getHandler(forKey: taskID)?.errorHandler {
-                    errorHandler(self, error)
-                }
+            sendOutput(output)
+        case let .failure(error):
+            if let errorHandler = getHandler(forKey: taskID)?.errorHandler {
+                errorHandler(self, error)
             }
+        }
+    }
+
+    private func finishExecuting(taskID: String, result: Result<Output, Error>) {
+        switch executingType {
+        case .onlyResult:
+            handleResult(result, with: taskID)
+            completeTask(taskID)
+
+            // Complete pending tasks
+            for (key, value) in completions {
+                handleResult(result, with: key)
+                completeTask(key)
+            }
+        case .default, .latest:
+            handleResult(result, with: taskID)
+            completeTask(taskID)
+        }
+
+        if isCompleted {
+            complete()
         }
     }
 
