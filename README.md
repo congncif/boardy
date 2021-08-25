@@ -156,6 +156,17 @@ New feature component will be created, contains a *Board*, an *IOInterface*, a *
 
 ***☞ If you are using [DadFoundation](https://github.com/ifsolution/father-foundation) & [DadSDK](https://github.com/ifsolution/father-sdk) for module integration***
 
+> `DadFoundation` defines `ModulePlugin`, **ModulePlugin** is place all of module components will be initialized and it will be integrated into `MainComponent` via `DadSDK`.
+>
+> `DadSDK` provide the methods to integrate (`install`) all modules into main app and launch them in some contexts.
+>
+> `DadFoundation` & `DadSDK` are for building plugin architecture of `MainComponent`, help `MainComponent` become clean and easy to scale.
+>
+> From **Boardy 1.27+**, `DadFoundation` & `DadSDK` become the subspec of `Boardy`. So you just add below subspec to use them instead of an external pods.
+```ruby
+pod "Boardy/ModulePlugin"
+```
+
 *You might need to add a `BoardRegistration` for `Your Board` to right place in `Integration/YourModulePlugin.swift`. The place depends on your flow structure. A `Motherboard` manages a business flow, a `continuousBoard` manages a child flow.*
 
 ***☞ Otherwise, you need to add registration to BoardProducer to provide YourBoard constructor***
