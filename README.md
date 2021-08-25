@@ -64,7 +64,7 @@ pod 'Boardy/ComponentKit'
 
 ## Some useful components in Kit
 
-### **Use `TaskBoard` for a Business-Logic-Only micro-service**
+### ❖ **Use `TaskBoard` for a Business-Logic-Only micro-service**
 
 `TaskBoard` is a *Board* which perform a logic task only such as request an `URLSession` then get response, query database, update shared values, etc. These jobs usually doesn't relate UI and could be executed in background. The result after that will be sent out to its `Motherboard` to continue flow.
 
@@ -107,7 +107,7 @@ enum LatestProductsFetchTaskBoardFactory {
 
 > `TaskBoard` could be activated many times and so each activation will perform separated executor so many output values (corresponding to the number of activations) will be sent to its `Motherboard`.
 
-### **Use `BlockTaskBoard` for single completable activation**
+### ❖ **Use `BlockTaskBoard` for single completable activation**
 
 `BlockTaskBoard` is very similar `TaskBoard`, it's for business logic task only. The difference is:
 
@@ -137,6 +137,10 @@ func getProducts(by categoryID: String) {
 }
 ```
 
+### ❖ Use `FlowBoard` when you would like to create a Board with flow registrations only
+
+When you would like to have a place to combine some Boards into a single business flow, instead of creating a custom Board, you can use `FlowBoard` conveniently. All you need to do is initialize with `registration closure` and `activation closure`.
+
 ## Install template to develop feature
 
 * Clone [module template](https://github.com/congncif/module-template.git) repo
@@ -146,9 +150,9 @@ func getProducts(by categoryID: String) {
 
 ## Add a new feature
 
-Right click in **Xcode** to add *New File...* then choose `Boardy` template, enter `name` and press *Next*, choose file location and *Create*.
+Right click in **Xcode** to add *New File...* then choose **`Boardy`** template, enter `name` and press *Next*, choose file location and *Create*.
 
-New feature component will be created, contains a *Board*, an *IOInterface*, a *View Controller or Viewless Controller* with *Builder* pattern.
+New feature component will be created, contains a **Board**, an **IOInterface**, a **View Controller or Viewless Controller** with **Builder** pattern.
 
 **Boardy 1.19+** introduces `IOInterface` to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***interact in type safety***.
 
@@ -156,13 +160,13 @@ New feature component will be created, contains a *Board*, an *IOInterface*, a *
 
 ***☞ If you are using [DadFoundation](https://github.com/ifsolution/father-foundation) & [DadSDK](https://github.com/ifsolution/father-sdk) for module integration***
 
-> `DadFoundation` defines `ModulePlugin`, **ModulePlugin** is place all of module components will be initialized and it will be integrated into `MainComponent` via `DadSDK`.
+> `DadFoundation` defines `ModulePlugin`, **ModulePlugin** is place where all of module components will be initialized and it will be integrated into `MainComponent` via `DadSDK`.
 >
 > `DadSDK` provide the methods to integrate (`install`) all modules into main app and launch them in some contexts.
 >
 > `DadFoundation` & `DadSDK` are for building plugin architecture of `MainComponent`, help `MainComponent` become clean and easy to scale.
 >
-> From **Boardy 1.27+**, `DadFoundation` & `DadSDK` become the subspec of `Boardy`. So you just add below subspec to use them instead of an external pods.
+> From **Boardy 1.27+**, `DadFoundation` & `DadSDK` become the subspec of `Boardy`. So you just add below subspec to use them instead of adding external pods.
 ```ruby
 pod "Boardy/ModulePlugin"
 ```

@@ -20,7 +20,7 @@ public final class FlowBoard<Input, Output>: ContinuousBoard, GuaranteedBoard, F
 
     private let flowActivation: FlowActivation
 
-    public init(identifier: BoardID = .random(),
+    public init(identifier: BoardID,
                 motherboard: FlowMotherboard,
                 flowRegistration: FlowRegistration,
                 flowActivation: @escaping FlowActivation) {
