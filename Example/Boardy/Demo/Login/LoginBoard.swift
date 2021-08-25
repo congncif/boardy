@@ -10,8 +10,12 @@ import Boardy
 import Foundation
 import Resolver
 
-final class LoginBoard: Board, ActivatableBoard {
+final class LoginBoard: Board, ActivatableBoard, GuaranteedCommandBoard {
+    func interact(command: String) {}
+
     @LazyInjected var builder: LoginBuildable
+
+    typealias CommandType = String
 
     init() {
         super.init(identifier: .login)

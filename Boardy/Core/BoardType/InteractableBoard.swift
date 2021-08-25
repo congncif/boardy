@@ -26,21 +26,39 @@ extension InteractableBoard {
 
 public protocol GuaranteedInteractableBoard: InteractableBoard {
     /// Incoming Command type
-    associatedtype Command: BoardCommandModel
+    associatedtype BoardCommandType: BoardCommandModel
 
     /// Implement the function `interact(guaranteedCommand:)` to react with a received Command
-    func interact(guaranteedCommand: Command)
+    func interact(guaranteedCommand: BoardCommandType)
 }
 
 extension GuaranteedInteractableBoard {
     public func interact(command: BoardCommandModel) {
-        guard let dedicatedCommand = command as? Command else {
+        guard let dedicatedCommand = command as? BoardCommandType else {
             #if DEBUG
-            print("\(String(describing: self)) \n⚠️ Has sent command \(command) while expected model type is \(Command.self)")
+            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command) while expected type is \(BoardCommandType.self)")
             #endif
             return
         }
         interact(guaranteedCommand: dedicatedCommand)
+    }
+}
+
+public protocol GuaranteedCommandBoard: InteractableBoard {
+    associatedtype CommandType
+
+    func interact(command: CommandType)
+}
+
+extension GuaranteedCommandBoard {
+    public func interact(command: BoardCommandModel) {
+        guard let commandData = command.data as? CommandType else {
+            #if DEBUG
+            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command.data) while expected type is \(CommandType.self)")
+            #endif
+            return
+        }
+        interact(command: commandData)
     }
 }
 
