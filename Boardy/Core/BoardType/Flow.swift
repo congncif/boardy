@@ -106,9 +106,9 @@ extension FlowManageable {
     ) -> Self {
         let box = ObjectBox()
         box.setObject(target)
-        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: { [box] (ouput: Output) in
+        let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, guaranteedNextHandler: { [box] (output: Output) in
             if let target = box.unboxed(Target.self) {
-                handler(target, ouput)
+                handler(target, output)
             }
         })
         registerFlow(generalFlow)
@@ -251,27 +251,27 @@ public struct BoardActivateFlow: BoardFlow {
         }
     }
 
-    public init<Ouput>(
+    public init<Output>(
         matcher: @escaping (BoardOutputModel) -> Bool,
-        dedicatedNextHandler: @escaping (Ouput?) -> Void
+        dedicatedNextHandler: @escaping (Output?) -> Void
     ) {
         self.matcher = matcher
         outputNextHandler = { output in
-            let data = output.data as? Ouput
+            let data = output.data as? Output
             dedicatedNextHandler(data)
         }
     }
 
-    public init<Ouput>(
+    public init<Output>(
         matcher: @escaping (BoardOutputModel) -> Bool,
-        guaranteedNextHandler: @escaping (Ouput) -> Void
+        guaranteedNextHandler: @escaping (Output) -> Void
     ) {
         self.matcher = matcher
         outputNextHandler = { output in
-            guard let data = output.data as? Ouput else {
+            guard let data = output.data as? Output else {
                 // Guaranteed output is Silent Data Types otherwise raise an assertion.
                 guard isSilentData(output.data) else {
-                    assertionFailure("🔥 [Flow with mismatch data type] [\(output.identifier)]  Cannot convert output of board \(output.identifier) from type \(String(describing: output.data)) to type \(Ouput.self)")
+                    assertionFailure("🔥 [Flow with mismatch data type] [\(output.identifier)]  Cannot convert output of board \(output.identifier) from type \(String(describing: output.data)) to type \(Output.self)")
                     return
                 }
                 return

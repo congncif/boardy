@@ -5,8 +5,8 @@
 //  Created by FOLY on 1/26/21.
 //
 
-// import AttachExtensions
 import Foundation
+import UIKit
 
 extension NSObject: AttachableObject {}
 extension Board: AttachableObject {}

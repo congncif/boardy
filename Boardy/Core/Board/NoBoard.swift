@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public final class NoBoard: Board, ActivatableBoard {
     private let handler: ((Any?) -> Void)?
