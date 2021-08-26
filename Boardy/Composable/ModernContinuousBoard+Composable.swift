@@ -24,7 +24,7 @@ extension ModernContinuousBoard {
     @discardableResult
     public func attachComposableMotherboard<Interface>(to interface: Interface,
                                                        configurationBuilder: (FlowComposableMotherboard) -> Void) -> FlowComposableMotherboard
-        where Interface: NSObject, Interface: ComposableInterface {
+        where Interface: AttachableObject, Interface: ComposableInterface {
         let newBoard = producer.produceComposableMotherboard(identifier: identifier.appending("composable-main"), from: self)
         configurationBuilder(newBoard)
 

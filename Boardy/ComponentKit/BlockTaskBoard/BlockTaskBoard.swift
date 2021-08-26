@@ -225,7 +225,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     private func cancelPendingTasksIfNeeded() {
         // Cancel pending tasks
         if !isCompleted {
-            for (key, value) in completions {
+            for (key, _) in completions {
                 completeTask(key, status: .cancelled)
             }
         }
@@ -259,6 +259,12 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private func finishExecuting(taskID: String, result: Result<Output, Error>) {
+        defer {
+            if isCompleted {
+                complete()
+            }
+        }
+
         switch executingType {
         case .onlyResult:
             handleResult(result, with: taskID)
@@ -284,12 +290,6 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             let nextInput = info.handler.input
             execute(input: nextInput) { [unowned self] nextResult in
                 self.finishExecuting(taskID: nextID, result: nextResult)
-            }
-        }
-
-        defer {
-            if isCompleted {
-                complete()
             }
         }
     }
