@@ -40,7 +40,7 @@ public struct MainOptions {
 
     public subscript(key: Key) -> Any {
         get {
-            return values[key]
+            return values[key] as Any
         }
 
         set {

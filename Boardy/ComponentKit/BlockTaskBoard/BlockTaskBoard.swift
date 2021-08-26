@@ -271,7 +271,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             completeTask(taskID)
 
             // Complete pending tasks
-            for (key, value) in completions {
+            for (key, _) in completions {
                 handleResult(result, with: key)
                 completeTask(key)
             }
