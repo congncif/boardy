@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 extension NSObject: AttachableObject {}
+
 extension Board: AttachableObject {}
 
 // MARK: - Utility extensions
@@ -34,21 +35,5 @@ extension MotherboardType where Self: FlowManageable {
 extension Board {
     public func attach(to object: UIViewController) {
         object.attach(board: self)
-    }
-}
-
-extension UIViewController {
-    public func handleDeepLink(_ deepLink: String, handlerClub: DeepLinkHandlerClubbing) {
-        let deepLinkHandler: DeepLinkHandlingComposable
-        if let handler: DeepLinkHandlingComposable = firstAttachedObject() {
-            handler.registerHandlerClubIfNeeded(handlerClub)
-            deepLinkHandler = handler
-        } else {
-            let handler = DeepLinkHandler(handlerClubbing: handlerClub)
-            attachObject(handler)
-            deepLinkHandler = handler
-        }
-        deepLinkHandler.start(with: self)
-        deepLinkHandler.handleDeepLink(deepLink)
     }
 }

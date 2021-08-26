@@ -14,8 +14,8 @@
 		270351C125C2BD26007AF693 /* AttachableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270351C025C2BD26007AF693 /* AttachableTests.swift */; };
 		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
 		27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FD12541571C005C9027 /* FeaturedBoard.swift */; };
-		278F26CD25AD4271005BD3EC /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */; };
-		278F26CF25AD4271005BD3EC /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */; };
+		278F26CD25AD4271005BD3EC /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CC25AD4271005BD3EC /* SwiftPackageProductDependency */; };
+		278F26CF25AD4271005BD3EC /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CE25AD4271005BD3EC /* SwiftPackageProductDependency */; };
 		2792860924FE3E5A0046FDB9 /* DeepLinkAppClub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */; };
 		2792860B24FE4DA80046FDB9 /* AppMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860A24FE4DA80046FDB9 /* AppMainboard.swift */; };
 		2792860D24FE57A20046FDB9 /* HomeMainboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792860C24FE57A20046FDB9 /* HomeMainboard.swift */; };
@@ -178,9 +178,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				278F26CD25AD4271005BD3EC /* CwlPosixPreconditionTesting in Frameworks */,
+				278F26CD25AD4271005BD3EC /* BuildFile in Frameworks */,
 				1C0B003BDA9E4E1663AC13AF /* Pods_Boardy_Tests.framework in Frameworks */,
-				278F26CF25AD4271005BD3EC /* CwlPreconditionTesting in Frameworks */,
+				278F26CF25AD4271005BD3EC /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,8 +508,8 @@
 			);
 			name = Boardy_Tests;
 			packageProductDependencies = (
-				278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */,
-				278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */,
+				278F26CC25AD4271005BD3EC /* SwiftPackageProductDependency */,
+				278F26CE25AD4271005BD3EC /* SwiftPackageProductDependency */,
 			);
 			productName = Tests;
 			productReference = 607FACE51AFB9204008FA782 /* Boardy_Tests.xctest */;
@@ -547,7 +547,7 @@
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
 			packageReferences = (
-				278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */,
+				278F26CB25AD4271005BD3EC /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
 			projectDirPath = "";
@@ -597,9 +597,7 @@
 				"${BUILT_PRODUCTS_DIR}/DifferenceKit/DifferenceKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Localize-Swift/Localize_Swift.framework",
 				"${BUILT_PRODUCTS_DIR}/RIBs/RIBs.framework",
-				"${BUILT_PRODUCTS_DIR}/ReferenceStoreManager/ReferenceStoreManager.framework",
 				"${BUILT_PRODUCTS_DIR}/Resolver/Resolver.framework",
-				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxRelay/RxRelay.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SiFUtilities/SiFUtilities.framework",
@@ -613,9 +611,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DifferenceKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Localize_Swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RIBs.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReferenceStoreManager.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Resolver.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SiFUtilities.framework",
@@ -994,7 +990,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */ = {
+		278F26CB25AD4271005BD3EC /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mattgallagher/CwlPreconditionTesting.git";
 			requirement = {
@@ -1005,14 +1001,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */ = {
+		278F26CC25AD4271005BD3EC /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			package = 278F26CB25AD4271005BD3EC /* RemoteSwiftPackageReference */;
 			productName = CwlPosixPreconditionTesting;
 		};
-		278F26CE25AD4271005BD3EC /* CwlPreconditionTesting */ = {
+		278F26CE25AD4271005BD3EC /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 278F26CB25AD4271005BD3EC /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			package = 278F26CB25AD4271005BD3EC /* RemoteSwiftPackageReference */;
 			productName = CwlPreconditionTesting;
 		};
 /* End XCSwiftPackageProductDependency section */

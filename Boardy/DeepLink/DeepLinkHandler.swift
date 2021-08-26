@@ -40,12 +40,12 @@ public protocol DeepLinkHandlerRegistering {
     func registerHandlerClub(_ handlerClub: DeepLinkHandlerClubbing)
     func unregisterHandlerClub(withIdentifier identifier: String)
 
-    func registredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing?
+    func registeredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing?
 }
 
 extension DeepLinkHandlerRegistering {
     public func registerHandlerClubIfNeeded(_ handlerClub: DeepLinkHandlerClubbing) {
-        if registredHandlerClub(withIdentifier: handlerClub.identifier) == nil {
+        if registeredHandlerClub(withIdentifier: handlerClub.identifier) == nil {
             registerHandlerClub(handlerClub)
         }
     }
@@ -90,21 +90,21 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
     }
 
     public func registerHandlerClub(_ handlerClub: DeepLinkHandlerClubbing) {
-        if let currentClub = registredHandlerClub(withIdentifier: handlerClub.identifier) {
+        if let currentClub = registeredHandlerClub(withIdentifier: handlerClub.identifier) {
             assertionFailure("⛈ [\(String(describing: self))] The club \(currentClub) was already registered. Please remove it before.")
         }
         clubsRoom[handlerClub.identifier] = handlerClub
     }
 
     public func unregisterHandlerClub(withIdentifier identifier: String) {
-        if registredHandlerClub(withIdentifier: identifier) != nil {
+        if registeredHandlerClub(withIdentifier: identifier) != nil {
             clubsRoom.removeValue(forKey: identifier)
         } else {
             assertionFailure("⛈ [\(String(describing: self))] The club with identifier \(identifier) was not registered.")
         }
     }
 
-    public func registredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing? {
+    public func registeredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing? {
         clubsRoom[identifier]
     }
 

@@ -9,8 +9,13 @@
 import Boardy
 import Foundation
 import Resolver
+import UIComposable
 
-final class LoginBoard: Board, ActivatableBoard, GuaranteedCommandBoard {
+protocol XXX: UIViewController, ComposableInterface {
+    
+}
+
+final class LoginBoard: ModernContinuousBoard, ActivatableBoard, GuaranteedCommandBoard {
     func interact(command: String) {}
 
     @LazyInjected var builder: LoginBuildable
@@ -18,7 +23,7 @@ final class LoginBoard: Board, ActivatableBoard, GuaranteedCommandBoard {
     typealias CommandType = String
 
     init() {
-        super.init(identifier: .login)
+        super.init(identifier: .login, boardProducer: NoBoardProducer())
     }
 
     func activate(withOption option: Any?) {
@@ -27,6 +32,12 @@ final class LoginBoard: Board, ActivatableBoard, GuaranteedCommandBoard {
         login.modalPresentationStyle = .fullScreen
         login.modalTransitionStyle = .crossDissolve
         rootViewController.topPresentedViewController.present(login, animated: true)
+        
+        var xxx: XXX!
+        
+        xxx.attachObject(self)
+        
+        attachComposableMotherboard(to: xxx, configurationBuilder: {_ in})
     }
 }
 

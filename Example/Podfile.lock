@@ -1,26 +1,23 @@
 PODS:
-  - Boardy (1.27.0):
-    - Boardy/Default (= 1.27.0)
-  - Boardy/Attachable (1.27.0):
+  - Boardy (1.29.2):
+    - Boardy/Default (= 1.29.2)
+  - Boardy/Attachable (1.29.2):
     - Boardy/Core
-    - Boardy/DeepLink
-  - Boardy/ComponentKit (1.27.0):
+  - Boardy/ComponentKit (1.29.2):
     - Boardy/Core
-  - Boardy/Composable (1.27.0):
-    - Boardy/Core
-    - UIComposable
-  - Boardy/Core (1.27.0)
-  - Boardy/DeepLink (1.27.0):
-    - Boardy/Core
-  - Boardy/Default (1.27.0):
+  - Boardy/Composable (1.29.2):
     - Boardy/Attachable
     - Boardy/Core
-  - Boardy/ModulePlugin (1.27.0):
+    - UIComposable
+  - Boardy/Core (1.29.2)
+  - Boardy/DeepLink (1.29.2):
+    - Boardy/Attachable
     - Boardy/Core
-  - Boardy/RxStoreRef (1.27.0):
+  - Boardy/Default (1.29.2):
+    - Boardy/Attachable
     - Boardy/Core
-    - Boardy/DeepLink
-    - ReferenceStoreManager
+  - Boardy/ModulePlugin (1.29.2):
+    - Boardy/Core
   - DiffableDataSources (0.4.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
     - DifferenceKit/UIKitExtension (~> 1.1)
@@ -33,16 +30,10 @@ PODS:
   - Localize-Swift/LocalizeSwiftCore (3.2.0)
   - Localize-Swift/UIKit (3.2.0):
     - Localize-Swift/LocalizeSwiftCore
-  - ReferenceStoreManager (0.2.0):
-    - RxCocoa
-    - RxSwift
   - Resolver (1.2.1)
   - RIBs (0.9.3):
     - RxRelay (~> 6.0.0)
     - RxSwift (~> 6.0.0)
-  - RxCocoa (6.0.0):
-    - RxRelay (= 6.0.0)
-    - RxSwift (= 6.0.0)
   - RxRelay (6.0.0):
     - RxSwift (= 6.0.0)
   - RxSwift (6.0.0)
@@ -101,7 +92,6 @@ DEPENDENCIES:
   - Boardy/Composable (from `../`)
   - Boardy/DeepLink (from `../`)
   - Boardy/ModulePlugin (from `../`)
-  - Boardy/RxStoreRef (from `../`)
   - Resolver (= 1.2.1)
   - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
   - SiFUtilities
@@ -113,9 +103,7 @@ SPEC REPOS:
     - DiffableDataSources
     - DifferenceKit
     - Localize-Swift
-    - ReferenceStoreManager
     - Resolver
-    - RxCocoa
     - RxRelay
     - RxSwift
     - SiFUtilities
@@ -135,20 +123,18 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: 66c05cdf58e8c7fb882335a58dedbfec661ce0c9
+  Boardy: f92595142e7239061121c7d0cdc824f7a7e50814
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
-  ReferenceStoreManager: f9b56c7eb783179e92ba39393fff362ca4937f10
   Resolver: 764e380b2ddb26bba48c6e45ab393c968894a156
   RIBs: dd8df1129289d51ed4fec6e2127613d9eaba204e
-  RxCocoa: 3f79328fafa3645b34600f37c31e64c73ae3a80e
   RxRelay: 8d593be109c06ea850df027351beba614b012ffb
   RxSwift: c14e798c59b9f6e9a2df8fd235602e85cc044295
   SiFUtilities: 6e2b198ae66898a3ad05ec2b25a1632f570c9ac2
   UIComposable: a002bab42cc52f8f71df1282fa4432583dd8c860
   ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: e46e1bd7eee4e49475c4ae07a3d4d0cc07e4f689
+PODFILE CHECKSUM: 3c393934e29b5dc6cc239ded2ab2dd916dce117d
 
 COCOAPODS: 1.10.2

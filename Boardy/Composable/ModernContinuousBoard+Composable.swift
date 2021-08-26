@@ -11,7 +11,7 @@ import UIComposable
 extension ModernContinuousBoard {
     @discardableResult
     public func mountComposableMotherboard(to interface: ComposableInterfaceObject,
-                                           configurationBuilder: (FlowComposableMotherboard) -> Void) -> FlowComposableMotherboard {
+                                           configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }) -> FlowComposableMotherboard {
         let newBoard = producer.produceComposableMotherboard(identifier: identifier.appending("composable-main"), from: self)
         configurationBuilder(newBoard)
 
@@ -22,9 +22,8 @@ extension ModernContinuousBoard {
     }
 
     @discardableResult
-    public func attachComposableMotherboard<Interface>(to interface: Interface,
-                                                       configurationBuilder: (FlowComposableMotherboard) -> Void) -> FlowComposableMotherboard
-        where Interface: AttachableObject, Interface: ComposableInterface {
+    public func attachComposableMotherboard(to interface: AttachableObject & ComposableInterface,
+                                            configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }) -> FlowComposableMotherboard {
         let newBoard = producer.produceComposableMotherboard(identifier: identifier.appending("composable-main"), from: self)
         configurationBuilder(newBoard)
 
