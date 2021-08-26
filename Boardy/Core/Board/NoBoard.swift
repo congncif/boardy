@@ -12,7 +12,7 @@ public final class NoBoard: Board, ActivatableBoard {
     private let handler: ((Any?) -> Void)?
     private let message: String?
 
-    public init(identifier: BoardID = .random(), message: String? = nil, handler: ((Any?) -> Void)? = nil) {
+    public init(identifier: BoardID, message: String? = nil, handler: ((Any?) -> Void)? = nil) {
         self.handler = handler
         self.message = message
         super.init(identifier: identifier)

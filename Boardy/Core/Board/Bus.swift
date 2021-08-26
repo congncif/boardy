@@ -20,7 +20,11 @@ open class BusCable<Input> {
         transportHandler(input)
     }
 
-    var isValid: Bool { true }
+    public private(set) var isValid: Bool = true
+
+    public func invalidate() {
+        isValid = false
+    }
 }
 
 final class ObjectBox {
@@ -33,6 +37,11 @@ final class ObjectBox {
         } else {
             value = object
         }
+    }
+
+    func makeEmpty() {
+        object = nil
+        value = nil
     }
 
     func unboxed<Object>(_ objectType: Object.Type = Object.self) -> Object? {
@@ -55,8 +64,12 @@ public final class TargetBusCable<Target, Input>: BusCable<Input> {
         })
     }
 
-    override var isValid: Bool {
+    override public var isValid: Bool {
         !box.isEmpty
+    }
+
+    override public func invalidate() {
+        box.makeEmpty()
     }
 }
 
@@ -93,6 +106,11 @@ public extension Bus {
         connect(target: target) { target, _ in
             handler(target)
         }
+    }
+
+    func deliver(handler: @escaping (Input) -> Void) {
+        let cab = BusCable(transportHandler: handler)
+        connect(cab)
     }
 }
 

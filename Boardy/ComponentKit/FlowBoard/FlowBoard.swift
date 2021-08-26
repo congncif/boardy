@@ -29,7 +29,7 @@ public final class FlowBoard<Input, Output>: ContinuousBoard, GuaranteedBoard, F
         flowRegistration(self)
     }
 
-    public convenience init(identifier: BoardID = .random(),
+    public convenience init(identifier: BoardID,
                             boardProducer: ActivableBoardProducer,
                             flowRegistration: FlowRegistration,
                             flowActivation: @escaping FlowActivation) {
