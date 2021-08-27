@@ -57,16 +57,16 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
          drawingBoard.justPlug(in: dashboard)
          */
 
-        let headline = HeadlineBoard()
-
-        let contentBoard = getComposableMotherboard(elementBoards: [headline])
-
-        contentBoard.attachInstall(to: dashboard)
-//        contentBoard.attach(to: dashboard)
-
-        contentBoard.connect(to: dashboard)
-
-        contentBoard.activateAllBoards()
+//        let headline = HeadlineBoard()
+//
+//        let contentBoard = getComposableMotherboard(elementBoards: [headline])
+//
+//        contentBoard.attachInstall(to: dashboard)
+////        contentBoard.attach(to: dashboard)
+//
+//        contentBoard.connect(to: dashboard)
+//
+//        contentBoard.activateAllBoards()
     }
 }
 

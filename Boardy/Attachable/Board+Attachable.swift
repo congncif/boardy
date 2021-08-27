@@ -6,34 +6,21 @@
 //
 
 import Foundation
-import UIKit
 
 extension NSObject: AttachableObject {}
 
 extension Board: AttachableObject {}
 
-// MARK: - Utility extensions
+extension ModernContinuableBoard {
+    @discardableResult
+    public func attachContinuousMotherboard(to context: AttachableObject,
+                                            configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
+        let newBoard = produceContinuousMotherboard()
+        configurationBuilder(newBoard)
 
-extension UIViewController {
-    /// Install a board and keep it alive with rootObject's lifecycle.
-    public func attach(motherboard: FlowMotherboard) {
-        attachObject(motherboard)
-    }
+        newBoard.installIntoRoot(context)
+        context.attachObject(newBoard)
 
-    public func attach(board: Board) {
-        attachObject(board)
-    }
-}
-
-extension MotherboardType where Self: FlowManageable {
-    public func attachInstall(to object: UIViewController) {
-        object.attach(motherboard: self)
-        object.install(board: self)
-    }
-}
-
-extension Board {
-    public func attach(to object: UIViewController) {
-        object.attach(board: self)
+        return newBoard
     }
 }

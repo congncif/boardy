@@ -75,14 +75,6 @@ extension IdentifiableBoard {
     }
 }
 
-// MARK: - Utility extensions
-
-extension NSObject {
-    public func install(board: OriginalBoard) {
-        board.installIntoRoot(self)
-    }
-}
-
 // MARK: - CompleteAction
 
 // Special action to indicate the board completed & should be removed.

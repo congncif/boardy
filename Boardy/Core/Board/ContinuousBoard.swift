@@ -30,7 +30,9 @@ extension ContinuableBoard {
     }
 }
 
-open class ModernContinuousBoard: Board, ContinuableBoard {
+// MARK: - ModernContinuableBoard
+
+open class ModernContinuableBoard: Board, ContinuableBoard {
     public var motherboard: FlowMotherboard { internalMainboard }
 
     public let producer: ActivableBoardProducer
@@ -41,15 +43,34 @@ open class ModernContinuousBoard: Board, ContinuableBoard {
         super.init(identifier: identifier)
     }
 
-    private lazy var internalMainboard: FlowMotherboard = {
-        producer.produceContinuousMotherboard(identifier: identifier.appending("continuous-main"), from: self)
-    }()
+    private lazy var internalMainboard: FlowMotherboard = produceContinuousMotherboard()
 
     override open func installIntoRoot(_ rootObject: AnyObject) {
         super.installIntoRoot(rootObject)
         motherboard.installIntoRoot(rootObject)
     }
+
+    func produceContinuousMotherboard() -> FlowMotherboard {
+        producer.produceContinuousMotherboard(identifier: identifier.appending("continuous-main"), from: self)
+    }
 }
+
+// MARK: - ModernContinuableBoard + Continuous
+
+extension ModernContinuableBoard {
+    @discardableResult
+    public func mountContinuousMotherboard(to context: AnyObject,
+                                           configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
+        let newBoard = produceContinuousMotherboard()
+        configurationBuilder(newBoard)
+
+        newBoard.installIntoRoot(context)
+
+        return newBoard
+    }
+}
+
+// MARK: - Legacy ContinuousBoard
 
 /// A ContinuousBoard contains an internal sub-motherboard by default.
 open class ContinuousBoard: Board, ContinuableBoard {

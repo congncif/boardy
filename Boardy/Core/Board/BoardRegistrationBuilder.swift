@@ -50,15 +50,6 @@ extension Motherboard {
     }
 }
 
-extension Board {
-    public func produceContinuousMotherboard(identifier: BoardID = .random(),
-                                             externalProducer: ActivableBoardProducer = NoBoardProducer(),
-                                             @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> Motherboard {
-        let producer = createProducer(from: externalProducer, registrationsBuilder: registrationsBuilder)
-        return produceContinuousMotherboard(identifier: identifier, boardProducer: producer, elementBoards: [])
-    }
-}
-
 extension BoardProducer {
     public convenience init(externalProducer: ActivableBoardProducer = NoBoardProducer(), @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
         self.init(externalProducer: externalProducer, registrations: [])

@@ -15,7 +15,7 @@ protocol XXX: UIViewController, ComposableInterface {
     
 }
 
-final class LoginBoard: ModernContinuousBoard, ActivatableBoard, GuaranteedCommandBoard {
+final class LoginBoard: ModernContinuableBoard, ActivatableBoard, GuaranteedCommandBoard {
     func interact(command: String) {}
 
     @LazyInjected var builder: LoginBuildable
