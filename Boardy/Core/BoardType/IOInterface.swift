@@ -53,8 +53,8 @@ extension ActivatableBoard {
         BoardActivation(destinationID: destinationID, source: self)
     }
 
-    public func activation(_ destinationID: BoardID) -> BoardActivation<Any> {
-        activation(destinationID, with: Any.self)
+    public func activation(_ destinationID: BoardID) -> BoardActivation<Any?> {
+        activation(destinationID, with: Any?.self)
     }
 }
 
@@ -63,8 +63,8 @@ extension MotherboardType {
         MainboardActivation(destinationID: destinationID, mainboard: self)
     }
 
-    public func activation(_ destinationID: BoardID) -> MainboardActivation<Any> {
-        activation(destinationID, with: Any.self)
+    public func activation(_ destinationID: BoardID) -> MainboardActivation<Any?> {
+        activation(destinationID, with: Any?.self)
     }
 }
 
@@ -123,8 +123,8 @@ extension FlowManageable {
         return FlowHandler(matchedIdentifier: identifier, manager: self)
     }
 
-    public func matchedFlow(_ identifier: BoardID) -> FlowHandler<Any> {
-        matchedFlow(identifier, with: Any.self)
+    public func matchedFlow(_ identifier: BoardID) -> FlowHandler<Any?> {
+        matchedFlow(identifier, with: Any?.self)
     }
 }
 
@@ -142,7 +142,7 @@ public struct MainboardInteraction<Input>: BoardInteracting {
     let mainboard: MotherboardType
 
     public func send(command: Input) {
-        mainboard.interactWithOtherBoard(.target(destinationID, command))
+        mainboard.interactWithBoard(.target(destinationID, command))
     }
 }
 
@@ -162,8 +162,8 @@ extension ActivatableBoard {
         BoardInteraction(destinationID: destinationID, source: self)
     }
 
-    public func interaction(_ destinationID: BoardID) -> BoardInteraction<Any> {
-        interaction(destinationID, with: Any.self)
+    public func interaction(_ destinationID: BoardID) -> BoardInteraction<Any?> {
+        interaction(destinationID, with: Any?.self)
     }
 }
 
@@ -172,8 +172,8 @@ extension MotherboardType {
         MainboardInteraction(destinationID: destinationID, mainboard: self)
     }
 
-    public func interaction(_ destinationID: BoardID) -> MainboardInteraction<Any> {
-        interaction(destinationID, with: Any.self)
+    public func interaction(_ destinationID: BoardID) -> MainboardInteraction<Any?> {
+        interaction(destinationID, with: Any?.self)
     }
 }
 
