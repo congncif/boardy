@@ -16,9 +16,9 @@ protocol HeadlineBoardOutput: AnyObject {
     func receive(label: String)
 }
 
-final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
+final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedCommandBoard {
     typealias InputType = Any
-    typealias Command = BoardCommand<String>
+    typealias CommandType = String
 
     @LazyInjected var builder: HeadlineBuildable
 
@@ -46,8 +46,8 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedInteractableBoard {
         putToComposer(elementAction: .update(element: element))
     }
 
-    func interact(guaranteedCommand: Command) {
-        let value = guaranteedCommand.input
+    func interact(guaranteedCommand: CommandType) {
+        let value = guaranteedCommand
         refreshBus.transport(input: value)
     }
 }

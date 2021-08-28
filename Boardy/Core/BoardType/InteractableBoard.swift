@@ -13,7 +13,7 @@ public protocol BoardCommandModel {
 }
 
 public protocol InteractableBoard: ActivatableBoard {
-    func interact(command: BoardCommandModel)
+    func interact(command: Any?)
 }
 
 extension InteractableBoard {
@@ -24,41 +24,21 @@ extension InteractableBoard {
     }
 }
 
-public protocol GuaranteedInteractableBoard: InteractableBoard {
-    /// Incoming Command type
-    associatedtype BoardCommandType: BoardCommandModel
-
-    /// Implement the function `interact(guaranteedCommand:)` to react with a received Command
-    func interact(guaranteedCommand: BoardCommandType)
-}
-
-extension GuaranteedInteractableBoard {
-    public func interact(command: BoardCommandModel) {
-        guard let dedicatedCommand = command as? BoardCommandType else {
-            #if DEBUG
-            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command) while expected type is \(BoardCommandType.self)")
-            #endif
-            return
-        }
-        interact(guaranteedCommand: dedicatedCommand)
-    }
-}
-
 public protocol GuaranteedCommandBoard: InteractableBoard {
     associatedtype CommandType
 
-    func interact(command: CommandType)
+    func interact(guaranteedCommand: CommandType)
 }
 
 extension GuaranteedCommandBoard {
-    public func interact(command: BoardCommandModel) {
-        guard let commandData = command.data as? CommandType else {
+    public func interact(command: Any?) {
+        guard let commandData = command as? CommandType else {
             #if DEBUG
-            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command.data) while expected type is \(CommandType.self)")
+            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command) while expected type is \(CommandType.self)")
             #endif
             return
         }
-        interact(command: commandData)
+        interact(guaranteedCommand: commandData)
     }
 }
 
@@ -107,18 +87,3 @@ extension BoardCommand where Input: ExpressibleByNilLiteral {
         BoardCommand<Input>(identifier: id)
     }
 }
-
-/*
- // MARK: - InteractableBoard sending a type safe command
-
- /// For Sender Board who want to guarantee always sending a type safe command
- public protocol GuaranteedCommandSendingBoard: IdentifiableBoard {
-     associatedtype OutgoingCommand: BoardCommandModel
- }
-
- extension GuaranteedCommandSendingBoard {
-     public func sendCommand(_ command: OutgoingCommand) {
-         interactWithOtherBoard(command: command)
-     }
- }
-  */
