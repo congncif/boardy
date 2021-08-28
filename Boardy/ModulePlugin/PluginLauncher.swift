@@ -90,17 +90,17 @@ public final class PluginLauncher {
 
     public func launch(on rootObject: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
         #if DEBUG
-        if mainboard.root != nil, mainboard.root !== rootObject {
-            print("⚠️ Motherboard \(mainboard) will change root from \(mainboard.root) to \(rootObject)")
+        if mainboard.context != nil, mainboard.context !== rootObject {
+            print("⚠️ Motherboard \(mainboard) will change root from \(mainboard.context) to \(rootObject)")
         }
         #endif
 
-        mainboard.installIntoRoot(rootObject)
+        mainboard.putIntoContext(rootObject)
         action(mainboard)
     }
 
     public func activateNow(_ action: (_ mainboard: FlowMotherboard) -> Void) {
-        guard mainboard.root != nil else {
+        guard mainboard.context != nil else {
             assertionFailure("🚧 Motherboard \(mainboard) was not installed. PluginLauncher must be launched before activating modules.")
             return
         }

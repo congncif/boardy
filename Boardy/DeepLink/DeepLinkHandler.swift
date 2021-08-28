@@ -118,7 +118,7 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
 
     private func forwardHosting() {
         if let rootObject = hostingObject {
-            mainboards.forEach { $0.installIntoRoot(rootObject) }
+            mainboards.forEach { $0.putIntoContext(rootObject) }
         }
     }
 

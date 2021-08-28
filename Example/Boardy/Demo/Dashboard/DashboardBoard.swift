@@ -30,8 +30,8 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
                 print(output)
             }
             .eventuallySkipHandling()
-        
-        motherboard.registerGuaranteedFlow(matchedIdentifiers: [.headline], target: self, uniqueOutputType: String.self) { (target, output) in
+
+        motherboard.registerGuaranteedFlow(matchedIdentifiers: [.headline], target: self, uniqueOutputType: String.self) { _, output in
             print(output)
         }
     }
@@ -57,16 +57,16 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
          drawingBoard.justPlug(in: dashboard)
          */
 
-//        let headline = HeadlineBoard()
+        let headline = HeadlineBoard()
 //
-//        let contentBoard = getComposableMotherboard(elementBoards: [headline])
+        let contentBoard = produceComposableMotherboard(elementBoards: [headline])
 //
-//        contentBoard.attachInstall(to: dashboard)
-////        contentBoard.attach(to: dashboard)
-//
-//        contentBoard.connect(to: dashboard)
-//
-//        contentBoard.activateAllBoards()
+        contentBoard.putIntoContext(dashboard)
+        dashboard.attachObject(contentBoard)
+
+        contentBoard.connect(to: dashboard)
+
+        contentBoard.activateAllBoards()
     }
 }
 
@@ -83,5 +83,22 @@ extension DashboardBoard: DashboardDelegate {
         contentBoard.addBoard(featured)
 
         featured.activate(withGuaranteedInput: nil)
+    }
+}
+
+// Legacy support
+extension Board {
+    /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
+    func produceComposableMotherboard(identifier: BoardID = .random(),
+                                      boardProducer: ActivableBoardProducer = NoBoardProducer(),
+                                      elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
+        let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer, boards: elementBoards)
+        // Setup chain of actions.
+        motherboard.forwardActionFlow(to: self)
+
+        // ComposableMotherboard should forward activation flow to previous Motherboard.
+        motherboard.forwardActivationFlow(to: self)
+
+        return motherboard
     }
 }

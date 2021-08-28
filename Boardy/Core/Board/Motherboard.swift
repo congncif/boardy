@@ -67,10 +67,10 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         }
     }
 
-    override open func installIntoRoot(_ rootObject: AnyObject) {
-        super.installIntoRoot(rootObject)
+    override open func putIntoContext(_ context: AnyObject) {
+        super.putIntoContext(context)
         for board in boards {
-            board.installIntoRoot(rootObject)
+            board.putIntoContext(context)
         }
     }
 
@@ -91,8 +91,8 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         didSet {
             for board in boards {
                 board.delegate = self
-                if board.root == nil, let root = self.root {
-                    board.installIntoRoot(root)
+                if board.context == nil, let root = self.context {
+                    board.putIntoContext(root)
                 }
             }
         }

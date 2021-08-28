@@ -18,7 +18,7 @@ extension ModernContinuableBoard {
         let newBoard = produceContinuousMotherboard()
         configurationBuilder(newBoard)
 
-        newBoard.installIntoRoot(context)
+        newBoard.putIntoContext(context)
         context.attachObject(newBoard)
 
         return newBoard

@@ -21,8 +21,8 @@ open class ContinuousRIBBoard: RIBBoard {
         motherboard.forwardActionFlow(to: self)
     }
 
-    override open func installIntoRoot(_ rootObject: AnyObject) {
-        super.installIntoRoot(rootObject)
-        motherboard.installIntoRoot(rootObject)
+    override open func putIntoContext(_ rootObject: AnyObject) {
+        super.putIntoContext(rootObject)
+        motherboard.putIntoContext(rootObject)
     }
 }

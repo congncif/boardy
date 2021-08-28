@@ -45,9 +45,9 @@ open class ModernContinuableBoard: Board, ContinuableBoard {
 
     private lazy var internalMainboard: FlowMotherboard = produceContinuousMotherboard()
 
-    override open func installIntoRoot(_ rootObject: AnyObject) {
-        super.installIntoRoot(rootObject)
-        motherboard.installIntoRoot(rootObject)
+    override open func putIntoContext(_ context: AnyObject) {
+        super.putIntoContext(context)
+        motherboard.putIntoContext(context)
     }
 
     func produceContinuousMotherboard() -> FlowMotherboard {
@@ -64,7 +64,7 @@ extension ModernContinuableBoard {
         let newBoard = produceContinuousMotherboard()
         configurationBuilder(newBoard)
 
-        newBoard.installIntoRoot(context)
+        newBoard.putIntoContext(context)
 
         return newBoard
     }
@@ -90,8 +90,8 @@ open class ContinuousBoard: Board, ContinuableBoard {
         self.init(identifier: identifier, motherboard: motherboard)
     }
 
-    override open func installIntoRoot(_ rootObject: AnyObject) {
-        super.installIntoRoot(rootObject)
-        motherboard.installIntoRoot(rootObject)
+    override open func putIntoContext(_ context: AnyObject) {
+        super.putIntoContext(context)
+        motherboard.putIntoContext(context)
     }
 }

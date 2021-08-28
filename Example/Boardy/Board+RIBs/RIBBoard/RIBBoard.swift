@@ -13,12 +13,12 @@ open class RIBBoard: Board, InstallableRIBBoard {
     private lazy var placeholderRouter: PlaceholderRouting = PlaceholderBuilder().build()
 
     public var rootRouter: ViewableRouting {
-        if let internalRouter = root as? ViewableRouting {
+        if let internalRouter = context as? ViewableRouting {
             return internalRouter
-        } else if let viewController = root as? UIViewController {
+        } else if let viewController = context as? UIViewController {
             placeholderRouter.injectViewController(viewController)
 
-        } else if let window = root as? UIWindow, let rootViewController = window.rootViewController {
+        } else if let window = context as? UIWindow, let rootViewController = window.rootViewController {
             placeholderRouter.injectViewController(rootViewController)
 
         } else {
@@ -32,6 +32,6 @@ open class RIBBoard: Board, InstallableRIBBoard {
     }
 
     open func installRootRouter(_ rootRouter: ViewableRouting) {
-        installIntoRoot(rootRouter)
+        putIntoContext(rootRouter)
     }
 }

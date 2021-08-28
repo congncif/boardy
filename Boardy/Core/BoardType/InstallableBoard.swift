@@ -16,7 +16,7 @@ public protocol InstallableBoard: OriginalBoard {
 
 extension InstallableBoard {
     public var rootViewController: UIViewController {
-        guard let viewController = root as? UIViewController else {
+        guard let viewController = context as? UIViewController else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `rootViewController` because it is not set or deallocated. Make sure install \(self) into a `rootViewController` before accessing it.")
             return UIViewController()
         }
@@ -24,7 +24,7 @@ extension InstallableBoard {
     }
 
     public func installIntoRootViewController(_ rootViewController: UIViewController) {
-        installIntoRoot(rootViewController)
+        putIntoContext(rootViewController)
     }
 
     public var navigationController: UINavigationController {
@@ -62,7 +62,7 @@ public protocol WindowInstallableBoard: OriginalBoard {
 
 extension WindowInstallableBoard {
     public var window: UIWindow {
-        guard let current = root as? UIWindow else {
+        guard let current = context as? UIWindow else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `window` because it is not set or deallocated. Make sure install \(self) into a `window` before accessing it.")
             return UIWindow()
         }
@@ -70,15 +70,15 @@ extension WindowInstallableBoard {
     }
 
     public func installIntoWindow(_ window: UIWindow) {
-        installIntoRoot(window)
+        putIntoContext(window)
     }
 }
 
 extension InstallableBoard where Self: WindowInstallableBoard {
     public var rootViewController: UIViewController {
-        if let currentWindow = root as? UIWindow, let viewController = currentWindow.rootViewController {
+        if let currentWindow = context as? UIWindow, let viewController = currentWindow.rootViewController {
             return viewController
-        } else if let viewController = root as? UIViewController {
+        } else if let viewController = context as? UIViewController {
             return viewController
         } else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `rootViewController` because it is not set or deallocated. Make sure install \(self) into a `rootViewController` before accessing it.")

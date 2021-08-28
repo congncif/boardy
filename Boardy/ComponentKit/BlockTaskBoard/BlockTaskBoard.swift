@@ -200,8 +200,8 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         saveHandler(of: input, to: taskID)
         startProgressIfNeeded(with: taskID)
 
-        execute(input: input.input) { [unowned self] result in
-            self.finishExecuting(taskID: taskID, result: result)
+        execute(input: input.input) { [weak self] result in
+            self?.finishExecuting(taskID: taskID, result: result)
         }
     }
 
@@ -288,8 +288,8 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
             let nextID = info.taskID
             let nextInput = info.handler.input
-            execute(input: nextInput) { [unowned self] nextResult in
-                self.finishExecuting(taskID: nextID, result: nextResult)
+            execute(input: nextInput) { [weak self] nextResult in
+                self?.finishExecuting(taskID: nextID, result: nextResult)
             }
         }
     }

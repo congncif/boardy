@@ -29,7 +29,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
      Give root object which associated with Board.
      */
 
-    public var root: AnyObject? { rootObject }
+    public var context: AnyObject? { rootObject }
 
     /**
         Install Board into a root object. The root object will be set as an associated object with this Board. After that the Board can use some public functions which root object provided.
@@ -37,8 +37,8 @@ open class Board: IdentifiableBoard, OriginalBoard {
          - Parameter rootObject: object Board will be linked to, should be `UIViewController`, `UIWindow` or a custom object.
      */
 
-    open func installIntoRoot(_ rootObject: AnyObject) {
-        self.rootObject = rootObject
+    open func putIntoContext(_ context: AnyObject) {
+        self.rootObject = context
     }
 
     // MARK: Content watching

@@ -15,7 +15,7 @@ extension ModernContinuableBoard {
         let newBoard = produceComposableMotherboard()
         configurationBuilder(newBoard)
 
-        newBoard.installIntoRoot(interface)
+        newBoard.putIntoContext(interface)
         newBoard.connect(to: interface)
 
         return newBoard
@@ -35,7 +35,7 @@ extension ModernContinuableBoard {
         let newBoard = produceComposableMotherboard()
         configurationBuilder(newBoard)
 
-        newBoard.installIntoRoot(interface)
+        newBoard.putIntoContext(interface)
         newBoard.connect(to: interface)
         interface.attachObject(newBoard)
 
