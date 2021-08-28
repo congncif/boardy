@@ -86,6 +86,13 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
         }
     }
 
+    deinit {
+        if !isCompleted {
+            activateCount = 0
+            processingHandler(self)
+        }
+    }
+
     private func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) {
         executor(self, input, completion)
     }
