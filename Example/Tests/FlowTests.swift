@@ -21,6 +21,21 @@ final class Test3Board: Board, ActivatableBoard {
     }
 }
 
+final class OutputBoard: Board, ActivatableBoard {
+    let result: String?
+    
+    init(identifier: BoardID, result: String?) {
+        self.result = result
+        super.init(identifier: identifier)
+    }
+    
+    func activate(withOption option: Any?) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.sendToMotherboard(data: self?.result)
+        }
+    }
+}
+
 final class FlowTests: XCTestCase {
     private let testId: BoardID = "test"
     private let testId2: BoardID = "test2"
@@ -120,5 +135,25 @@ final class FlowTests: XCTestCase {
         
         testBoard.activate(withOption: nil)
         XCTAssertEqual(testBoard3.activatedCount, 1)
+    }
+    
+    func testIOFlowHandle() {
+        let expectedValue = "OUTPUT"
+        let outBoard = OutputBoard(identifier: "out-test", result: expectedValue)
+        motherboard.addBoard(outBoard)
+        
+        let expectation = self.expectation(description: "flow-test-expectation")
+        var result: String?
+        
+        (motherboard as FlowMotherboard).matchedFlow("out-test").handle { output in
+            result = output as? String
+            expectation.fulfill()
+        }
+        
+        (motherboard as FlowMotherboard).activation("out-test").activate(with: "Input" as Any)
+        
+        waitForExpectations(timeout: 2, handler: nil)
+
+        XCTAssertEqual(result, expectedValue)
     }
 }

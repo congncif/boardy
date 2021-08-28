@@ -76,12 +76,19 @@ public protocol FlowHandling {
     func addTarget<Target>(_ target: Target, action: @escaping (Target, Output) -> Void)
     func bind(to bus: Bus<Output>)
     func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output
+    func handle(_ handler: @escaping (Output) -> Void)
 }
 
 extension FlowHandling where Output == Void {
     public func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
         addTarget(target) { internalTarget, _ in
             action(internalTarget)
+        }
+    }
+
+    public func handle(_ handler: @escaping () -> Void) {
+        handle { (_: Void) in
+            handler()
         }
     }
 }
@@ -101,6 +108,13 @@ public struct FlowHandler<Output>: FlowHandling {
 
     public func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
         manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, sendOutputThrough: board)
+    }
+
+    public func handle(_ handler: @escaping (Output) -> Void) {
+        let noneTarget = NoneTarget()
+        manager.registerGuaranteedFlow(matchedIdentifiers: matchedIdentifier, target: noneTarget, handler: { _, output in
+            handler(output)
+        })
     }
 }
 
@@ -162,3 +176,5 @@ extension MotherboardType {
         interaction(destinationID, with: Any.self)
     }
 }
+
+struct NoneTarget {}

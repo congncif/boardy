@@ -33,11 +33,11 @@ final class LoginBoard: ModernContinuableBoard, ActivatableBoard, GuaranteedComm
         login.modalTransitionStyle = .crossDissolve
         rootViewController.topPresentedViewController.present(login, animated: true)
         
-        var xxx: XXX!
-        
-        xxx.attachObject(self)
-        
-        attachComposableMotherboard(to: xxx, configurationBuilder: {_ in})
+//        var xxx: XXX!
+//        
+//        xxx.attachObject(self)
+//        
+//        attachComposableMotherboard(to: xxx, configurationBuilder: {_ in})
     }
 }
 
