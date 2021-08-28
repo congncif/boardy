@@ -13,7 +13,6 @@ public final class LauncherComponent {
     private var container = BoardProducer(registrations: [])
 
     private var plugins: [ModulePlugin] = []
-    private var flowRegistrations: [(FlowMotherboard) -> Void] = []
 
     init(options: MainOptions) {
         self.options = options
@@ -38,23 +37,29 @@ public final class LauncherComponent {
         return self
     }
 
-    public func install(plugin: ModulePlugin,
-                        with flowRegistration: @escaping (FlowMotherboard) -> Void = { _ in }) -> Self {
-        if append(plugin: plugin) {
-            flowRegistrations.append(flowRegistration)
-        }
+    public func install(plugin: ModulePlugin) -> Self {
+        _ = append(plugin: plugin)
         return self
     }
 
-    public func initialize() {
-        // Load plugins
+    func loadPluginsIfNeeded() {
         plugins.forEach { $0.apply(for: self) }
+        plugins.removeAll()
+    }
 
-        let mainboard = Motherboard(boardProducer: producer)
-        flowRegistrations.forEach { $0(mainboard) }
+    func generateMainboard() -> Motherboard {
+        loadPluginsIfNeeded()
+        return Motherboard(boardProducer: producer)
+    }
 
-        // Init shared Launcher
-        PluginLauncher.sharedInstance = PluginLauncher(mainboard: mainboard)
+    /// Create & return new instance of Launcher
+    public func instantiate() -> PluginLauncher {
+        PluginLauncher(mainboard: generateMainboard())
+    }
+
+    /// Create shared instance of Launcher
+    public func initialize() {
+        PluginLauncher.sharedInstance = instantiate()
     }
 }
 
