@@ -11,7 +11,7 @@ public protocol FlowingBoard: NormalBoard {
     var motherboard: FlowMotherboard { get }
 }
 
-public final class FlowBoard<Input, Output>: ContinuousBoard, GuaranteedBoard, FlowingBoard, GuaranteedOutputSendingBoard {
+public final class FlowBoard<Input, Output>: ModernContinuableBoard, GuaranteedBoard, FlowingBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = Input
     public typealias OutputType = Output
 
@@ -21,20 +21,12 @@ public final class FlowBoard<Input, Output>: ContinuousBoard, GuaranteedBoard, F
     private let flowActivation: FlowActivation
 
     public init(identifier: BoardID,
-                motherboard: FlowMotherboard,
+                producer: ActivableBoardProducer,
                 flowRegistration: FlowRegistration,
                 flowActivation: @escaping FlowActivation) {
         self.flowActivation = flowActivation
-        super.init(identifier: identifier, motherboard: motherboard)
+        super.init(identifier: identifier, boardProducer: producer)
         flowRegistration(self)
-    }
-
-    public convenience init(identifier: BoardID,
-                            boardProducer: ActivableBoardProducer,
-                            flowRegistration: FlowRegistration,
-                            flowActivation: @escaping FlowActivation) {
-        let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
-        self.init(identifier: identifier, motherboard: motherboard, flowRegistration: flowRegistration, flowActivation: flowActivation)
     }
 
     public func activate(withGuaranteedInput input: InputType) {
