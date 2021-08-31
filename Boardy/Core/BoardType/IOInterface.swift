@@ -116,6 +116,12 @@ public struct FlowHandler<Output>: FlowHandling {
             handler(output)
         })
     }
+
+    public func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output {
+        handle { output in
+            activation.activate(with: output)
+        }
+    }
 }
 
 extension FlowManageable {

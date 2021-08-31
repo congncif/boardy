@@ -36,13 +36,22 @@ final class OutputBoard: Board, ActivatableBoard {
     }
 }
 
+final class InBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
+    typealias InputType = String
+    typealias OutputType = String
+    
+    func activate(withGuaranteedInput input: String) {
+        sendOutput(input)
+    }
+}
+
 final class FlowTests: XCTestCase {
     private let testId: BoardID = "test"
     private let testId2: BoardID = "test2"
     private let testId3: BoardID = "test3"
     
     var testBoard: TestBoard!
-    var motherboard: Motherboard!
+    var motherboard: FlowMotherboard!
     
     override func setUp() {
         super.setUp()
@@ -137,7 +146,7 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(testBoard3.activatedCount, 1)
     }
     
-    func testIOFlowHandle() {
+    func testIOFlowHandling() {
         let expectedValue = "OUTPUT"
         let outBoard = OutputBoard(identifier: "out-test", result: expectedValue)
         motherboard.addBoard(outBoard)
@@ -145,15 +154,42 @@ final class FlowTests: XCTestCase {
         let expectation = self.expectation(description: "flow-test-expectation")
         var result: String?
         
-        (motherboard as FlowMotherboard).matchedFlow("out-test").handle { output in
+        motherboard.matchedFlow("out-test").handle { output in
             result = output as? String
             expectation.fulfill()
         }
         
-        (motherboard as FlowMotherboard).activation("out-test").activate(with: "Input" as Any)
+        motherboard.activation("out-test").activate(with: "Input" as Any)
         
         waitForExpectations(timeout: 2, handler: nil)
 
         XCTAssertEqual(result, expectedValue)
+    }
+    
+    func testIOFlowNextActivation() {
+        let value = "VALUE"
+        let outBoard = OutputBoard(identifier: "out-board", result: value)
+        let inBoard = InBoard(identifier: "in-board")
+        
+        motherboard.addBoard(outBoard)
+        motherboard.addBoard(inBoard)
+        
+        XCTAssertEqual(motherboard.boards.count, 3)
+        
+        let expectation = self.expectation(description: "flow-test-expectation")
+        var result: String?
+        
+        motherboard.matchedFlow("out-board", with: String.self).activate(motherboard.activation("in-board", with: String.self))
+        
+        motherboard.matchedFlow("in-board", with: String.self).handle { output in
+            result = output
+            expectation.fulfill()
+        }
+        
+        motherboard.activation("out-board").activate()
+        
+        waitForExpectations(timeout: 3, handler: nil)
+        
+        XCTAssertEqual(result, value)
     }
 }

@@ -1,22 +1,22 @@
 PODS:
-  - Boardy (1.29.2):
-    - Boardy/Default (= 1.29.2)
-  - Boardy/Attachable (1.29.2):
+  - Boardy (1.31.3):
+    - Boardy/Default (= 1.31.3)
+  - Boardy/Attachable (1.31.3):
     - Boardy/Core
-  - Boardy/ComponentKit (1.29.2):
+  - Boardy/ComponentKit (1.31.3):
     - Boardy/Core
-  - Boardy/Composable (1.29.2):
+  - Boardy/Composable (1.31.3):
     - Boardy/Attachable
     - Boardy/Core
     - UIComposable
-  - Boardy/Core (1.29.2)
-  - Boardy/DeepLink (1.29.2):
+  - Boardy/Core (1.31.3)
+  - Boardy/DeepLink (1.31.3):
     - Boardy/Attachable
     - Boardy/Core
-  - Boardy/Default (1.29.2):
+  - Boardy/Default (1.31.3):
     - Boardy/Attachable
     - Boardy/Core
-  - Boardy/ModulePlugin (1.29.2):
+  - Boardy/ModulePlugin (1.31.3):
     - Boardy/Core
   - DiffableDataSources (0.4.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
@@ -123,7 +123,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/uber/RIBs.git
 
 SPEC CHECKSUMS:
-  Boardy: f92595142e7239061121c7d0cdc824f7a7e50814
+  Boardy: be63a1658496bb13b8fdba040cec307d3bc480ee
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232

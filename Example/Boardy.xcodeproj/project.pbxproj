@@ -15,6 +15,7 @@
 		27058AE026DA4281008FB4F6 /* BarrierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27058ADF26DA4281008FB4F6 /* BarrierTests.swift */; };
 		27547FCE25415640005C9027 /* HeadlineBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FCD25415640005C9027 /* HeadlineBoard.swift */; };
 		27547FD22541571C005C9027 /* FeaturedBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27547FD12541571C005C9027 /* FeaturedBoard.swift */; };
+		2776F43126DD0F4900680B7F /* TaskBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2776F43026DD0F4900680B7F /* TaskBoardTests.swift */; };
 		277BC12926D9EEF400BDEA8F /* AdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277BC12826D9EEF400BDEA8F /* AdapterTests.swift */; };
 		277BC12B26D9F75C00BDEA8F /* InteractableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277BC12A26D9F75C00BDEA8F /* InteractableTests.swift */; };
 		278F26CD25AD4271005BD3EC /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 278F26CC25AD4271005BD3EC /* CwlPosixPreconditionTesting */; };
@@ -98,6 +99,7 @@
 		27058ADF26DA4281008FB4F6 /* BarrierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarrierTests.swift; sourceTree = "<group>"; };
 		27547FCD25415640005C9027 /* HeadlineBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlineBoard.swift; sourceTree = "<group>"; };
 		27547FD12541571C005C9027 /* FeaturedBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBoard.swift; sourceTree = "<group>"; };
+		2776F43026DD0F4900680B7F /* TaskBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBoardTests.swift; sourceTree = "<group>"; };
 		277BC12826D9EEF400BDEA8F /* AdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterTests.swift; sourceTree = "<group>"; };
 		277BC12A26D9F75C00BDEA8F /* InteractableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractableTests.swift; sourceTree = "<group>"; };
 		2792860824FE3E5A0046FDB9 /* DeepLinkAppClub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkAppClub.swift; sourceTree = "<group>"; };
@@ -440,14 +442,15 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				607FACEB1AFB9204008FA782 /* FlowTests.swift */,
-				270351C025C2BD26007AF693 /* AttachableTests.swift */,
-				607FACE91AFB9204008FA782 /* Supporting Files */,
-				279F720B25CBC8E9000160C6 /* LifecycleTests.swift */,
-				27E40B9126CF533D00A0F634 /* BlockTaskTests.swift */,
 				277BC12826D9EEF400BDEA8F /* AdapterTests.swift */,
-				277BC12A26D9F75C00BDEA8F /* InteractableTests.swift */,
+				270351C025C2BD26007AF693 /* AttachableTests.swift */,
 				27058ADF26DA4281008FB4F6 /* BarrierTests.swift */,
+				27E40B9126CF533D00A0F634 /* BlockTaskTests.swift */,
+				607FACEB1AFB9204008FA782 /* FlowTests.swift */,
+				277BC12A26D9F75C00BDEA8F /* InteractableTests.swift */,
+				279F720B25CBC8E9000160C6 /* LifecycleTests.swift */,
+				2776F43026DD0F4900680B7F /* TaskBoardTests.swift */,
+				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -746,6 +749,7 @@
 				27058AE026DA4281008FB4F6 /* BarrierTests.swift in Sources */,
 				277BC12926D9EEF400BDEA8F /* AdapterTests.swift in Sources */,
 				277BC12B26D9F75C00BDEA8F /* InteractableTests.swift in Sources */,
+				2776F43126DD0F4900680B7F /* TaskBoardTests.swift in Sources */,
 				279F720C25CBC8E9000160C6 /* LifecycleTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* FlowTests.swift in Sources */,
 			);
