@@ -35,7 +35,6 @@ class TaskBoardTests: XCTestCase {
         processingHandler: { board in isLoading = board.isProcessing }
         completionHandler: { board in
             if board.isCompleted {
-                board.complete()
                 expectation.fulfill()
             }
         }

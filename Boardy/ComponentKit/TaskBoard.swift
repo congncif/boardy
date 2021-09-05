@@ -42,7 +42,7 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
 
     public init(identifier: BoardID,
                 executor: @escaping Executor,
-                successHandler: @escaping SuccessHandler = { $0.sendOutput($1) },
+                successHandler: @escaping SuccessHandler = { _, _ in },
                 processingHandler: @escaping ProcessingHandler = { _ in },
                 errorHandler: @escaping ErrorHandler = { board, error in
                     DispatchQueue.main.async { [weak board] in
@@ -53,9 +53,7 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
                         viewController.present(alert, animated: true)
                     }
                 },
-                completionHandler: @escaping CompletionHandler = {
-                    if $0.isCompleted { $0.complete() }
-                }) {
+                completionHandler: @escaping CompletionHandler = { _ in }) {
         self.executor = executor
         self.successHandler = successHandler
         self.processingHandler = processingHandler
@@ -75,11 +73,17 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
                 self.decreaseActivateCount()
                 self.processingHandler(self)
                 self.completionHandler(self)
+
+                if self.isCompleted {
+                    self.complete()
+                }
             }
 
             switch result {
             case let .success(output):
                 self.successHandler(self, output)
+                
+                self.sendOutput(output)
             case let .failure(error):
                 self.errorHandler(self, error)
             }
