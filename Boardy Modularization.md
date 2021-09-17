@@ -12,7 +12,7 @@ A `IOInterface` contains 2 flies:
 
 Each of micro-service has a `IOInterface`. **Boardy Modularization** provides templates to create `IOInterface` easily.
 
-## Module Plugin
+## ModulePlugin
 
 Each application has a main component where all things integrated with each other. `Main Component` will soon become cumbersome and difficult to manage as the application expands. **Boardy** provides a plugin mechanism for the integration of micro-service modules. Using the plugin module, adding or replacing a module is extremely simple, make your application become scalable.
 
@@ -77,7 +77,7 @@ extension PaymentModulePlugin {
 
 ⭐️ Your Module might have multiple entry points, that is when you should define more `ServiceType` and provide correct destination Board in `func apply(for main: MainComponent)`.
 
-⭐️ In addition to defining the entry point, **ModulePlugin** is the best place to allocate internal instance of your module and resolve dependencies to external services.
+⭐️ In addition to defining the entry point, **ModulePlugin** is the best place to allocate internal instances of your module and resolve dependencies to external services.
 
 >Module Plugin will be integrated into the app through the `PluginLauncher`, which will be presented in the following section.
 

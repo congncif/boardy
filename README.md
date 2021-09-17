@@ -240,6 +240,7 @@ func sendCustomEvent(value: String) {
 ## Reference
 
 * [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
+* [Boardy Modularization](Boardy%20Modularization.md)
 
 ## Author
 
