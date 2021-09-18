@@ -79,6 +79,20 @@ public protocol FlowHandling {
     func handle(_ handler: @escaping (Output) -> Void)
 }
 
+extension FlowHandling {
+    public func bind(to bus: Bus<Output?>) {
+        handle { [weak bus] output in
+            bus?.transport(input: output)
+        }
+    }
+
+    public func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output? {
+        handle { [weak board] output in
+            board?.sendOutput(output)
+        }
+    }
+}
+
 extension FlowHandling where Output == Void {
     public func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
         addTarget(target) { internalTarget, _ in
