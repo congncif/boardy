@@ -45,12 +45,18 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
                 successHandler: @escaping SuccessHandler = { _, _ in },
                 processingHandler: @escaping ProcessingHandler = { _ in },
                 errorHandler: @escaping ErrorHandler = { board, error in
-                    DispatchQueue.main.async { [weak board] in
-                        guard let board = board, board.context != nil else { return }
-                        let viewController = board.rootViewController.presentedViewController ?? board.rootViewController
+                    guard board.context != nil else { return }
+
+                    // Get top view controller
+                    var topViewController = board.rootViewController
+                    while let viewController = topViewController.presentedViewController {
+                        topViewController = viewController
+                    }
+
+                    DispatchQueue.main.async { [weak topViewController] in
                         let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
-                        viewController.present(alert, animated: true)
+                        topViewController?.present(alert, animated: true)
                     }
                 },
                 completionHandler: @escaping CompletionHandler = { _ in }) {
@@ -82,7 +88,7 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
             switch result {
             case let .success(output):
                 self.successHandler(self, output)
-                
+
                 self.sendOutput(output)
             case let .failure(error):
                 self.errorHandler(self, error)
