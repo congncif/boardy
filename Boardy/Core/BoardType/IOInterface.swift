@@ -77,6 +77,7 @@ public protocol FlowHandling {
     func bind(to bus: Bus<Output>)
     func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output
     func handle(_ handler: @escaping (Output) -> Void)
+    func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output
 }
 
 extension FlowHandling {

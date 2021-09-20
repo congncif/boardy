@@ -154,7 +154,7 @@ Right click in **Xcode** to add *New File...* then choose **`Boardy`** template,
 
 New feature component will be created, contains a **Board**, an **IOInterface**, a **View Controller or Viewless Controller** with **Builder** pattern.
 
-**Boardy 1.19+** introduces `IOInterface` to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***interact in type safety***.
+**Boardy 1.19+** introduces [`IOInterface`](Boardy%20Modularization.md) to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***type-safe interaction***.
 
 > Note: You need to check and update correct Input & Output Type you would like to use for Your Component in `YourInOut.swift` *(by default the Input Ouput is Optional Any)*.
 
@@ -166,7 +166,7 @@ New feature component will be created, contains a **Board**, an **IOInterface**,
 >
 > `DadFoundation` & `DadSDK` are for building plugin architecture of `MainComponent`, help `MainComponent` become clean and easy to scale.
 >
-> From **Boardy 1.27+**, `DadFoundation` & `DadSDK` become the subspec of `Boardy`. So you just add below subspec to use them instead of adding external pods.
+> From **Boardy 1.27+**, `DadFoundation` & `DadSDK` become the subspec of `Boardy` - [`ModulePlugin`](Boardy%20Modularization.md#moduleplugin). So you just add below subspec to use them instead of adding external pods.
 ```ruby
 pod "Boardy/ModulePlugin"
 ```
@@ -179,9 +179,7 @@ pod "Boardy/ModulePlugin"
 
 ```swift
 BoardRegistration(.yourFeature) { identifier in
-    YourBoard(identifier: identifier,
-              builder: YourBuilder(),
-              continuousBoard: Motherboard(identifier: identifier.appending("main")))
+    YourBoard(identifier: identifier, builder: YourBuilder())
 }
 ```
 
@@ -241,7 +239,7 @@ func sendCustomEvent(value: String) {
 
 * [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
 * [Boardy Modularization](Boardy%20Modularization.md)
-* [HelloBoardy - A demo for Boardy: Part I+II - Basic, Part III - Boardy Modularization](https://github.com/congncif/hello-boardy)
+* [HelloBoardy - A demo for Boardy: Part I+II - Basic, Part III - Boardy Modularization](https://github.com/congncif/hello-boardy/tree/master/Part-III)
 
 ## Author
 
