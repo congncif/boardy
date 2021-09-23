@@ -23,9 +23,9 @@ public protocol BoardDynamicProducer: AnyObject, ActivableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
 }
 
-extension BoardDynamicProducer {
+public extension BoardDynamicProducer {
     /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
-    public var boxed: ActivableBoardProducer {
+    var boxed: ActivableBoardProducer {
         return BoardProducerBox(producer: self)
     }
 }
@@ -69,7 +69,7 @@ public final class BoardProducer: BoardDynamicProducer {
     }
 
     public func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
-        if let registration = registrations.first { $0.identifier == identifier } {
+        if let registration = registrations.first(where: { $0.identifier == identifier }) {
             return registration.constructor(anotherIdentifier)
         } else if let board = externalProducer.matchBoard(withIdentifier: identifier, to: anotherIdentifier) {
             return board

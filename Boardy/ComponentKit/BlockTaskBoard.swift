@@ -418,7 +418,7 @@ final class ExecutionSchedulerOperation<In, Out>: Operation {
                     self?.state = .finished
                     return
                 }
-                task?.finishExecuting(taskID: taskID, result: nextResult)
+                currentTask.finishExecuting(taskID: taskID, result: nextResult)
                 self?.state = .finished
             }
         } else {
