@@ -42,3 +42,9 @@ class InteractableTests: XCTestCase {
         XCTAssertEqual(otherValue, board.cmd as? String)
     }
 }
+
+private final class TestBoard: Board, ActivatableBoard {
+    func activate(withOption option: Any?) {
+        sendToMotherboard()
+    }
+}

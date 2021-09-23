@@ -15,14 +15,14 @@ public protocol BoardActivating {
     func activate(with input: Input)
 }
 
-extension BoardActivating where Input: ExpressibleByNilLiteral {
-    public func activate() {
+public extension BoardActivating where Input: ExpressibleByNilLiteral {
+    func activate() {
         activate(with: nil)
     }
 }
 
-extension BoardActivating where Input == Void {
-    public func activate() {
+public extension BoardActivating where Input == Void {
+    func activate() {
         activate(with: ())
     }
 }
@@ -47,23 +47,23 @@ public struct BoardActivation<Input>: BoardActivating {
     }
 }
 
-extension ActivatableBoard {
+public extension ActivatableBoard {
     // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
-    public func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardActivation<Input> {
+    func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardActivation<Input> {
         BoardActivation(destinationID: destinationID, source: self)
     }
 
-    public func activation(_ destinationID: BoardID) -> BoardActivation<Any?> {
+    func activation(_ destinationID: BoardID) -> BoardActivation<Any?> {
         activation(destinationID, with: Any?.self)
     }
 }
 
-extension MotherboardType {
-    public func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardActivation<Input> {
+public extension MotherboardType {
+    func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardActivation<Input> {
         MainboardActivation(destinationID: destinationID, mainboard: self)
     }
 
-    public func activation(_ destinationID: BoardID) -> MainboardActivation<Any?> {
+    func activation(_ destinationID: BoardID) -> MainboardActivation<Any?> {
         activation(destinationID, with: Any?.self)
     }
 }
@@ -80,28 +80,28 @@ public protocol FlowHandling {
     func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output
 }
 
-extension FlowHandling {
-    public func bind(to bus: Bus<Output?>) {
+public extension FlowHandling {
+    func bind(to bus: Bus<Output?>) {
         handle { [weak bus] output in
             bus?.transport(input: output)
         }
     }
 
-    public func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output? {
+    func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output? {
         handle { [weak board] output in
             board?.sendOutput(output)
         }
     }
 }
 
-extension FlowHandling where Output == Void {
-    public func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
+public extension FlowHandling where Output == Void {
+    func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
         addTarget(target) { internalTarget, _ in
             action(internalTarget)
         }
     }
 
-    public func handle(_ handler: @escaping () -> Void) {
+    func handle(_ handler: @escaping () -> Void) {
         handle { (_: Void) in
             handler()
         }
@@ -139,13 +139,59 @@ public struct FlowHandler<Output>: FlowHandling {
     }
 }
 
-extension FlowManageable {
-    public func matchedFlow<Output>(_ identifier: BoardID, with outputType: Output.Type) -> FlowHandler<Output> {
-        return FlowHandler(matchedIdentifier: identifier, manager: self)
+public struct CompletionFlowHandler {
+    let matchedIdentifier: BoardID
+    let manager: FlowManageable
+
+    public func handle(_ handler: @escaping () -> Void) {
+        manager.registerGeneralFlow { (output: CompleteAction) in
+            if output.identifier == matchedIdentifier {
+                handler()
+            }
+        }
     }
 
-    public func matchedFlow(_ identifier: BoardID) -> FlowHandler<Any?> {
+    public func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
+        manager.registerGeneralFlow(target: target) { (target, output: CompleteAction) in
+            if output.identifier == matchedIdentifier {
+                action(target)
+            }
+        }
+    }
+}
+
+public struct ActionFlowHandler<Action: BoardFlowAction> {
+    let matchedIdentifier: BoardID
+    let manager: FlowManageable
+
+    public func handle(_ handler: @escaping (Action) -> Void) {
+        manager.registerGeneralFlow { (output: Action) in
+            handler(output)
+        }
+    }
+
+    public func addTarget<Target>(_ target: Target, action: @escaping (Target, Action) -> Void) {
+        manager.registerGeneralFlow(target: target) { (target, output: Action) in
+            action(target, output)
+        }
+    }
+}
+
+public extension FlowManageable {
+    func matchedFlow<Output>(_ identifier: BoardID, with outputType: Output.Type) -> FlowHandler<Output> {
+        FlowHandler(matchedIdentifier: identifier, manager: self)
+    }
+
+    func matchedFlow(_ identifier: BoardID) -> FlowHandler<Any?> {
         matchedFlow(identifier, with: Any?.self)
+    }
+
+    func completionFlow(_ identifier: BoardID) -> CompletionFlowHandler {
+        CompletionFlowHandler(matchedIdentifier: identifier, manager: self)
+    }
+
+    func actionFlow<Action: BoardFlowAction>(_ identifier: BoardID, with actionType: Action.Type) -> ActionFlowHandler<Action> {
+        ActionFlowHandler(matchedIdentifier: identifier, manager: self)
     }
 }
 
@@ -177,23 +223,23 @@ public struct BoardInteraction<Input>: BoardInteracting {
     }
 }
 
-extension ActivatableBoard {
+public extension ActivatableBoard {
     // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
-    public func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardInteraction<Input> {
+    func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardInteraction<Input> {
         BoardInteraction(destinationID: destinationID, source: self)
     }
 
-    public func interaction(_ destinationID: BoardID) -> BoardInteraction<Any?> {
+    func interaction(_ destinationID: BoardID) -> BoardInteraction<Any?> {
         interaction(destinationID, with: Any?.self)
     }
 }
 
-extension MotherboardType {
-    public func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardInteraction<Input> {
+public extension MotherboardType {
+    func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardInteraction<Input> {
         MainboardInteraction(destinationID: destinationID, mainboard: self)
     }
 
-    public func interaction(_ destinationID: BoardID) -> MainboardInteraction<Any?> {
+    func interaction(_ destinationID: BoardID) -> MainboardInteraction<Any?> {
         interaction(destinationID, with: Any?.self)
     }
 }

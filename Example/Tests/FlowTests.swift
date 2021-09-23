@@ -2,56 +2,13 @@ import Boardy
 import CwlPreconditionTesting
 import XCTest
 
-final class TestBoard: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {
-        sendToMotherboard()
-    }
-}
-
-final class Test2Board: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {
-        sendToMotherboard()
-    }
-}
-
-final class Test3Board: Board, ActivatableBoard {
-    var activatedCount: Int = 0
-    func activate(withOption option: Any?) {
-        activatedCount += 1
-    }
-}
-
-final class OutputBoard: Board, ActivatableBoard {
-    let result: String?
-    
-    init(identifier: BoardID, result: String?) {
-        self.result = result
-        super.init(identifier: identifier)
-    }
-    
-    func activate(withOption option: Any?) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.sendToMotherboard(data: self?.result)
-        }
-    }
-}
-
-final class InBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
-    typealias InputType = String
-    typealias OutputType = String
-    
-    func activate(withGuaranteedInput input: String) {
-        sendOutput(input)
-    }
-}
-
 final class FlowTests: XCTestCase {
     private let testId: BoardID = "test"
     private let testId2: BoardID = "test2"
     private let testId3: BoardID = "test3"
     
-    var testBoard: TestBoard!
-    var motherboard: FlowMotherboard!
+    private var testBoard: TestBoard!
+    private var motherboard: FlowMotherboard!
     
     override func setUp() {
         super.setUp()
@@ -65,7 +22,7 @@ final class FlowTests: XCTestCase {
         motherboard.resetFlows()
     }
     
-    func testChainFlow() {
+    func test_chainFlow() {
         var intResult: (FlowTests, Int)?
         var stringResult: (FlowTests, String)?
         var voidResult: (FlowTests, Any?)?
@@ -94,7 +51,7 @@ final class FlowTests: XCTestCase {
         XCTAssertNil(voidResult?.1)
     }
     
-    func testGuaranteedFlow() throws {
+    func test_guaranteedFlow() throws {
         var result: (FlowTests, String)?
         
         motherboard.registerGuaranteedFlow(matchedIdentifiers: [testId], target: self, uniqueOutputType: String.self) {
@@ -123,13 +80,13 @@ final class FlowTests: XCTestCase {
         XCTAssertFalse(assertionPassed)
     }
     
-    func testCompleteFlow() {
+    func test_completeFlow() {
         XCTAssertEqual(motherboard.boards.count, 1)
         testBoard.complete()
         XCTAssertEqual(motherboard.boards.count, 0)
     }
     
-    func testFlowSteps() {
+    func test_flowSteps() {
         let testBoard2 = Test2Board(identifier: testId2)
         let testBoard3 = Test3Board(identifier: testId3)
         
@@ -146,7 +103,7 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(testBoard3.activatedCount, 1)
     }
     
-    func testIOFlowHandling() {
+    func test_ioFlowHandling() {
         let expectedValue = "OUTPUT"
         let outBoard = OutputBoard(identifier: "out-test", result: expectedValue)
         motherboard.addBoard(outBoard)
@@ -166,7 +123,7 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(result, expectedValue)
     }
     
-    func testIOFlowNextActivation() {
+    func test_ioFlowNextActivation() {
         let value = "VALUE"
         let outBoard = OutputBoard(identifier: "out-board", result: value)
         let inBoard = InBoard(identifier: "in-board")
@@ -192,4 +149,112 @@ final class FlowTests: XCTestCase {
         
         XCTAssertEqual(result, value)
     }
+    
+    func test_ioCompletionFlow() {
+        let boardID: BoardID = "completion-board"
+        let board = CompletionBoard(identifier: boardID)
+        
+        let otherBoard = InBoard(identifier: "other-board")
+        motherboard.addBoard(board)
+        
+        let expectation = self.expectation(description: "test-expectation")
+        var result: String?
+        
+        motherboard.matchedFlow(boardID, with: String.self).handle { value in
+            result = value
+        }
+        
+        motherboard.completionFlow(boardID).handle {
+            expectation.fulfill()
+        }
+        
+        otherBoard.complete()
+        motherboard.activation(boardID, with: String.self).activate(with: "VALUE")
+        
+        waitForExpectations(timeout: 3, handler: nil)
+        
+        XCTAssertEqual(result, "VALUE")
+    }
+    
+    func test_ioActionFlow() {
+        let id: BoardID = "sut"
+        let sutBoard = SutBoard(identifier: id)
+        motherboard.addBoard(sutBoard)
+        
+        let expectation = self.expectation(description: "test-expectation")
+        var result: Action?
+        
+        motherboard.actionFlow(id, with: Action.self).handle { action in
+            result = action
+            expectation.fulfill()
+        }
+        
+        sutBoard.sendFlowAction(Action.ok)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(result, Action.ok)
+    }
+}
+
+private final class TestBoard: Board, ActivatableBoard {
+    func activate(withOption option: Any?) {
+        sendToMotherboard()
+    }
+}
+
+private final class Test2Board: Board, ActivatableBoard {
+    func activate(withOption option: Any?) {
+        sendToMotherboard()
+    }
+}
+
+private final class Test3Board: Board, ActivatableBoard {
+    var activatedCount: Int = 0
+    func activate(withOption option: Any?) {
+        activatedCount += 1
+    }
+}
+
+private final class OutputBoard: Board, ActivatableBoard {
+    let result: String?
+    
+    init(identifier: BoardID, result: String?) {
+        self.result = result
+        super.init(identifier: identifier)
+    }
+    
+    func activate(withOption option: Any?) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.sendToMotherboard(data: self?.result)
+        }
+    }
+}
+
+private final class InBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
+    typealias InputType = String
+    typealias OutputType = String
+    
+    func activate(withGuaranteedInput input: String) {
+        sendOutput(input)
+    }
+}
+
+private final class CompletionBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
+    typealias InputType = String
+    typealias OutputType = String
+    
+    func activate(withGuaranteedInput input: String) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.sendOutput(input)
+            self?.complete()
+        }
+    }
+}
+
+private class SutBoard: Board, ActivatableBoard {
+    func activate(withOption option: Any?) {}
+}
+
+private enum Action: BoardFlowAction, Equatable {
+    case ok
+    case nope
 }
