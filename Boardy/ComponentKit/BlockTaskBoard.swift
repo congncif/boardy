@@ -116,8 +116,8 @@ public enum TaskCompletionStatus {
     case cancelled
 }
 
-extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
-    public convenience init() {
+public extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
+    convenience init() {
         self.init(input: nil)
     }
 }
@@ -158,21 +158,40 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
         /// Tasks run under FIFO
         case queue
+
+        /// Schedule tasks with max concurrent operations
+        case concurrent(max: Int)
+
+        /// concurrent type with default max concurrent operation count
+        public static var concurrent: ExecutingType { .concurrent(max: 3) }
     }
 
     private let executor: Executor
     private let executingType: ExecutingType
+    private let operationQueue: OperationQueue
 
     public init(identifier: BoardID,
                 executingType: ExecutingType = .default,
                 executor: @escaping Executor) {
         self.executor = executor
         self.executingType = executingType
+        operationQueue = OperationQueue()
+        operationQueue.name = "boardy.block-task-board.operation.queue"
+        operationQueue.qualityOfService = .utility
+
+        switch executingType {
+        case let .concurrent(max):
+            operationQueue.maxConcurrentOperationCount = max
+        default:
+            break
+        }
+
         super.init(identifier: identifier)
     }
 
     deinit {
         cancelPendingTasksIfNeeded()
+        operationQueue.cancelAllOperations()
     }
 
     public func activate(withGuaranteedInput input: InputType) {
@@ -193,6 +212,13 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
                 input.completionHandler?(self, .cancelled)
                 return
             }
+        case .concurrent:
+            saveHandler(of: input, to: taskID)
+            startProgressIfNeeded(with: taskID)
+
+            let operation = ExecutionSchedulerOperation(taskID: taskID, input: input.input, taskBoard: self)
+            operationQueue.addOperation(operation)
+            return
         case .default:
             break
         }
@@ -258,7 +284,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         }
     }
 
-    private func finishExecuting(taskID: String, result: Result<Output, Error>) {
+    func finishExecuting(taskID: String, result: Result<Output, Error>) {
         defer {
             if isCompleted {
                 complete()
@@ -275,7 +301,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
                 handleResult(result, with: key)
                 completeTask(key)
             }
-        case .default, .latest, .only:
+        case .default, .latest, .only, .concurrent:
             handleResult(result, with: taskID)
             completeTask(taskID)
         case .queue:
@@ -294,7 +320,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         }
     }
 
-    private func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) {
+    func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) {
         executor(self, input, completion)
     }
 
@@ -303,10 +329,10 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     private var completions: [String: BlockHandler<Input, Output>] = [:]
     private var taskIDs: [String] = []
 
-    private let completionQueue = DispatchQueue(label: "boardy.block-task-board.queue", attributes: .concurrent)
+    private let syncQueue = DispatchQueue(label: "boardy.block-task-board.sync-queue")
 
     private func removeTask(taskID: String) {
-        completionQueue.sync { [weak self] in
+        syncQueue.sync { [weak self] in
             guard let self = self else { return }
             self.taskIDs.removeAll { $0 == taskID }
             self.completions.removeValue(forKey: taskID)
@@ -314,7 +340,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private func appendNewTask(taskID: String, handler: BlockHandler<Input, Output>) {
-        completionQueue.sync { [weak self] in
+        syncQueue.sync { [weak self] in
             guard let self = self else { return }
             self.taskIDs.append(taskID)
             self.completions[taskID] = handler
@@ -322,13 +348,13 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private func getHandler(forKey key: String) -> BlockHandler<Input, Output>? {
-        completionQueue.sync {
+        syncQueue.sync {
             completions[key]
         }
     }
 
     private func getFirstTaskInfo() -> (taskID: String, handler: BlockHandler<Input, Output>)? {
-        completionQueue.sync {
+        syncQueue.sync {
             guard let firstID = taskIDs.first, let handler = completions[firstID] else {
                 return nil
             }
@@ -337,8 +363,66 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private var isCompleted: Bool {
-        completionQueue.sync {
+        syncQueue.sync {
             completions.isEmpty
+        }
+    }
+}
+
+final class ExecutionSchedulerOperation<In, Out>: Operation {
+    private let taskID: String
+    private let input: In
+    private weak var taskBoard: BlockTaskBoard<In, Out>?
+
+    init(taskID: String, input: In, taskBoard: BlockTaskBoard<In, Out>) {
+        self.taskBoard = taskBoard
+        self.taskID = taskID
+        self.input = input
+        super.init()
+    }
+
+    enum State {
+        case ready
+        case executing
+        case finished
+    }
+
+    var state: State = .ready
+
+    override var isExecuting: Bool {
+        state == .executing
+    }
+
+    override var isFinished: Bool {
+        state == .finished
+    }
+
+    override func cancel() {
+        state = .finished
+    }
+
+    override func start() {
+        if isCancelled {
+            state = .finished
+            return
+        }
+
+        state = .executing
+        main()
+    }
+
+    override func main() {
+        if let task = taskBoard {
+            task.execute(input: input) { [weak task, weak self, taskID] nextResult in
+                guard let currentTask = task else {
+                    self?.state = .finished
+                    return
+                }
+                task?.finishExecuting(taskID: taskID, result: nextResult)
+                self?.state = .finished
+            }
+        } else {
+            state = .finished
         }
     }
 }
