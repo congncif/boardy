@@ -30,7 +30,7 @@ public protocol IdentifiableBoard: AnyObject, CustomDebugStringConvertible {
 extension IdentifiableBoard {
     /// Send a message with data attached (if available) to the motherboard.
     public func sendToMotherboard(data: Any? = nil) {
-        DebugLog.logActivator(source: self, data: data)
+        DebugLog.logActivity(source: self, data: data)
 
         #if DEBUG
         if delegate == nil && !(self is MotherboardType) {

@@ -24,7 +24,7 @@ enum DebugLog {
         #endif
     }
 
-    static func logActivator(source: IdentifiableBoard, data: Any?) {
+    static func logActivity(source: IdentifiableBoard, data: Any?) {
         #if DEBUG
         if Environment.boardyLogEnabled {
             var icon: String = "🍁"
@@ -68,6 +68,10 @@ enum DebugLog {
 
             print("\(icon) Boardy Log:")
             print("    🍀 [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
+            
+            if let motherboard = source.delegate as? IdentifiableBoard {
+                print("    🎯 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
+            }
 
             if let dest = destination {
                 print("    💐 [\(String(describing: type(of: dest)))] ➤ \(dest.rawValue)")
