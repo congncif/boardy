@@ -10,7 +10,7 @@ import Foundation
 public final class LauncherComponent {
     public let options: MainOptions
 
-    private var container = BoardProducer(registrations: [])
+    private var container = BoardProducer()
 
     private var plugins: [ModulePlugin] = []
 
@@ -49,7 +49,7 @@ public final class LauncherComponent {
 
     func generateMainboard() -> Motherboard {
         loadPluginsIfNeeded()
-        return Motherboard(boardProducer: producer)
+        return Motherboard(boardProducer: container)
     }
 
     /// Create & return new instance of Launcher
@@ -64,7 +64,7 @@ public final class LauncherComponent {
 }
 
 extension LauncherComponent: MainComponent {
-    public var producer: BoardDynamicProducer { container }
+    public var producer: BoardDynamicProducer { container.boxed }
 }
 
 public final class PluginLauncher {
@@ -78,7 +78,7 @@ public final class PluginLauncher {
 
     public static var shared: PluginLauncher {
         guard let instance = sharedInstance else {
-            fatalError("PluginLauncher must be initialized before using")
+            preconditionFailure("PluginLauncher must be initialized before using")
         }
         return instance
     }

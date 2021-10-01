@@ -19,15 +19,8 @@ extension Array: BoardRegistrationsConvertible where Element == BoardRegistratio
     public func asBoardRegistrations() -> [BoardRegistration] { self }
 }
 
-public protocol BoardDynamicProducer: AnyObject, ActivableBoardProducer {
+public protocol BoardDynamicProducer: ActivableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
-}
-
-public extension BoardDynamicProducer {
-    /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
-    var boxed: ActivableBoardProducer {
-        return BoardProducerBox(producer: self)
-    }
 }
 
 public final class BoardProducer: BoardDynamicProducer {
@@ -35,7 +28,7 @@ public final class BoardProducer: BoardDynamicProducer {
 
     private var externalProducer: ActivableBoardProducer
 
-    public init(externalProducer: ActivableBoardProducer = NoBoardProducer(), registrations: [BoardRegistration]) {
+    public init(externalProducer: ActivableBoardProducer = NoBoardProducer(), registrations: [BoardRegistration] = []) {
         self.externalProducer = externalProducer
         self.registrations = Set(registrations)
     }
@@ -79,8 +72,38 @@ public final class BoardProducer: BoardDynamicProducer {
     }
 }
 
+public extension BoardDynamicProducer where Self: AnyObject {
+    /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
+    var boxed: BoardDynamicProducer {
+        return BoardDynamicProducerBox(producer: self)
+    }
+}
+
+struct BoardDynamicProducerBox: BoardDynamicProducer {
+    weak var producer: (BoardDynamicProducer & AnyObject)?
+
+    func produceBoard(identifier: BoardID) -> ActivatableBoard? {
+        producer?.produceBoard(identifier: identifier)
+    }
+
+    func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+        producer?.matchBoard(withIdentifier: identifier, to: anotherIdentifier)
+    }
+
+    func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard) {
+        producer?.registerBoard(identifier, factory: factory)
+    }
+}
+
+public extension ActivableBoardProducer where Self: AnyObject {
+    /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
+    var boxed: ActivableBoardProducer {
+        return BoardProducerBox(producer: self)
+    }
+}
+
 struct BoardProducerBox: ActivableBoardProducer {
-    weak var producer: BoardDynamicProducer?
+    weak var producer: (ActivableBoardProducer & AnyObject)?
 
     func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         producer?.produceBoard(identifier: identifier)

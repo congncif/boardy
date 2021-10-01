@@ -53,7 +53,7 @@ extension Motherboard {
 extension BoardProducer {
     public convenience init(externalProducer: ActivableBoardProducer = NoBoardProducer(), @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
         self.init(externalProducer: externalProducer, registrations: [])
-        let registrations = registrationsBuilder(BoardProducerBox(producer: self))
+        let registrations = registrationsBuilder(BoardDynamicProducerBox(producer: self))
         for registration in registrations {
             add(registration: registration)
         }
