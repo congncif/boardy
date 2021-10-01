@@ -43,7 +43,7 @@ public final class LauncherComponent {
     }
 
     func loadPluginsIfNeeded() {
-        plugins.forEach { $0.apply(for: self) }
+        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed)) }
         plugins.removeAll()
     }
 
@@ -63,8 +63,9 @@ public final class LauncherComponent {
     }
 }
 
-extension LauncherComponent: MainComponent {
-    public var producer: BoardDynamicProducer { container.boxed }
+struct Component: MainComponent {
+    let options: MainOptions
+    let producer: BoardDynamicProducer
 }
 
 public final class PluginLauncher {
