@@ -122,6 +122,12 @@ public extension BlockTaskParameter where Input: ExpressibleByNilLiteral {
     }
 }
 
+public extension BlockTaskParameter where Input == Void {
+    convenience init() {
+        self.init(input: ())
+    }
+}
+
 struct BlockHandler<Input, Output> {
     typealias SuccessHandler = BlockTaskParameter<Input, Output>.SuccessHandler
     typealias ProcessingHandler = BlockTaskParameter<Input, Output>.ProcessingHandler
