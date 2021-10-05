@@ -51,33 +51,33 @@ public final class AdapterBoard<Destination, In, Out>: Board, GuaranteedBoard, G
     }
     
     public func board(_ board: IdentifiableBoard, didSendData data: Any?) {
-        guard let data = data as? Destination.OutputType else {
+        guard let rawData = data as? Destination.OutputType else {
             sendToMotherboard(data: data)
             return
         }
         
         if let mapper = outputMapper {
-            sendOutput(mapper(data))
+            sendOutput(mapper(rawData))
         } else {
-            sendToMotherboard(data: data)
+            sendToMotherboard(data: rawData)
         }
     }
 }
 
-extension AdapterBoard where Destination.InputType == In {
-    public convenience init(destination: Destination, outputMapper: @escaping (Destination.OutputType) -> Out) {
+public extension AdapterBoard where Destination.InputType == In {
+    convenience init(destination: Destination, outputMapper: @escaping (Destination.OutputType) -> Out) {
         self.init(destination: destination, inputMapper: { $0 }, outputMapper: outputMapper)
     }
 }
 
-extension AdapterBoard where Destination.OutputType == Out {
-    public convenience init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType) {
+public extension AdapterBoard where Destination.OutputType == Out {
+    convenience init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType) {
         self.init(destination: destination, inputMapper: inputMapper, outputMapper: { $0 })
     }
 }
 
-extension AdapterBoard where Destination.InputType == In, Destination.OutputType == Out {
-    public convenience init(destination: Destination) {
+public extension AdapterBoard where Destination.InputType == In, Destination.OutputType == Out {
+    convenience init(destination: Destination) {
         self.init(destination: destination, inputMapper: { $0 }, outputMapper: { $0 })
     }
 }
