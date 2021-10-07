@@ -137,6 +137,10 @@ public struct FlowHandler<Output>: FlowHandling {
             activation.activate(with: output)
         }
     }
+
+    public var specifications: GuaranteedOutputSpecifications<Output> {
+        return GuaranteedOutputSpecifications<Output>(identifier: matchedIdentifier, valueType: Output.self)
+    }
 }
 
 public struct CompletionFlowHandler {

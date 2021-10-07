@@ -26,9 +26,9 @@ public protocol FlowManageable: AnyObject {
     func resetFlows()
 }
 
-extension FlowManageable {
+public extension FlowManageable {
     @discardableResult
-    public func registerFlows(_ flows: [BoardFlow]) -> Self {
+    func registerFlows(_ flows: [BoardFlow]) -> Self {
         flows.forEach { [unowned self] in
             self.registerFlow($0)
         }
@@ -37,7 +37,7 @@ extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    public func registerGeneralFlow<Output>(uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Output) -> Void) -> Self {
+    func registerGeneralFlow<Output>(uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Output) -> Void) -> Self {
         let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
             guard let output = data as? Output else { return }
             nextHandler(output)
@@ -48,7 +48,7 @@ extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    public func registerGeneralFlow<Target, Output>(
+    func registerGeneralFlow<Target, Output>(
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
@@ -65,7 +65,7 @@ extension FlowManageable {
 
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Output>(
+    func registerFlow<Output>(
         matchedIdentifiers: [FlowID],
         uniqueOutputType: Output.Type = Output.self,
         nextHandler: @escaping (Output) -> Void
@@ -80,7 +80,7 @@ extension FlowManageable {
 
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Target, Output>(
+    func registerFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
@@ -98,7 +98,7 @@ extension FlowManageable {
 
     /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
-    public func registerGuaranteedFlow<Target, Output>(
+    func registerGuaranteedFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
@@ -116,7 +116,7 @@ extension FlowManageable {
     }
 
     /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
-    public func registerChainFlow<Target>(matchedIdentifiers: [FlowID], target: Target) -> ChainBoardFlow<Target> {
+    func registerChainFlow<Target>(matchedIdentifiers: [FlowID], target: Target) -> ChainBoardFlow<Target> {
         let flow = ChainBoardFlow(manager: self, target: target) {
             matchedIdentifiers.contains($0.identifier)
         }
@@ -124,17 +124,17 @@ extension FlowManageable {
     }
 }
 
-extension FlowManageable where Self: MotherboardType {
+public extension FlowManageable where Self: MotherboardType {
     /// Flow Steps will skip Silent Data Types (`BoardFlowAction`, `BoardInputModel`, `BoardCommandModel`, `CompleteAction`). So to register Flow Steps, the Board InputType can't be Silent Data Types. If you still want to handle Silent Data Types as Input of your board, you must register by regular `BoardActivateFlow`.
     @discardableResult
-    public func registerFlowSteps(_ flowSteps: [IDFlowStep]) -> Self {
+    func registerFlowSteps(_ flowSteps: [IDFlowStep]) -> Self {
         let activateFlows = flowSteps.map { flowStep in
             BoardActivateFlow(
                 matcher: { board -> Bool in
                     flowStep.source == board.identifier
                 },
                 nextHandler: { [weak self] data in
-                    // Guaranteed data is not Slient Data Types otherwise skip handling.
+                    // Guaranteed data is not Silent Data Types otherwise skip handling.
                     guard !isSilentData(data) else { return }
                     self?.activateBoard(identifier: flowStep.destination, withOption: data)
                 }
@@ -330,8 +330,8 @@ public func ->> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
 
 public typealias FlowMotherboard = MotherboardType & FlowManageable
 
-extension BoardDelegate where Self: FlowManageable {
-    public func board(_ board: IdentifiableBoard, didSendData data: Any?) {
+public extension BoardDelegate where Self: FlowManageable {
+    func board(_ board: IdentifiableBoard, didSendData data: Any?) {
         // Handle dedicated flow actions
         let output = OutputModel(identifier: board.identifier, data: data)
         flows.filter { $0.match(with: output) }.forEach { $0.doNext(with: output) }
@@ -340,14 +340,14 @@ extension BoardDelegate where Self: FlowManageable {
 
 // MARK: - Forward functions
 
-extension FlowManageable {
-    public func forwardActionFlow(to board: IdentifiableBoard) {
+public extension FlowManageable {
+    func forwardActionFlow(to board: IdentifiableBoard) {
         registerGeneralFlow { [weak board] in
             board?.sendFlowAction($0)
         }
     }
 
-    public func forwardActivationFlow(to board: IdentifiableBoard) {
+    func forwardActivationFlow(to board: IdentifiableBoard) {
         registerGeneralFlow { [weak board] in
             board?.nextToBoard(model: $0)
         }
