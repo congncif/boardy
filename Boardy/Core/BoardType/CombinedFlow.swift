@@ -119,6 +119,23 @@ public class OutputCombinedFlow: BoardFlow {
     }
 }
 
+public class OutputCombinedCollectionFlow<Value>: OutputCombinedFlow {
+    public init(specs: [GuaranteedOutputSpecifications<Value>],
+                strategy: Strategy,
+                handler: @escaping ([Value]) -> Void) {
+        let convertedHandler: ([Any]) -> Void = { values in
+            guard let result = values as? [Value] else {
+                assertionFailure("🆘 [Flow mismatch data type] \n👉 ➤ \(String(describing: Value.self))")
+                return
+            }
+
+            handler(result)
+        }
+
+        super.init(specifications: specs, strategy: strategy, handler: convertedHandler)
+    }
+}
+
 public class OutputCombined2Flow<V1, V2>: OutputCombinedFlow {
     public init(spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
@@ -276,6 +293,31 @@ public class OutputCombined5Flow<V1, V2, V3, V4, V5>: OutputCombinedFlow {
 }
 
 public extension FlowManageable {
+    @discardableResult
+    func registerCombinedFlow<Output>(_ specs: [GuaranteedOutputSpecifications<Output>],
+                                      strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
+                                      nextHandler: @escaping ([Output]) -> Void) -> Self {
+        let generalFlow = OutputCombinedCollectionFlow(specs: specs, strategy: strategy, handler: nextHandler)
+        registerFlow(generalFlow)
+        return self
+    }
+
+    @discardableResult
+    func registerCombinedFlow<Target, Output>(_ specs: [GuaranteedOutputSpecifications<Output>],
+                                              strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
+                                              target: Target,
+                                              action: @escaping (Target, [Output]) -> Void) -> Self {
+        let box = ObjectBox()
+        box.setObject(target)
+
+        let generalFlow = OutputCombinedCollectionFlow(specs: specs, strategy: strategy, handler: { [box] output in
+            guard let unboxedTarget = box.unboxed(Target.self) else { return }
+            action(unboxedTarget, output)
+        })
+        registerFlow(generalFlow)
+        return self
+    }
+
     @discardableResult
     func registerCombinedFlow<O1, O2>(_ outputSpecifications1: GuaranteedOutputSpecifications<O1>,
                                       _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
