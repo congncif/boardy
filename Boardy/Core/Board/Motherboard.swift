@@ -91,7 +91,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
         didSet {
             for board in boards {
                 board.delegate = self
-                if board.context == nil, let root = self.context {
+                if board.context == nil, let root = context {
                     board.putIntoContext(root)
                 }
             }

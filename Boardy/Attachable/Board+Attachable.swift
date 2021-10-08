@@ -11,16 +11,19 @@ extension NSObject: AttachableObject {}
 
 extension Board: AttachableObject {}
 
-extension ModernContinuableBoard {
+public extension ModernContinuableBoard {
     @discardableResult
-    public func attachContinuousMotherboard(to context: AttachableObject,
-                                            configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
-        let newBoard = produceContinuousMotherboard()
-        configurationBuilder(newBoard)
-
-        newBoard.putIntoContext(context)
+    func attachContinuousMotherboard(to context: AttachableObject,
+                                     configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
+        let newBoard = mountContinuousMotherboard(to: context, configurationBuilder: configurationBuilder)
         context.attachObject(newBoard)
+        return newBoard
+    }
 
+    @discardableResult
+    func attachContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AttachableObject, build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+        let newBoard = mountContinuousMotherboard(to: context, build: build)
+        context.attachObject(newBoard)
         return newBoard
     }
 }
