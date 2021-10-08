@@ -40,7 +40,16 @@ public struct GuaranteedOutputSpecifications<Value>: OutputSpecifications {
 }
 
 public class OutputCombinedFlow: BoardFlow {
+    public enum Strategy {
+        /// When the result is fulfilled, output values will be removed and you need to start a new batch request to get the combined value
+        case batchOneByOne
+
+        /// The output values will be kept forever in the flow manager, when the values change, a new combined result will be sent out
+        case latestForever
+    }
+
     public let specifications: [OutputSpecifications]
+    public let strategy: Strategy
 
     let handler: ([Any]) -> Void
 
@@ -51,17 +60,20 @@ public class OutputCombinedFlow: BoardFlow {
     }
 
     public init(matchedIdentifiers: [BoardID],
+                strategy: Strategy = .batchOneByOne,
                 handler: @escaping ([Any]) -> Void) {
         let specs = matchedIdentifiers.map {
             GeneralOutputSpecifications(identifier: $0)
         }
         specifications = specs
         self.handler = handler
+        self.strategy = strategy
     }
 
-    public init(specifications: [OutputSpecifications], handler: @escaping ([Any]) -> Void) {
+    public init(specifications: [OutputSpecifications], strategy: Strategy, handler: @escaping ([Any]) -> Void) {
         self.specifications = specifications
         self.handler = handler
+        self.strategy = strategy
     }
 
     private var _outputValues: [BoardID: Any] = [:]
@@ -91,8 +103,12 @@ public class OutputCombinedFlow: BoardFlow {
 
                 handler(result)
 
-                print(result)
-                _outputValues.removeAll() // clear data
+                switch self.strategy {
+                case .batchOneByOne:
+                    _outputValues.removeAll() // clear data
+                case .latestForever:
+                    break
+                }
             }
         }
     }
@@ -104,7 +120,10 @@ public class OutputCombinedFlow: BoardFlow {
 }
 
 public class OutputCombined2Flow<V1, V2>: OutputCombinedFlow {
-    public init(spec1: GuaranteedOutputSpecifications<V1>, spec2: GuaranteedOutputSpecifications<V2>, handler: @escaping (V1, V2) -> Void) {
+    public init(spec1: GuaranteedOutputSpecifications<V1>,
+                spec2: GuaranteedOutputSpecifications<V2>,
+                strategy: Strategy,
+                handler: @escaping (V1, V2) -> Void) {
         let convertedHandler: ([Any]) -> Void = { values in
             guard let v1 = values[0] as? V1 else {
                 if !isSilentData(values[0]) {
@@ -123,7 +142,7 @@ public class OutputCombined2Flow<V1, V2>: OutputCombinedFlow {
             handler(v1, v2)
         }
 
-        super.init(specifications: [spec1, spec2], handler: convertedHandler)
+        super.init(specifications: [spec1, spec2], strategy: strategy, handler: convertedHandler)
     }
 }
 
@@ -131,6 +150,7 @@ public class OutputCombined3Flow<V1, V2, V3>: OutputCombinedFlow {
     public init(spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
                 spec3: GuaranteedOutputSpecifications<V3>,
+                strategy: Strategy,
                 handler: @escaping (V1, V2, V3) -> Void) {
         let convertedHandler: ([Any]) -> Void = { values in
             guard let v1 = values[0] as? V1 else {
@@ -157,7 +177,7 @@ public class OutputCombined3Flow<V1, V2, V3>: OutputCombinedFlow {
             handler(v1, v2, v3)
         }
 
-        super.init(specifications: [spec1, spec2, spec3], handler: convertedHandler)
+        super.init(specifications: [spec1, spec2, spec3], strategy: strategy, handler: convertedHandler)
     }
 }
 
@@ -166,6 +186,7 @@ public class OutputCombined4Flow<V1, V2, V3, V4>: OutputCombinedFlow {
                 spec2: GuaranteedOutputSpecifications<V2>,
                 spec3: GuaranteedOutputSpecifications<V3>,
                 spec4: GuaranteedOutputSpecifications<V4>,
+                strategy: Strategy,
                 handler: @escaping (V1, V2, V3, V4) -> Void) {
         let convertedHandler: ([Any]) -> Void = { values in
             guard let v1 = values[0] as? V1 else {
@@ -199,7 +220,7 @@ public class OutputCombined4Flow<V1, V2, V3, V4>: OutputCombinedFlow {
             handler(v1, v2, v3, v4)
         }
 
-        super.init(specifications: [spec1, spec2, spec3, spec4], handler: convertedHandler)
+        super.init(specifications: [spec1, spec2, spec3, spec4], strategy: strategy, handler: convertedHandler)
     }
 }
 
@@ -209,6 +230,7 @@ public class OutputCombined5Flow<V1, V2, V3, V4, V5>: OutputCombinedFlow {
                 spec3: GuaranteedOutputSpecifications<V3>,
                 spec4: GuaranteedOutputSpecifications<V4>,
                 spec5: GuaranteedOutputSpecifications<V5>,
+                strategy: Strategy,
                 handler: @escaping (V1, V2, V3, V4, V5) -> Void) {
         let convertedHandler: ([Any]) -> Void = { values in
             guard let v1 = values[0] as? V1 else {
@@ -249,7 +271,7 @@ public class OutputCombined5Flow<V1, V2, V3, V4, V5>: OutputCombinedFlow {
             handler(v1, v2, v3, v4, v5)
         }
 
-        super.init(specifications: [spec1, spec2, spec3, spec4, spec5], handler: convertedHandler)
+        super.init(specifications: [spec1, spec2, spec3, spec4, spec5], strategy: strategy, handler: convertedHandler)
     }
 }
 
@@ -257,8 +279,9 @@ public extension FlowManageable {
     @discardableResult
     func registerCombinedFlow<O1, O2>(_ outputSpecifications1: GuaranteedOutputSpecifications<O1>,
                                       _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
+                                      strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                       nextHandler: @escaping (O1, O2) -> Void) -> Self {
-        let generalFlow = OutputCombined2Flow(spec1: outputSpecifications1, spec2: outputSpecifications2, handler: nextHandler)
+        let generalFlow = OutputCombined2Flow(spec1: outputSpecifications1, spec2: outputSpecifications2, strategy: strategy, handler: nextHandler)
         registerFlow(generalFlow)
         return self
     }
@@ -266,12 +289,13 @@ public extension FlowManageable {
     @discardableResult
     func registerCombinedFlow<Target, O1, O2>(_ outputSpecifications1: GuaranteedOutputSpecifications<O1>,
                                               _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
+                                              strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                               target: Target,
                                               action: @escaping (Target, O1, O2) -> Void) -> Self {
         let box = ObjectBox()
         box.setObject(target)
 
-        let generalFlow = OutputCombined2Flow(spec1: outputSpecifications1, spec2: outputSpecifications2, handler: { [box] v1, v2 in
+        let generalFlow = OutputCombined2Flow(spec1: outputSpecifications1, spec2: outputSpecifications2, strategy: strategy, handler: { [box] v1, v2 in
             guard let unboxedTarget = box.unboxed(Target.self) else { return }
             action(unboxedTarget, v1, v2)
         })
@@ -283,10 +307,12 @@ public extension FlowManageable {
     func registerCombinedFlow<O1, O2, O3>(_ outputSpecifications1: GuaranteedOutputSpecifications<O1>,
                                           _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
                                           _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
+                                          strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                           nextHandler: @escaping (O1, O2, O3) -> Void) -> Self {
         let generalFlow = OutputCombined3Flow(spec1: outputSpecifications1,
                                               spec2: outputSpecifications2,
                                               spec3: outputSpecifications3,
+                                              strategy: strategy,
                                               handler: nextHandler)
         registerFlow(generalFlow)
         return self
@@ -296,6 +322,7 @@ public extension FlowManageable {
     func registerCombinedFlow<Target, O1, O2, O3>(_ outputSpecifications1: GuaranteedOutputSpecifications<O1>,
                                                   _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
                                                   _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
+                                                  strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                                   target: Target,
                                                   action: @escaping (Target, O1, O2, O3) -> Void) -> Self {
         let box = ObjectBox()
@@ -304,6 +331,7 @@ public extension FlowManageable {
         let generalFlow = OutputCombined3Flow(spec1: outputSpecifications1,
                                               spec2: outputSpecifications2,
                                               spec3: outputSpecifications3,
+                                              strategy: strategy,
                                               handler: { [box] v1, v2, v3 in
                                                   guard let unboxedTarget = box.unboxed(Target.self) else { return }
                                                   action(unboxedTarget, v1, v2, v3)
@@ -317,11 +345,13 @@ public extension FlowManageable {
                                               _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
                                               _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
                                               _ outputSpecifications4: GuaranteedOutputSpecifications<O4>,
+                                              strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                               nextHandler: @escaping (O1, O2, O3, O4) -> Void) -> Self {
         let generalFlow = OutputCombined4Flow(spec1: outputSpecifications1,
                                               spec2: outputSpecifications2,
                                               spec3: outputSpecifications3,
                                               spec4: outputSpecifications4,
+                                              strategy: strategy,
                                               handler: nextHandler)
         registerFlow(generalFlow)
         return self
@@ -332,6 +362,7 @@ public extension FlowManageable {
                                                       _ outputSpecifications2: GuaranteedOutputSpecifications<O2>,
                                                       _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
                                                       _ outputSpecifications4: GuaranteedOutputSpecifications<O4>,
+                                                      strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                                       target: Target,
                                                       action: @escaping (Target, O1, O2, O3, O4) -> Void) -> Self {
         let box = ObjectBox()
@@ -341,6 +372,7 @@ public extension FlowManageable {
                                               spec2: outputSpecifications2,
                                               spec3: outputSpecifications3,
                                               spec4: outputSpecifications4,
+                                              strategy: strategy,
                                               handler: { [box] v1, v2, v3, v4 in
                                                   guard let unboxedTarget = box.unboxed(Target.self) else { return }
                                                   action(unboxedTarget, v1, v2, v3, v4)
@@ -355,12 +387,14 @@ public extension FlowManageable {
                                                   _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
                                                   _ outputSpecifications4: GuaranteedOutputSpecifications<O4>,
                                                   _ outputSpecifications5: GuaranteedOutputSpecifications<O5>,
+                                                  strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                                   nextHandler: @escaping (O1, O2, O3, O4, O5) -> Void) -> Self {
         let generalFlow = OutputCombined5Flow(spec1: outputSpecifications1,
                                               spec2: outputSpecifications2,
                                               spec3: outputSpecifications3,
                                               spec4: outputSpecifications4,
                                               spec5: outputSpecifications5,
+                                              strategy: strategy,
                                               handler: nextHandler)
         registerFlow(generalFlow)
         return self
@@ -372,6 +406,7 @@ public extension FlowManageable {
                                                           _ outputSpecifications3: GuaranteedOutputSpecifications<O3>,
                                                           _ outputSpecifications4: GuaranteedOutputSpecifications<O4>,
                                                           _ outputSpecifications5: GuaranteedOutputSpecifications<O5>,
+                                                          strategy: OutputCombinedFlow.Strategy = .batchOneByOne,
                                                           target: Target,
                                                           action: @escaping (Target, O1, O2, O3, O4, O5) -> Void) -> Self {
         let box = ObjectBox()
@@ -382,6 +417,7 @@ public extension FlowManageable {
                                               spec3: outputSpecifications3,
                                               spec4: outputSpecifications4,
                                               spec5: outputSpecifications5,
+                                              strategy: strategy,
                                               handler: { [box] v1, v2, v3, v4, v5 in
                                                   guard let unboxedTarget = box.unboxed(Target.self) else { return }
                                                   action(unboxedTarget, v1, v2, v3, v4, v5)
