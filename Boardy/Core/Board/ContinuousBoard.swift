@@ -12,20 +12,20 @@ public protocol ContinuableBoard: IdentifiableBoard, OriginalBoard {
     var motherboard: FlowMotherboard { get }
 }
 
-extension ContinuableBoard {
-    public func continueBoard<Input>(_ input: BoardInput<Input>) {
+public extension ContinuableBoard {
+    func continueBoard<Input>(_ input: BoardInput<Input>) {
         motherboard.activateBoard(input)
     }
 
-    public func continueBoard(model: BoardInputModel) {
+    func continueBoard(model: BoardInputModel) {
         motherboard.activateBoard(model: model)
     }
 
-    public func continueInteractWithBoard<Input>(_ input: BoardCommand<Input>) {
+    func continueInteractWithBoard<Input>(_ input: BoardCommand<Input>) {
         motherboard.interactWithBoard(input)
     }
 
-    public func continueInteractWithBoard(command: BoardCommandModel) {
+    func continueInteractWithBoard(command: BoardCommandModel) {
         motherboard.interactWithBoard(command: command)
     }
 }
@@ -57,13 +57,21 @@ open class ModernContinuableBoard: Board, ContinuableBoard {
 
 // MARK: - ModernContinuableBoard + Continuous
 
-extension ModernContinuableBoard {
+public extension ModernContinuableBoard {
     @discardableResult
-    public func mountContinuousMotherboard(to context: AnyObject,
-                                           configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
+    func mountContinuousMotherboard(to context: AnyObject,
+                                    configurationBuilder: (FlowMotherboard) -> Void = { _ in }) -> FlowMotherboard {
         let newBoard = produceContinuousMotherboard()
         configurationBuilder(newBoard)
 
+        newBoard.putIntoContext(context)
+
+        return newBoard
+    }
+
+    @discardableResult
+    func mountContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AnyObject, build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+        let newBoard = build(producer)
         newBoard.putIntoContext(context)
 
         return newBoard
