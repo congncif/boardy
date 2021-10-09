@@ -222,7 +222,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             saveHandler(of: input, to: taskID)
             startProgressIfNeeded(with: taskID)
 
-            let operation = ExecutionSchedulerOperation(taskID: taskID, input: input.input, taskBoard: self)
+            let operation = BlockTaskExecutionOperation(taskID: taskID, input: input.input, taskBoard: self)
             operationQueue.addOperation(operation)
             return
         case .default:
@@ -375,7 +375,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 }
 
-final class ExecutionSchedulerOperation<In, Out>: Operation {
+final class BlockTaskExecutionOperation<In, Out>: Operation {
     private let taskID: String
     private let input: In
     private weak var taskBoard: BlockTaskBoard<In, Out>?
@@ -387,13 +387,41 @@ final class ExecutionSchedulerOperation<In, Out>: Operation {
         super.init()
     }
 
-    enum State {
-        case ready
-        case executing
-        case finished
+    enum State: String {
+        case ready = "Ready"
+        case executing = "Executing"
+        case finished = "Finished"
+
+        fileprivate var keyPath: String { return "is" + rawValue }
     }
 
-    var state: State = .ready
+    /// Thread-safe computed state value
+    var state: State {
+        get {
+            stateQueue.sync {
+                stateStore
+            }
+        }
+        set {
+            let oldValue = state
+            willChangeValue(forKey: state.keyPath)
+            willChangeValue(forKey: newValue.keyPath)
+            stateQueue.sync(flags: .barrier) {
+                stateStore = newValue
+            }
+            didChangeValue(forKey: state.keyPath)
+            didChangeValue(forKey: oldValue.keyPath)
+        }
+    }
+
+    private let stateQueue = DispatchQueue(label: "boardy.block-task-board.operation", attributes: .concurrent)
+
+    /// Non thread-safe state storage, use only with locks
+    private var stateStore: State = .ready
+
+    override var isAsynchronous: Bool {
+        return true
+    }
 
     override var isExecuting: Bool {
         state == .executing
@@ -410,25 +438,29 @@ final class ExecutionSchedulerOperation<In, Out>: Operation {
     override func start() {
         if isCancelled {
             state = .finished
-            return
+        } else {
+            state = .ready
+            main()
         }
-
-        state = .executing
-        main()
     }
 
     override func main() {
-        if let task = taskBoard {
-            task.execute(input: input) { [weak task, weak self, taskID] nextResult in
-                guard let currentTask = task else {
-                    self?.state = .finished
-                    return
-                }
-                currentTask.finishExecuting(taskID: taskID, result: nextResult)
-                self?.state = .finished
-            }
-        } else {
+        if isCancelled {
             state = .finished
+        } else {
+            if let task = taskBoard {
+                state = .executing
+                task.execute(input: input) { [weak task, weak self, taskID] nextResult in
+                    guard let currentTask = task else {
+                        self?.state = .finished
+                        return
+                    }
+                    currentTask.finishExecuting(taskID: taskID, result: nextResult)
+                    self?.state = .finished
+                }
+            } else {
+                state = .finished
+            }
         }
     }
 }
