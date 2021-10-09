@@ -275,10 +275,10 @@ class BlockTaskTests: XCTestCase {
         motherboard.activateBoard(.target("block-task", parameter2))
         motherboard.activateBoard(.target("block-task", parameter3))
 
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { [weak motherboard] in
-            motherboard?.removeBoard(withIdentifier: "block-task")
-            blockTask = nil
-        }
+//        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { [weak motherboard] in
+//            motherboard?.removeBoard(withIdentifier: "block-task")
+//            blockTask = nil
+//        }
 
         waitForExpectations(timeout: 3, handler: nil)
 
@@ -288,7 +288,7 @@ class BlockTaskTests: XCTestCase {
         XCTAssertEqual(status2, .done)
         XCTAssertEqual(result2, input2)
 
-        XCTAssertEqual(status3, .cancelled)
-        XCTAssertNil(result3)
+        XCTAssertEqual(status3, .done)
+        XCTAssertEqual(result3, input3)
     }
 }
