@@ -52,7 +52,7 @@ class TaskBoardTests: XCTestCase {
         self.waitForExpectations(timeout: 6, handler: nil)
         
         XCTAssertEqual(isLoading, false)
-        XCTAssertEqual(results.count, 3)
+        XCTAssertEqual(results.count, 1)
         XCTAssertEqual(motherboard.boards.count, 0)
     }
 }

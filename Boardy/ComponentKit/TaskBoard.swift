@@ -69,6 +69,13 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
     }
 
     public func activate(withGuaranteedInput input: Input) {
+        guard activateCount == 0 else {
+            #if DEBUG
+            print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
+            #endif
+            return
+        }
+
         increaseActivateCount()
         processingHandler(self)
 

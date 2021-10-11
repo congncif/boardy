@@ -54,7 +54,7 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
     public func activate(withGuaranteedInput input: Input) {
         guard !isActive else {
             #if DEBUG
-            print("⚠️ \(String(describing: self)) is already activated.")
+            print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
             #endif
             return
         }
