@@ -47,19 +47,21 @@ public final class LauncherComponent {
         plugins.removeAll()
     }
 
-    func generateMainboard() -> Motherboard {
+    func generateMainboard(with settings: (_ mainboard: FlowMotherboard) -> Void) -> Motherboard {
         loadPluginsIfNeeded()
-        return Motherboard(boardProducer: container)
+        let motherboard = Motherboard(boardProducer: container)
+        settings(motherboard)
+        return motherboard
     }
 
     /// Create & return new instance of Launcher
-    public func instantiate() -> PluginLauncher {
-        PluginLauncher(mainboard: generateMainboard())
+    public func instantiate(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
+        PluginLauncher(mainboard: generateMainboard(with: settings))
     }
 
     /// Create shared instance of Launcher
-    public func initialize() {
-        PluginLauncher.sharedInstance = instantiate()
+    public func initialize(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
+        PluginLauncher.sharedInstance = instantiate(settings)
     }
 }
 
@@ -88,28 +90,43 @@ public final class PluginLauncher {
         LauncherComponent(options: options)
     }
 
-    public func launch<Input>(on rootObject: AnyObject, input: BoardInput<Input>) {
-        launch(on: rootObject) { mainboard in
+    public func launch<Input>(in context: AnyObject, with input: BoardInput<Input>) {
+        launch(in: context) { mainboard in
             mainboard.activateBoard(input)
         }
     }
 
-    public func launch(on rootObject: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
+    public func launch(in context: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
         #if DEBUG
-        if mainboard.context != nil, mainboard.context !== rootObject {
-            print("⚠️ Motherboard \(mainboard) will change root from \(mainboard.context) to \(rootObject)")
+        if mainboard.context != nil, mainboard.context !== context {
+            print("⚠️ The Mainboard [\(mainboard.identifier)] will change the context from \(mainboard.context) to \(context).")
         }
         #endif
 
-        mainboard.putIntoContext(rootObject)
+        mainboard.putIntoContext(context)
         action(mainboard)
     }
 
     public func activateNow(_ action: (_ mainboard: FlowMotherboard) -> Void) {
-        guard mainboard.context != nil else {
-            assertionFailure("🚧 Motherboard \(mainboard) was not installed. PluginLauncher must be launched before activating modules.")
-            return
+        #if DEBUG
+        if mainboard.context == nil {
+            print("⚠️ The Mainboard [\(mainboard.identifier)] has no contexts. The PluginLauncher should be launched before activating modules.")
         }
+        #endif
         action(mainboard)
+    }
+}
+
+// MARK: - Deprecated
+
+public extension PluginLauncher {
+    @available(*, deprecated, message: "This method was renamed. Use launch(in:input:) context instead.")
+    func launch<Input>(on rootObject: AnyObject, input: BoardInput<Input>) {
+        launch(in: rootObject, with: input)
+    }
+
+    @available(*, deprecated, message: "This method was renamed. Use launch(in:action:) context instead.")
+    func launch(on rootObject: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
+        launch(in: rootObject, action: action)
     }
 }

@@ -27,13 +27,13 @@ public protocol IdentifiableBoard: AnyObject, CustomDebugStringConvertible {
     var identifier: BoardID { get }
 }
 
-extension IdentifiableBoard {
+public extension IdentifiableBoard {
     /// Send a message with data attached (if available) to the motherboard.
-    public func sendToMotherboard(data: Any? = nil) {
+    func sendToMotherboard(data: Any? = nil) {
         DebugLog.logActivity(source: self, data: data)
 
         #if DEBUG
-        if delegate == nil && !(self is MotherboardType) {
+        if delegate == nil, !(self is MotherboardType) {
             print("⚠️ [\(String(describing: type(of: self)))] [\(#function)] [\(identifier)] sent a message with data \(String(describing: data)) to its Motherboard but it seems to have no Motherboards.")
         }
         #endif
@@ -42,35 +42,35 @@ extension IdentifiableBoard {
     }
 
     /// Request the motherboard to activate another board.
-    public func nextToBoard(model: BoardInputModel) {
+    func nextToBoard(model: BoardInputModel) {
         sendToMotherboard(data: model)
     }
 
-    public func nextToBoard<Input>(_ input: BoardInput<Input>) {
+    func nextToBoard<Input>(_ input: BoardInput<Input>) {
         nextToBoard(model: input)
     }
 
     /// Send a Broadcast action to all older motherboards in chain.
-    public func sendFlowAction(_ action: BoardFlowAction) {
+    func sendFlowAction(_ action: BoardFlowAction) {
         sendToMotherboard(data: action)
     }
 
     /// Send a Broadcast action with generic type. See more sendFlowAction(_:).
-    public func broadcastAction<Action: BoardFlowAction>(_ action: Action) {
+    func broadcastAction<Action: BoardFlowAction>(_ action: Action) {
         sendFlowAction(action)
     }
 
     /// Interact with a brotherhood relationship board in same Motherboard.
-    public func interactWithOtherBoard(command: BoardCommandModel) {
+    func interactWithOtherBoard(command: BoardCommandModel) {
         sendToMotherboard(data: command)
     }
 
-    public func interactWithOtherBoard<Input>(_ input: BoardCommand<Input>) {
+    func interactWithOtherBoard<Input>(_ input: BoardCommand<Input>) {
         interactWithOtherBoard(command: input)
     }
 
     /// Complete this board & ask to be removed.
-    public func complete() {
+    func complete() {
         sendToMotherboard(data: CompleteAction(identifier: identifier))
     }
 }
