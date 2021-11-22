@@ -11,25 +11,32 @@ public protocol FlowingBoard: NormalBoard {
     var motherboard: FlowMotherboard { get }
 }
 
-public final class FlowBoard<Input, Output>: ModernContinuableBoard, GuaranteedBoard, FlowingBoard, GuaranteedOutputSendingBoard {
+open class FlowBoard<Input, Output, Action: BoardFlowAction>: ModernContinuableBoard, GuaranteedBoard, FlowingBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard {
     public typealias InputType = Input
     public typealias OutputType = Output
+    public typealias FlowActionType = Action
 
-    public typealias FlowRegistration = (FlowBoard<Input, Output>) -> Void
-    public typealias FlowActivation = (FlowBoard<Input, Output>, InputType) -> Void
+    public typealias FlowRegistration = (FlowBoard<Input, Output, Action>) -> Void
+    public typealias FlowActivation = (FlowBoard<Input, Output, Action>, InputType) -> Void
 
     private let flowActivation: FlowActivation
+    private let flowRegistration: FlowRegistration
 
     public init(identifier: BoardID,
                 producer: ActivableBoardProducer,
-                flowRegistration: FlowRegistration,
+                flowRegistration: @escaping FlowRegistration,
                 flowActivation: @escaping FlowActivation) {
         self.flowActivation = flowActivation
+        self.flowRegistration = flowRegistration
         super.init(identifier: identifier, boardProducer: producer)
-        flowRegistration(self)
+        registerFlows()
     }
 
-    public func activate(withGuaranteedInput input: InputType) {
+    open func activate(withGuaranteedInput input: InputType) {
         flowActivation(self, input)
+    }
+
+    open func registerFlows() {
+        flowRegistration(self)
     }
 }

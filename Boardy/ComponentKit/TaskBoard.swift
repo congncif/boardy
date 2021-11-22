@@ -13,7 +13,7 @@ public protocol TaskingBoard: NormalBoard {
     var isProcessing: Bool { get }
 }
 
-public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, GuaranteedOutputSendingBoard {
+open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, GuaranteedOutputSendingBoard {
     public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
     public typealias Executor = (TaskingBoard, Input, @escaping ExecutorCompletion) -> Void
 
@@ -77,15 +77,15 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
         }
 
         increaseActivateCount()
-        processingHandler(self)
+        handleProgress()
 
         execute(input: input) { [weak self] result in
             guard let self = self else { return }
 
             defer {
                 self.decreaseActivateCount()
-                self.processingHandler(self)
-                self.completionHandler(self)
+                self.handleProgress()
+                self.willComplete()
 
                 if self.isCompleted {
                     self.complete()
@@ -94,11 +94,11 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
 
             switch result {
             case let .success(output):
-                self.successHandler(self, output)
+                self.handleSuccess(output)
 
                 self.sendOutput(output)
             case let .failure(error):
-                self.errorHandler(self, error)
+                self.handleError(error)
             }
         }
     }
@@ -106,11 +106,27 @@ public final class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoar
     deinit {
         if !isCompleted {
             activateCount = 0
-            processingHandler(self)
+            handleProgress()
         }
     }
 
     private func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) {
         executor(self, input, completion)
+    }
+
+    open func handleSuccess(_ output: Output) {
+        successHandler(self, output)
+    }
+
+    open func handleProgress() {
+        processingHandler(self)
+    }
+
+    open func handleError(_ error: Error) {
+        errorHandler(self, error)
+    }
+
+    open func willComplete() {
+        completionHandler(self)
     }
 }
