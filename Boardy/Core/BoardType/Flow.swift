@@ -10,6 +10,8 @@ import Foundation
 /// Special data type which should be forwarded through all of steps of the flow.
 public protocol BoardFlowAction {}
 
+public enum BoardFlowNoneAction: BoardFlowAction {}
+
 public typealias FlowID = BoardID
 
 public protocol BoardFlow {

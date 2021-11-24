@@ -15,10 +15,15 @@ enum DebugLog {
         #if DEBUG
         if Environment.boardyLogEnabled {
             print("\(icon) Boardy Log:")
-            print("    🌏 [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
+            print("    🏝 [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
+
+            if let motherboard = source.delegate as? IdentifiableBoard {
+                print("    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
+            }
+
             print("    🎯 [\(String(describing: type(of: destination)))] ➤ \(destination.identifier.rawValue)")
             if let data = data {
-                print("    📦 [\(String(describing: type(of: data)))] ➤ \(data)")
+                print("    🌷 [\(String(describing: type(of: data)))] ➤ \(data)")
             }
         }
         #endif
@@ -67,18 +72,18 @@ enum DebugLog {
             }
 
             print("\(icon) Boardy Log:")
-            print("    🍀 [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
-            
+            print("    🏝 [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
+
             if let motherboard = source.delegate as? IdentifiableBoard {
-                print("    🎯 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
+                print("    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
             }
 
             if let dest = destination {
-                print("    💐 [\(String(describing: type(of: dest)))] ➤ \(dest.rawValue)")
+                print("    🎯 [\(String(describing: type(of: dest)))] ➤ \(dest.rawValue)")
             }
 
             if let logData = rawData {
-                print("    🌾 [\(String(describing: type(of: logData)))] ➤ \(logData)")
+                print("    💐 [\(String(describing: type(of: logData)))] ➤ \(logData)")
             }
         }
         #endif

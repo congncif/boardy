@@ -37,7 +37,7 @@ public final class ChainDataHandler<Target: AnyObject> {
             """
             ⚠️ [\(String(describing: ChainDataHandler.self))] fallback handling:
             🎯 Target: \(String(describing: target))
-            📦 Data: \(String(describing: data))
+            🌸 Data: \(String(describing: data))
             """
         )
         #endif
