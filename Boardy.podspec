@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.39.0"
+  s.version = "1.39.1"
   s.swift_versions = ["5.3", "5.4", "5.5"]
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
