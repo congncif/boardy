@@ -83,7 +83,7 @@ public extension GuaranteedBoard where InputType: Decodable {
 
             if let encodedData = input as? Data {
                 data = encodedData
-            } else if let any = input, let jsonData = try? JSONSerialization.data(withJSONObject: any, options: .prettyPrinted) {
+            } else if let any = input, JSONSerialization.isValidJSONObject(any), let jsonData = try? JSONSerialization.data(withJSONObject: any, options: .prettyPrinted) {
                 data = jsonData
             }
 
