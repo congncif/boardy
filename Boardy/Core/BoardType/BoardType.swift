@@ -68,6 +68,15 @@ public extension IdentifiableBoard {
     func complete() {
         sendToMotherboard(data: CompleteAction(identifier: identifier))
     }
+
+    var debugDescription: String {
+        var desc: String = ""
+        desc += "    🏝 [\(String(describing: type(of: self)))] ➤ \(identifier.rawValue)"
+        if let motherboard = delegate as? IdentifiableBoard {
+            desc += "    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)"
+        }
+        return desc
+    }
 }
 
 // MARK: - CompleteAction

@@ -15,9 +15,10 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     override public var debugDescription: String {
         let superDesc = super.debugDescription
         return superDesc + "\n" + """
-            ● [Children] ➤ \(String(describing: boards.map { $0.identifier }))
-            ● [Flows] ➤ \(String(describing: flows.count))
-            ● [Producer] ➤ \(String(describing: boardProducer))
+            🌏 [Motherboard] ➤ \(String(describing: identifier))
+            🍒 [Children] ➤ \(String(describing: boards.map { $0.identifier }))
+            🌈 [Flows] ➤ \(String(describing: flows.count))
+            🌋 [Producer] ➤ \(String(describing: boardProducer))
         """
     }
 

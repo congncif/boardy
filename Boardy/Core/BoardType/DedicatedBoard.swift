@@ -76,6 +76,25 @@ public extension GuaranteedBoard {
     }
 }
 
+public extension GuaranteedBoard where InputType: Decodable {
+    var inputAdapters: [(Any?) -> InputType?] {
+        [{ input in
+            var data: Data?
+
+            if let encodedData = input as? Data {
+                data = encodedData
+            } else if let jsonData = try? JSONSerialization.data(withJSONObject: input, options: .prettyPrinted) {
+                data = jsonData
+            }
+
+            guard let rawData = data else { return nil }
+
+            let decoder = JSONDecoder()
+            return try? decoder.decode(InputType.self, from: rawData)
+        }]
+    }
+}
+
 // MARK: - The Board sends a type safe Output data
 
 public protocol GuaranteedOutputSendingBoard: IdentifiableBoard {
@@ -90,6 +109,24 @@ public extension GuaranteedOutputSendingBoard {
         }
         #endif
         sendToMotherboard(data: data)
+    }
+}
+
+public extension GuaranteedOutputSendingBoard where OutputType: Encodable {
+    func sendEncodedOutput(_ data: OutputType) {
+        #if DEBUG
+        if isSilentData(data) {
+            print("\(String(describing: self))\n🔥 Sending a special Data Type might lead unexpected behaviors!\n👉 You should wrap \(data) in custom Output Type.")
+        }
+        #endif
+
+        let encoder = JSONEncoder()
+        do {
+            let rawData = try encoder.encode(data)
+            sendToMotherboard(data: rawData)
+        } catch {
+            assertionFailure("‼️ An encoding error \(error) occurred when sending output data\n\(debugDescription)")
+        }
     }
 }
 
