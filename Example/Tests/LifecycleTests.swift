@@ -34,17 +34,18 @@ class LifecycleTests: XCTestCase {
     }
 
     func testBoardShouldBeReleasedAfterCompleted() throws {
-        let motherboard = Motherboard(boards: [SingleBoard(identifier: "1"), ContiBoard(identifier: "2", motherboard: Motherboard())])
+        let motherboard: FlowMotherboard = Motherboard(boards: [SingleBoard(identifier: "1"), ContiBoard(identifier: "2", motherboard: Motherboard())])
         weak var singleBoard = motherboard.boards.first { $0.identifier == "1" }
         weak var contiBoard = motherboard.boards.first { $0.identifier == "2" }
 
         XCTAssertNotNil(singleBoard)
         XCTAssertNotNil(contiBoard)
 
-        singleBoard?.complete()
+        contiBoard?.activation("1").complete()
+//        singleBoard?.complete()
         XCTAssertNil(singleBoard)
 
-        contiBoard?.complete()
+        motherboard.activation("2").complete()
         XCTAssertNil(contiBoard)
     }
 }

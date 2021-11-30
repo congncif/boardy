@@ -13,6 +13,7 @@ public protocol BoardActivating {
     associatedtype Input
 
     func activate(with input: Input)
+    func complete()
 }
 
 public extension BoardActivating where Input: ExpressibleByNilLiteral {
@@ -32,8 +33,14 @@ public struct MainboardActivation<Input>: BoardActivating {
     let destinationID: BoardID
     let mainboard: MotherboardType
 
+    /// Activate a board from its Motherboard
     public func activate(with input: Input) {
         mainboard.activateBoard(.target(destinationID, input))
+    }
+
+    /// Complete a board from its Motherboard
+    public func complete() {
+        mainboard.getBoard(identifier: destinationID)?.complete()
     }
 }
 
@@ -42,8 +49,15 @@ public struct BoardActivation<Input>: BoardActivating {
     let destinationID: BoardID
     let source: ActivatableBoard
 
+    /// Activate the next board in the same Motherboard with the `source`
     public func activate(with input: Input) {
         source.nextToBoard(.target(destinationID, input))
+    }
+
+    /// Complete the destination board which has the same Motherboard with the `source`
+    public func complete() {
+        let completeAction = CompleteAction(identifier: destinationID)
+        source.sendToMotherboard(data: completeAction)
     }
 }
 
