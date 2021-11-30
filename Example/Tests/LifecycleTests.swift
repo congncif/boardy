@@ -41,11 +41,11 @@ class LifecycleTests: XCTestCase {
         XCTAssertNotNil(singleBoard)
         XCTAssertNotNil(contiBoard)
 
-        contiBoard?.activation("1").complete()
+        contiBoard?.completer("1").complete()
 //        singleBoard?.complete()
         XCTAssertNil(singleBoard)
 
-        motherboard.activation("2").complete()
+        motherboard.completer("2").complete()
         XCTAssertNil(contiBoard)
     }
 }

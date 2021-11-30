@@ -7,13 +7,49 @@
 
 import Foundation
 
+public protocol Completable {
+    func complete()
+}
+
+public struct MainboardCompleter: Completable {
+    let destinationID: BoardID
+    let mainboard: MotherboardType
+
+    /// Complete a board from its Motherboard
+    public func complete() {
+        mainboard.getBoard(identifier: destinationID)?.complete()
+    }
+}
+
+public struct BoardCompleter: Completable {
+    let destinationID: BoardID
+    let source: ActivatableBoard
+
+    /// Complete the destination board which has the same Motherboard with the `source`
+    public func complete() {
+        let completeAction = CompleteAction(identifier: destinationID)
+        source.sendToMotherboard(data: completeAction)
+    }
+}
+
+public extension ActivatableBoard {
+    func completer(_ destinationID: BoardID) -> BoardCompleter {
+        BoardCompleter(destinationID: destinationID, source: self)
+    }
+}
+
+public extension MotherboardType {
+    func completer(_ destinationID: BoardID) -> MainboardCompleter {
+        MainboardCompleter(destinationID: destinationID, mainboard: self)
+    }
+}
+
 // MARK: - Activate
 
 public protocol BoardActivating {
     associatedtype Input
 
     func activate(with input: Input)
-    func complete()
 }
 
 public extension BoardActivating where Input: ExpressibleByNilLiteral {
@@ -37,11 +73,6 @@ public struct MainboardActivation<Input>: BoardActivating {
     public func activate(with input: Input) {
         mainboard.activateBoard(.target(destinationID, input))
     }
-
-    /// Complete a board from its Motherboard
-    public func complete() {
-        mainboard.getBoard(identifier: destinationID)?.complete()
-    }
 }
 
 // iOS 13+ internal
@@ -52,12 +83,6 @@ public struct BoardActivation<Input>: BoardActivating {
     /// Activate the next board in the same Motherboard with the `source`
     public func activate(with input: Input) {
         source.nextToBoard(.target(destinationID, input))
-    }
-
-    /// Complete the destination board which has the same Motherboard with the `source`
-    public func complete() {
-        let completeAction = CompleteAction(identifier: destinationID)
-        source.sendToMotherboard(data: completeAction)
     }
 }
 
