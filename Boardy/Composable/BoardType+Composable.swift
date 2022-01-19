@@ -7,6 +7,7 @@
 
 import Foundation
 import UIComposable
+import UIKit
 
 extension IdentifiableBoard {
     public func putToComposer(elementAction: UIElementAction) {
