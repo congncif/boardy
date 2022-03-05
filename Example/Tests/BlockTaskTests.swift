@@ -222,7 +222,7 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testConcurrentExecuting() {
-        var blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .concurrent(max: 2)) { _, input, completion in
+        let blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .concurrent(max: 2)) { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }

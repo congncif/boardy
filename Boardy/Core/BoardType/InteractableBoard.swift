@@ -34,7 +34,7 @@ extension GuaranteedCommandBoard {
     public func interact(command: Any?) {
         guard let commandData = command as? CommandType else {
             #if DEBUG
-            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(command) while expected type is \(CommandType.self)")
+            assertionFailure("\(String(describing: self)) \n⚠️ Received command \(String(describing: command)) while expected type is \(CommandType.self)")
             #endif
             return
         }
