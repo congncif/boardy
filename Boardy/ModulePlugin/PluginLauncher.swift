@@ -173,7 +173,7 @@ public final class PluginLauncher {
             #endif
         case _ where numberOfHandlers > 1:
             #if DEBUG
-            print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin that handles the URL ➤ \(url)")
+            print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
             #endif
         default:
             #if DEBUG

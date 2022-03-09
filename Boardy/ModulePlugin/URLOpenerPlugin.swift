@@ -14,7 +14,7 @@ public protocol URLOpenerPlugin {
 }
 
 public extension URLOpenerPlugin {
-    var name: String { String(describing: type(of: self)) }
+    var name: String { String(describing: self) }
 }
 
 public protocol URLOpenerPluginConvertible {
