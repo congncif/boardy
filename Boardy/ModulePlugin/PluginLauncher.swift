@@ -60,8 +60,11 @@ public final class LauncherComponent {
     }
 
     /// Create shared instance of Launcher
-    public func initialize(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
-        PluginLauncher.sharedInstance = instantiate(settings)
+    @discardableResult
+    public func initialize(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
+        let instance = instantiate(settings)
+        PluginLauncher.sharedInstance = instance
+        return instance
     }
 }
 
@@ -114,6 +117,77 @@ public final class PluginLauncher {
         }
         #endif
         action(mainboard)
+    }
+
+    // MARK: URL opener
+
+    private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
+
+    @discardableResult
+    public func install(urlOpenerPlugin: URLOpenerPlugin) -> Self {
+        urlOpenerPlugins.append(urlOpenerPlugin)
+        return self
+    }
+
+    @discardableResult
+    public func install(urlOpenerPlugins: [URLOpenerPlugin]) -> Self {
+        self.urlOpenerPlugins.append(contentsOf: urlOpenerPlugins)
+        return self
+    }
+
+    @discardableResult
+    public func installURLOpenerPlugin<Parameter>(
+        condition: @escaping (URL) -> URLOpeningAbility<Parameter>,
+        handler: @escaping (FlowMotherboard, Parameter) -> Void) -> Self {
+        let plugin = BlockURLOpenerPlugin(condition: condition, handler: handler)
+        return install(urlOpenerPlugin: plugin)
+    }
+
+    @discardableResult
+    public func installURLOpenerPlugin(
+        condition: @escaping (URL) -> Bool,
+        handler: @escaping (FlowMotherboard) -> Void) -> Self {
+        let plugin = BlockURLOpenerPlugin<Void>(condition: { url in
+            if condition(url) {
+                return .canOpen(())
+            } else {
+                return .cannotOpen
+            }
+        }, handler: { mainboard, _ in
+            handler(mainboard)
+        })
+        return install(urlOpenerPlugin: plugin)
+    }
+
+    public func open(url: URL) {
+        let handlers = urlOpenerPlugins.filter {
+            $0.mainboard(mainboard, open: url)
+        }
+
+        let numberOfHandlers = handlers.count
+
+        switch numberOfHandlers {
+        case 0:
+            #if DEBUG
+            print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
+            #endif
+        case _ where numberOfHandlers > 1:
+            #if DEBUG
+            print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin that handles the URL ➤ \(url)")
+            #endif
+        default:
+            #if DEBUG
+            print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
+            #endif
+        }
+    }
+
+    public func open(link: String) {
+        if let url = URL(string: link) {
+            open(url: url)
+        } else {
+            print("⚠️ Cannot open an invalid URL ➤ \(link)")
+        }
     }
 }
 

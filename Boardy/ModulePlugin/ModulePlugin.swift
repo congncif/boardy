@@ -61,7 +61,7 @@ public protocol ModulePlugin: ModulePluginConvertible {
 }
 
 public protocol ModulePluginConvertible {
-    var plugins: [ModulePlugin] { get }
+    var modulePlugins: [ModulePlugin] { get }
 }
 
 extension ModulePlugin {

@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.swizzling()
 
-        guard let window = self.window else { return false }
+        guard let window = window else { return false }
         rootBoard.installIntoWindow(window)
         rootBoard.activate(withGuaranteedInput: launchOptions)
 
