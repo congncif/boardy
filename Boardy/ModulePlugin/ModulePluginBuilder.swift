@@ -10,7 +10,7 @@ import Foundation
 #if swift(>=5.4)
 
 extension Array: ModulePluginConvertible where Element == ModulePlugin {
-    public var plugins: [ModulePlugin] {
+    public var modulePlugins: [ModulePlugin] {
         return self
     }
 }
@@ -18,19 +18,19 @@ extension Array: ModulePluginConvertible where Element == ModulePlugin {
 @resultBuilder
 public struct ModulePluginBuilder {
     public static func buildBlock(_ components: ModulePluginConvertible...) -> [ModulePlugin] {
-        components.flatMap { $0.plugins }
+        components.flatMap { $0.modulePlugins }
     }
 
     public static func buildArray(_ components: [ModulePluginConvertible]) -> [ModulePlugin] {
-        components.flatMap { $0.plugins }
+        components.flatMap { $0.modulePlugins }
     }
 
     public static func buildEither(first component: ModulePluginConvertible) -> ModulePluginConvertible {
-        component.plugins
+        component.modulePlugins
     }
 
     public static func buildEither(second component: ModulePluginConvertible) -> ModulePluginConvertible {
-        component.plugins
+        component.modulePlugins
     }
 
     public static func buildOptional(_ component: ModulePluginConvertible?) -> ModulePluginConvertible {
