@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol URLOpenerPlugin {
+public protocol URLOpenerPlugin: URLOpenerPluginConvertible {
     var name: String { get }
 
     func mainboard(_ mainboard: FlowMotherboard, open url: URL) -> Bool
@@ -21,15 +21,19 @@ public protocol URLOpenerPluginConvertible {
     var urlOpenerPlugins: [URLOpenerPlugin] { get }
 }
 
-public enum URLOpeningAbility<Parameter> {
-    case canOpen(Parameter)
-    case cannotOpen
+public extension URLOpenerPlugin {
+    var urlOpenerPlugins: [URLOpenerPlugin] { [self] }
+}
+
+public enum URLOpeningOption<Parameter> {
+    case yes(Parameter)
+    case no
 }
 
 public protocol GuaranteedURLOpenerPlugin: URLOpenerPlugin {
     associatedtype Parameter
 
-    func willOpen(url: URL) -> URLOpeningAbility<Parameter>
+    func willOpen(url: URL) -> URLOpeningOption<Parameter>
 
     func mainboard(_ mainboard: FlowMotherboard, openWith parameter: Parameter)
 }
@@ -37,9 +41,9 @@ public protocol GuaranteedURLOpenerPlugin: URLOpenerPlugin {
 public extension GuaranteedURLOpenerPlugin {
     func mainboard(_ mainboard: FlowMotherboard, open url: URL) -> Bool {
         switch willOpen(url: url) {
-        case .cannotOpen:
+        case .no:
             return false
-        case let .canOpen(parameter):
+        case let .yes(parameter):
             self.mainboard(mainboard, openWith: parameter)
             return true
         }
@@ -47,15 +51,21 @@ public extension GuaranteedURLOpenerPlugin {
 }
 
 public struct BlockURLOpenerPlugin<Parameter>: GuaranteedURLOpenerPlugin {
-    let condition: (URL) -> URLOpeningAbility<Parameter>
-    let handler: (FlowMotherboard, Parameter) -> Void
+    private let condition: (URL) -> URLOpeningOption<Parameter>
+    private let handler: (FlowMotherboard, Parameter) -> Void
+    private let customName: String?
 
-    public init(condition: @escaping (URL) -> URLOpeningAbility<Parameter>, handler: @escaping (FlowMotherboard, Parameter) -> Void) {
+    public var name: String {
+        customName ?? String(describing: self)
+    }
+
+    public init(name: String? = nil, condition: @escaping (URL) -> URLOpeningOption<Parameter>, handler: @escaping (FlowMotherboard, Parameter) -> Void) {
+        self.customName = name
         self.condition = condition
         self.handler = handler
     }
 
-    public func willOpen(url: URL) -> URLOpeningAbility<Parameter> {
+    public func willOpen(url: URL) -> URLOpeningOption<Parameter> {
         condition(url)
     }
 

@@ -137,21 +137,23 @@ public final class PluginLauncher {
 
     @discardableResult
     public func installURLOpenerPlugin<Parameter>(
-        condition: @escaping (URL) -> URLOpeningAbility<Parameter>,
+        name: String? = nil,
+        condition: @escaping (URL) -> URLOpeningOption<Parameter>,
         handler: @escaping (FlowMotherboard, Parameter) -> Void) -> Self {
-        let plugin = BlockURLOpenerPlugin(condition: condition, handler: handler)
+        let plugin = BlockURLOpenerPlugin(name: name, condition: condition, handler: handler)
         return install(urlOpenerPlugin: plugin)
     }
 
     @discardableResult
     public func installURLOpenerPlugin(
+        name: String? = nil,
         condition: @escaping (URL) -> Bool,
         handler: @escaping (FlowMotherboard) -> Void) -> Self {
-        let plugin = BlockURLOpenerPlugin<Void>(condition: { url in
+        let plugin = BlockURLOpenerPlugin<Void>(name: name, condition: { url in
             if condition(url) {
-                return .canOpen(())
+                return .yes(())
             } else {
-                return .cannotOpen
+                return .no
             }
         }, handler: { mainboard, _ in
             handler(mainboard)
@@ -159,48 +161,41 @@ public final class PluginLauncher {
         return install(urlOpenerPlugin: plugin)
     }
 
-    public func open(url: URL) {
+    /// Open an URL using URLOpenerPlugin
+    /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
+    /// - Returns: A array of strings name of matched plugins that handled the URL
+    @discardableResult
+    public func open(url: URL) -> [String] {
         let handlers = urlOpenerPlugins.filter {
             $0.mainboard(mainboard, open: url)
         }
 
+        #if DEBUG
         let numberOfHandlers = handlers.count
 
         switch numberOfHandlers {
         case 0:
-            #if DEBUG
             print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
-            #endif
         case _ where numberOfHandlers > 1:
-            #if DEBUG
             print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
-            #endif
         default:
-            #if DEBUG
             print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
-            #endif
         }
+        #endif
+
+        return handlers.map { $0.name }
     }
 
-    public func open(link: String) {
+    /// Open a link using URLOpenerPlugin
+    /// - Parameter link: Might be a deep link, universal link or any income URL to the app
+    /// - Returns: A array of strings name of matched plugins that handled the link
+    @discardableResult
+    public func open(link: String) -> [String] {
         if let url = URL(string: link) {
-            open(url: url)
+            return open(url: url)
         } else {
             print("⚠️ Cannot open an invalid URL ➤ \(link)")
+            return []
         }
-    }
-}
-
-// MARK: - Deprecated
-
-public extension PluginLauncher {
-    @available(*, deprecated, message: "This method was renamed. Use launch(in:input:) context instead.")
-    func launch<Input>(on rootObject: AnyObject, input: BoardInput<Input>) {
-        launch(in: rootObject, with: input)
-    }
-
-    @available(*, deprecated, message: "This method was renamed. Use launch(in:action:) context instead.")
-    func launch(on rootObject: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
-        launch(in: rootObject, action: action)
     }
 }

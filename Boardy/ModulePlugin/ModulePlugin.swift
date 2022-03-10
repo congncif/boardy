@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension MainOptions.Key {
-    public static let environment = MainOptions.Key(rawValue: "environment")
+public extension MainOptions.Key {
+    static let environment = MainOptions.Key(rawValue: "environment")
 }
 
 public struct MainOptions {
@@ -64,6 +64,6 @@ public protocol ModulePluginConvertible {
     var modulePlugins: [ModulePlugin] { get }
 }
 
-extension ModulePlugin {
-    public var plugins: [ModulePlugin] { [self] }
+public extension ModulePlugin {
+    var modulePlugins: [ModulePlugin] { [self] }
 }
