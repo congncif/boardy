@@ -7,7 +7,7 @@ use_frameworks!
 target 'Boardy_Example' do
   pod 'Boardy', :path => '../'
   pod 'Boardy/ComponentKit', :path => '../'
-  pod 'Boardy/DeepLink', :path => '../'
+#  pod 'Boardy/DeepLink', :path => '../'
   pod 'Boardy/Composable', :path => '../'
   pod 'Boardy/ModulePlugin', :path => '../'
 #  pod 'Boardy/RxStoreRef', :path => '../'

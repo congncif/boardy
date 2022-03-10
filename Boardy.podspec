@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.42.0"
+  s.version = "1.43.0"
   s.swift_versions = ["5.3", "5.4", "5.5"]
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
@@ -31,13 +31,6 @@ Pod::Spec.new do |s|
     co.source_files = "Boardy/Attachable/**/*.swift"
 
     co.dependency "Boardy/Core"
-  end
-
-  s.subspec "DeepLink" do |co|
-    co.source_files = "Boardy/DeepLink/**/*.swift"
-
-    co.dependency "Boardy/Core"
-    co.dependency "Boardy/Attachable"
   end
   
   s.subspec "Composable" do |co|

@@ -5,11 +5,12 @@
 //  Created by NGUYEN CHI CONG on 8/26/21.
 //
 
+import Boardy
 import Foundation
 import UIKit
 
-extension UIViewController {
-    public func handleDeepLink(_ deepLink: String, handlerClub: DeepLinkHandlerClubbing) {
+public extension UIViewController {
+    func handleDeepLink(_ deepLink: String, handlerClub: DeepLinkHandlerClubbing) {
         let deepLinkHandler: DeepLinkHandlingComposable
         if let handler: DeepLinkHandlingComposable = firstAttachedObject() {
             handler.registerHandlerClubIfNeeded(handlerClub)

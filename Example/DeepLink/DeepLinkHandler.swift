@@ -6,6 +6,7 @@
 //  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
+import Boardy
 import Foundation
 import UIKit
 
@@ -43,8 +44,8 @@ public protocol DeepLinkHandlerRegistering {
     func registeredHandlerClub(withIdentifier identifier: String) -> DeepLinkHandlerClubbing?
 }
 
-extension DeepLinkHandlerRegistering {
-    public func registerHandlerClubIfNeeded(_ handlerClub: DeepLinkHandlerClubbing) {
+public extension DeepLinkHandlerRegistering {
+    func registerHandlerClubIfNeeded(_ handlerClub: DeepLinkHandlerClubbing) {
         if registeredHandlerClub(withIdentifier: handlerClub.identifier) == nil {
             registerHandlerClub(handlerClub)
         }
@@ -123,13 +124,13 @@ public final class DeepLinkHandler: DeepLinkHandlingComposable {
     }
 
     private var parsers: [DeepLinkParsing] {
-        clubsRoom.reduce([]) { (result, clubInfo) -> [DeepLinkParsing] in
+        clubsRoom.reduce([]) { result, clubInfo -> [DeepLinkParsing] in
             result + [clubInfo.value.parser]
         }
     }
 
     private var mainboards: [FlowMotherboard] {
-        clubsRoom.reduce([]) { (result, clubInfo) -> [FlowMotherboard] in
+        clubsRoom.reduce([]) { result, clubInfo -> [FlowMotherboard] in
             result + clubInfo.value.workflowMainboards
         }
     }
