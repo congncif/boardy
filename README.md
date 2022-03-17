@@ -62,11 +62,6 @@ pod 'Boardy/ModulePlugin'
 pod 'Boardy/Composable'
 ```
 
-```ruby
-# Handle deep link using Boardy
-pod 'Boardy/DeepLink'
-```
-
 ## Install template to develop feature
 
 * Clone [module template](https://github.com/congncif/module-template.git) repo
