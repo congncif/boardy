@@ -64,6 +64,6 @@ struct YourModel {
     let id: Int
     let code: String
 
-    init(from parameters: [String: String?]) { ... }
+    init?(from parameters: [String: String?]) { ... }
 }
 ```
