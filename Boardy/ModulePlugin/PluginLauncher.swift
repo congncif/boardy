@@ -9,6 +9,7 @@ import Foundation
 
 public final class LauncherComponent {
     public let options: MainOptions
+    public var encodedData: Data?
 
     private var container = BoardProducer()
 
@@ -30,6 +31,16 @@ public final class LauncherComponent {
         return false
     }
 
+    public func share(encodedData: Data?) -> Self {
+        self.encodedData = encodedData
+        return self
+    }
+
+    public func share<Model>(jsonValue: Model) -> Self where Model: Encodable {
+        let data = try? JSONEncoder().encode(jsonValue)
+        return share(encodedData: data)
+    }
+
     public func install(plugins: [ModulePlugin]) -> Self {
         for plugin in plugins {
             _ = append(plugin: plugin)
@@ -43,7 +54,7 @@ public final class LauncherComponent {
     }
 
     func loadPluginsIfNeeded() {
-        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed)) }
+        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed, encodedData: encodedData)) }
         plugins.removeAll()
     }
 
@@ -71,6 +82,7 @@ public final class LauncherComponent {
 struct Component: MainComponent {
     let options: MainOptions
     let producer: BoardDynamicProducer
+    let encodedData: Data?
 }
 
 public final class PluginLauncher {
@@ -122,6 +134,7 @@ public final class PluginLauncher {
     // MARK: URL opener
 
     private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
+    private var urlNotFoundHandler: ((URL) -> Void)?
 
     @discardableResult
     public func install(urlOpenerPlugin: URLOpenerPlugin) -> Self {
@@ -161,6 +174,12 @@ public final class PluginLauncher {
         return install(urlOpenerPlugin: plugin)
     }
 
+    @discardableResult
+    public func setURLNotFoundHandler(_ handler: ((URL) -> Void)?) -> Self {
+        urlNotFoundHandler = handler
+        return self
+    }
+
     /// Open an URL using URLOpenerPlugin
     /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
     /// - Returns: A array of strings name of matched plugins that handled the URL
@@ -170,18 +189,23 @@ public final class PluginLauncher {
             $0.mainboard(mainboard, open: url)
         }
 
-        #if DEBUG
         let numberOfHandlers = handlers.count
 
         switch numberOfHandlers {
         case 0:
+            #if DEBUG
             print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
+            #endif
+            urlNotFoundHandler?(url)
         case _ where numberOfHandlers > 1:
+            #if DEBUG
             print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
+            #endif
         default:
+            #if DEBUG
             print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
+            #endif
         }
-        #endif
 
         return handlers.map { $0.name }
     }

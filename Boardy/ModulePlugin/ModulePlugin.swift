@@ -51,6 +51,7 @@ public struct MainOptions {
 
 public protocol MainComponent {
     var options: MainOptions { get }
+    var encodedData: Data? { get }
     var producer: BoardDynamicProducer { get }
 }
 
