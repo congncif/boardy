@@ -33,9 +33,9 @@ public extension IdentifiableBoard {
         DebugLog.logActivity(source: self, data: data)
 
         #if DEBUG
-        if delegate == nil, !(self is MotherboardType) {
-            print("⚠️ [\(String(describing: type(of: self)))] [\(#function)] [\(identifier)] sent a message with data \(String(describing: data)) to its Motherboard but it seems to have no Motherboards.")
-        }
+            if delegate == nil, !(self is MotherboardType) {
+                print("⚠️ [\(String(describing: type(of: self)))] [\(#function)] [\(identifier)] sent a message with data \(String(describing: data)) to its Motherboard but it seems to have no Motherboards.")
+            }
         #endif
 
         delegate?.board(self, didSendData: data)
@@ -70,7 +70,7 @@ public extension IdentifiableBoard {
     }
 
     var debugDescription: String {
-        var desc: String = ""
+        var desc = ""
         desc += "    🏝 [\(String(describing: type(of: self)))] ➤ \(identifier.rawValue)"
         if let motherboard = delegate as? IdentifiableBoard {
             desc += "    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)"

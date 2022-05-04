@@ -71,7 +71,7 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     public func activate(withGuaranteedInput input: Input) {
         guard activateCount == 0 else {
             #if DEBUG
-            print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
+                print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
             #endif
             return
         }

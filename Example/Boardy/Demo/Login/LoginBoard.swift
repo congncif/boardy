@@ -11,12 +11,10 @@ import Foundation
 import Resolver
 import UIComposable
 
-protocol XXX: UIViewController, ComposableInterface {
-    
-}
+protocol XXX: UIViewController, ComposableInterface {}
 
 final class LoginBoard: ModernContinuableBoard, ActivatableBoard, GuaranteedCommandBoard {
-    func interact(guaranteedCommand: String) {}
+    func interact(guaranteedCommand _: String) {}
 
     @LazyInjected var builder: LoginBuildable
 
@@ -26,17 +24,17 @@ final class LoginBoard: ModernContinuableBoard, ActivatableBoard, GuaranteedComm
         super.init(identifier: .login, boardProducer: NoBoardProducer())
     }
 
-    func activate(withOption option: Any?) {
+    func activate(withOption _: Any?) {
         let login = builder.build()
         login.delegate = self
         login.modalPresentationStyle = .fullScreen
         login.modalTransitionStyle = .crossDissolve
         rootViewController.topPresentedViewController.present(login, animated: true)
-        
+
 //        var xxx: XXX!
-//        
+//
 //        xxx.attachObject(self)
-//        
+//
 //        attachComposableMotherboard(to: xxx, configurationBuilder: {_ in})
     }
 }

@@ -20,6 +20,8 @@ target 'Boardy_Example' do
   pod 'ViewStateCore'
   pod 'SiFUtilities'
   pod 'Resolver' , '1.2.1'
+  
+  pod "SwiftFormat/CLI"
 
   target 'Boardy_Tests' do
     inherit! :search_paths

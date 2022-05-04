@@ -10,11 +10,11 @@ import Boardy
 import XCTest
 
 final class ContiBoard: ContinuousBoard, ActivatableBoard {
-    func activate(withOption option: Any?) {}
+    func activate(withOption _: Any?) {}
 }
 
 final class SingleBoard: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {}
+    func activate(withOption _: Any?) {}
 }
 
 class LifecycleTests: XCTestCase {

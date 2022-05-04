@@ -38,7 +38,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
      */
 
     open func putIntoContext(_ context: AnyObject) {
-        self.rootObject = context
+        rootObject = context
     }
 
     // MARK: Content watching
@@ -79,7 +79,7 @@ open class Board: IdentifiableBoard, OriginalBoard {
     /**
      Give list of available watched contents with object type specified.
      */
-    public func availableWatchedContents<Object>(_ contentType: Object.Type = Object.self) -> [Object] {
+    public func availableWatchedContents<Object>(_: Object.Type = Object.self) -> [Object] {
         availableWatchedContents().compactMap { $0 as? Object }
     }
 

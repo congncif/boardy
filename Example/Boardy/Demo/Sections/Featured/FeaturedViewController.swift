@@ -15,7 +15,7 @@ final class FeaturedViewController: UIViewController, FeaturedController {
 
     weak var delegate: FeaturedDelegate?
 
-    lazy var state: FeaturedViewState = FeaturedViewState()
+    lazy var state: FeaturedViewState = .init()
 
     // MARK: LifeCycle
 
@@ -38,13 +38,13 @@ final class FeaturedViewController: UIViewController, FeaturedController {
             self.view.layoutIfNeeded()
         }
 
-        self.view.closestContainerTableView?.performUpdates()
+        view.closestContainerTableView?.performUpdates()
     }
-    
+
     @IBAction private func removeButtonDidTap() {
         delegate?.removeFeaturedContent()
     }
-    
+
     @IBAction private func refreshButtonDidTap() {
         delegate?.refreshHeadline()
     }
@@ -59,7 +59,7 @@ extension FeaturedViewController {
 // MARK: - ViewState
 
 extension FeaturedViewController: DedicatedViewStateRenderable {
-    func dedicatedRender(state: FeaturedViewState) {
+    func dedicatedRender(state _: FeaturedViewState) {
         // handle state changes
     }
 }

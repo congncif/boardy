@@ -21,7 +21,7 @@ final class HeadlineUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
         super.init()
     }
 
-    func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
+    func buildInterface(withGuaranteedInput _: Any?) -> UIViewController? {
         let viewController = builder.build()
         viewController.delegate = self
         return viewController

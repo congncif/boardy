@@ -41,11 +41,11 @@ extension BoardID: Equatable {
 
 // Overload the ~= operator to match a BoardID with a string.
 public func ~= (pattern: BoardID, value: String) -> Bool {
-    return pattern.rawValue == value
+    pattern.rawValue == value
 }
 
 public extension BoardID {
     func appending(_ tail: String, separator: String = ".") -> BoardID {
-        return BoardID(rawValue + separator + tail)
+        BoardID(rawValue + separator + tail)
     }
 }

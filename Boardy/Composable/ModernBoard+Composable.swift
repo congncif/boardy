@@ -12,7 +12,8 @@ public extension ModernContinuableBoard {
     @discardableResult
     func mountComposableMotherboard(
         to interface: ComposableInterfaceObject,
-        configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }) -> FlowComposableMotherboard {
+        configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }
+    ) -> FlowComposableMotherboard {
         let newBoard = produceComposableMotherboard()
         configurationBuilder(newBoard)
 
@@ -25,7 +26,8 @@ public extension ModernContinuableBoard {
     @discardableResult
     func mountComposableMotherboard<Mainboard: FlowComposableMotherboard>(
         to interface: ComposableInterfaceObject,
-        build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+        build: (ActivableBoardProducer) -> Mainboard
+    ) -> Mainboard {
         let newBoard = build(producer)
 
         newBoard.putIntoContext(interface)
@@ -45,7 +47,8 @@ public extension ModernContinuableBoard {
     @discardableResult
     func attachComposableMotherboard(
         to interface: AttachableObject & ComposableInterface,
-        configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }) -> FlowComposableMotherboard {
+        configurationBuilder: (FlowComposableMotherboard) -> Void = { _ in }
+    ) -> FlowComposableMotherboard {
         let newBoard = mountComposableMotherboard(to: interface, configurationBuilder: configurationBuilder)
         interface.attachObject(newBoard)
 
@@ -55,7 +58,8 @@ public extension ModernContinuableBoard {
     @discardableResult
     func attachComposableMotherboard<Mainboard: FlowComposableMotherboard>(
         to interface: AttachableObject & ComposableInterface,
-        build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+        build: (ActivableBoardProducer) -> Mainboard
+    ) -> Mainboard {
         let newBoard = mountComposableMotherboard(to: interface, build: build)
         interface.attachObject(newBoard)
         return newBoard

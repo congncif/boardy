@@ -10,7 +10,7 @@
 import XCTest
 
 private class StubBoard: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {}
+    func activate(withOption _: Any?) {}
 }
 
 class ProducerTests: XCTestCase {

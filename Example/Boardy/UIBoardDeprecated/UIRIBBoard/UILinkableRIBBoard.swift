@@ -15,8 +15,8 @@ public protocol UILinkableRIBBoard: ActivatableBoard {
     func linkInterface(_ viewRouter: ViewableRouting)
 }
 
-extension UILinkableRIBBoard {
-    public func activate(withOption option: Any?) {
+public extension UILinkableRIBBoard {
+    func activate(withOption option: Any?) {
         guard let childRouter = buildInterface(withOption: option) else {
             assertionFailure("Cannot build interface for \(self) with option \(String(describing: option))")
             return
@@ -29,8 +29,8 @@ public protocol UIDedicatedRIBBoard: UILinkableRIBBoard, AdaptableBoard {
     func buildInterface(withInput input: InputType?) -> ViewableRouting?
 }
 
-extension UIDedicatedRIBBoard {
-    public func buildInterface(withOption option: Any?) -> ViewableRouting? {
+public extension UIDedicatedRIBBoard {
+    func buildInterface(withOption option: Any?) -> ViewableRouting? {
         buildInterface(withInput: convertOptionToInput(option))
     }
 }
@@ -39,8 +39,8 @@ public protocol UIGuaranteedRIBBoard: UILinkableRIBBoard, AdaptableBoard {
     func buildInterface(withGuaranteedInput input: InputType) -> ViewableRouting?
 }
 
-extension UIGuaranteedRIBBoard {
-    public func buildInterface(withOption option: Any?) -> ViewableRouting? {
+public extension UIGuaranteedRIBBoard {
+    func buildInterface(withOption option: Any?) -> ViewableRouting? {
         guard let input = convertOptionToInput(option) else {
             assertionFailure("Cannot convert input from \(String(describing: option)) to type \(InputType.self)")
             return nil

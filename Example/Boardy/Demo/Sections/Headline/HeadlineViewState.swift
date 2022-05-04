@@ -10,5 +10,5 @@ import Foundation
 import ViewStateCore
 
 final class HeadlineViewState: ViewState {
-    //@objc dynamic var
+    // @objc dynamic var
 }

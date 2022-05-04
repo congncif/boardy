@@ -17,7 +17,7 @@ struct Atomic<Value> {
     }
 
     var wrappedValue: Value {
-        get { return get() }
+        get { get() }
         set { set(newValue) }
     }
 

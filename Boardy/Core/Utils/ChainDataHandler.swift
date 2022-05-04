@@ -18,7 +18,7 @@ public final class ChainDataHandler<Target: AnyObject> {
         self.target = target
     }
 
-    public func with<Value>(dataType: Value.Type, handler: @escaping (Target, Value) -> Void) -> Self {
+    public func with<Value>(dataType _: Value.Type, handler: @escaping (Target, Value) -> Void) -> Self {
         let matcher = TargetHandler { (object: Target, data) in
             if let output = data as? Value {
                 handler(object, output)
@@ -33,13 +33,13 @@ public final class ChainDataHandler<Target: AnyObject> {
 
     public func fallback(handler: @escaping (Target, Any?) -> Void = { target, data in
         #if DEBUG
-        print(
-            """
-            ⚠️ [\(String(describing: ChainDataHandler.self))] fallback handling:
-            🎯 Target: \(String(describing: target))
-            🌸 Data: \(String(describing: data))
-            """
-        )
+            print(
+                """
+                ⚠️ [\(String(describing: ChainDataHandler.self))] fallback handling:
+                🎯 Target: \(String(describing: target))
+                🌸 Data: \(String(describing: data))
+                """
+            )
         #endif
     }) -> Self {
         let matcher = TargetHandler { (object: Target, data) in

@@ -65,7 +65,7 @@ class CodableBoardTests: XCTestCase {
 
         mainboard.activateBoard(identifier: "receiver", withOption: [
             "strValue": "String",
-            "intValue": 100
+            "intValue": 100,
         ])
 
         XCTAssertNotNil(data)

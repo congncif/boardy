@@ -6,8 +6,8 @@
 //  Copyright © 2020 [iF] Solution. All rights reserved.
 //
 
-import UIKit
 import SiFUtilities
+import UIKit
 
 struct HeadlineBuilder: HeadlineBuildable {
     func build() -> HeadlineController {

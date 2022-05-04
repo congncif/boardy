@@ -9,43 +9,43 @@ import Foundation
 
 #if swift(>=5.4)
 
-extension Array: URLOpenerPluginConvertible where Element == URLOpenerPlugin {
-    public var urlOpenerPlugins: [URLOpenerPlugin] {
-        return self
-    }
-}
-
-@resultBuilder
-public enum URLOpenerPluginBuilder {
-    public static func buildBlock(_ components: URLOpenerPluginConvertible...) -> [URLOpenerPlugin] {
-        components.flatMap { $0.urlOpenerPlugins }
+    extension Array: URLOpenerPluginConvertible where Element == URLOpenerPlugin {
+        public var urlOpenerPlugins: [URLOpenerPlugin] {
+            self
+        }
     }
 
-    public static func buildArray(_ components: [URLOpenerPluginConvertible]) -> [URLOpenerPlugin] {
-        components.flatMap { $0.urlOpenerPlugins }
+    @resultBuilder
+    public enum URLOpenerPluginBuilder {
+        public static func buildBlock(_ components: URLOpenerPluginConvertible...) -> [URLOpenerPlugin] {
+            components.flatMap { $0.urlOpenerPlugins }
+        }
+
+        public static func buildArray(_ components: [URLOpenerPluginConvertible]) -> [URLOpenerPlugin] {
+            components.flatMap { $0.urlOpenerPlugins }
+        }
+
+        public static func buildEither(first component: URLOpenerPluginConvertible) -> URLOpenerPluginConvertible {
+            component.urlOpenerPlugins
+        }
+
+        public static func buildEither(second component: URLOpenerPluginConvertible) -> URLOpenerPluginConvertible {
+            component.urlOpenerPlugins
+        }
+
+        public static func buildOptional(_ component: URLOpenerPluginConvertible?) -> URLOpenerPluginConvertible {
+            component ?? []
+        }
+
+        public static func buildExpression(_ expression: URLOpenerPluginConvertible?) -> URLOpenerPluginConvertible {
+            expression ?? []
+        }
     }
 
-    public static func buildEither(first component: URLOpenerPluginConvertible) -> URLOpenerPluginConvertible {
-        component.urlOpenerPlugins
+    public extension PluginLauncher {
+        func install(@URLOpenerPluginBuilder urlOpenerPluginsBuilder: () -> [URLOpenerPlugin]) -> Self {
+            install(urlOpenerPlugins: urlOpenerPluginsBuilder())
+        }
     }
-
-    public static func buildEither(second component: URLOpenerPluginConvertible) -> URLOpenerPluginConvertible {
-        component.urlOpenerPlugins
-    }
-
-    public static func buildOptional(_ component: URLOpenerPluginConvertible?) -> URLOpenerPluginConvertible {
-        component ?? []
-    }
-
-    public static func buildExpression(_ expression: URLOpenerPluginConvertible?) -> URLOpenerPluginConvertible {
-        expression ?? []
-    }
-}
-
-public extension PluginLauncher {
-    func install(@URLOpenerPluginBuilder urlOpenerPluginsBuilder: () -> [URLOpenerPlugin]) -> Self {
-        install(urlOpenerPlugins: urlOpenerPluginsBuilder())
-    }
-}
 
 #endif

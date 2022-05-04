@@ -21,7 +21,7 @@ final class FeaturedUIBoard: UIBoard, UIGuaranteedViewControllerBoard {
         super.init(identifier: .featured)
     }
 
-    func buildInterface(withGuaranteedInput input: Any?) -> UIViewController? {
+    func buildInterface(withGuaranteedInput _: Any?) -> UIViewController? {
         let featured = builder.build()
         featured.delegate = self
         return featured

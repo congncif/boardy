@@ -14,8 +14,8 @@ public protocol InstallableBoard: OriginalBoard {
     func installIntoRootViewController(_ rootViewController: UIViewController)
 }
 
-extension InstallableBoard {
-    public var rootViewController: UIViewController {
+public extension InstallableBoard {
+    var rootViewController: UIViewController {
         guard let viewController = context as? UIViewController else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `rootViewController` because it is not set or deallocated. Make sure install \(self) into a `rootViewController` before accessing it.")
             return UIViewController()
@@ -23,11 +23,11 @@ extension InstallableBoard {
         return viewController
     }
 
-    public func installIntoRootViewController(_ rootViewController: UIViewController) {
+    func installIntoRootViewController(_ rootViewController: UIViewController) {
         putIntoContext(rootViewController)
     }
 
-    public var navigationController: UINavigationController {
+    var navigationController: UINavigationController {
         if let controller = rootViewController as? UINavigationController {
             return controller
         } else if let controller = rootViewController.navigationController {
@@ -40,7 +40,7 @@ extension InstallableBoard {
         }
     }
 
-    public var tabBarController: UITabBarController {
+    var tabBarController: UITabBarController {
         if let controller = rootViewController as? UITabBarController {
             return controller
         } else if let controller = rootViewController.tabBarController {
@@ -60,8 +60,8 @@ public protocol WindowInstallableBoard: OriginalBoard {
     func installIntoWindow(_ window: UIWindow)
 }
 
-extension WindowInstallableBoard {
-    public var window: UIWindow {
+public extension WindowInstallableBoard {
+    var window: UIWindow {
         guard let current = context as? UIWindow else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `window` because it is not set or deallocated. Make sure install \(self) into a `window` before accessing it.")
             return UIWindow()
@@ -69,13 +69,13 @@ extension WindowInstallableBoard {
         return current
     }
 
-    public func installIntoWindow(_ window: UIWindow) {
+    func installIntoWindow(_ window: UIWindow) {
         putIntoContext(window)
     }
 }
 
-extension InstallableBoard where Self: WindowInstallableBoard {
-    public var rootViewController: UIViewController {
+public extension InstallableBoard where Self: WindowInstallableBoard {
+    var rootViewController: UIViewController {
         if let currentWindow = context as? UIWindow, let viewController = currentWindow.rootViewController {
             return viewController
         } else if let viewController = context as? UIViewController {

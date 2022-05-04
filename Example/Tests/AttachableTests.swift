@@ -33,14 +33,12 @@ class AttachableTests: XCTestCase {
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
-    override func tearDownWithError() throws {
-        
-    }
+    override func tearDownWithError() throws {}
 
     func testAttachObject() throws {
         let some = SomeObject()
         let mainObject = MainObject()
-        
+
         mainObject.attachObject(some)
 
         let attachedObjects = mainObject.attachedObjects()
@@ -60,7 +58,7 @@ class AttachableTests: XCTestCase {
     func testAttachTo() {
         let some = SomeObject()
         let mainObject = MainObject()
-        
+
         some.attach(to: mainObject)
 
         let attachedObjects = mainObject.attachedObjects()

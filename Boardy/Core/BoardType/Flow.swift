@@ -39,7 +39,7 @@ public extension FlowManageable {
 
     /// A General Flow doesn't check identifier of sender, handler will be executed whenever data matches with Output type. This mean it will be applied for all senders in workflow.
     @discardableResult
-    func registerGeneralFlow<Output>(uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Output) -> Void) -> Self {
+    func registerGeneralFlow<Output>(uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Output) -> Void) -> Self {
         let generalFlow = BoardActivateFlow(matcher: { _ in true }, nextHandler: { data in
             guard let output = data as? Output else { return }
             nextHandler(output)
@@ -52,7 +52,7 @@ public extension FlowManageable {
     @discardableResult
     func registerGeneralFlow<Target, Output>(
         target: Target,
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
     ) -> Self {
         let box = ObjectBox()
@@ -69,7 +69,7 @@ public extension FlowManageable {
     @discardableResult
     func registerFlow<Output>(
         matchedIdentifiers: [FlowID],
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         nextHandler: @escaping (Output) -> Void
     ) -> Self {
         let generalFlow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, dedicatedNextHandler: { (output: Output?) in
@@ -85,7 +85,7 @@ public extension FlowManageable {
     func registerFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
     ) -> Self {
         let box = ObjectBox()
@@ -103,7 +103,7 @@ public extension FlowManageable {
     func registerGuaranteedFlow<Target, Output>(
         matchedIdentifiers: [FlowID],
         target: Target,
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         handler: @escaping (Target, Output) -> Void
     ) -> Self {
         let box = ObjectBox()
@@ -176,7 +176,7 @@ public final class ChainBoardFlow<Target>: BoardFlow {
     private let box = ObjectBox()
 
     private var target: Target? {
-        return box.unboxed(Target.self)
+        box.unboxed(Target.self)
     }
 
     init(manager: FlowManageable, target: Target, matcher: @escaping (BoardOutputModel) -> Bool) {
@@ -185,7 +185,7 @@ public final class ChainBoardFlow<Target>: BoardFlow {
         box.setObject(target)
     }
 
-    public func handle<Output>(outputType: Output.Type, handler: @escaping (Target, Output) -> Void) -> Self {
+    public func handle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output) -> Void) -> Self {
         let matcher = HandlerInfo { (object: Target, output) in
             let data = output.data
             if let output = data as? Output {
@@ -200,7 +200,7 @@ public final class ChainBoardFlow<Target>: BoardFlow {
     }
 
     @discardableResult
-    public func eventuallyHandle<Output>(outputType: Output.Type, handler: @escaping (Target, Output?) -> Void) -> FlowManageable {
+    public func eventuallyHandle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output?) -> Void) -> FlowManageable {
         let matcher = HandlerInfo { (object: Target, output) in
             let data = output.data
             let output = data as? Output
@@ -227,11 +227,11 @@ public final class ChainBoardFlow<Target>: BoardFlow {
 
     @discardableResult
     public func eventuallySkipHandling() -> FlowManageable {
-        return eventuallyHandle { _, _ in }
+        eventuallyHandle { _, _ in }
     }
 
     public func match(with output: BoardOutputModel) -> Bool {
-        return matcher(output)
+        matcher(output)
     }
 
     public func doNext(with output: BoardOutputModel) {
@@ -312,7 +312,7 @@ public struct BoardActivateFlow: BoardFlow {
     }
 
     public func match(with output: BoardOutputModel) -> Bool {
-        return matcher(output)
+        matcher(output)
     }
 
     public func doNext(with output: BoardOutputModel) {
@@ -332,7 +332,7 @@ public struct IDFlowStep {
 
 infix operator ->>: MultiplicationPrecedence
 public func ->> (left: FlowID, right: FlowID) -> [IDFlowStep] {
-    return [IDFlowStep(source: left, destination: right)]
+    [IDFlowStep(source: left, destination: right)]
 }
 
 public func ->> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {

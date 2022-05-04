@@ -16,12 +16,12 @@ final class RootBoard: ContinuousBoard, GuaranteedBoard {
     typealias InputType = [UIApplication.LaunchOptionsKey: Any]?
 
     @LazyInjected var builder: RootBuildable
-    
+
     init(motherboard: AppMotherboard) {
         super.init(identifier: .root, motherboard: motherboard)
     }
 
-    func activate(withGuaranteedInput input: [UIApplication.LaunchOptionsKey: Any]?) {
+    func activate(withGuaranteedInput _: [UIApplication.LaunchOptionsKey: Any]?) {
         let viewController = builder.build()
         viewController.delegate = self
         window.setRootViewController(viewController)

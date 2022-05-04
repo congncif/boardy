@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension MotherboardType {
+public extension MotherboardType {
     /// Interact with a child board which this motherboard directly manages.
-    public func interactWithBoard(command: BoardCommandModel) {
+    func interactWithBoard(command: BoardCommandModel) {
         let identifier = command.identifier
         let board = getBoard(identifier: identifier)
         guard let interactBoard = board as? InteractableBoard else {
@@ -20,7 +20,7 @@ extension MotherboardType {
         interactBoard.interact(command: command.data)
     }
 
-    public func interactWithBoard<Input>(_ input: BoardCommand<Input>) {
+    func interactWithBoard<Input>(_ input: BoardCommand<Input>) {
         interactWithBoard(command: input)
     }
 }

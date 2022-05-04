@@ -10,15 +10,15 @@ import Foundation
 public final class BarrierBoard<Input>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = Action
     public typealias OutputType = Input
-    
+
     public typealias Process = (Input) -> Void
-    
+
     public enum Action {
         case wait(Process)
         case overcome(OutputType)
         case cancel
     }
-    
+
     public func activate(withGuaranteedInput input: InputType) {
         switch input {
         case let .wait(process):
@@ -35,27 +35,27 @@ public final class BarrierBoard<Input>: Board, GuaranteedBoard, GuaranteedOutput
             complete(true)
         }
     }
-    
+
     // MARK: Processes holding
 
     private var processes: [Process] = []
-    
+
     private let queue = DispatchQueue(label: "boardy.barrier-board.queue", attributes: .concurrent)
-    
+
     private func appendProcess(_ process: @escaping Process) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             self.processes.append(process)
         }
     }
-    
+
     private func clearProcesses() {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             self.processes.removeAll()
         }
     }
-    
+
     private func getProcesses() -> [Process] {
         queue.sync { processes }
     }

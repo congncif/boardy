@@ -36,7 +36,7 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
         }
     }
 
-    func activate(withGuaranteedInput input: Any?) {
+    func activate(withGuaranteedInput _: Any?) {
         let dashboard = builder.build()
         dashboard.delegate = self
         rootViewController.topPresentedViewController.show(dashboard)

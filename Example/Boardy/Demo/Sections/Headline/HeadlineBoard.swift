@@ -30,7 +30,7 @@ final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedCommandBoard {
         super.init(identifier: .headline)
     }
 
-    func activate(withGuaranteedInput input: Any) {
+    func activate(withGuaranteedInput _: Any) {
         let viewController = builder.build()
         viewController.delegate = self
 

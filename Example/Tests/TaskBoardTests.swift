@@ -19,11 +19,11 @@ class TaskBoardTests: XCTestCase {
     }
 
     func testExample() throws {
-        var isLoading: Bool = false
+        var isLoading = false
         var results: [String?] = []
-        
-        let expectation = self.expectation(description: "expectation")
-        
+
+        let expectation = expectation(description: "expectation")
+
         let board = TaskBoard<Int, String>(identifier: "test-board") { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 print("🚧 \(String(input))")
@@ -38,19 +38,19 @@ class TaskBoardTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        
+
         let motherboard: FlowMotherboard = Motherboard(boards: [board])
-        
+
         motherboard.matchedFlow("test-board", with: String.self).handle { output in
             results.append(output)
         }
-        
+
         motherboard.activation("test-board", with: Int.self).activate(with: 1)
         motherboard.activation("test-board", with: Int.self).activate(with: 2)
         motherboard.activation("test-board", with: Int.self).activate(with: 3)
-        
-        self.waitForExpectations(timeout: 6, handler: nil)
-        
+
+        waitForExpectations(timeout: 6, handler: nil)
+
         XCTAssertEqual(isLoading, false)
         XCTAssertEqual(results.count, 1)
         XCTAssertEqual(motherboard.boards.count, 0)

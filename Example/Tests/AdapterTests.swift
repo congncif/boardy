@@ -39,7 +39,7 @@ class AdapterTests: XCTestCase {
 
         let motherboard: FlowMotherboard = Motherboard(boards: [adapter])
 
-        let expectation = self.expectation(description: "flow-test-expectation")
+        let expectation = expectation(description: "flow-test-expectation")
         var result: Int?
 
         (motherboard as FlowMotherboard).matchedFlow("board-to-test", with: Int.self).handle { output in

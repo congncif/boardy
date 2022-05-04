@@ -70,7 +70,7 @@ public struct BlockURLOpenerPlugin<Parameter>: GuaranteedURLOpenerPlugin {
     }
 
     public init(name: String? = nil, condition: @escaping (URL) -> URLOpeningOption<Parameter>, handler: @escaping (FlowMotherboard, Parameter) -> Void) {
-        self.customName = name
+        customName = name
         self.condition = condition
         self.handler = handler
     }

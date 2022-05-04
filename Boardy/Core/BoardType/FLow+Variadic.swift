@@ -17,7 +17,7 @@ public extension FlowManageable {
         nextHandler: @escaping (Target, Output) -> Void
     ) -> Self {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerFlow(matchedIdentifiers: listIds, target: target, uniqueOutputType: uniqueOutputType, nextHandler: nextHandler)
+        return registerFlow(matchedIdentifiers: listIds, target: target, uniqueOutputType: uniqueOutputType, nextHandler: nextHandler)
     }
 
     @discardableResult
@@ -26,7 +26,7 @@ public extension FlowManageable {
         bindToBus bus: Bus<Output>
     ) -> Self {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerFlow(matchedIdentifiers: listIds, target: bus, uniqueOutputType: Output.self, nextHandler: { target, data in
+        return registerFlow(matchedIdentifiers: listIds, target: bus, uniqueOutputType: Output.self, nextHandler: { target, data in
             target.transport(input: data)
         })
     }
@@ -34,11 +34,11 @@ public extension FlowManageable {
     @discardableResult
     func registerFlow<Output, OutBoard>(
         matchedIdentifiers: FlowID...,
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         sendOutputThrough board: OutBoard
     ) -> Self where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, nextHandler: { target, data in
+        return registerFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, nextHandler: { target, data in
             target.sendOutput(data)
         })
     }
@@ -52,7 +52,7 @@ public extension FlowManageable {
         handler: @escaping (Target, Output) -> Void
     ) -> Self {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: target, uniqueOutputType: uniqueOutputType, handler: handler)
+        return registerGuaranteedFlow(matchedIdentifiers: listIds, target: target, uniqueOutputType: uniqueOutputType, handler: handler)
     }
 
     @discardableResult
@@ -61,7 +61,7 @@ public extension FlowManageable {
         bindToBus bus: Bus<Output>
     ) -> Self {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: bus, uniqueOutputType: Output.self, handler: { target, data in
+        return registerGuaranteedFlow(matchedIdentifiers: listIds, target: bus, uniqueOutputType: Output.self, handler: { target, data in
             target.transport(input: data)
         })
     }
@@ -69,11 +69,11 @@ public extension FlowManageable {
     @discardableResult
     func registerGuaranteedFlow<Output, OutBoard>(
         matchedIdentifiers: FlowID...,
-        uniqueOutputType: Output.Type = Output.self,
+        uniqueOutputType _: Output.Type = Output.self,
         sendOutputThrough board: OutBoard
     ) -> Self where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerGuaranteedFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, handler: { target, data in
+        return registerGuaranteedFlow(matchedIdentifiers: listIds, target: board, uniqueOutputType: Output.self, handler: { target, data in
             target.sendOutput(data)
         })
     }
@@ -81,7 +81,7 @@ public extension FlowManageable {
     /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
     func registerChainFlow<Target>(matchedIdentifiers: FlowID..., target: Target) -> ChainBoardFlow<Target> {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerChainFlow(matchedIdentifiers: listIds, target: target)
+        return registerChainFlow(matchedIdentifiers: listIds, target: target)
     }
 
     @discardableResult
@@ -90,6 +90,6 @@ public extension FlowManageable {
         nextHandler: @escaping (_ isDone: Bool) -> Void
     ) -> Self {
         let listIds: [FlowID] = matchedIdentifiers
-        return self.registerCompletionFlow(matchedIdentifiers: listIds, nextHandler: nextHandler)
+        return registerCompletionFlow(matchedIdentifiers: listIds, nextHandler: nextHandler)
     }
 }

@@ -33,7 +33,7 @@ final class PlaceholderBuilder: Builder<PlaceholderDependency>, PlaceholderBuild
 
 public final class PlaceholderExBuilder: PlaceholderBuildable {
     public init() {}
-    
+
     public func build() -> PlaceholderRouting {
         PlaceholderBuilder().build()
     }

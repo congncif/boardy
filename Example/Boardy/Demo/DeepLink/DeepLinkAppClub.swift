@@ -20,16 +20,14 @@ final class DeepLinkAppClub: DeepLinkHandlerClubbing {
 
     @LazyInjected var boardCollection: DeepLinkBoardCollection
 
-    private lazy var mainboard: FlowMotherboard = {
-        appMainboard.extended(boards: boardCollection.boards)
-    }()
+    private lazy var mainboard: FlowMotherboard = appMainboard.extended(boards: boardCollection.boards)
 
     var identifier: String { String(describing: self) }
 
     var workflowMainboards: [FlowMotherboard] { [mainboard] }
 
     var parser: DeepLinkParsing {
-        DeepLinkParser { (deepLink) -> BoardIdentity? in
+        DeepLinkParser { deepLink -> BoardIdentity? in
             switch deepLink {
             case "boardy://login":
                 return .login

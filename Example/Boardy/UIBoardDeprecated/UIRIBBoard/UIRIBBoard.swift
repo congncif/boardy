@@ -26,7 +26,7 @@ open class UIRIBBoard: RIBBoard, UIChangableBoard {
     private let changeRelay = PublishRelay<UIChangableBoard>()
 
     open var changeSequence: Observable<UIChangableBoard> {
-        return changeRelay.asObservable()
+        changeRelay.asObservable()
     }
 
     open func reload() {
@@ -35,8 +35,8 @@ open class UIRIBBoard: RIBBoard, UIChangableBoard {
     }
 }
 
-extension UILinkableRIBBoard where Self: UIRIBBoard {
-    public func linkInterface(_ viewRouter: ViewableRouting) {
+public extension UILinkableRIBBoard where Self: UIRIBBoard {
+    func linkInterface(_ viewRouter: ViewableRouting) {
         rootRouter.attachChild(viewRouter)
         contentViewController = viewRouter.viewControllable.uiviewController
     }

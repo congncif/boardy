@@ -26,10 +26,10 @@ class ResultBoardTests: XCTestCase {
             }
         }
 
-        var isLoading: Bool = false
+        var isLoading = false
         var results: String?
 
-        let expectation = self.expectation(description: "expectation")
+        let expectation = expectation(description: "expectation")
 
         let motherboard: FlowMotherboard = Motherboard(boards: [board])
 
@@ -38,7 +38,7 @@ class ResultBoardTests: XCTestCase {
             case let .success(data):
                 results = data
                 isLoading = false
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     expectation.fulfill()
                 }
@@ -46,7 +46,7 @@ class ResultBoardTests: XCTestCase {
                 isLoading = true
             default:
                 isLoading = false
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     expectation.fulfill()
                 }

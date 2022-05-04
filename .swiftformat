@@ -1,0 +1,6 @@
+--exclude Pods, **/*/Generated/*, **/*/Example/*
+--swiftversion 5.5
+
+--disable numberFormatting
+--disable wrapMultilineStatementBraces
+--disable preferKeyPath

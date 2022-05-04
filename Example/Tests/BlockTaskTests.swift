@@ -29,9 +29,9 @@ class BlockTaskTests: XCTestCase {
 
         motherboard.installBoard(blockTask)
 
-        let expectation = self.expectation(description: "block-task-expectation")
+        let expectation = expectation(description: "block-task-expectation")
         var result: String?
-        let input: String = "ABC"
+        let input = "ABC"
         var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
@@ -45,7 +45,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
-        let input2: String = "ABC2"
+        let input2 = "ABC2"
         var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
@@ -78,9 +78,9 @@ class BlockTaskTests: XCTestCase {
 
         motherboard.installBoard(blockTask)
 
-        let expectation = self.expectation(description: "block-task-expectation")
+        let expectation = expectation(description: "block-task-expectation")
         var result: String?
-        let input: String = "ABC"
+        let input = "ABC"
         var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
@@ -94,7 +94,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
-        let input2: String = "ABC2"
+        let input2 = "ABC2"
         var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
@@ -127,9 +127,9 @@ class BlockTaskTests: XCTestCase {
 
         motherboard.installBoard(blockTask)
 
-        let expectation = self.expectation(description: "block-task-expectation")
+        let expectation = expectation(description: "block-task-expectation")
         var result: String?
-        let input: String = "ABC"
+        let input = "ABC"
         var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
@@ -143,7 +143,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
-        let input2: String = "ABC2"
+        let input2 = "ABC2"
         var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
@@ -176,9 +176,9 @@ class BlockTaskTests: XCTestCase {
 
         motherboard.installBoard(blockTask!)
 
-        let expectation = self.expectation(description: "block-task-expectation")
+        let expectation = expectation(description: "block-task-expectation")
         var result: String?
-        let input: String = "ABC"
+        let input = "ABC"
         var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
@@ -192,7 +192,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
-        let input2: String = "ABC2"
+        let input2 = "ABC2"
         var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
@@ -229,9 +229,9 @@ class BlockTaskTests: XCTestCase {
         }
         motherboard.installBoard(blockTask!)
 
-        let expectation = self.expectation(description: "block-task-expectation")
+        let expectation = expectation(description: "block-task-expectation")
         var result: String?
-        let input: String = "ABC"
+        let input = "ABC"
         var status: TaskCompletionStatus?
 
         let parameter = BlockTaskParameter<String, String>(input: input)
@@ -245,7 +245,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation2 = self.expectation(description: "block-task-expectation-2")
         var result2: String?
-        let input2: String = "ABC2"
+        let input2 = "ABC2"
         var status2: TaskCompletionStatus?
 
         let parameter2 = BlockTaskParameter<String, String>(input: input2)
@@ -259,7 +259,7 @@ class BlockTaskTests: XCTestCase {
 
         let expectation3 = self.expectation(description: "block-task-expectation-3")
         var result3: String?
-        let input3: String = "ABC3"
+        let input3 = "ABC3"
         var status3: TaskCompletionStatus?
 
         let parameter3 = BlockTaskParameter<String, String>(input: input3)

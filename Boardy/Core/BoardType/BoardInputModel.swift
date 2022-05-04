@@ -24,30 +24,30 @@ public struct BoardInput<Input>: BoardInputModel {
     }
 }
 
-extension BoardInput {
-    public static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
+public extension BoardInput {
+    static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
         BoardInput<Input>(target: id, input: input)
     }
 }
 
-extension BoardInput where Input == Void {
-    public init(target: BoardID) {
+public extension BoardInput where Input == Void {
+    init(target: BoardID) {
         identifier = target
         input = ()
     }
 
-    public static func target(_ id: BoardID) -> BoardInput<Void> {
+    static func target(_ id: BoardID) -> BoardInput<Void> {
         BoardInput<Void>(target: id)
     }
 }
 
-extension BoardInput where Input: ExpressibleByNilLiteral {
-    public init(target: BoardID) {
+public extension BoardInput where Input: ExpressibleByNilLiteral {
+    init(target: BoardID) {
         identifier = target
         input = nil
     }
 
-    public static func target(_ id: BoardID) -> BoardInput<Input> {
+    static func target(_ id: BoardID) -> BoardInput<Input> {
         BoardInput<Input>(target: id)
     }
 }

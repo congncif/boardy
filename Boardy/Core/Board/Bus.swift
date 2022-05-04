@@ -44,7 +44,7 @@ final class ObjectBox {
         value = nil
     }
 
-    func unboxed<Object>(_ objectType: Object.Type = Object.self) -> Object? {
+    func unboxed<Object>(_: Object.Type = Object.self) -> Object? {
         object as? Object ?? value as? Object
     }
 
@@ -128,6 +128,6 @@ public extension Bus where Input == Any? {
 
 public extension Bus where Input == Any {
     func transport() {
-        transport(input: Optional<Any>.none as Any)
+        transport(input: Any?.none as Any)
     }
 }

@@ -21,7 +21,7 @@ enum StaticStorage {
 
 public extension AttachableObject {
     private var storage: NSMapTable<AnyObject, NSHashTable<AnyObject>> {
-        return StaticStorage.mapTable
+        StaticStorage.mapTable
     }
 
     func attach(to object: AnyObject) {
@@ -47,15 +47,15 @@ public extension AttachableObject {
         return []
     }
 
-    func attachedObjects<ObjectType>(_ objectType: ObjectType.Type = ObjectType.self) -> [ObjectType] {
+    func attachedObjects<ObjectType>(_: ObjectType.Type = ObjectType.self) -> [ObjectType] {
         attachedObjects().compactMap { $0 as? ObjectType }
     }
 
-    func firstAttachedObject<ObjectType>(_ objectType: ObjectType.Type = ObjectType.self) -> ObjectType? {
+    func firstAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType? {
         attachedObjects().first
     }
 
-    func lastAttachedObject<ObjectType>(_ objectType: ObjectType.Type = ObjectType.self) -> ObjectType? {
+    func lastAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType? {
         attachedObjects().last
     }
 
@@ -65,7 +65,7 @@ public extension AttachableObject {
         }
     }
 
-    func detachObjects<ObjectType>(_ objectType: ObjectType.Type, where condition: (ObjectType) -> Bool = { _ in true }) {
+    func detachObjects<ObjectType>(_: ObjectType.Type, where condition: (ObjectType) -> Bool = { _ in true }) {
         let objects: [AnyObject] = attachedObjects().filter {
             guard let object = $0 as? ObjectType else { return false }
             return condition(object)

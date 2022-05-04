@@ -9,15 +9,15 @@ import Foundation
 import UIComposable
 import UIKit
 
-extension IdentifiableBoard {
-    public func putToComposer(elementAction: UIElementAction) {
+public extension IdentifiableBoard {
+    func putToComposer(elementAction: UIElementAction) {
         sendToMotherboard(data: elementAction)
     }
 }
 
 // Overload method with BoardID
-extension UIElement {
-    public init(identifier: BoardID, contentViewController: UIViewController?, configuration: Any? = nil) {
+public extension UIElement {
+    init(identifier: BoardID, contentViewController: UIViewController?, configuration: Any? = nil) {
         self.init(identifier: identifier.rawValue, contentViewController: contentViewController, configuration: configuration)
     }
 }

@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension MotherboardType {
+public extension MotherboardType {
     /// Activate all of installed boards in Motherboard at once. This is useful for preparing to plug them in Interface.
-    public func activateAllBoards(withOptions options: [BoardID: Any] = [:], defaultOption: Any? = nil) {
+    func activateAllBoards(withOptions options: [BoardID: Any] = [:], defaultOption: Any? = nil) {
         for board in boards {
             let option = options[board.identifier] ?? defaultOption
             DebugLog.logActivation(source: self, destination: board, data: option)
@@ -18,7 +18,7 @@ extension MotherboardType {
     }
 
     /// Activate all of installed boards in Motherboard at once. The boards is not in models parameter will be activated with option defaultOption.
-    public func activateAllBoards(models: [BoardInputModel], defaultOption: Any? = nil) {
+    func activateAllBoards(models: [BoardInputModel], defaultOption: Any? = nil) {
         let options: [BoardID: Any] = models.reduce([:]) { result, model in
             result.merging([model.identifier: model.option as Any]) { $1 }
         }
@@ -26,7 +26,7 @@ extension MotherboardType {
     }
 
     /// Activate all of installed boards in Motherboard at once when they have same input type. If the input of a board is unavailable, the board will be activated with default input.
-    public func activateAllBoards<Input>(withInputs inputs: [BoardInput<Input>] = [], defaultInput: Input) {
+    func activateAllBoards<Input>(withInputs inputs: [BoardInput<Input>] = [], defaultInput: Input) {
         for board in boards {
             guard let input = inputs.first(where: { $0.identifier == board.identifier }) else {
                 let input = BoardInput<Input>(target: board.identifier, input: defaultInput)
@@ -38,7 +38,7 @@ extension MotherboardType {
     }
 
     /// Activate all of installed boards in Motherboard at once when they have same input type without default value. If the input of a board is unavailable, the board will be activated with nil option.
-    public func activateAllBoards<Input>(withInputs inputs: [BoardInput<Input>]) {
+    func activateAllBoards<Input>(withInputs inputs: [BoardInput<Input>]) {
         for board in boards {
             guard let input = inputs.first(where: { $0.identifier == board.identifier }) else {
                 activateBoard(identifier: board.identifier)

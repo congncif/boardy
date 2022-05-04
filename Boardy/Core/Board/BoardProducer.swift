@@ -75,7 +75,7 @@ public final class BoardProducer: BoardDynamicProducer {
 public extension BoardDynamicProducer where Self: AnyObject {
     /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
     var boxed: BoardDynamicProducer {
-        return BoardDynamicProducerBox(producer: self)
+        BoardDynamicProducerBox(producer: self)
     }
 }
 
@@ -98,7 +98,7 @@ struct BoardDynamicProducerBox: BoardDynamicProducer {
 public extension ActivableBoardProducer where Self: AnyObject {
     /// Boxed the producer as a ValueType without retaining to avoid working with reference counter
     var boxed: ActivableBoardProducer {
-        return BoardProducerBox(producer: self)
+        BoardProducerBox(producer: self)
     }
 }
 

@@ -21,7 +21,6 @@ protocol MainBuildable: Buildable {
 }
 
 final class MainBuilder: Builder<MainDependency>, MainBuildable {
-
     override init(dependency: MainDependency = MainRootComponent()) {
         super.init(dependency: dependency)
     }

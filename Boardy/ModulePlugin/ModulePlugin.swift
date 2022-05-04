@@ -35,12 +35,12 @@ public struct MainOptions {
     public static let `default` = MainOptions()
 
     public subscript<Value>(key: Key) -> Value? {
-        return self[key] as? Value
+        self[key] as? Value
     }
 
     public subscript(key: Key) -> Any {
         get {
-            return values[key] as Any
+            values[key] as Any
         }
 
         set {

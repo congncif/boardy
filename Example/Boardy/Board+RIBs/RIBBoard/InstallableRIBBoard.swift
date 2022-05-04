@@ -16,7 +16,7 @@ public protocol InstallableRIBBoard: OriginalBoard {
 }
 
 // Backward support to compatiate older version.
-extension InstallableRIBBoard {
+public extension InstallableRIBBoard {
     @available(*, deprecated, message: "Use rootRouter instead")
-    public var router: ViewableRouting { rootRouter }
+    var router: ViewableRouting { rootRouter }
 }

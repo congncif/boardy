@@ -14,7 +14,7 @@ final class LoginViewController: UIViewController, LoginController {
 
     weak var delegate: LoginDelegate?
 
-    lazy var state: LoginViewState = LoginViewState()
+    lazy var state: LoginViewState = .init()
 
     // MARK: LifeCycle
 
@@ -25,10 +25,10 @@ final class LoginViewController: UIViewController, LoginController {
 
         usernameField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         passwordField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        
+
         usernameField.text = "username"
         passwordField.text = "pwd"
-        
+
         usernameField.sendActions(for: .editingChanged)
         passwordField.sendActions(for: .editingChanged)
     }

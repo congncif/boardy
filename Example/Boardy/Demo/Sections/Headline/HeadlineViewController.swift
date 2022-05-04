@@ -10,7 +10,6 @@ import UIKit
 import ViewStateCore
 
 final class HeadlineViewController: UIViewController, HeadlineController {
-
     // MARK: Dependencies
 
     weak var delegate: HeadlineDelegate?
@@ -53,7 +52,7 @@ extension HeadlineViewController {
 // MARK: - ViewState
 
 extension HeadlineViewController: DedicatedViewStateRenderable {
-    func dedicatedRender(state: HeadlineViewState) {
+    func dedicatedRender(state _: HeadlineViewState) {
         // handle state changes
     }
 }

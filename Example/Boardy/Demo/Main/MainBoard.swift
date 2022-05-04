@@ -22,9 +22,7 @@ final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
     @LazyInjected var boardCollection: MainBoardCollection
 
     // To defer initializing sub-boards, use mainboard instead of motherboard (default) for activation related activities.
-    private lazy var mainboard: FlowMotherboard = {
-        motherboard.extended(boards: boardCollection.boards)
-    }()
+    private lazy var mainboard: FlowMotherboard = motherboard.extended(boards: boardCollection.boards)
 
     init(homeBoard: HomeMotherboard) {
         super.init(identifier: .main, motherboard: homeBoard)
@@ -42,14 +40,14 @@ final class MainBoard: ContinuousRIBBoard, GuaranteedBoard {
         if rootViewController.presentedViewController != nil {
             rootViewController.dismiss(animated: false)
         }
-        
-        motherboard.registerGeneralFlow(target: self, uniqueOutputType: Any.self) { target, out in
+
+        motherboard.registerGeneralFlow(target: self, uniqueOutputType: Any.self) { _, _ in
             print("AAA")
         }
 
         rootRouter.viewControllable.uiviewController.topPresentedViewController.present(nav, animated: true)
     }
-    
+
     deinit {
         print("XXX")
     }

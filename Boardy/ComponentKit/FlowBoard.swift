@@ -31,14 +31,14 @@ open class FlowBoard<Input, Output, Command, Action: BoardFlowAction>: ModernCon
                 flowActivation: @escaping FlowActivation,
                 flowInteraction: @escaping FlowInteraction = { board, command in
                     #if DEBUG
-                    print("""
-                    ⚠️ The FlowBoard received an interaction command but missing a handler!
-                        🏝 [\(String(describing: type(of: board)))] ➤ \(board.identifier.rawValue)
-                        🚦 [\(String(describing: type(of: command)))] ➤ \(command)
-                    """)
-                    if let motherboard = board.delegate as? IdentifiableBoard {
-                        print("    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
-                    }
+                        print("""
+                        ⚠️ The FlowBoard received an interaction command but missing a handler!
+                            🏝 [\(String(describing: type(of: board)))] ➤ \(board.identifier.rawValue)
+                            🚦 [\(String(describing: type(of: command)))] ➤ \(command)
+                        """)
+                        if let motherboard = board.delegate as? IdentifiableBoard {
+                            print("    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
+                        }
                     #endif
                 }) {
         self.flowActivation = flowActivation

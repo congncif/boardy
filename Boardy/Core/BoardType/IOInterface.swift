@@ -88,7 +88,7 @@ public struct BoardActivation<Input>: BoardActivating {
 
 public extension ActivatableBoard {
     // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
-    func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardActivation<Input> {
+    func activation<Input>(_ destinationID: BoardID, with _: Input.Type) -> BoardActivation<Input> {
         BoardActivation(destinationID: destinationID, source: self)
     }
 
@@ -98,7 +98,7 @@ public extension ActivatableBoard {
 }
 
 public extension MotherboardType {
-    func activation<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardActivation<Input> {
+    func activation<Input>(_ destinationID: BoardID, with _: Input.Type) -> MainboardActivation<Input> {
         MainboardActivation(destinationID: destinationID, mainboard: self)
     }
 
@@ -178,7 +178,7 @@ public struct FlowHandler<Output>: FlowHandling {
     }
 
     public var specifications: GuaranteedOutputSpecifications<Output> {
-        return GuaranteedOutputSpecifications<Output>(identifier: matchedIdentifier, valueType: Output.self)
+        GuaranteedOutputSpecifications<Output>(identifier: matchedIdentifier, valueType: Output.self)
     }
 }
 
@@ -221,7 +221,7 @@ public struct ActionFlowHandler<Action: BoardFlowAction> {
 }
 
 public extension FlowManageable {
-    func matchedFlow<Output>(_ identifier: BoardID, with outputType: Output.Type) -> FlowHandler<Output> {
+    func matchedFlow<Output>(_ identifier: BoardID, with _: Output.Type) -> FlowHandler<Output> {
         FlowHandler(matchedIdentifier: identifier, manager: self)
     }
 
@@ -233,7 +233,7 @@ public extension FlowManageable {
         CompletionFlowHandler(matchedIdentifier: identifier, manager: self)
     }
 
-    func actionFlow<Action: BoardFlowAction>(_ identifier: BoardID, with actionType: Action.Type) -> ActionFlowHandler<Action> {
+    func actionFlow<Action: BoardFlowAction>(_ identifier: BoardID, with _: Action.Type) -> ActionFlowHandler<Action> {
         ActionFlowHandler(matchedIdentifier: identifier, manager: self)
     }
 }
@@ -268,7 +268,7 @@ public struct BoardInteraction<Input>: BoardInteracting {
 
 public extension ActivatableBoard {
     // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
-    func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> BoardInteraction<Input> {
+    func interaction<Input>(_ destinationID: BoardID, with _: Input.Type) -> BoardInteraction<Input> {
         BoardInteraction(destinationID: destinationID, source: self)
     }
 
@@ -278,7 +278,7 @@ public extension ActivatableBoard {
 }
 
 public extension MotherboardType {
-    func interaction<Input>(_ destinationID: BoardID, with inputType: Input.Type) -> MainboardInteraction<Input> {
+    func interaction<Input>(_ destinationID: BoardID, with _: Input.Type) -> MainboardInteraction<Input> {
         MainboardInteraction(destinationID: destinationID, mainboard: self)
     }
 

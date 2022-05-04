@@ -392,7 +392,7 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
         case executing = "Executing"
         case finished = "Finished"
 
-        fileprivate var keyPath: String { return "is" + rawValue }
+        fileprivate var keyPath: String { "is" + rawValue }
     }
 
     /// Thread-safe computed state value
@@ -420,7 +420,7 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
     private var stateStore: State = .ready
 
     override var isAsynchronous: Bool {
-        return true
+        true
     }
 
     override var isExecuting: Bool {

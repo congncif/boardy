@@ -19,7 +19,7 @@ public protocol HeadlineActivatable {
 /// For Motherboard call
 struct HeadlineMainActivation {
     let identifier: BoardID
-    let mainboard: MotherboardType
+    let mainboard: FlowMotherboard
 }
 
 extension HeadlineMainActivation: HeadlineActivatable {
@@ -50,10 +50,10 @@ extension HeadlineActivation: HeadlineActivatable {
 
 // MARK: - Factory
 
-extension ActivatableBoard {
-    public func headline(identifier: BoardID) -> HeadlineActivatable {
+public extension ActivatableBoard {
+    func headline(identifier: BoardID) -> HeadlineActivatable {
         switch self {
-        case let main as MotherboardType:
+        case let main as FlowMotherboard:
             return HeadlineMainActivation(identifier: identifier, mainboard: main)
         default:
             return HeadlineActivation(identifier: identifier, source: self)

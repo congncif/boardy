@@ -26,7 +26,7 @@ final class PlaceholderRouter: ViewableRouter<PlaceholderInteractable, Placehold
     func injectViewController(_ viewController: UIViewController?) {
         self.viewController.setViewController(viewController)
     }
-    
+
     deinit {
         injectViewController(nil)
     }

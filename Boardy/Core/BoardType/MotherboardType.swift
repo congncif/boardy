@@ -28,7 +28,7 @@ public extension MotherboardType {
     /// Install additional a board after its Motherboard was installed.
     func installBoard(_ board: ActivatableBoard) {
         addBoard(board)
-        if let root = self.context {
+        if let root = context {
             board.putIntoContext(root)
         }
     }

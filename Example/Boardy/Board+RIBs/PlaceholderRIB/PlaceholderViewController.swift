@@ -16,7 +16,7 @@ final class PlaceholderViewController: PlaceholderPresentable, PlaceholderViewCo
     private weak var viewController: UIViewController?
 
     var uiviewController: UIViewController {
-        return viewController ?? UIViewController()
+        viewController ?? UIViewController()
     }
 
     func setViewController(_ viewController: UIViewController?) {

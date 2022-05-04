@@ -12,8 +12,8 @@ public protocol ActivableBoardProducer {
     func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard?
 }
 
-extension ActivableBoardProducer {
-    public func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+public extension ActivableBoardProducer {
+    func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         produceBoard(identifier: anotherIdentifier)
     }
 }

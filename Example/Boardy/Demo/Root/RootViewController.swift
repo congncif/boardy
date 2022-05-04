@@ -14,7 +14,7 @@ final class RootViewController: UIViewController, RootController {
 
     weak var delegate: RootDelegate?
 
-    lazy var state: RootViewState = RootViewState()
+    lazy var state: RootViewState = .init()
 
     // MARK: LifeCycle
 
@@ -53,7 +53,7 @@ extension RootViewController {
 // MARK: - ViewState
 
 extension RootViewController: DedicatedViewStateRenderable {
-    func dedicatedRender(state: RootViewState) {
+    func dedicatedRender(state _: RootViewState) {
         // handle state changes
     }
 }

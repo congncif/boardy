@@ -14,9 +14,9 @@ public struct LBBoardActivation {
     let mainboard: MotherboardType
 }
 
-extension MotherboardType {
-    public var lb: LBBoardActivation {
-        return LBBoardActivation(mainboard: self)
+public extension MotherboardType {
+    var lb: LBBoardActivation {
+        LBBoardActivation(mainboard: self)
     }
 }
 

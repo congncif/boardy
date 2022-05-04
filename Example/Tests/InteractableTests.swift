@@ -12,10 +12,10 @@ import XCTest
 class MockInteractableBoard: Board, ActivatableBoard, InteractableBoard {
     var cmd: Any?
 
-    func activate(withOption option: Any?) {}
+    func activate(withOption _: Any?) {}
 
     func interact(command: Any?) {
-        self.cmd = command
+        cmd = command
     }
 }
 
@@ -44,7 +44,7 @@ class InteractableTests: XCTestCase {
 }
 
 private final class TestBoard: Board, ActivatableBoard {
-    func activate(withOption option: Any?) {
+    func activate(withOption _: Any?) {
         sendToMotherboard()
     }
 }

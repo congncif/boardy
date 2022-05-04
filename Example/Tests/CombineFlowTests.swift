@@ -34,7 +34,7 @@ class CombineFlowTests: XCTestCase {
 
         let motherboard: FlowMotherboard = Motherboard(boards: [board1, board2])
 
-        let expectation = self.expectation(description: "test-expectation")
+        let expectation = expectation(description: "test-expectation")
 
         var resultStr: String?
         var resultInt: Int?

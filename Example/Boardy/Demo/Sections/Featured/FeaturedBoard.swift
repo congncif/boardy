@@ -21,7 +21,7 @@ final class FeaturedBoard: Board, GuaranteedBoard {
         super.init(identifier: .random())
     }
 
-    func activate(withGuaranteedInput input: Any?) {
+    func activate(withGuaranteedInput _: Any?) {
         let viewController = builder.build()
         viewController.delegate = self
 
@@ -45,6 +45,6 @@ extension FeaturedBoard: FeaturedDelegate {
 
 extension ActivatableBoard {
     var headline: HeadlineActivatable {
-        return headline(identifier: .headline)
+        headline(identifier: .headline)
     }
 }

@@ -25,7 +25,7 @@ public final class LauncherComponent {
             return true
         } else {
             #if DEBUG
-            print("⚠️ Duplicated plugin \(plugin.identifier)")
+                print("⚠️ Duplicated plugin \(plugin.identifier)")
             #endif
         }
         return false
@@ -113,9 +113,9 @@ public final class PluginLauncher {
 
     public func launch(in context: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
         #if DEBUG
-        if mainboard.context != nil, mainboard.context !== context {
-            print("⚠️ The Mainboard [\(mainboard.identifier)] will change the context from \(String(describing: mainboard.context)) to \(context).")
-        }
+            if mainboard.context != nil, mainboard.context !== context {
+                print("⚠️ The Mainboard [\(mainboard.identifier)] will change the context from \(String(describing: mainboard.context)) to \(context).")
+            }
         #endif
 
         mainboard.putIntoContext(context)
@@ -124,9 +124,9 @@ public final class PluginLauncher {
 
     public func activateNow(_ action: (_ mainboard: FlowMotherboard) -> Void) {
         #if DEBUG
-        if mainboard.context == nil {
-            print("⚠️ The Mainboard [\(mainboard.identifier)] has no contexts. The PluginLauncher should be launched before activating modules.")
-        }
+            if mainboard.context == nil {
+                print("⚠️ The Mainboard [\(mainboard.identifier)] has no contexts. The PluginLauncher should be launched before activating modules.")
+            }
         #endif
         action(mainboard)
     }
@@ -156,7 +156,8 @@ public final class PluginLauncher {
     public func installURLOpenerPlugin<Parameter>(
         name: String? = nil,
         condition: @escaping (URL) -> URLOpeningOption<Parameter>,
-        handler: @escaping (FlowMotherboard, Parameter) -> Void) -> Self {
+        handler: @escaping (FlowMotherboard, Parameter) -> Void
+    ) -> Self {
         let plugin = BlockURLOpenerPlugin(name: name, condition: condition, handler: handler)
         return install(urlOpenerPlugin: plugin)
     }
@@ -165,7 +166,8 @@ public final class PluginLauncher {
     public func installURLOpenerPlugin(
         name: String? = nil,
         condition: @escaping (URL) -> Bool,
-        handler: @escaping (FlowMotherboard) -> Void) -> Self {
+        handler: @escaping (FlowMotherboard) -> Void
+    ) -> Self {
         let plugin = BlockURLOpenerPlugin<Void>(name: name, condition: { url in
             if condition(url) {
                 return .yes(())
@@ -205,7 +207,7 @@ public final class PluginLauncher {
         case 0:
             urlNotFoundHandler?(url)
             #if DEBUG
-            print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
+                print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
             #endif
         case _ where numberOfHandlers > 1:
             urlOpenerSelectionHandler(mainboard, url, handlers) { [mainboard] selectedPlugins in
@@ -214,20 +216,20 @@ public final class PluginLauncher {
                 }
 
                 #if DEBUG
-                switch selectedPlugins.count {
-                case 0:
-                    print("⚠️ [\(String(describing: self))] URL cancelled ➤ \(url)")
-                case let count where count > 1:
-                    print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
-                default:
-                    print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
-                }
+                    switch selectedPlugins.count {
+                    case 0:
+                        print("⚠️ [\(String(describing: self))] URL cancelled ➤ \(url)")
+                    case let count where count > 1:
+                        print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
+                    default:
+                        print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
+                    }
                 #endif
             }
         default:
             handlers[0].mainboard(mainboard, open: url)
             #if DEBUG
-            print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
+                print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
             #endif
         }
 

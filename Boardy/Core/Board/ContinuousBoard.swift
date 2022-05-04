@@ -39,7 +39,7 @@ open class ModernContinuableBoard: Board, ContinuableBoard {
 
     public init(identifier: BoardID,
                 boardProducer: ActivableBoardProducer) {
-        self.producer = boardProducer
+        producer = boardProducer
         super.init(identifier: identifier)
     }
 
