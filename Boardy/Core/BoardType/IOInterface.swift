@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol Completable {
-    func complete()
+    func complete(_ isDone: Bool)
 }
 
 public struct MainboardCompleter: Completable {
@@ -16,8 +16,8 @@ public struct MainboardCompleter: Completable {
     let mainboard: MotherboardType
 
     /// Complete a board from its Motherboard
-    public func complete() {
-        mainboard.getBoard(identifier: destinationID)?.complete()
+    public func complete(_ isDone: Bool = true) {
+        mainboard.getBoard(identifier: destinationID)?.complete(isDone)
     }
 }
 
@@ -26,8 +26,8 @@ public struct BoardCompleter: Completable {
     let source: ActivatableBoard
 
     /// Complete the destination board which has the same Motherboard with the `source`
-    public func complete() {
-        let completeAction = CompleteAction(identifier: destinationID)
+    public func complete(_ isDone: Bool = true) {
+        let completeAction = CompleteAction(identifier: destinationID, isDone: isDone)
         source.sendToMotherboard(data: completeAction)
     }
 }

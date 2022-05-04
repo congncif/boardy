@@ -82,24 +82,25 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
         execute(input: input) { [weak self] result in
             guard let self = self else { return }
 
-            defer {
-                self.decreaseActivateCount()
-                self.handleProgress()
-                self.willComplete()
-
-                if self.isCompleted {
-                    self.complete()
-                }
-            }
-
             switch result {
             case let .success(output):
                 self.handleSuccess(output)
-
                 self.sendOutput(output)
+                self.endProcess(isDone: true)
             case let .failure(error):
                 self.handleError(error)
+                self.endProcess(isDone: false)
             }
+        }
+    }
+
+    func endProcess(isDone: Bool) {
+        decreaseActivateCount()
+        handleProgress()
+        willComplete()
+
+        if isCompleted {
+            complete(isDone)
         }
     }
 

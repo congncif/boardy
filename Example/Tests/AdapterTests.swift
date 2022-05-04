@@ -53,7 +53,7 @@ class AdapterTests: XCTestCase {
 
         XCTAssertEqual(result, 1)
 
-        board.complete()
+        board.complete(true)
         XCTAssertEqual(motherboard.boards.count, 0)
     }
 }

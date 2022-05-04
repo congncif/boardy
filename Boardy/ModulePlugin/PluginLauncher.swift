@@ -217,7 +217,7 @@ public final class PluginLauncher {
                 switch selectedPlugins.count {
                 case 0:
                     print("⚠️ [\(String(describing: self))] URL cancelled ➤ \(url)")
-                case let x where x > 1:
+                case let count where count > 1:
                     print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
                 default:
                     print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")

@@ -65,8 +65,8 @@ public extension IdentifiableBoard {
     }
 
     /// Complete this board & ask to be removed.
-    func complete() {
-        sendToMotherboard(data: CompleteAction(identifier: identifier))
+    func complete(_ isDone: Bool = true) {
+        sendToMotherboard(data: CompleteAction(identifier: identifier, isDone: isDone))
     }
 
     var debugDescription: String {
@@ -84,4 +84,5 @@ public extension IdentifiableBoard {
 // Special action to indicate the board completed & should be removed.
 struct CompleteAction {
     let identifier: BoardID
+    let isDone: Bool
 }

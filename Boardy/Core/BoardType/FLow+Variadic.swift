@@ -7,10 +7,10 @@
 
 import Foundation
 
-extension FlowManageable {
+public extension FlowManageable {
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
-    public func registerFlow<Target, Output>(
+    func registerFlow<Target, Output>(
         matchedIdentifiers: FlowID...,
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
@@ -21,7 +21,7 @@ extension FlowManageable {
     }
 
     @discardableResult
-    public func registerFlow<Output>(
+    func registerFlow<Output>(
         matchedIdentifiers: FlowID...,
         bindToBus bus: Bus<Output>
     ) -> Self {
@@ -32,7 +32,7 @@ extension FlowManageable {
     }
 
     @discardableResult
-    public func registerFlow<Output, OutBoard>(
+    func registerFlow<Output, OutBoard>(
         matchedIdentifiers: FlowID...,
         uniqueOutputType: Output.Type = Output.self,
         sendOutputThrough board: OutBoard
@@ -45,7 +45,7 @@ extension FlowManageable {
 
     /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
-    public func registerGuaranteedFlow<Target, Output>(
+    func registerGuaranteedFlow<Target, Output>(
         matchedIdentifiers: FlowID...,
         target: Target,
         uniqueOutputType: Output.Type = Output.self,
@@ -56,7 +56,7 @@ extension FlowManageable {
     }
 
     @discardableResult
-    public func registerGuaranteedFlow<Output>(
+    func registerGuaranteedFlow<Output>(
         matchedIdentifiers: FlowID...,
         bindToBus bus: Bus<Output>
     ) -> Self {
@@ -67,7 +67,7 @@ extension FlowManageable {
     }
 
     @discardableResult
-    public func registerGuaranteedFlow<Output, OutBoard>(
+    func registerGuaranteedFlow<Output, OutBoard>(
         matchedIdentifiers: FlowID...,
         uniqueOutputType: Output.Type = Output.self,
         sendOutputThrough board: OutBoard
@@ -79,8 +79,17 @@ extension FlowManageable {
     }
 
     /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
-    public func registerChainFlow<Target>(matchedIdentifiers: FlowID..., target: Target) -> ChainBoardFlow<Target> {
+    func registerChainFlow<Target>(matchedIdentifiers: FlowID..., target: Target) -> ChainBoardFlow<Target> {
         let listIds: [FlowID] = matchedIdentifiers
         return self.registerChainFlow(matchedIdentifiers: listIds, target: target)
+    }
+
+    @discardableResult
+    func registerCompletionFlow(
+        matchedIdentifiers: FlowID...,
+        nextHandler: @escaping (_ isDone: Bool) -> Void
+    ) -> Self {
+        let listIds: [FlowID] = matchedIdentifiers
+        return self.registerCompletionFlow(matchedIdentifiers: listIds, nextHandler: nextHandler)
     }
 }

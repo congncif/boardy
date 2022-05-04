@@ -25,16 +25,14 @@ public final class BarrierBoard<Input>: Board, GuaranteedBoard, GuaranteedOutput
             appendProcess(process)
         case .cancel:
             clearProcesses()
-            complete()
+            complete(false)
         case let .overcome(value):
             getProcesses().forEach { process in
                 process(value)
             }
-            
             sendOutput(value)
-            
             clearProcesses()
-            complete()
+            complete(true)
         }
     }
     

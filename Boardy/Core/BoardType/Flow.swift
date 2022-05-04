@@ -124,6 +124,19 @@ public extension FlowManageable {
         }
         return flow
     }
+
+    @discardableResult
+    func registerCompletionFlow(
+        matchedIdentifiers: [FlowID],
+        nextHandler: @escaping (_ isDone: Bool) -> Void
+    ) -> Self {
+        let flow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, nextHandler: { data in
+            guard let completionAction = data as? CompleteAction else { return }
+            nextHandler(completionAction.isDone)
+        })
+        registerFlow(flow)
+        return self
+    }
 }
 
 public extension FlowManageable where Self: MotherboardType {

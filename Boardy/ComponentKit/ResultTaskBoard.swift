@@ -37,13 +37,7 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
     private let executor: Executor
 
     @Atomic
-    private var isActive = false {
-        didSet {
-            if !isActive {
-                complete()
-            }
-        }
-    }
+    private var isActive = false
 
     public init(identifier: BoardID,
                 executor: @escaping Executor) {
@@ -68,12 +62,15 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
             case let .success(output):
                 self.isActive = false
                 self.sendOutput(.success(output))
+                self.complete(true)
             case let .failure(error):
                 self.isActive = false
                 self.sendOutput(.failure(error))
+                self.complete(false)
             case .cancel:
                 self.isActive = false
                 self.sendOutput(.cancel)
+                self.complete(false)
             }
         }
     }

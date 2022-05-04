@@ -293,7 +293,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     func finishExecuting(taskID: String, result: Result<Output, Error>) {
         defer {
             if isCompleted {
-                complete()
+                complete(true)
             }
         }
 

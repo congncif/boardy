@@ -82,7 +82,7 @@ final class FlowTests: XCTestCase {
     
     func test_completeFlow() {
         XCTAssertEqual(motherboard.boards.count, 1)
-        testBoard.complete()
+        testBoard.complete(true)
         XCTAssertEqual(motherboard.boards.count, 0)
     }
     
@@ -168,7 +168,7 @@ final class FlowTests: XCTestCase {
             expectation.fulfill()
         }
         
-        otherBoard.complete()
+        otherBoard.complete(true)
         motherboard.activation(boardID, with: String.self).activate(with: "VALUE")
         
         waitForExpectations(timeout: 3, handler: nil)
@@ -245,7 +245,7 @@ private final class CompletionBoard: Board, GuaranteedBoard, GuaranteedOutputSen
     func activate(withGuaranteedInput input: String) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.sendOutput(input)
-            self?.complete()
+            self?.complete(true)
         }
     }
 }
