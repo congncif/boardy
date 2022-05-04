@@ -23,6 +23,7 @@ public final class NoBoard: Board, ActivatableBoard {
         let alert = UIAlertController(title: "Feature Not Found", message: msg, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Got it!", style: .cancel, handler: { [weak self] _ in
             self?.handler?(option)
+            self?.complete()
         }))
         rootViewController.topPresented.present(alert, animated: true)
     }
@@ -31,8 +32,8 @@ public final class NoBoard: Board, ActivatableBoard {
 public final class NoBoardProducer: ActivableBoardProducer {
     public init() {}
 
-    public func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
-        return NoBoard(identifier: anotherIdentifier)
+    public func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+        NoBoard(identifier: anotherIdentifier)
     }
 
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {

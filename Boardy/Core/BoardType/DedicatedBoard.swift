@@ -36,6 +36,8 @@ public extension AdaptableBoard {
 // MARK: - DedicatedBoard
 
 public protocol DedicatedBoard: AdaptableBoard, ActivatableBoard {
+    func activationBarrier(withInput input: InputType?) -> ActivationBarrier?
+
     func activate(withInput input: InputType?)
 }
 
@@ -43,11 +45,22 @@ public extension DedicatedBoard {
     func activate(withOption option: Any?) {
         activate(withInput: convertOptionToInput(option))
     }
+
+    func activationBarrier(withOption option: Any?) -> ActivationBarrier? {
+        let input = convertOptionToInput(option)
+        return activationBarrier(withInput: input)
+    }
+
+    func activationBarrier(withInput _: InputType?) -> ActivationBarrier? {
+        nil
+    }
 }
 
 // MARK: - GuaranteedBoard
 
 public protocol GuaranteedBoard: AdaptableBoard, ActivatableBoard {
+    func activationBarrier(withGuaranteedInput input: InputType) -> ActivationBarrier?
+
     func activate(withGuaranteedInput input: InputType)
 
     var silentInputWhiteList: [(_ input: Any?) -> Bool] { get }
@@ -73,6 +86,17 @@ public extension GuaranteedBoard {
             return
         }
         activate(withGuaranteedInput: input)
+    }
+
+    func activationBarrier(withOption option: Any?) -> ActivationBarrier? {
+        guard let input = convertOptionToInput(option) else {
+            return nil
+        }
+        return activationBarrier(withGuaranteedInput: input)
+    }
+
+    func activationBarrier(withGuaranteedInput _: InputType) -> ActivationBarrier? {
+        nil
     }
 }
 
@@ -104,9 +128,9 @@ public protocol GuaranteedOutputSendingBoard: IdentifiableBoard {
 public extension GuaranteedOutputSendingBoard {
     func sendOutput(_ data: OutputType) {
         #if DEBUG
-        if isSilentData(data) {
-            print("\(String(describing: self))\n🔥 Sending a special Data Type might lead unexpected behaviors!\n👉 You should wrap \(data) in custom Output Type.")
-        }
+            if isSilentData(data) {
+                print("\(String(describing: self))\n🔥 Sending a special Data Type might lead unexpected behaviors!\n👉 You should wrap \(data) in custom Output Type.")
+            }
         #endif
         sendToMotherboard(data: data)
     }
@@ -115,9 +139,9 @@ public extension GuaranteedOutputSendingBoard {
 public extension GuaranteedOutputSendingBoard where OutputType: Encodable {
     func sendEncodedOutput(_ data: OutputType) {
         #if DEBUG
-        if isSilentData(data) {
-            print("\(String(describing: self))\n🔥 Sending a special Data Type might lead unexpected behaviors!\n👉 You should wrap \(data) in custom Output Type.")
-        }
+            if isSilentData(data) {
+                print("\(String(describing: self))\n🔥 Sending a special Data Type might lead unexpected behaviors!\n👉 You should wrap \(data) in custom Output Type.")
+            }
         #endif
 
         let encoder = JSONEncoder()

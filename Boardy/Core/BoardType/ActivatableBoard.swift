@@ -9,19 +9,34 @@ import Foundation
 import UIKit
 
 public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard, BoardRegistrationsConvertible {
+    func activationBarrier(withOption option: Any?) -> ActivationBarrier?
     func activate(withOption option: Any?)
 }
 
-extension ActivatableBoard {
-    public func asBoardRegistrations() -> [BoardRegistration] {
+public extension ActivatableBoard {
+    func asBoardRegistrations() -> [BoardRegistration] {
         [BoardRegistration(identifier) { _ in self }]
     }
 }
 
-extension ActivatableBoard {
-    public func activate() {
+public extension ActivatableBoard {
+    func activate() {
         activate(withOption: nil)
+    }
+
+    func activationBarrier(withOption _: Any?) -> ActivationBarrier? {
+        nil
     }
 }
 
 public typealias NormalBoard = InstallableBoard & ActivatableBoard
+
+public struct ActivationBarrier {
+    public let identifier: BoardID
+    public let scope: Scope
+
+    public enum Scope {
+        case inMain
+        case global
+    }
+}
