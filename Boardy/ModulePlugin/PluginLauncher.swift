@@ -136,6 +136,10 @@ public final class PluginLauncher {
     private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
     private var urlNotFoundHandler: ((URL) -> Void)?
 
+    public typealias URLOpenerSelectionHandler = (_ mainboard: FlowMotherboard, _ url: URL, _ candidatePlugins: [URLOpenerPlugin], (_ selectedPlugins: [URLOpenerPlugin]) -> Void) -> Void
+
+    private var urlOpenerSelectionHandler: URLOpenerSelectionHandler = { $3($2) }
+
     @discardableResult
     public func install(urlOpenerPlugin: URLOpenerPlugin) -> Self {
         urlOpenerPlugins.append(urlOpenerPlugin)
@@ -180,28 +184,48 @@ public final class PluginLauncher {
         return self
     }
 
+    @discardableResult
+    public func setURLOpenerSelectionHandler(_ handler: @escaping URLOpenerSelectionHandler) -> Self {
+        urlOpenerSelectionHandler = handler
+        return self
+    }
+
     /// Open an URL using URLOpenerPlugin
     /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
     /// - Returns: A array of strings name of matched plugins that handled the URL
     @discardableResult
     public func open(url: URL) -> [String] {
-        let handlers = urlOpenerPlugins.filter {
-            $0.mainboard(mainboard, open: url)
+        let handlers = urlOpenerPlugins.filter { plugin in
+            plugin.canOpenURL(url)
         }
 
         let numberOfHandlers = handlers.count
 
         switch numberOfHandlers {
         case 0:
+            urlNotFoundHandler?(url)
             #if DEBUG
             print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
             #endif
-            urlNotFoundHandler?(url)
         case _ where numberOfHandlers > 1:
-            #if DEBUG
-            print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
-            #endif
+            urlOpenerSelectionHandler(mainboard, url, handlers) { [mainboard] selectedPlugins in
+                for plugin in selectedPlugins {
+                    plugin.mainboard(mainboard, open: url)
+                }
+
+                #if DEBUG
+                switch selectedPlugins.count {
+                case 0:
+                    print("⚠️ [\(String(describing: self))] URL cancelled ➤ \(url)")
+                case let x where x > 1:
+                    print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
+                default:
+                    print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
+                }
+                #endif
+            }
         default:
+            handlers[0].mainboard(mainboard, open: url)
             #if DEBUG
             print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
             #endif

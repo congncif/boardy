@@ -9,12 +9,17 @@ import Foundation
 
 public protocol URLOpenerPlugin: URLOpenerPluginConvertible {
     var name: String { get }
+    var identifier: String { get }
 
-    func mainboard(_ mainboard: FlowMotherboard, open url: URL) -> Bool
+    func canOpenURL(_ url: URL) -> Bool
+
+    func mainboard(_ mainboard: FlowMotherboard, open url: URL)
 }
 
 public extension URLOpenerPlugin {
     var name: String { String(describing: self) }
+
+    var identifier: String { String(describing: type(of: self)) }
 }
 
 public protocol URLOpenerPluginConvertible {
@@ -39,13 +44,18 @@ public protocol GuaranteedURLOpenerPlugin: URLOpenerPlugin {
 }
 
 public extension GuaranteedURLOpenerPlugin {
-    func mainboard(_ mainboard: FlowMotherboard, open url: URL) -> Bool {
+    func canOpenURL(_ url: URL) -> Bool {
         switch willOpen(url: url) {
         case .no:
             return false
-        case let .yes(parameter):
-            self.mainboard(mainboard, openWith: parameter)
+        case .yes:
             return true
+        }
+    }
+
+    func mainboard(_ mainboard: FlowMotherboard, open url: URL) {
+        if case let .yes(parameter) = willOpen(url: url) {
+            self.mainboard(mainboard, openWith: parameter)
         }
     }
 }
