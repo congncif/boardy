@@ -21,9 +21,9 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     }
 
     @Atomic
-    var pendingOptions: [BoardActivationOption] = []
+    var pendingActivations: [() -> Void] = []
 
-    var isProcessing: Bool { pendingOptions.count != 0 }
+    var isProcessing: Bool { !pendingActivations.isEmpty }
 
     func registerCompletableFlow(to manager: FlowManageable) {
         manager.registerCompletionFlow(matchedIdentifiers: completableIdentifier) { [weak self] in
@@ -32,23 +32,24 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     }
 
     func activate(withOption option: Any?) {
-        guard let option = option as? BoardActivationOption else { return }
+        guard let option = option as? () -> Void else { return }
 
         if isProcessing {
-            pendingOptions.append(option)
+            pendingActivations.append(option)
         } else {
-            pendingOptions.append(option)
+            pendingActivations.append(option)
             nextToBoard(BoardInput<Void>(target: completableIdentifier, input: ()))
         }
     }
 
     func completePendingTasks(isDone: Bool) {
         if isDone {
-            for option in pendingOptions {
-                nextToBoard(model: option)
+            for activation in pendingActivations {
+                activation()
             }
         }
-        pendingOptions.removeAll()
+        pendingActivations.removeAll()
+        complete()
     }
 }
 

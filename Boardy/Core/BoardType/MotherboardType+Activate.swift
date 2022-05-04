@@ -16,8 +16,14 @@ public extension MotherboardType {
 
         if let barrier = board.activationBarrier(withOption: option) {
             let barrierBoard = getBarrierBoard(barrier)
-            let pending = BoardActivationOption(identifier: identifier, option: option)
-            barrierBoard.activate(withOption: pending)
+
+            DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
+
+            let pendingActivation: () -> Void = { [weak board] in
+                board?.activate(withOption: option)
+            }
+
+            barrierBoard.activate(withOption: pendingActivation)
         } else {
             DebugLog.logActivation(source: self, destination: board, data: option)
             board.activate(withOption: option)

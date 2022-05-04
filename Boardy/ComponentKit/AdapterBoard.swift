@@ -34,6 +34,14 @@ public final class AdapterBoard<Destination, In, Out>: Board, GuaranteedBoard, G
         return self
     }
 
+    public func activationBarrier(withGuaranteedInput input: In) -> ActivationBarrier? {
+        if let mapper = inputMapper {
+            return destination.activationBarrier(withGuaranteedInput: mapper(input))
+        } else {
+            return destination.activationBarrier(withOption: input)
+        }
+    }
+
     public func activate(withGuaranteedInput input: InputType) {
         if let mapper = inputMapper {
             destination.activate(withGuaranteedInput: mapper(input))

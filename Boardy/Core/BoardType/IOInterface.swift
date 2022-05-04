@@ -86,6 +86,12 @@ public struct BoardActivation<Input>: BoardActivating {
     }
 }
 
+public extension BoardActivation where Input == Void {
+    func barrier(scope: ActivationBarrier.Scope = .inMain) -> ActivationBarrier {
+        ActivationBarrier(identifier: destinationID, scope: scope)
+    }
+}
+
 public extension ActivatableBoard {
     // When min iOS version up to 13+, please change return type to opaque type `some BoardActivatable`, and make concrete type `BoardActivation` to `internal`.
     func activation<Input>(_ destinationID: BoardID, with _: Input.Type) -> BoardActivation<Input> {
