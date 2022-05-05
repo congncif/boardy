@@ -153,6 +153,7 @@ func sendCustomEvent(value: String) {
 * [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
 * [Boardy Modularization](Boardy%20Modularization.md)
 * [Handle URL opening / deep link](Open%20an%20URL.md)
+* [Configure Activation Barrier for your Board](Activation%20Barrier.md)
 * [Boardy ComponentKit](ComponentKit.md)
 * [HelloBoardy - A demo for Boardy: Part I+II - Basic, Part III - Boardy Modularization](https://github.com/congncif/hello-boardy/tree/master/Part-III)
 
