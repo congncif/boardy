@@ -7,11 +7,6 @@
 
 import Foundation
 
-struct BoardActivationOption: BoardInputModel {
-    let identifier: BoardID
-    let option: Any?
-}
-
 final class ActivatableBarrierBoard: Board, ActivatableBoard {
     let completableIdentifier: BoardID
 

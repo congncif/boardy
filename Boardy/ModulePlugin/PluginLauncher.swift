@@ -133,12 +133,13 @@ public final class PluginLauncher {
 
     // MARK: URL opener
 
-    private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
-    private var urlNotFoundHandler: ((URL) -> Void)?
-
     public typealias URLOpenerSelectionHandler = (_ mainboard: FlowMotherboard, _ url: URL, _ candidatePlugins: [URLOpenerPlugin], (_ selectedPlugins: [URLOpenerPlugin]) -> Void) -> Void
+    public typealias URLNotFoundHandler = (_ mainboard: FlowMotherboard, _ url: URL) -> Void
+
+    private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
 
     private var urlOpenerSelectionHandler: URLOpenerSelectionHandler = { $3($2) }
+    private var urlNotFoundHandler: URLNotFoundHandler?
 
     @discardableResult
     public func install(urlOpenerPlugin: URLOpenerPlugin) -> Self {
@@ -181,7 +182,7 @@ public final class PluginLauncher {
     }
 
     @discardableResult
-    public func setURLNotFoundHandler(_ handler: ((URL) -> Void)?) -> Self {
+    public func setURLNotFoundHandler(_ handler: URLNotFoundHandler?) -> Self {
         urlNotFoundHandler = handler
         return self
     }
@@ -205,7 +206,7 @@ public final class PluginLauncher {
 
         switch numberOfHandlers {
         case 0:
-            urlNotFoundHandler?(url)
+            urlNotFoundHandler?(mainboard, url)
             #if DEBUG
                 print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
             #endif
