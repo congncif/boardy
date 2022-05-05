@@ -35,10 +35,10 @@ public extension ContinuableBoard {
 open class ModernContinuableBoard: Board, ContinuableBoard {
     public var motherboard: FlowMotherboard { internalMainboard }
 
-    public let producer: ActivableBoardProducer
+    public let producer: ActivatableBoardProducer
 
     public init(identifier: BoardID,
-                boardProducer: ActivableBoardProducer) {
+                boardProducer: ActivatableBoardProducer) {
         producer = boardProducer
         super.init(identifier: identifier)
     }
@@ -70,7 +70,7 @@ public extension ModernContinuableBoard {
     }
 
     @discardableResult
-    func mountContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AnyObject, build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+    func mountContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AnyObject, build: (ActivatableBoardProducer) -> Mainboard) -> Mainboard {
         let newBoard = build(producer)
         newBoard.putIntoContext(context)
 
@@ -93,7 +93,7 @@ open class ContinuousBoard: Board, ContinuableBoard {
     }
 
     public convenience init(identifier: BoardID,
-                            boardProducer: ActivableBoardProducer) {
+                            boardProducer: ActivatableBoardProducer) {
         let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
         self.init(identifier: identifier, motherboard: motherboard)
     }

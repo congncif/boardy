@@ -29,7 +29,7 @@ public final class NoBoard: Board, ActivatableBoard {
     }
 }
 
-public final class NoBoardProducer: ActivableBoardProducer {
+public final class NoBoardProducer: ActivatableBoardProducer {
     public init() {}
 
     public func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {

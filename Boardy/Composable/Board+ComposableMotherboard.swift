@@ -7,11 +7,11 @@
 
 import Foundation
 
-public extension ActivableBoardProducer {
+public extension ActivatableBoardProducer {
     /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up to parent.
     func produceComposableMotherboard(identifier: BoardID,
                                       from parent: IdentifiableBoard? = nil,
-                                      elementsBuilder: (ActivableBoardProducer) -> [ActivatableBoard] = { _ in [] }) -> FlowComposableMotherboard {
+                                      elementsBuilder: (ActivatableBoardProducer) -> [ActivatableBoard] = { _ in [] }) -> FlowComposableMotherboard {
         let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: self, boards: elementsBuilder(self))
 
         if let parent = parent {

@@ -8,11 +8,11 @@
 import Foundation
 
 public final class BoardContainer: BoardDynamicProducer {
-    private var externalProducer: ActivableBoardProducer?
+    private var externalProducer: ActivatableBoardProducer?
 
     private var container: [BoardID: BoardConstructor] = [:]
 
-    public init(externalProducer: ActivableBoardProducer? = nil) {
+    public init(externalProducer: ActivatableBoardProducer? = nil) {
         self.externalProducer = externalProducer
     }
 

@@ -44,7 +44,7 @@ public extension MotherboardType {
 }
 
 protocol LazyMotherboard: MotherboardType {
-    var boardProducer: ActivableBoardProducer { get }
+    var boardProducer: ActivatableBoardProducer { get }
 }
 
 extension LazyMotherboard {

@@ -21,7 +21,7 @@ public extension ModernContinuableBoard {
     }
 
     @discardableResult
-    func attachContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AttachableObject, build: (ActivableBoardProducer) -> Mainboard) -> Mainboard {
+    func attachContinuousMotherboard<Mainboard: FlowMotherboard>(to context: AttachableObject, build: (ActivatableBoardProducer) -> Mainboard) -> Mainboard {
         let newBoard = mountContinuousMotherboard(to: context, build: build)
         context.attachObject(newBoard)
         return newBoard

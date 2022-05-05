@@ -10,7 +10,7 @@ import Boardy
 import Foundation
 import Resolver
 
-struct BoardProducer: ActivableBoardProducer {
+struct BoardProducer: ActivatableBoardProducer {
     func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         switch identifier {
         case .login:

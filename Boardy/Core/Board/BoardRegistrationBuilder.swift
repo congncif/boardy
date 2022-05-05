@@ -43,15 +43,15 @@ import Foundation
 
     public extension Motherboard {
         convenience init(identifier: BoardID = .random(),
-                         externalProducer: ActivableBoardProducer = NoBoardProducer(),
-                         @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
+                         externalProducer: ActivatableBoardProducer = NoBoardProducer(),
+                         @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivatableBoardProducer) -> [BoardRegistration]) {
             let producer = createProducer(from: externalProducer, registrationsBuilder: registrationsBuilder)
             self.init(identifier: identifier, boardProducer: producer)
         }
     }
 
     public extension BoardProducer {
-        convenience init(externalProducer: ActivableBoardProducer = NoBoardProducer(), @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) {
+        convenience init(externalProducer: ActivatableBoardProducer = NoBoardProducer(), @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivatableBoardProducer) -> [BoardRegistration]) {
             self.init(externalProducer: externalProducer, registrations: [])
             let registrations = registrationsBuilder(BoardDynamicProducerBox(producer: self))
             for registration in registrations {
@@ -60,7 +60,7 @@ import Foundation
         }
     }
 
-    internal func createProducer(from externalProducer: ActivableBoardProducer, @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivableBoardProducer) -> [BoardRegistration]) -> ActivableBoardProducer {
+    internal func createProducer(from externalProducer: ActivatableBoardProducer, @BoardRegistrationBuilder registrationsBuilder: (_ producer: ActivatableBoardProducer) -> [BoardRegistration]) -> ActivatableBoardProducer {
         let producer = BoardProducer(externalProducer: externalProducer, registrations: [])
         let registrations = registrationsBuilder(producer.boxed)
         for registration in registrations {

@@ -12,7 +12,7 @@ import Foundation
 protocol AppMotherboard: FlowMotherboard {}
 
 final class AppMainboard: Motherboard, AppMotherboard {
-    init(boardProducer: ActivableBoardProducer) {
+    init(boardProducer: ActivatableBoardProducer) {
         super.init(boardProducer: boardProducer)
 //        registerFlowSteps(.login >=> .main >=> .login)
 

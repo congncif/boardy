@@ -90,7 +90,7 @@ extension DashboardBoard: DashboardDelegate {
 extension Board {
     /// Create a new ComposableMotherboard which uses internally by a board. Chain of actions will be set up.
     func produceComposableMotherboard(identifier: BoardID = .random(),
-                                      boardProducer: ActivableBoardProducer = NoBoardProducer(),
+                                      boardProducer: ActivatableBoardProducer = NoBoardProducer(),
                                       elementBoards: [ActivatableBoard] = []) -> ComposableMotherboard {
         let motherboard = ComposableMotherboard(identifier: identifier, boardProducer: boardProducer, boards: elementBoards)
         // Setup chain of actions.

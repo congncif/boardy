@@ -26,7 +26,7 @@ open class FlowBoard<Input, Output, Command, Action: BoardFlowAction>: ModernCon
     private let flowInteraction: FlowInteraction
 
     public init(identifier: BoardID,
-                producer: ActivableBoardProducer,
+                producer: ActivatableBoardProducer,
                 flowRegistration: @escaping FlowRegistration,
                 flowActivation: @escaping FlowActivation,
                 flowInteraction: @escaping FlowInteraction = { board, command in

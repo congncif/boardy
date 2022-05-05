@@ -35,13 +35,13 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     }
 
     public init(identifier: BoardID = .random(),
-                boardProducer: ActivableBoardProducer) {
+                boardProducer: ActivatableBoardProducer) {
         self.boardProducer = boardProducer
         super.init(identifier: identifier)
         registerDefaultFlows()
     }
 
-    public convenience init(identifier: BoardID = .random(), boardProducer: ActivableBoardProducer, boards: [ActivatableBoard]) {
+    public convenience init(identifier: BoardID = .random(), boardProducer: ActivatableBoardProducer, boards: [ActivatableBoard]) {
         self.init(identifier: identifier, boardProducer: boardProducer)
         for board in boards {
             addBoard(board)
@@ -101,7 +101,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     // MARK: - LazyMotherboard
 
-    public private(set) var boardProducer: ActivableBoardProducer
+    public private(set) var boardProducer: ActivatableBoardProducer
 }
 
 /// A Motherboard is a special board which only accepts a BoardInputModel as input. When activate func is called, the motherboard will activate a Board with identifier in list of boards it manages.

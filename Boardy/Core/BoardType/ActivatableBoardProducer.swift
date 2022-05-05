@@ -7,12 +7,12 @@
 
 import Foundation
 
-public protocol ActivableBoardProducer {
+public protocol ActivatableBoardProducer {
     func produceBoard(identifier: BoardID) -> ActivatableBoard?
     func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard?
 }
 
-public extension ActivableBoardProducer {
+public extension ActivatableBoardProducer {
     func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         produceBoard(identifier: anotherIdentifier)
     }
