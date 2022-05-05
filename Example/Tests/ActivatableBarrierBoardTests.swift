@@ -55,8 +55,8 @@ class ActivatableBarrierBoardTests: XCTestCase {
         authBoard = BarrierAuthBoard(identifier: sampleBarrierAuthID)
 
         sutMotherboard = Motherboard(registrationsBuilder: { _ in
-            sutBoard
             authBoard
+            sutBoard
             sut2Board
         })
     }
@@ -76,7 +76,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
         let barrierBoard = sutMotherboard.getBoard(identifier: sampleBarrierAuthID.appending("___PRIVATE_BARRIER___")) as? ActivatableBarrierBoard
         XCTAssertNotNil(barrierBoard)
         XCTAssertTrue(barrierBoard?.isProcessing == true)
-        XCTAssertEqual(barrierBoard?.pendingActivations.count, 2)
+        XCTAssertEqual(barrierBoard?.pendingTasks.count, 2)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             expectation.fulfill()
@@ -103,7 +103,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
         let barrierBoard = sutMotherboard.getBoard(identifier: sampleBarrierAuthID.appending("___PRIVATE_BARRIER___")) as? ActivatableBarrierBoard
         XCTAssertNotNil(barrierBoard)
         XCTAssertTrue(barrierBoard?.isProcessing == true)
-        XCTAssertEqual(barrierBoard?.pendingActivations.count, 2)
+        XCTAssertEqual(barrierBoard?.pendingTasks.count, 2)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             expectation.fulfill()

@@ -86,9 +86,9 @@ public struct BoardActivation<Input>: BoardActivating {
     }
 }
 
-public extension BoardActivation where Input == Void {
-    func barrier(scope: ActivationBarrier.Scope = .inMain) -> ActivationBarrier {
-        ActivationBarrier(identifier: destinationID, scope: scope)
+public extension BoardActivation {
+    func barrier(scope: ActivationBarrierScope = .inMain, option: ActivationBarrierOption = .void) -> ActivationBarrier {
+        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: option)
     }
 }
 

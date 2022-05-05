@@ -16,9 +16,9 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     }
 
     @Atomic
-    var pendingActivations: [() -> Void] = []
+    var pendingTasks: [BarrierPendingTask] = []
 
-    var isProcessing: Bool { !pendingActivations.isEmpty }
+    var isProcessing: Bool { !pendingTasks.isEmpty }
 
     func registerCompletableFlow(to manager: FlowManageable) {
         manager.registerCompletionFlow(matchedIdentifiers: completableIdentifier) { [weak self] in
@@ -27,23 +27,23 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     }
 
     func activate(withOption option: Any?) {
-        guard let option = option as? () -> Void else { return }
+        guard let task = option as? BarrierPendingTask else { return }
 
         if isProcessing {
-            pendingActivations.append(option)
+            pendingTasks.append(task)
         } else {
-            pendingActivations.append(option)
-            nextToBoard(BoardInput<Void>(target: completableIdentifier, input: ()))
+            pendingTasks.append(task)
+            nextToBoard(BoardInput<Any?>(target: completableIdentifier, input: task.barrierOptionValue))
         }
     }
 
     func completePendingTasks(isDone: Bool) {
         if isDone {
-            for activation in pendingActivations {
-                activation()
+            for task in pendingTasks {
+                task.activation()
             }
         }
-        pendingActivations.removeAll()
+        pendingTasks.removeAll()
         complete()
     }
 }
@@ -53,19 +53,24 @@ enum ActivationBarrierFactory {
     static var cache: [BoardID: ActivatableBarrierBoard] = [:]
 
     static func makeBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
-        let identifier = barrierActivation.identifier.appending("___PRIVATE_BARRIER___")
+        let identifier = barrierActivation.identifier
 
         switch barrierActivation.scope {
         case .inMain:
-            return ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.identifier)
+            return ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.barrierIdentifier)
         case .global:
             if let cachedInstance = cache[identifier] {
                 return cachedInstance
             } else {
-                let newInstance = ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.identifier)
+                let newInstance = ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.barrierIdentifier)
                 cache[identifier] = newInstance
                 return newInstance
             }
         }
     }
+}
+
+struct BarrierPendingTask {
+    let activation: () -> Void
+    let barrierOptionValue: Any?
 }

@@ -32,11 +32,59 @@ public extension ActivatableBoard {
 public typealias NormalBoard = InstallableBoard & ActivatableBoard
 
 public struct ActivationBarrier {
-    public let identifier: BoardID
-    public let scope: Scope
+    public let barrierIdentifier: BoardID
+    public let scope: ActivationBarrierScope
+    public let option: ActivationBarrierOption
+}
 
-    public enum Scope {
-        case inMain
-        case global
+/// Control lifecycle of Activation Barrier
+public enum ActivationBarrierScope {
+    /// Activation Barrier is created and lives on the current Mainboard
+    case inMain
+
+    /// Activation Barrier is unique by identifier in whole the application
+    case global
+}
+
+/// Enable identity Activation Barrier with the input option
+public enum ActivationBarrierOption {
+    /// Activation Barrier without input. This is default value.
+    case void
+
+    /// Activation Barrier is unique with the hashed input. Will create a new barrier if the hash value changes.
+    case unique(AnyHashable)
+
+    /// Activation Barrier is always created with any input. When the input is `nil`, this option works similarly to `.none` option.
+    case unidentified(Any?)
+
+    var value: Any? {
+        switch self {
+        case .void:
+            return ()
+        case let .unique(value):
+            return value
+        case let .unidentified(value):
+            return value
+        }
+    }
+}
+
+public extension ActivationBarrier {
+    var identifier: BoardID {
+        var privateID = barrierIdentifier.appending("___PRIVATE_BARRIER___")
+
+        switch option {
+        case .void:
+            break
+        case let .unique(value):
+            let optionValue = String(value.hashValue)
+            privateID = privateID.appending(optionValue)
+        case let .unidentified(value):
+            if value != nil {
+                privateID = privateID.appending(UUID().uuidString)
+            }
+        }
+
+        return privateID
     }
 }

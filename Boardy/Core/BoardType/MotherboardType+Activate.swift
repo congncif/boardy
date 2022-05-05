@@ -23,7 +23,9 @@ public extension MotherboardType {
                 board?.activate(withOption: option)
             }
 
-            barrierBoard.activate(withOption: pendingActivation)
+            let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)
+
+            barrierBoard.activate(withOption: pendingTask)
         } else {
             DebugLog.logActivation(source: self, destination: board, data: option)
             board.activate(withOption: option)
@@ -46,9 +48,7 @@ public extension MotherboardType {
 
 extension MotherboardType {
     func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBoard {
-        let identifier = barrierActivation.identifier.appending("___PRIVATE_BARRIER___")
-
-        if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
+        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.identifier }) {
             return installedBoard
         }
 
