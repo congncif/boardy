@@ -19,8 +19,10 @@ public extension MotherboardType {
 
             DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
 
-            let pendingActivation: () -> Void = { [weak board] in
-                board?.activate(withOption: option)
+            let pendingActivation: () -> Void = { [weak board, weak self] in
+                guard let self = self, let board = board else { return }
+                DebugLog.logActivation(source: self, destination: board, data: option)
+                board.activate(withOption: option)
             }
 
             let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)

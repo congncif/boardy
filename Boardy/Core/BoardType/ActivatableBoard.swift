@@ -81,7 +81,13 @@ public extension ActivationBarrier {
             privateID = privateID.appending(optionValue)
         case let .unidentified(value):
             if value != nil {
-                privateID = privateID.appending(UUID().uuidString)
+                if value is Void {
+                    break
+                } else {
+                    privateID = privateID.appending(UUID().uuidString)
+                }
+            } else {
+                privateID = privateID.appending("none")
             }
         }
 
