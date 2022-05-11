@@ -25,7 +25,7 @@ public final class NoBoard: Board, ActivatableBoard {
             self?.handler?(option)
             self?.complete()
         }))
-        rootViewController.topPresented.present(alert, animated: true)
+        rootViewController.topPresentedViewController.present(alert, animated: true)
     }
 }
 
@@ -38,15 +38,5 @@ public final class NoBoardProducer: ActivatableBoardProducer {
 
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         NoBoard(identifier: identifier)
-    }
-}
-
-private extension UIViewController {
-    var topPresented: UIViewController {
-        if let top = presentedViewController {
-            return top.topPresented
-        } else {
-            return self
-        }
     }
 }

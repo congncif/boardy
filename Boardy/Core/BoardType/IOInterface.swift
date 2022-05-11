@@ -192,18 +192,18 @@ public struct CompletionFlowHandler {
     let matchedIdentifier: BoardID
     let manager: FlowManageable
 
-    public func handle(_ handler: @escaping () -> Void) {
+    public func handle(_ handler: @escaping (_ isDone: Bool) -> Void) {
         manager.registerGeneralFlow { (output: CompleteAction) in
             if output.identifier == matchedIdentifier {
-                handler()
+                handler(output.isDone)
             }
         }
     }
 
-    public func addTarget<Target>(_ target: Target, action: @escaping (Target) -> Void) {
+    public func addTarget<Target>(_ target: Target, action: @escaping (Target, Bool) -> Void) {
         manager.registerGeneralFlow(target: target) { (target, output: CompleteAction) in
             if output.identifier == matchedIdentifier {
-                action(target)
+                action(target, output.isDone)
             }
         }
     }

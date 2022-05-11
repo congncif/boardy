@@ -164,7 +164,7 @@ final class FlowTests: XCTestCase {
             result = value
         }
 
-        motherboard.completionFlow(boardID).handle {
+        motherboard.completionFlow(boardID).handle { _ in
             expectation.fulfill()
         }
 

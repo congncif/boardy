@@ -135,11 +135,18 @@ public final class PluginLauncher {
 
     public typealias URLOpenerSelectionHandler = (_ mainboard: FlowMotherboard, _ url: URL, _ candidatePlugins: [URLOpenerPlugin], (_ selectedPlugins: [URLOpenerPlugin]) -> Void) -> Void
     public typealias URLNotFoundHandler = (_ mainboard: FlowMotherboard, _ url: URL) -> Void
+    public typealias URLOpeningValidator = (_ url: URL) -> URLOpeningValidationStatus
+    public typealias URLDeniedHandler = (_ mainboard: FlowMotherboard, _ url: URL) -> Void
 
     private lazy var urlOpenerPlugins: [URLOpenerPlugin] = []
 
     private var urlOpenerSelectionHandler: URLOpenerSelectionHandler = { $3($2) }
     private var urlNotFoundHandler: URLNotFoundHandler?
+
+    private var urlOpeningValidator: URLOpeningValidator = { _ in .accepted }
+    private lazy var urlDeniedHandler: URLDeniedHandler? = { [unowned self] in
+        self.urlNotFoundHandler?($0, $1)
+    }
 
     @discardableResult
     public func install(urlOpenerPlugin: URLOpenerPlugin) -> Self {
@@ -193,11 +200,46 @@ public final class PluginLauncher {
         return self
     }
 
+    @discardableResult
+    public func setURLOpeningValidator(_ validator: @escaping URLOpeningValidator) -> Self {
+        urlOpeningValidator = validator
+        return self
+    }
+
+    @discardableResult
+    public func setURLDeniedHandler(_ handler: @escaping URLDeniedHandler) -> Self {
+        urlDeniedHandler = handler
+        return self
+    }
+
     /// Open an URL using URLOpenerPlugin
     /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
     /// - Returns: A array of strings name of matched plugins that handled the URL
     @discardableResult
     public func open(url: URL) -> [String] {
+        switch urlOpeningValidator(url) {
+        case .accepted:
+            return handleOpen(url: url)
+        case .denied:
+            urlDeniedHandler?(mainboard, url)
+            return []
+        }
+    }
+
+    /// Open a link using URLOpenerPlugin
+    /// - Parameter link: Might be a deep link, universal link or any income URL to the app
+    /// - Returns: A array of strings name of matched plugins that handled the link
+    @discardableResult
+    public func open(link: String) -> [String] {
+        if let url = URL(string: link) {
+            return open(url: url)
+        } else {
+            print("⚠️ Cannot open an invalid URL ➤ \(link)")
+            return []
+        }
+    }
+
+    func handleOpen(url: URL) -> [String] {
         let handlers = urlOpenerPlugins.filter { plugin in
             plugin.canOpenURL(url)
         }
@@ -236,17 +278,9 @@ public final class PluginLauncher {
 
         return handlers.map { $0.name }
     }
+}
 
-    /// Open a link using URLOpenerPlugin
-    /// - Parameter link: Might be a deep link, universal link or any income URL to the app
-    /// - Returns: A array of strings name of matched plugins that handled the link
-    @discardableResult
-    public func open(link: String) -> [String] {
-        if let url = URL(string: link) {
-            return open(url: url)
-        } else {
-            print("⚠️ Cannot open an invalid URL ➤ \(link)")
-            return []
-        }
-    }
+public enum URLOpeningValidationStatus {
+    case accepted
+    case denied
 }
