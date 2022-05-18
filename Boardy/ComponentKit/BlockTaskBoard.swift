@@ -200,6 +200,15 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         operationQueue.cancelAllOperations()
     }
 
+    public var inputAdapters: [(Any?) -> BlockTaskParameter<Input, Output>?] {
+        [{ input in
+            guard let input = input as? Input else {
+                return nil
+            }
+            return BlockTaskParameter<Input, Output>(input: input)
+        }]
+    }
+
     public func activate(withGuaranteedInput input: InputType) {
         let taskID = UUID().uuidString
 

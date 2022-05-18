@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.45.1"
-  s.swift_versions = ["5.3", "5.4", "5.5", "5.6"]
+  s.version = "1.46.0"
+  s.swift_version = "5"
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
   s.description = <<-DESC
@@ -21,6 +21,8 @@ Pod::Spec.new do |s|
   s.subspec "Default" do |co|
     co.dependency "Boardy/Core"
     co.dependency "Boardy/Attachable"
+    co.dependency "Boardy/ModulePlugin"
+    co.dependency "Boardy/ComponentKit"
   end
 
   s.subspec "Core" do |co|

@@ -291,4 +291,35 @@ class BlockTaskTests: XCTestCase {
         XCTAssertEqual(status3, .done)
         XCTAssertEqual(result3, input3)
     }
+
+    func testBlockTaskInputAdapter() throws {
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default) { _, input, completion in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                completion(.success(input))
+            }
+        }
+
+        motherboard.installBoard(blockTask)
+
+        let expectation = expectation(description: #function)
+        var result: String?
+        let input = "ABC"
+
+        (motherboard as FlowManageable).matchedFlow("block-task", with: String.self)
+            .handle { value in
+                result = value
+            }
+
+        (motherboard as FlowManageable).completionFlow("block-task").handle { _ in
+            expectation.fulfill()
+        }
+
+        (motherboard as MotherboardType)
+            .blockActivation("block-task", with: BlockTaskParameter<String, String>.self)
+            .activate(with: input)
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertEqual(result, input)
+    }
 }
