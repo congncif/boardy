@@ -96,7 +96,7 @@ public final class PluginLauncher {
 
     public static var shared: PluginLauncher {
         guard let instance = sharedInstance else {
-            preconditionFailure("PluginLauncher must be initialized before using")
+            preconditionFailure("PluginLauncher must be initialized before use")
         }
         return instance
     }
@@ -185,6 +185,16 @@ public final class PluginLauncher {
         }, handler: { mainboard, _ in
             handler(mainboard)
         })
+        return install(urlOpenerPlugin: plugin)
+    }
+
+    @discardableResult
+    public func installURLOpenerPlugin(
+        name: String? = nil,
+        matchingPath: String,
+        handler: @escaping (_ mainboard: FlowMotherboard, _ parameters: [String: String]) -> Void
+    ) -> Self {
+        let plugin = BlockURLOpenerPathMatchingPlugin(name: name, matchingPath: matchingPath, handler: handler)
         return install(urlOpenerPlugin: plugin)
     }
 
