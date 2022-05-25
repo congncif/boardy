@@ -30,4 +30,8 @@ public struct BoardyURLExtensions {
     public var queryData: Data {
         (try? JSONSerialization.data(withJSONObject: queryParameters, options: .prettyPrinted)) ?? Data()
     }
+
+    public var pathComponents: [String] {
+        url.pathComponents.filter { $0 != "/" }
+    }
 }

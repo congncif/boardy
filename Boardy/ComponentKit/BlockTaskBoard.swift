@@ -142,12 +142,23 @@ struct BlockHandler<Input, Output> {
     let completionHandler: CompletionHandler?
 }
 
+public extension BlockTaskBoard {
+    convenience init(identifier: BoardID,
+                     executingType: ExecutingType = .default,
+                     execute work: @escaping (BlockTaskBoard<Input, Output>, Input, @escaping ExecutorCompletion) -> Void) {
+        self.init(identifier: identifier, executingType: executingType, executor: { board, input, completion in
+            work(board, input, completion)
+            return .none
+        })
+    }
+}
+
 public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = BlockTaskParameter<Input, Output>
     public typealias OutputType = Output
 
     public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
-    public typealias Executor = (BlockTaskBoard<Input, Output>, Input, @escaping ExecutorCompletion) -> Void
+    public typealias Executor = (BlockTaskBoard<Input, Output>, Input, @escaping ExecutorCompletion) -> BlockTaskCanceler
 
     public enum ExecutingType {
         /// Tasks run independently
@@ -188,6 +199,8 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         switch executingType {
         case let .concurrent(max):
             operationQueue.maxConcurrentOperationCount = max
+        case .latest:
+            operationQueue.maxConcurrentOperationCount = 1
         default:
             break
         }
@@ -197,7 +210,6 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
     deinit {
         cancelPendingTasksIfNeeded()
-        operationQueue.cancelAllOperations()
     }
 
     public var inputAdapters: [(Any?) -> BlockTaskParameter<Input, Output>?] {
@@ -212,9 +224,22 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     public func activate(withGuaranteedInput input: InputType) {
         let taskID = UUID().uuidString
 
+        func startOperationTask() {
+            saveHandler(of: input, to: taskID)
+            startProgressIfNeeded(with: taskID)
+
+            let operation = BlockTaskExecutionOperation(taskID: taskID, input: input.input, taskBoard: self)
+            operationQueue.addOperation(operation)
+        }
+
         switch executingType {
         case .latest:
             cancelPendingTasksIfNeeded()
+            startOperationTask()
+            return
+        case .concurrent:
+            startOperationTask()
+            return
         case .onlyResult, .queue:
             if !isCompleted {
                 // Add to pending tasks & wait current task complete
@@ -227,13 +252,6 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
                 input.completionHandler?(self, .cancelled)
                 return
             }
-        case .concurrent:
-            saveHandler(of: input, to: taskID)
-            startProgressIfNeeded(with: taskID)
-
-            let operation = BlockTaskExecutionOperation(taskID: taskID, input: input.input, taskBoard: self)
-            operationQueue.addOperation(operation)
-            return
         case .default:
             break
         }
@@ -241,7 +259,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         saveHandler(of: input, to: taskID)
         startProgressIfNeeded(with: taskID)
 
-        execute(input: input.input) { [weak self] result in
+        _ = execute(input: input.input) { [weak self] result in
             self?.finishExecuting(taskID: taskID, result: result)
         }
     }
@@ -264,7 +282,10 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     }
 
     private func cancelPendingTasksIfNeeded() {
-        // Cancel pending tasks
+        // Cancel pending operations
+        operationQueue.cancelAllOperations()
+
+        // Send cancel feedback to the pending tasks
         if !isCompleted {
             for (key, _) in completions {
                 completeTask(key, status: .cancelled)
@@ -329,13 +350,13 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
             let nextID = info.taskID
             let nextInput = info.handler.input
-            execute(input: nextInput) { [weak self] nextResult in
+            _ = execute(input: nextInput) { [weak self] nextResult in
                 self?.finishExecuting(taskID: nextID, result: nextResult)
             }
         }
     }
 
-    func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) {
+    func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) -> BlockTaskCanceler {
         executor(self, input, completion)
     }
 
@@ -428,6 +449,8 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
     /// Non thread-safe state storage, use only with locks
     private var stateStore: State = .ready
 
+    private var canceler: BlockTaskCanceler?
+
     override var isAsynchronous: Bool {
         true
     }
@@ -441,6 +464,7 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
     }
 
     override func cancel() {
+        canceler?.cancel()
         state = .finished
     }
 
@@ -459,7 +483,7 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
         } else {
             if let task = taskBoard {
                 state = .executing
-                task.execute(input: input) { [weak task, weak self, taskID] nextResult in
+                canceler = task.execute(input: input) { [weak task, weak self, taskID] nextResult in
                     guard let currentTask = task else {
                         self?.state = .finished
                         return
@@ -471,5 +495,31 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
                 state = .finished
             }
         }
+    }
+}
+
+// public protocol TaskCancelable {
+//    func cancel()
+// }
+
+public extension BlockTaskCanceler {
+    static var none: BlockTaskCanceler {
+        BlockTaskCanceler(handler: {})
+    }
+
+    static func `default`(handler: @escaping () -> Void) -> BlockTaskCanceler {
+        BlockTaskCanceler(handler: handler)
+    }
+}
+
+public struct BlockTaskCanceler {
+    let handler: () -> Void
+
+    public init(handler: @escaping () -> Void) {
+        self.handler = handler
+    }
+
+    public func cancel() {
+        handler()
     }
 }

@@ -21,11 +21,12 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testBlockTask() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .onlyResult) { _, input, completion in
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .onlyResult, executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return BlockTaskCanceler.none
+        })
 
         motherboard.installBoard(blockTask)
 
@@ -70,11 +71,18 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testBlockTaskLatest() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .latest) { _, input, completion in
+        var invokedCancelCount = 0
+        var invokedCancelParameters: [String] = []
+
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .latest, executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return .default {
+                invokedCancelCount += 1
+                invokedCancelParameters.append(input)
+            }
+        })
 
         motherboard.installBoard(blockTask)
 
@@ -107,23 +115,29 @@ class BlockTaskTests: XCTestCase {
             }
 
         motherboard.activateBoard(.target("block-task", parameter))
-        motherboard.activateBoard(.target("block-task", parameter2))
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak motherboard] in
+            motherboard?.activateBoard(.target("block-task", parameter2))
+        }
 
         waitForExpectations(timeout: 3, handler: nil)
 
         XCTAssertEqual(status, .cancelled)
         XCTAssertNil(result)
+        XCTAssertEqual(invokedCancelCount, 1)
+        XCTAssertEqual(invokedCancelParameters.first, input)
 
         XCTAssertEqual(status2, .done)
         XCTAssertEqual(result2, input2)
     }
 
     func testBlockTaskDefault() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default) { _, input, completion in
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default, executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return .none
+        })
 
         motherboard.installBoard(blockTask)
 
@@ -168,11 +182,12 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testBlockTaskQueue() throws {
-        var blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .queue) { _, input, completion in
+        var blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .queue, executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return .none
+        })
 
         motherboard.installBoard(blockTask!)
 
@@ -222,11 +237,12 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testConcurrentExecuting() {
-        let blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .concurrent(max: 2)) { _, input, completion in
+        let blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .concurrent(max: 2), executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return .none
+        })
         motherboard.installBoard(blockTask!)
 
         let expectation = expectation(description: "block-task-expectation")
@@ -293,11 +309,12 @@ class BlockTaskTests: XCTestCase {
     }
 
     func testBlockTaskInputAdapter() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default) { _, input, completion in
+        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default, executor: { _, input, completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 completion(.success(input))
             }
-        }
+            return .none
+        })
 
         motherboard.installBoard(blockTask)
 
