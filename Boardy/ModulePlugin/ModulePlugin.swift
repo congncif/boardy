@@ -51,8 +51,15 @@ public struct MainOptions {
 
 public protocol MainComponent {
     var options: MainOptions { get }
-    var encodedData: Data? { get }
     var producer: BoardDynamicProducer { get }
+
+    func sharedValue<Value: Decodable>(_ valueType: Value.Type) -> Value?
+}
+
+public extension MainComponent {
+    func sharedValue<Value: Decodable>() -> Value? {
+        sharedValue(Value.self)
+    }
 }
 
 public protocol ModulePlugin: ModulePluginConvertible {

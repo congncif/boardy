@@ -31,13 +31,13 @@ public final class LauncherComponent {
         return false
     }
 
-    public func share(encodedData: Data?) -> Self {
+    func share(encodedData: Data?) -> Self {
         self.encodedData = encodedData
         return self
     }
 
-    public func share<Model>(jsonValue: Model) -> Self where Model: Encodable {
-        let data = try? JSONEncoder().encode(jsonValue)
+    public func share<Model>(value: Model) -> Self where Model: Encodable {
+        let data = try? JSONEncoder().encode(value)
         return share(encodedData: data)
     }
 
@@ -83,6 +83,12 @@ struct Component: MainComponent {
     let options: MainOptions
     let producer: BoardDynamicProducer
     let encodedData: Data?
+
+    func sharedValue<Value: Decodable>(_: Value.Type) -> Value? {
+        guard let data = encodedData else { return nil }
+        let decoder = JSONDecoder()
+        return try? decoder.decode(Value.self, from: data)
+    }
 }
 
 public final class PluginLauncher {
