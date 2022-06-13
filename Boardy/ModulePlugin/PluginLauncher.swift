@@ -117,7 +117,7 @@ public final class PluginLauncher {
         }
     }
 
-    public func launch(in context: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void) {
+    public func launch(in context: AnyObject, action: (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
         #if DEBUG
             if mainboard.context != nil, mainboard.context !== context {
                 print("⚠️ The Mainboard [\(mainboard.identifier)] will change the context from \(String(describing: mainboard.context)) to \(context).")

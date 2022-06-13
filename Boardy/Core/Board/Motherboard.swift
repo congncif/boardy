@@ -109,7 +109,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 extension Motherboard: GuaranteedBoard {
     public typealias InputType = BoardInputModel
 
-    open func activate(withGuaranteedInput input: BoardInputModel) {
+    public func activate(withGuaranteedInput input: BoardInputModel) {
         activateBoard(model: input)
     }
 }
