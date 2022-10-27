@@ -98,12 +98,12 @@ public final class BlockTaskParameter<Input, Output> {
         }
     }
 
-    let input: Input
+    public let input: Input
 
-    var successHandler: SuccessHandler?
-    var processingHandler: ProcessingHandler?
-    var errorHandler: ErrorHandler?
-    var completionHandler: CompletionHandler?
+    public private(set) var successHandler: SuccessHandler?
+    public private(set) var processingHandler: ProcessingHandler?
+    public private(set) var errorHandler: ErrorHandler?
+    public private(set) var completionHandler: CompletionHandler?
 
     public typealias SuccessHandler = (ActivatableBoard, Output) -> Void
     public typealias ProcessingHandler = (ActivatableBoard, Bool) -> Void
