@@ -111,6 +111,40 @@ public final class BlockTaskParameter<Input, Output> {
     public typealias CompletionHandler = (ActivatableBoard, TaskCompletionStatus) -> Void
 }
 
+public extension BlockTaskParameter {
+    func appendingSuccessHandler(_ handler: @escaping SuccessHandler) -> Self {
+        let currentHandler = successHandler
+        return onSuccess { board, output in
+            currentHandler?(board, output)
+            handler(board, output)
+        }
+    }
+
+    func appendingErrorHandler(_ handler: @escaping ErrorHandler) -> Self {
+        let currentHandler = errorHandler
+        return onError { board, output in
+            currentHandler?(board, output)
+            handler(board, output)
+        }
+    }
+
+    func appendingCompletionHandler(_ handler: @escaping CompletionHandler) -> Self {
+        let currentHandler = completionHandler
+        return onCompletion { board, output in
+            currentHandler?(board, output)
+            handler(board, output)
+        }
+    }
+
+    func appendingProcessingHandler(_ handler: @escaping ProcessingHandler) -> Self {
+        let currentHandler = processingHandler
+        return onProcessing { board, output in
+            currentHandler?(board, output)
+            handler(board, output)
+        }
+    }
+}
+
 public enum TaskCompletionStatus {
     case done
     case cancelled
