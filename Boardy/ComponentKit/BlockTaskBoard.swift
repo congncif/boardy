@@ -187,35 +187,35 @@ public extension BlockTaskBoard {
     }
 }
 
+public enum ExecutingType {
+    /// Tasks run independently
+    case `default`
+
+    /// Only one latest task will be observed, all previous pending tasks will be cancelled.
+    case latest
+
+    /// Only one task run at the moment, all tasks activate while current task incomplete will be cancelled intermediately.
+    case only
+
+    /// The first result will be returned for all pending tasks, the input of the pending tasks after current task may be not used.
+    case onlyResult
+
+    /// Tasks run under FIFO
+    case queue
+
+    /// Schedule tasks with max concurrent operations
+    case concurrent(max: Int)
+
+    /// concurrent type with default max concurrent operation count
+    public static var concurrent: ExecutingType { .concurrent(max: 3) }
+}
+
 public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = BlockTaskParameter<Input, Output>
     public typealias OutputType = Output
 
     public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
     public typealias Executor = (BlockTaskBoard<Input, Output>, Input, @escaping ExecutorCompletion) -> BlockTaskCanceler
-
-    public enum ExecutingType {
-        /// Tasks run independently
-        case `default`
-
-        /// Only one latest task will be observed, all previous pending tasks will be cancelled.
-        case latest
-
-        /// Only one task run at the moment, all tasks activate while current task incomplete will be cancelled intermediately.
-        case only
-
-        /// The first result will be returned for all pending tasks, the input of the pending tasks after current task may be not used.
-        case onlyResult
-
-        /// Tasks run under FIFO
-        case queue
-
-        /// Schedule tasks with max concurrent operations
-        case concurrent(max: Int)
-
-        /// concurrent type with default max concurrent operation count
-        public static var concurrent: ExecutingType { .concurrent(max: 3) }
-    }
 
     private let executor: Executor
     private let executingType: ExecutingType

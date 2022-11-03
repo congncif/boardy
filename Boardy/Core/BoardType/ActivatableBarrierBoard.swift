@@ -15,8 +15,9 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         super.init(identifier: identifier)
     }
 
-    @Atomic
-    var pendingTasks: [BarrierPendingTask] = []
+//    @Atomic
+//    var pendingTasks: [BarrierPendingTask] = []
+    var pendingTasks = SafeArray<BarrierPendingTask>()
 
     var isProcessing: Bool { !pendingTasks.isEmpty }
 
@@ -39,7 +40,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
 
     func completePendingTasks(isDone: Bool) {
         if isDone {
-            for task in pendingTasks {
+            for task in pendingTasks.elements {
                 task.activation()
             }
         }
@@ -49,8 +50,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
 }
 
 enum ActivationBarrierFactory {
-    @Atomic
-    static var cache: [BoardID: ActivatableBarrierBoard] = [:]
+    static var cache = SafeDictionary<BoardID, ActivatableBarrierBoard>()
 
     static func makeBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
         let identifier = barrierActivation.identifier
@@ -69,6 +69,10 @@ enum ActivationBarrierFactory {
         }
     }
 }
+
+// extension Array {
+//    var elements: [Element] { self }
+// }
 
 struct BarrierPendingTask {
     let activation: () -> Void
