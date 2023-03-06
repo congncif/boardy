@@ -25,7 +25,7 @@ public final class NoBoard: Board, ActivatableBoard {
             self?.handler?(option)
             self?.complete()
         }))
-        rootViewController.topPresentedViewController.present(alert, animated: true)
+        rootViewController.boardy_topPresentedViewController.present(alert, animated: true)
     }
 }
 

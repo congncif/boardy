@@ -12,7 +12,7 @@ public protocol BoardFlowAction {}
 
 public enum BoardFlowNoneAction: BoardFlowAction {}
 
-public typealias FlowID = BoardID
+public typealias FlowStepID = BoardID
 
 public protocol BoardFlow {
     func match(with output: BoardOutputModel) -> Bool
@@ -68,7 +68,7 @@ public extension FlowManageable {
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
     func registerFlow<Output>(
-        matchedIdentifiers: [FlowID],
+        matchedIdentifiers: [FlowStepID],
         uniqueOutputType _: Output.Type = Output.self,
         nextHandler: @escaping (Output) -> Void
     ) -> Self {
@@ -83,7 +83,7 @@ public extension FlowManageable {
     /// Default flow is a dedicated flow with specified output type. If data matches with Output type, handler will be executed, otherwise the handler will be skipped.
     @discardableResult
     func registerFlow<Target, Output>(
-        matchedIdentifiers: [FlowID],
+        matchedIdentifiers: [FlowStepID],
         target: Target,
         uniqueOutputType _: Output.Type = Output.self,
         nextHandler: @escaping (Target, Output) -> Void
@@ -101,7 +101,7 @@ public extension FlowManageable {
     /// Guaranteed Flow ensures data must match with Output type if not handler will fatal in debug and will be skipped in release mode.
     @discardableResult
     func registerGuaranteedFlow<Target, Output>(
-        matchedIdentifiers: [FlowID],
+        matchedIdentifiers: [FlowStepID],
         target: Target,
         uniqueOutputType _: Output.Type = Output.self,
         handler: @escaping (Target, Output) -> Void
@@ -118,7 +118,7 @@ public extension FlowManageable {
     }
 
     /// Chain Flow handles step by step of chain of handlers until a handler in chain is executed. Eventually handler is mandatory to register this flow.
-    func registerChainFlow<Target>(matchedIdentifiers: [FlowID], target: Target) -> ChainBoardFlow<Target> {
+    func registerChainFlow<Target>(matchedIdentifiers: [FlowStepID], target: Target) -> ChainBoardFlow<Target> {
         let flow = ChainBoardFlow(manager: self, target: target) {
             matchedIdentifiers.contains($0.identifier)
         }
@@ -127,7 +127,7 @@ public extension FlowManageable {
 
     @discardableResult
     func registerCompletionFlow(
-        matchedIdentifiers: [FlowID],
+        matchedIdentifiers: [FlowStepID],
         nextHandler: @escaping (_ isDone: Bool) -> Void
     ) -> Self {
         let flow = BoardActivateFlow(matchedIdentifiers: matchedIdentifiers, nextHandler: { data in
@@ -295,19 +295,19 @@ public struct BoardActivateFlow: BoardFlow {
         }
     }
 
-    public init(matchedIdentifiers: [FlowID], outputNextHandler: @escaping (BoardOutputModel) -> Void) {
+    public init(matchedIdentifiers: [FlowStepID], outputNextHandler: @escaping (BoardOutputModel) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, outputNextHandler: outputNextHandler)
     }
 
-    public init(matchedIdentifiers: [FlowID], nextHandler: @escaping (Any?) -> Void) {
+    public init(matchedIdentifiers: [FlowStepID], nextHandler: @escaping (Any?) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, nextHandler: nextHandler)
     }
 
-    public init<Output>(matchedIdentifiers: [FlowID], dedicatedNextHandler: @escaping (Output?) -> Void) {
+    public init<Output>(matchedIdentifiers: [FlowStepID], dedicatedNextHandler: @escaping (Output?) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, dedicatedNextHandler: dedicatedNextHandler)
     }
 
-    public init<Output>(matchedIdentifiers: [FlowID], guaranteedNextHandler: @escaping (Output) -> Void) {
+    public init<Output>(matchedIdentifiers: [FlowStepID], guaranteedNextHandler: @escaping (Output) -> Void) {
         self.init(matcher: { matchedIdentifiers.contains($0.identifier) }, guaranteedNextHandler: guaranteedNextHandler)
     }
 
@@ -321,21 +321,21 @@ public struct BoardActivateFlow: BoardFlow {
 }
 
 public struct IDFlowStep {
-    public let source: FlowID
-    public let destination: FlowID
+    public let source: FlowStepID
+    public let destination: FlowStepID
 
-    public init(source: FlowID, destination: FlowID) {
+    public init(source: FlowStepID, destination: FlowStepID) {
         self.source = source
         self.destination = destination
     }
 }
 
 infix operator ->>: MultiplicationPrecedence
-public func ->> (left: FlowID, right: FlowID) -> [IDFlowStep] {
+public func ->> (left: FlowStepID, right: FlowStepID) -> [IDFlowStep] {
     [IDFlowStep(source: left, destination: right)]
 }
 
-public func ->> (left: [IDFlowStep], right: FlowID) -> [IDFlowStep] {
+public func ->> (left: [IDFlowStep], right: FlowStepID) -> [IDFlowStep] {
     guard let lastLeft = left.last else {
         assertionFailure("Empty flow is not allowed")
         return []

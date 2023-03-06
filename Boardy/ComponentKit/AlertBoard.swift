@@ -74,7 +74,7 @@ final class AlertBoard: Board, GuaranteedBoard {
             }
         }
 
-        rootViewController.topPresentedViewController.present(alertController, animated: true, completion: nil)
+        rootViewController.boardy_topPresentedViewController.present(alertController, animated: true, completion: nil)
     }
 }
 

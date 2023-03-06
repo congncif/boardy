@@ -246,6 +246,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         cancelPendingTasksIfNeeded()
     }
 
+    // FIXME: - not working?
     public var inputAdapters: [(Any?) -> BlockTaskParameter<Input, Output>?] {
         [{ input in
             guard let input = input as? Input else {

@@ -9,17 +9,17 @@ import Foundation
 import UIKit
 
 extension UIViewController {
-    var allPresentedViewControllers: [UIViewController] {
+    var boardy_allPresentedViewControllers: [UIViewController] {
         if let presented = presentedViewController {
-            return [presented] + presented.allPresentedViewControllers
+            return [presented] + presented.boardy_allPresentedViewControllers
         } else {
             return []
         }
     }
 
-    var allPresentingViewControllers: [UIViewController] {
+    var boardy_allPresentingViewControllers: [UIViewController] {
         if let presenting = presentingViewController {
-            return [presenting] + presenting.allPresentingViewControllers
+            return [presenting] + presenting.boardy_allPresentingViewControllers
         } else {
             return []
         }
@@ -27,25 +27,25 @@ extension UIViewController {
 }
 
 extension UITabBarController {
-    @objc override var topMostViewController: UIViewController {
-        selectedViewController?.topMostViewController ?? self
+    @objc override var boardy_topMostViewController: UIViewController {
+        selectedViewController?.boardy_topMostViewController ?? self
     }
 }
 
 extension UINavigationController {
-    @objc override var topMostViewController: UIViewController {
-        topViewController?.topMostViewController ?? self
+    @objc override var boardy_topMostViewController: UIViewController {
+        topViewController?.boardy_topMostViewController ?? self
     }
 }
 
 extension UIViewController {
-    @objc var topMostViewController: UIViewController {
+    @objc var boardy_topMostViewController: UIViewController {
         self
     }
 }
 
 extension UIViewController {
-    var topPresentedViewController: UIViewController {
-        allPresentedViewControllers.last?.topMostViewController ?? self
+    var boardy_topPresentedViewController: UIViewController {
+        boardy_allPresentedViewControllers.last?.boardy_topMostViewController ?? self
     }
 }
