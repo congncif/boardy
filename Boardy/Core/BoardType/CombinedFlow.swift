@@ -48,6 +48,7 @@ public class OutputCombinedFlow: BoardFlow {
         case latestForever
     }
 
+    public let identifier: String
     public let specifications: [OutputSpecifications]
     public let strategy: Strategy
 
@@ -59,21 +60,24 @@ public class OutputCombinedFlow: BoardFlow {
         specifications.map { $0.identifier }
     }
 
-    public init(matchedIdentifiers: [BoardID],
+    public init(identifier: String = UUID().uuidString,
+                matchedIdentifiers: [BoardID],
                 strategy: Strategy = .batchOneByOne,
                 handler: @escaping ([Any]) -> Void) {
         let specs = matchedIdentifiers.map {
             GeneralOutputSpecifications(identifier: $0)
         }
+        self.identifier = identifier
         specifications = specs
         self.handler = handler
         self.strategy = strategy
     }
 
-    public init(specifications: [OutputSpecifications], strategy: Strategy, handler: @escaping ([Any]) -> Void) {
+    public init(identifier: String = UUID().uuidString, specifications: [OutputSpecifications], strategy: Strategy, handler: @escaping ([Any]) -> Void) {
         self.specifications = specifications
         self.handler = handler
         self.strategy = strategy
+        self.identifier = identifier
     }
 
     private var _outputValues: [BoardID: Any] = [:]
@@ -120,7 +124,8 @@ public class OutputCombinedFlow: BoardFlow {
 }
 
 public class OutputCombinedCollectionFlow<Value>: OutputCombinedFlow {
-    public init(specs: [GuaranteedOutputSpecifications<Value>],
+    public init(identifier: String = UUID().uuidString,
+                specs: [GuaranteedOutputSpecifications<Value>],
                 strategy: Strategy,
                 handler: @escaping ([Value]) -> Void) {
         let convertedHandler: ([Any]) -> Void = { values in
@@ -132,12 +137,13 @@ public class OutputCombinedCollectionFlow<Value>: OutputCombinedFlow {
             handler(result)
         }
 
-        super.init(specifications: specs, strategy: strategy, handler: convertedHandler)
+        super.init(identifier: identifier, specifications: specs, strategy: strategy, handler: convertedHandler)
     }
 }
 
 public class OutputCombined2Flow<V1, V2>: OutputCombinedFlow {
-    public init(spec1: GuaranteedOutputSpecifications<V1>,
+    public init(identifier: String = UUID().uuidString,
+                spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
                 strategy: Strategy,
                 handler: @escaping (V1, V2) -> Void) {
@@ -159,12 +165,13 @@ public class OutputCombined2Flow<V1, V2>: OutputCombinedFlow {
             handler(v1, v2)
         }
 
-        super.init(specifications: [spec1, spec2], strategy: strategy, handler: convertedHandler)
+        super.init(identifier: identifier, specifications: [spec1, spec2], strategy: strategy, handler: convertedHandler)
     }
 }
 
 public class OutputCombined3Flow<V1, V2, V3>: OutputCombinedFlow {
-    public init(spec1: GuaranteedOutputSpecifications<V1>,
+    public init(identifier: String = UUID().uuidString,
+                spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
                 spec3: GuaranteedOutputSpecifications<V3>,
                 strategy: Strategy,
@@ -194,12 +201,13 @@ public class OutputCombined3Flow<V1, V2, V3>: OutputCombinedFlow {
             handler(v1, v2, v3)
         }
 
-        super.init(specifications: [spec1, spec2, spec3], strategy: strategy, handler: convertedHandler)
+        super.init(identifier: identifier, specifications: [spec1, spec2, spec3], strategy: strategy, handler: convertedHandler)
     }
 }
 
 public class OutputCombined4Flow<V1, V2, V3, V4>: OutputCombinedFlow {
-    public init(spec1: GuaranteedOutputSpecifications<V1>,
+    public init(identifier: String = UUID().uuidString,
+                spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
                 spec3: GuaranteedOutputSpecifications<V3>,
                 spec4: GuaranteedOutputSpecifications<V4>,
@@ -237,12 +245,13 @@ public class OutputCombined4Flow<V1, V2, V3, V4>: OutputCombinedFlow {
             handler(v1, v2, v3, v4)
         }
 
-        super.init(specifications: [spec1, spec2, spec3, spec4], strategy: strategy, handler: convertedHandler)
+        super.init(identifier: identifier, specifications: [spec1, spec2, spec3, spec4], strategy: strategy, handler: convertedHandler)
     }
 }
 
 public class OutputCombined5Flow<V1, V2, V3, V4, V5>: OutputCombinedFlow {
-    public init(spec1: GuaranteedOutputSpecifications<V1>,
+    public init(identifier: String = UUID().uuidString,
+                spec1: GuaranteedOutputSpecifications<V1>,
                 spec2: GuaranteedOutputSpecifications<V2>,
                 spec3: GuaranteedOutputSpecifications<V3>,
                 spec4: GuaranteedOutputSpecifications<V4>,
@@ -288,7 +297,7 @@ public class OutputCombined5Flow<V1, V2, V3, V4, V5>: OutputCombinedFlow {
             handler(v1, v2, v3, v4, v5)
         }
 
-        super.init(specifications: [spec1, spec2, spec3, spec4, spec5], strategy: strategy, handler: convertedHandler)
+        super.init(identifier: identifier, specifications: [spec1, spec2, spec3, spec4, spec5], strategy: strategy, handler: convertedHandler)
     }
 }
 

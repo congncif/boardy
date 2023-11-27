@@ -77,6 +77,14 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     @discardableResult
     public func registerFlow(_ flow: BoardFlow) -> Self {
+        #if DEBUG
+            if flows.firstIndex(where: { registeredFlow in
+                registeredFlow.identifier == flow.identifier
+            }) != nil {
+                print("⚠️ [Motherboard] ➤ \(identifier)\n  [Duplicated flow] ➤ A flow with identifier \(flow.identifier) is already registered!")
+            }
+        #endif
+
         flows.append(flow)
         return self
     }
@@ -84,6 +92,12 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     public func resetFlows() {
         flows = []
         registerDefaultFlows()
+    }
+
+    public func removeFlow(by identifier: String) {
+        flows.removeAll { flow in
+            flow.identifier == identifier
+        }
     }
 
     // MARK: - MotherboardRepresentable

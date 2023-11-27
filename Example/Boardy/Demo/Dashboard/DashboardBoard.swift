@@ -34,6 +34,14 @@ final class DashboardBoard: ContinuousBoard, GuaranteedBoard {
         motherboard.registerGuaranteedFlow(matchedIdentifiers: [.headline], target: self, uniqueOutputType: String.self) { _, output in
             print(output)
         }
+
+        let flow1 = IDGenericBoardFlow(matchedBoardID: .headline, of: HeadlineBoard.self, target: self) { _, _ in
+        }
+        motherboard.registerFlow(flow1)
+
+        let flow2 = IDGenericBoardFlow(matchedBoardID: .headline, of: HeadlineBoard.self, target: self) { _, _ in
+        }
+        motherboard.registerFlow(flow2)
     }
 
     func activate(withGuaranteedInput _: Any?) {

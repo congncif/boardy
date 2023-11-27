@@ -20,6 +20,18 @@ public final class BoardContainer: BoardDynamicProducer {
         container[identifier] = factory
     }
 
+    public func registerBoards(_ identifiers: [BoardID], factory: @escaping BoardConstructor) {
+        identifiers.forEach { identifier in
+            container[identifier] = factory
+        }
+    }
+
+    public func registerBoards(_ identifiers: BoardID..., factory: @escaping BoardConstructor) {
+        identifiers.forEach { identifier in
+            container[identifier] = factory
+        }
+    }
+
     public func produceBoard(identifier: BoardID) -> ActivatableBoard? {
         if let boardFactory = container[identifier] {
             return boardFactory(identifier)

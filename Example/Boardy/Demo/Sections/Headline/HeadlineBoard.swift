@@ -16,9 +16,10 @@ protocol HeadlineBoardOutput: AnyObject {
     func receive(label: String)
 }
 
-final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedCommandBoard {
+final class HeadlineBoard: Board, GuaranteedBoard, GuaranteedCommandBoard, GuaranteedOutputSendingBoard {
     typealias InputType = Any
     typealias CommandType = String
+    typealias OutputType = String
 
     @LazyInjected var builder: HeadlineBuildable
 
