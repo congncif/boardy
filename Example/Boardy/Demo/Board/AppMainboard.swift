@@ -24,3 +24,9 @@ final class AppMainboard: Motherboard, AppMotherboard {
         }
     }
 }
+
+public final class ___VARIABLE_moduleName___ServiceMap: ServiceMap {}
+
+public extension ServiceMap {
+    var ___VARIABLE_serviceMap___: ___VARIABLE_moduleName___ServiceMap { link() }
+}

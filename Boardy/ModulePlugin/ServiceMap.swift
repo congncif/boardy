@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Centralized Service Map which should be extended for calling a Boardy. Using ServiceMap enable the manager has an overview of micro-services in whole of system.
+/// Centralized Service Map which should be extended for calling a Boardy. Using ServiceMap enables the manager has an overview of micro-services in whole of system.
 /// ```
 /// // 1. Extend ServiceMap
 /// public extension ServiceMap {
@@ -32,12 +32,22 @@ import Foundation
 /// }
 /// ```
 ///
-public struct ServiceMap {
+open class ServiceMap {
     public let mainboard: FlowMotherboard
+
+    public required init(mainboard: FlowMotherboard) {
+        self.mainboard = mainboard
+    }
 }
 
 public extension MotherboardType where Self: FlowManageable {
     var serviceMap: ServiceMap {
         ServiceMap(mainboard: self)
+    }
+}
+
+public extension ServiceMap {
+    func link<MapType: ServiceMap>(_: MapType.Type = MapType.self) -> MapType {
+        MapType(mainboard: mainboard)
     }
 }
