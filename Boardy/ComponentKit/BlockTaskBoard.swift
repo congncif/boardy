@@ -497,6 +497,10 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
     override var isFinished: Bool {
         state == .finished
     }
+    
+    override var isCancelled: Bool {
+        state == .finished
+    }
 
     override func cancel() {
         canceler?.cancel()
