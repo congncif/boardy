@@ -14,6 +14,8 @@ public final class LauncherComponent {
     private var container = BoardProducer()
 
     private var plugins: [ModulePlugin] = []
+    private var urlOpenerPlugins: [URLOpenerPlugin] = []
+    private var customHandlers: [(FlowMotherboard) -> Void] = []
 
     init(options: MainOptions) {
         self.options = options
@@ -53,6 +55,23 @@ public final class LauncherComponent {
         return self
     }
 
+    public func install(urlOpenerPlugins: [URLOpenerPlugin]) -> Self {
+        self.urlOpenerPlugins.append(contentsOf: urlOpenerPlugins)
+        return self
+    }
+
+    public func install(mainSettings: @escaping (FlowMotherboard) -> Void) -> Self {
+        customHandlers.append(mainSettings)
+        return self
+    }
+
+    @discardableResult
+    public func install(launcherPlugin: LauncherPlugin) -> Self {
+        install(plugins: launcherPlugin.modulePlugins)
+            .install(urlOpenerPlugins: launcherPlugin.urlOpenerPlugins)
+//            .install(customSettings: launcherPlugin.mainSettings)
+    }
+
     func loadPluginsIfNeeded() {
         plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed, encodedData: encodedData)) }
         plugins.removeAll()
@@ -61,13 +80,20 @@ public final class LauncherComponent {
     func generateMainboard(with settings: (_ mainboard: FlowMotherboard) -> Void) -> Motherboard {
         loadPluginsIfNeeded()
         let motherboard = Motherboard(boardProducer: container)
+
+        for customHandler in customHandlers {
+            customHandler(motherboard)
+        }
+
         settings(motherboard)
+
         return motherboard
     }
 
     /// Create & return new instance of Launcher
     public func instantiate(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
         PluginLauncher(mainboard: generateMainboard(with: settings))
+            .install(urlOpenerPlugins: urlOpenerPlugins)
     }
 
     /// Create shared instance of Launcher
@@ -299,4 +325,16 @@ public final class PluginLauncher {
 public enum URLOpeningValidationStatus {
     case accepted
     case denied
+}
+
+public struct LauncherPlugin {
+    public init(modulePlugins: [ModulePlugin], urlOpenerPlugins: [URLOpenerPlugin] = []) {
+        self.modulePlugins = modulePlugins
+        self.urlOpenerPlugins = urlOpenerPlugins
+//        self.mainSettings = mainSettings
+    }
+
+    public let modulePlugins: [ModulePlugin]
+    public let urlOpenerPlugins: [URLOpenerPlugin]
+//    public let mainSettings: (_ mainboard: FlowMotherboard) -> Void
 }
