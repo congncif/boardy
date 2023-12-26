@@ -67,8 +67,8 @@ public final class LauncherComponent {
 
     @discardableResult
     public func install(launcherPlugin: LauncherPlugin) -> Self {
-        install(plugins: launcherPlugin.modulePlugins)
-            .install(urlOpenerPlugins: launcherPlugin.urlOpenerPlugins)
+        install(plugins: launcherPlugin.moduleComponent.modulePlugins)
+            .install(urlOpenerPlugins: launcherPlugin.moduleComponent.urlOpenerPlugins)
 //            .install(customSettings: launcherPlugin.mainSettings)
     }
 
@@ -327,7 +327,11 @@ public enum URLOpeningValidationStatus {
     case denied
 }
 
-public struct LauncherPlugin {
+public protocol LauncherPlugin {
+    var moduleComponent: ModuleComponent { get }
+}
+
+public struct ModuleComponent {
     public init(modulePlugins: [ModulePlugin], urlOpenerPlugins: [URLOpenerPlugin] = []) {
         self.modulePlugins = modulePlugins
         self.urlOpenerPlugins = urlOpenerPlugins
