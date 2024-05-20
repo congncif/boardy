@@ -63,6 +63,9 @@ public final class LauncherComponent {
     @discardableResult
     public func initialize(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
         let instance = instantiate(settings)
+        
+        precondition(PluginLauncher.sharedInstance == nil, "🆘 [Boardy] PluginLauncher.shared is already initialized. ‼️ Re-initialize is not allowed. 👉 Please use instantiate(:) instead of.")
+        
         PluginLauncher.sharedInstance = instance
         return instance
     }
@@ -84,7 +87,7 @@ public final class PluginLauncher {
 
     public static var shared: PluginLauncher {
         guard let instance = sharedInstance else {
-            preconditionFailure("PluginLauncher must be initialized before using")
+            preconditionFailure("🆘 [Boardy] PluginLauncher.shared must be initialized before using ‼️")
         }
         return instance
     }
