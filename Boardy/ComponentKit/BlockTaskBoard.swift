@@ -222,7 +222,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     private let operationQueue: OperationQueue
 
     public init(identifier: BoardID,
-                executingType: ExecutingType = .default,
+                executingType: ExecutingType,
                 executor: @escaping Executor) {
         self.executor = executor
         self.executingType = executingType
