@@ -17,3 +17,6 @@ public extension ActivatableBoardProducer {
         produceBoard(identifier: anotherIdentifier)
     }
 }
+
+@available(*, deprecated, renamed: "ActivatableBoardProducer", message: "The protocol was renamed to ActivatableBoardProducer to fix typo")
+public typealias ActivableBoardProducer = ActivatableBoardProducer
