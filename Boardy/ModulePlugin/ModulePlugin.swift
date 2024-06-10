@@ -38,14 +38,20 @@ public struct MainOptions {
         self[key] as? Value
     }
 
-    public subscript(key: Key) -> Any {
+    public subscript(key: Key) -> Any? {
         get {
-            values[key] as Any
+            values[key]
         }
 
         set {
             values[key] = newValue
         }
+    }
+
+    public func set(_ value: Any?, forKey key: Key) -> Self {
+        var result = self
+        result[key] = value
+        return result
     }
 }
 

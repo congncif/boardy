@@ -25,8 +25,8 @@ public struct BoardInput<Input>: BoardInputModel {
 }
 
 public extension BoardInput {
-    static func target<Input>(_ id: BoardID, _ input: Input) -> BoardInput<Input> {
-        BoardInput<Input>(target: id, input: input)
+    static func target<InputValue>(_ id: BoardID, _ input: InputValue) -> BoardInput<InputValue> {
+        BoardInput<InputValue>(target: id, input: input)
     }
 }
 

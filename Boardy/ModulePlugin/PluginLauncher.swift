@@ -9,13 +9,13 @@ import Foundation
 
 public final class LauncherComponent {
     public let options: MainOptions
-    public var encodedData: Data?
+    public var sharedEncodedData: Data?
 
     private var container = BoardProducer()
 
     private var plugins: [ModulePlugin] = []
     private var urlOpenerPlugins: [URLOpenerPlugin] = []
-    private var customHandlers: [(FlowMotherboard) -> Void] = []
+    private var customLaunchSettings: [(FlowMotherboard) -> Void] = []
 
     init(options: MainOptions) {
         self.options = options
@@ -34,7 +34,7 @@ public final class LauncherComponent {
     }
 
     func share(encodedData: Data?) -> Self {
-        self.encodedData = encodedData
+        sharedEncodedData = encodedData
         return self
     }
 
@@ -60,20 +60,22 @@ public final class LauncherComponent {
         return self
     }
 
-    public func install(mainSettings: @escaping (FlowMotherboard) -> Void) -> Self {
-        customHandlers.append(mainSettings)
+    public func install(launchSettings: @escaping (FlowMotherboard) -> Void) -> Self {
+        customLaunchSettings.append(launchSettings)
         return self
     }
 
     @discardableResult
     public func install(launcherPlugin: LauncherPlugin) -> Self {
-        install(plugins: launcherPlugin.moduleComponent.modulePlugins)
-            .install(urlOpenerPlugins: launcherPlugin.moduleComponent.urlOpenerPlugins)
-//            .install(customSettings: launcherPlugin.mainSettings)
+        let moduleComponent = launcherPlugin.prepareForLaunching(withOptions: options)
+
+        return install(plugins: moduleComponent.modulePlugins)
+            .install(urlOpenerPlugins: moduleComponent.urlOpenerPlugins)
+            .install(launchSettings: moduleComponent.launchSettings)
     }
 
     func loadPluginsIfNeeded() {
-        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed, encodedData: encodedData)) }
+        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed, encodedData: sharedEncodedData)) }
         plugins.removeAll()
     }
 
@@ -81,25 +83,25 @@ public final class LauncherComponent {
         loadPluginsIfNeeded()
         let motherboard = Motherboard(boardProducer: container)
 
-        for customHandler in customHandlers {
-            customHandler(motherboard)
-        }
-
         settings(motherboard)
+
+        for customLaunchSetting in customLaunchSettings {
+            customLaunchSetting(motherboard)
+        }
 
         return motherboard
     }
 
     /// Create & return new instance of Launcher
-    public func instantiate(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
-        PluginLauncher(mainboard: generateMainboard(with: settings))
+    public func instantiate(_ launchSettings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
+        PluginLauncher(mainboard: generateMainboard(with: launchSettings))
             .install(urlOpenerPlugins: urlOpenerPlugins)
     }
 
     /// Create shared instance of Launcher
     @discardableResult
-    public func initialize(_ settings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
-        let instance = instantiate(settings)
+    public func initialize(_ launchSettings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
+        let instance = instantiate(launchSettings)
 
         precondition(PluginLauncher.sharedInstance == nil, "🆘 [Boardy] PluginLauncher.shared is already initialized. ‼️ Re-initialize is not allowed. 👉 Please use instantiate(:) instead of.")
 
@@ -331,17 +333,19 @@ public enum URLOpeningValidationStatus {
 }
 
 public protocol LauncherPlugin {
-    var moduleComponent: ModuleComponent { get }
+    func prepareForLaunching(withOptions options: MainOptions) -> ModuleComponent
 }
 
 public struct ModuleComponent {
-    public init(modulePlugins: [ModulePlugin], urlOpenerPlugins: [URLOpenerPlugin] = []) {
+    public init(modulePlugins: [ModulePlugin],
+                urlOpenerPlugins: [URLOpenerPlugin] = [],
+                launchSettings: @escaping (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
         self.modulePlugins = modulePlugins
         self.urlOpenerPlugins = urlOpenerPlugins
-//        self.mainSettings = mainSettings
+        self.launchSettings = launchSettings
     }
 
     public let modulePlugins: [ModulePlugin]
     public let urlOpenerPlugins: [URLOpenerPlugin]
-//    public let mainSettings: (_ mainboard: FlowMotherboard) -> Void
+    public let launchSettings: (_ mainboard: FlowMotherboard) -> Void
 }

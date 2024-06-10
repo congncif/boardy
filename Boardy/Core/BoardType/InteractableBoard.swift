@@ -63,8 +63,8 @@ public extension BoardCommand {
 }
 
 public extension BoardCommand {
-    static func target<Input>(_ id: BoardID, _ input: Input) -> BoardCommand<Input> {
-        BoardCommand<Input>(identifier: id, input: input)
+    static func target<InputValue>(_ id: BoardID, _ input: InputValue) -> BoardCommand<InputValue> {
+        BoardCommand<InputValue>(identifier: id, input: input)
     }
 }
 

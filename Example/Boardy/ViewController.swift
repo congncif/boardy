@@ -10,6 +10,12 @@ import Boardy
 import Resolver
 import UIKit
 
+class XXXP: ActivableBoardProducer {
+    func produceBoard(identifier _: Boardy.BoardID) -> (any Boardy.ActivatableBoard)? {
+        nil
+    }
+}
+
 public struct LBBoardActivation {
     let mainboard: MotherboardType
 }
