@@ -1,77 +1,85 @@
 PODS:
-  - Boardy (1.54.0):
-    - Boardy/Default (= 1.54.0)
-  - Boardy/Attachable (1.54.0):
+  - Authentication (0.1.0):
+    - Boardy
+  - AuthenticationPlugins (0.1.0):
+    - Authentication
+    - Boardy/ModulePlugin
+    - SiFUtilities
+  - Boardy (1.54.2):
+    - Boardy/Default (= 1.54.2)
+  - Boardy/Attachable (1.54.2):
     - Boardy/Core
-  - Boardy/ComponentKit (1.54.0):
+  - Boardy/ComponentKit (1.54.2):
     - Boardy/Core
-  - Boardy/Composable (1.54.0):
+  - Boardy/Composable (1.54.2):
     - Boardy/Attachable
     - Boardy/Core
     - UIComposable
-  - Boardy/Core (1.54.0)
-  - Boardy/Default (1.54.0):
+  - Boardy/Core (1.54.2)
+  - Boardy/Default (1.54.2):
     - Boardy/Attachable
     - Boardy/ComponentKit
     - Boardy/Core
     - Boardy/ModulePlugin
-  - Boardy/ModulePlugin (1.54.0):
+  - Boardy/ModulePlugin (1.54.2):
     - Boardy/Core
+  - Dashboard (0.1.0):
+    - Boardy
+  - DashboardPlugins (0.1.0):
+    - Authentication
+    - Boardy/ModulePlugin
+    - Dashboard
+    - EmployeeManagement
+    - SiFUtilities
   - DiffableDataSources (0.4.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
     - DifferenceKit/UIKitExtension (~> 1.1)
   - DifferenceKit/Core (1.1.5)
   - DifferenceKit/UIKitExtension (1.1.5):
     - DifferenceKit/Core
-  - Localize-Swift (3.2.0):
-    - Localize-Swift/LocalizeSwiftCore (= 3.2.0)
-    - Localize-Swift/UIKit (= 3.2.0)
-  - Localize-Swift/LocalizeSwiftCore (3.2.0)
-  - Localize-Swift/UIKit (3.2.0):
-    - Localize-Swift/LocalizeSwiftCore
-  - Resolver (1.2.1)
-  - RIBs (0.9.3):
-    - RxRelay (~> 6.0.0)
-    - RxSwift (~> 6.0.0)
-  - RxRelay (6.0.0):
-    - RxSwift (= 6.0.0)
-  - RxSwift (6.0.0)
-  - SiFUtilities (4.17.1):
-    - SiFUtilities/Default (= 4.17.1)
-  - SiFUtilities/Default (4.17.1):
+  - EmployeeManagement (0.1.0):
+    - Boardy
+  - EmployeeManagementPlugins (0.1.0):
+    - Boardy/ModulePlugin
+    - EmployeeManagement
+    - SiFUtilities
+  - SiFUtilities (4.28.0):
+    - SiFUtilities/Default (= 4.28.0)
+  - SiFUtilities/Boardy (4.28.0):
+    - Boardy/ComponentKit
+    - SiFUtilities/Loading
+    - SiFUtilities/Show
+  - SiFUtilities/Default (4.28.0):
+    - SiFUtilities/Boardy
     - SiFUtilities/Endpoint
     - SiFUtilities/Foundation
     - SiFUtilities/Helpers
     - SiFUtilities/IBDesignable
     - SiFUtilities/KeyValue
     - SiFUtilities/Loading
-    - SiFUtilities/Localize
     - SiFUtilities/Media
     - SiFUtilities/Nib
     - SiFUtilities/Runtime
     - SiFUtilities/Show
     - SiFUtilities/UIKit
     - SiFUtilities/WeakObject
-  - SiFUtilities/Endpoint (4.17.1)
-  - SiFUtilities/Foundation (4.17.1)
-  - SiFUtilities/Helpers (4.17.1)
-  - SiFUtilities/IBDesignable (4.17.1):
+  - SiFUtilities/Endpoint (4.28.0)
+  - SiFUtilities/Foundation (4.28.0)
+  - SiFUtilities/Helpers (4.28.0)
+  - SiFUtilities/IBDesignable (4.28.0):
     - SiFUtilities/UIKit
-  - SiFUtilities/KeyValue (4.17.1)
-  - SiFUtilities/Loading (4.17.1)
-  - SiFUtilities/Localize (4.17.1):
-    - Localize-Swift
+  - SiFUtilities/KeyValue (4.28.0)
+  - SiFUtilities/Loading (4.28.0):
     - SiFUtilities/Foundation
-    - SiFUtilities/Runtime
-    - SiFUtilities/UIKit
-  - SiFUtilities/Media (4.17.1)
-  - SiFUtilities/Nib (4.17.1):
+  - SiFUtilities/Media (4.28.0)
+  - SiFUtilities/Nib (4.28.0):
     - SiFUtilities/Foundation
-  - SiFUtilities/Runtime (4.17.1)
-  - SiFUtilities/Show (4.17.1):
+  - SiFUtilities/Runtime (4.28.0):
+    - SiFUtilities/Foundation
+  - SiFUtilities/Show (4.28.0):
     - SiFUtilities/UIKit
-  - SiFUtilities/UIKit (4.17.1)
-  - SiFUtilities/WeakObject (4.17.1)
+  - SiFUtilities/UIKit (4.28.0)
+  - SiFUtilities/WeakObject (4.28.0)
   - SwiftFormat/CLI (0.49.7)
   - UIComposable (0.5.1):
     - UIComposable/Default (= 0.5.1)
@@ -84,59 +92,60 @@ PODS:
     - UIComposable/Core
   - UIComposable/UIKit (0.5.1):
     - UIComposable/Core
-  - ViewStateCore (1.7.0)
 
 DEPENDENCIES:
+  - Authentication (from `submodules/Authentication`)
+  - AuthenticationPlugins (from `submodules/Authentication`)
   - Boardy (from `../`)
   - Boardy/ComponentKit (from `../`)
   - Boardy/Composable (from `../`)
   - Boardy/ModulePlugin (from `../`)
-  - Resolver (= 1.2.1)
-  - RIBs (from `https://github.com/uber/RIBs.git`, branch `master`)
+  - Dashboard (from `submodules/Dashboard`)
+  - DashboardPlugins (from `submodules/Dashboard`)
+  - EmployeeManagement (from `submodules/EmployeeManagement`)
+  - EmployeeManagementPlugins (from `submodules/EmployeeManagement`)
   - SiFUtilities
   - SwiftFormat/CLI
   - UIComposable/DiffUI
-  - ViewStateCore
 
 SPEC REPOS:
   trunk:
     - DiffableDataSources
     - DifferenceKit
-    - Localize-Swift
-    - Resolver
-    - RxRelay
-    - RxSwift
     - SiFUtilities
     - SwiftFormat
     - UIComposable
-    - ViewStateCore
 
 EXTERNAL SOURCES:
+  Authentication:
+    :path: submodules/Authentication
+  AuthenticationPlugins:
+    :path: submodules/Authentication
   Boardy:
     :path: "../"
-  RIBs:
-    :branch: master
-    :git: https://github.com/uber/RIBs.git
-
-CHECKOUT OPTIONS:
-  RIBs:
-    :commit: 32ca504b7e58f1929bec7ae34101ec3f75a17127
-    :git: https://github.com/uber/RIBs.git
+  Dashboard:
+    :path: submodules/Dashboard
+  DashboardPlugins:
+    :path: submodules/Dashboard
+  EmployeeManagement:
+    :path: submodules/EmployeeManagement
+  EmployeeManagementPlugins:
+    :path: submodules/EmployeeManagement
 
 SPEC CHECKSUMS:
-  Boardy: 468815bf1fa08b076ad8e95da5b6dfc850f2fdd2
+  Authentication: c0ea01a6f5a09497839d6a64098174560b847131
+  AuthenticationPlugins: 9a6528dee245fa0653a2f8d3b08cea24a9d10870
+  Boardy: f607c924a2ba027fe4f022195e49ea26f5c3f7e0
+  Dashboard: e640f15290373c564879dfa771b98dbd762d52b0
+  DashboardPlugins: f668cd2a6f3f9dfc47b2d7821496f03e08691537
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
-  Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
-  Resolver: 764e380b2ddb26bba48c6e45ab393c968894a156
-  RIBs: dd8df1129289d51ed4fec6e2127613d9eaba204e
-  RxRelay: 8d593be109c06ea850df027351beba614b012ffb
-  RxSwift: c14e798c59b9f6e9a2df8fd235602e85cc044295
-  SiFUtilities: 6e2b198ae66898a3ad05ec2b25a1632f570c9ac2
+  EmployeeManagement: d21900966e0813c360b74229a588d219ad292a06
+  EmployeeManagementPlugins: 35bb2cd2d925690994a6491101f1576373db2430
+  SiFUtilities: 9224ff24e7b3fce4da0206aac9179eb386210399
   SwiftFormat: b70e3c776a74c67ce8bd140425a8c86d4a843759
   UIComposable: a002bab42cc52f8f71df1282fa4432583dd8c860
-  ViewStateCore: 2f433a0e17e44edf36e90f52c0887d981c08d1a7
 
-PODFILE CHECKSUM: a0121796ec3956db6e712400e2c48792cf3c56e3
+PODFILE CHECKSUM: a898972610ef644d2792230cee4af31059df0169
 
 COCOAPODS: 1.15.2

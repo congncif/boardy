@@ -1,0 +1,19 @@
+strings:
+  inputs: Resources/en.lproj
+  filter: .+\.strings$
+  outputs:
+    - templateName: structured-swift5
+      output: Generated/Strings.swift
+      params:
+        enumName: Strings
+        publicAccess: false
+        lookupFunction: localizedString
+xcassets:
+  inputs:
+    - Resources/Checkout.xcassets
+  outputs:
+    - templateName: swift5
+      output: Generated/Assets.swift
+      params:
+        enumName: Assets
+        publicAccess: false

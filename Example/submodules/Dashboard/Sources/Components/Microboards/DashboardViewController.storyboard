@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Y6W-OH-hqX">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Dashboard-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="DashboardViewController" id="Y6W-OH-hqX" customClass="DashboardViewController" customModule="DashboardPlugins" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Not logged in yet" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xs6-vc-Bde">
+                                <rect key="frame" x="142" y="116" width="130" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kvw-2T-0Bs">
+                                <rect key="frame" x="16" y="160.5" width="382" height="38.5"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Login"/>
+                                <connections>
+                                    <action selector="loginButtonTapped" destination="Y6W-OH-hqX" eventType="touchUpInside" id="XJA-dw-fM3"/>
+                                </connections>
+                            </button>
+                            <scrollView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Dyp-95-mdg">
+                                <rect key="frame" x="0.0" y="215" width="414" height="631"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YqM-O3-JPX">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="38.5"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="y5P-Ch-nT6">
+                                                <rect key="frame" x="16" y="0.0" width="382" height="38.5"/>
+                                                <subviews>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zSl-h0-JBv">
+                                                        <rect key="frame" x="0.0" y="0.0" width="382" height="38.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="filled" title="Employee Management"/>
+                                                        <connections>
+                                                            <action selector="employeeManagementButtonTapped" destination="Y6W-OH-hqX" eventType="touchUpInside" id="NCQ-Ew-33y"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="y5P-Ch-nT6" firstAttribute="top" secondItem="YqM-O3-JPX" secondAttribute="top" id="1Yh-oh-7IH"/>
+                                            <constraint firstAttribute="trailing" secondItem="y5P-Ch-nT6" secondAttribute="trailing" constant="16" id="Ooj-1z-AOU"/>
+                                            <constraint firstItem="y5P-Ch-nT6" firstAttribute="leading" secondItem="YqM-O3-JPX" secondAttribute="leading" constant="16" id="XAi-vH-IQc"/>
+                                            <constraint firstAttribute="bottom" secondItem="y5P-Ch-nT6" secondAttribute="bottom" id="fSe-DN-9jZ"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="EgZ-Am-KpF" firstAttribute="trailing" secondItem="YqM-O3-JPX" secondAttribute="trailing" id="1J5-yY-VAK"/>
+                                    <constraint firstItem="YqM-O3-JPX" firstAttribute="height" secondItem="hKI-SH-haO" secondAttribute="height" id="Pyw-0j-VwM"/>
+                                    <constraint firstItem="YqM-O3-JPX" firstAttribute="leading" secondItem="EgZ-Am-KpF" secondAttribute="leading" id="bP0-Xm-cwg"/>
+                                    <constraint firstItem="YqM-O3-JPX" firstAttribute="top" secondItem="EgZ-Am-KpF" secondAttribute="top" id="dGe-Yn-Idh"/>
+                                    <constraint firstItem="YqM-O3-JPX" firstAttribute="width" secondItem="hKI-SH-haO" secondAttribute="width" id="zmN-1b-TIm"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="hKI-SH-haO"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="EgZ-Am-KpF"/>
+                            </scrollView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="kvw-2T-0Bs" firstAttribute="top" secondItem="Xs6-vc-Bde" secondAttribute="bottom" constant="24" id="Awg-db-pma"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="kvw-2T-0Bs" secondAttribute="trailing" constant="16" id="KAc-9D-OMH"/>
+                            <constraint firstItem="Dyp-95-mdg" firstAttribute="top" secondItem="kvw-2T-0Bs" secondAttribute="bottom" constant="16" id="M4o-xX-we0"/>
+                            <constraint firstItem="Dyp-95-mdg" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="bXE-Uw-s3Z"/>
+                            <constraint firstItem="Xs6-vc-Bde" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="24" id="ds2-3Z-xSb"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="Dyp-95-mdg" secondAttribute="bottom" constant="16" id="psJ-9A-ClG"/>
+                            <constraint firstItem="Xs6-vc-Bde" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="q90-z2-Qrp"/>
+                            <constraint firstItem="kvw-2T-0Bs" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="rLt-U3-hC1"/>
+                            <constraint firstItem="Dyp-95-mdg" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="zvM-LO-3Jn"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Dashboard" id="pGq-ZV-TSO"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="contentScrollView" destination="Dyp-95-mdg" id="85K-80-VdW"/>
+                        <outlet property="loginButton" destination="kvw-2T-0Bs" id="H1w-fG-ED4"/>
+                        <outlet property="welcomeLabel" destination="Xs6-vc-Bde" id="eih-ST-Y7v"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="66.666666666666671" y="68.973214285714278"/>
+        </scene>
+    </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

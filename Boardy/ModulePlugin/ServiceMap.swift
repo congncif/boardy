@@ -49,7 +49,7 @@ public extension MotherboardType where Self: FlowManageable {
 public extension IdentifiableBoard {
     var serviceMap: ServiceMap {
         if let continuableBoard = self as? ContinuableBoard {
-            return continuableBoard.serviceMap
+            return continuableBoard.motherboard.serviceMap
         } else if let motherboard = delegate as? FlowMotherboard {
             return motherboard.serviceMap
         } else {

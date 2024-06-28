@@ -20,12 +20,21 @@ target 'Boardy_Example' do
   
 #  pod 'ReferenceStoreManager', :git => 'https://github.com/congncif/RxReferenceStoreManager.git'
   
-  pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
-  pod 'ViewStateCore'
+#  pod 'RIBs' , :git => 'https://github.com/uber/RIBs.git', :branch => 'master'
+#  pod 'ViewStateCore'
   pod 'SiFUtilities'
-  pod 'Resolver' , '1.2.1'
+#  pod 'Resolver' , '1.2.1'
   
   pod "SwiftFormat/CLI"
+  
+  pod "Dashboard", :path => "submodules/Dashboard"
+  pod "DashboardPlugins", :path => "submodules/Dashboard"
+  
+  pod "Authentication", :path => "submodules/Authentication"
+  pod "AuthenticationPlugins", :path => "submodules/Authentication"
+  
+  pod "EmployeeManagement", :path => "submodules/EmployeeManagement"
+  pod "EmployeeManagementPlugins", :path => "submodules/EmployeeManagement"
 
   target 'Boardy_Tests' do
     inherit! :search_paths
