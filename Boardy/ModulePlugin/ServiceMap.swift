@@ -46,6 +46,18 @@ public extension MotherboardType where Self: FlowManageable {
     }
 }
 
+public extension IdentifiableBoard {
+    var serviceMap: ServiceMap {
+        if let continuableBoard = self as? ContinuableBoard {
+            return continuableBoard.serviceMap
+        } else if let motherboard = delegate as? FlowMotherboard {
+            return motherboard.serviceMap
+        } else {
+            preconditionFailure("❌ [Boardy] The board \(identifier) was not installed into any motherboard!")
+        }
+    }
+}
+
 public extension ServiceMap {
     func link<MapType: ServiceMap>(_: MapType.Type = MapType.self) -> MapType {
         MapType(mainboard: mainboard)
