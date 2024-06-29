@@ -31,15 +31,15 @@ struct AuthenticationModulePlugin: ModulePlugin {
         switch service {
         case .login:
             mainProducer.registerBoard(service.identifier) { identifier in
-                LoginBoard(identifier: identifier, builder: LoginBuilder(), producer: continuousProducer)
+                LoginBoard(identifier: identifier, builder: LoginBuilder(authStateProvider: AuthStateProvider.shared), producer: continuousProducer)
             }
         case .logout:
             mainProducer.registerBoard(service.identifier) { identifier in
-                LogoutBoard(identifier: identifier, producer: continuousProducer)
+                LogoutBoard(identifier: identifier, producer: continuousProducer, authStateProvider: AuthStateProvider.shared)
             }
         case .currentUser:
             mainProducer.registerBoard(service.identifier) { identifier in
-                CurrentUserBoardFactory.make(identifier: identifier)
+                CurrentUserBoard(identifier: identifier, producer: continuousProducer, authStateProvider: AuthStateProvider.shared)
             }
         }
     }

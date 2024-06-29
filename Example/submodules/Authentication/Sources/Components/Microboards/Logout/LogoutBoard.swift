@@ -18,7 +18,10 @@ final class LogoutBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutp
     typealias FlowActionType = LogoutAction
     typealias CommandType = LogoutCommand
 
-    init(identifier: BoardID, producer: ActivatableBoardProducer) {
+    private let authStateProvider: AuthStateUpdater
+
+    init(identifier: BoardID, producer: ActivatableBoardProducer, authStateProvider: AuthStateUpdater) {
+        self.authStateProvider = authStateProvider
         super.init(identifier: identifier, boardProducer: producer)
         registerFlows()
     }
@@ -26,7 +29,7 @@ final class LogoutBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutp
     /// Build and run an instance of Boardy micro-service
     func activate(withGuaranteedInput _: InputType) {
         rootViewController.topPresentedViewController.confirm(message: "Are you sure logout?") { [weak self] in
-            AuthStorage.currentUser = nil
+            self?.authStateProvider.update(user: nil)
             self?.sendOutput(nil)
         }
     }

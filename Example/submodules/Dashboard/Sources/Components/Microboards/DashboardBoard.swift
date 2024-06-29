@@ -72,7 +72,5 @@ extension DashboardBoard: DashboardDelegate {
 private extension DashboardBoard {
     func registerFlows() {
         serviceMap.modAuthentication.ioCurrentUser.flow.bind(to: currentUserBus)
-        serviceMap.modAuthentication.ioLogin.flow.bind(to: currentUserBus)
-        serviceMap.modAuthentication.ioLogout.flow.bind(to: currentUserBus)
     }
 }

@@ -9,6 +9,8 @@
 import UIKit
 
 struct LoginBuilder: LoginBuildable {
+    let authStateProvider: AuthStateUpdater
+
     func build(withDelegate delegate: LoginDelegate?) -> LoginInterface {
         let nibName = String(describing: LoginViewController.self)
         let bundle = Bundle(for: LoginViewController.self)
@@ -18,7 +20,7 @@ struct LoginBuilder: LoginBuildable {
         let presenter = LoginPresenter()
         presenter.view = viewController
 
-        let interactor = LoginInteractor(presenter: presenter)
+        let interactor = LoginInteractor(presenter: presenter, authStateProvider: authStateProvider)
         interactor.delegate = delegate
 
         viewController.interactor = interactor

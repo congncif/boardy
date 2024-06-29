@@ -15,9 +15,11 @@ final class LoginInteractor {
     weak var delegate: LoginControlDelegate!
 
     private let presenter: LoginPresentable
+    private let authStateProvider: AuthStateUpdater
 
-    init(presenter: LoginPresentable) {
+    init(presenter: LoginPresentable, authStateProvider: AuthStateUpdater) {
         self.presenter = presenter
+        self.authStateProvider = authStateProvider
     }
 
     // MARK: Private properties
@@ -35,7 +37,9 @@ extension LoginInteractor: LoginInteractable {
             return
         }
         let user = User(username: username)
-        AuthStorage.currentUser = user
+
+        authStateProvider.update(user: user)
+
         delegate.userDidLogin(user)
     }
 }

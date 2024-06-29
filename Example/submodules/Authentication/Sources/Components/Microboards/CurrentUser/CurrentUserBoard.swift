@@ -2,18 +2,39 @@
 //  CurrentUserBoard.swift
 //  AuthenticationPlugins
 //
-//  Created by NGUYEN CHI CONG on 28/6/24.
+//  Created by NGUYEN CHI CONG on 29/6/24.
 //  Compatible with Boardy 1.54 or later
 //
 
 import Boardy
 import Foundation
+import UIKit
 
-enum CurrentUserBoardFactory {
-    static func make(identifier: BoardID, executingType: ExecutingType = .concurrent) -> ActivatableBoard {
-        BlockTaskBoard<CurrentUserInput, CurrentUserOutput>(identifier: identifier, executingType: executingType, executor: { _, _, completion in
-            completion(.success(AuthStorage.currentUser))
-            return .none
-        })
+final class CurrentUserBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
+    typealias InputType = CurrentUserParameter
+    typealias OutputType = CurrentUserOutput
+    typealias FlowActionType = CurrentUserAction
+    typealias CommandType = CurrentUserCommand
+
+    private let authStateProvider: AuthStateObservable
+
+    init(identifier: BoardID, producer: ActivatableBoardProducer, authStateProvider: AuthStateObservable) {
+        self.authStateProvider = authStateProvider
+        super.init(identifier: identifier, boardProducer: producer)
+        registerFlows()
     }
+
+    /// Build and run an instance of Boardy micro-service
+    func activate(withGuaranteedInput _: InputType) {
+        authStateProvider.addObserver(self) { target, user in
+            target.sendOutput(user)
+        }
+    }
+
+    /// Handle the command received from other boards
+    func interact(guaranteedCommand _: CommandType) {}
+}
+
+private extension CurrentUserBoard {
+    func registerFlows() {}
 }

@@ -15,7 +15,7 @@ import DashboardPlugins
 import EmployeeManagementPlugins
 
 extension AppDelegate {
-    func launch() {
+    func launchPlugins() {
         PluginLauncher.with(options: .default)
             .install(launcherPlugin: DashboardLauncherPlugin())
             .install(launcherPlugin: AuthenticationLauncherPlugin())
