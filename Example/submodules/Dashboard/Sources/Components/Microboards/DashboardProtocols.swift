@@ -12,8 +12,8 @@ import UIKit
 // MARK: - Inward
 
 /// Use for pushing messages inwards from outside
-protocol DashboardControllable: AnyObject {
-    func updateCurrentUser(_ user: User?)
+protocol DashboardControllable: AnyObject, CurrentUserListener {
+    func receive(currentUser: User?)
 }
 
 // MARK: - Outward
@@ -27,7 +27,7 @@ protocol DashboardActionDelegate: AnyObject {
 
 /// Use for Controller (Interactor) sending messages to outside
 protocol DashboardControlDelegate: AnyObject {
-    func loadData()
+    func loadData(with listener: CurrentUserListener?)
 }
 
 /// Interface combined of above two delegates for convenience using purpose

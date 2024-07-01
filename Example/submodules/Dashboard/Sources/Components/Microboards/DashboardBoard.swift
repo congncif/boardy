@@ -37,23 +37,21 @@ final class DashboardBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedO
 
         let navigationController = UINavigationController(rootViewController: viewController)
         window.setRootViewController(navigationController, animated: false)
-
-        currentUserBus.connect(target: component.controller) { target, user in
-            target.updateCurrentUser(user)
-        }
     }
 
     /// Handle the command received from other boards
     func interact(guaranteedCommand _: CommandType) {}
 
     // MARK: Private properties
-
-    private let currentUserBus = Bus<User?>()
 }
 
 extension DashboardBoard: DashboardDelegate {
-    func loadData() {
-        serviceMap.modAuthentication.ioCurrentUser.activation.activate()
+    func loadData(with listener: CurrentUserListener?) {
+        serviceMap.modAuthentication
+            .ioCurrentUser.activation
+            .activate(with:
+                CurrentUserParameter(listener: listener)
+            )
     }
 
     func openLogin() {
@@ -70,7 +68,5 @@ extension DashboardBoard: DashboardDelegate {
 }
 
 private extension DashboardBoard {
-    func registerFlows() {
-        serviceMap.modAuthentication.ioCurrentUser.flow.bind(to: currentUserBus)
-    }
+    func registerFlows() {}
 }

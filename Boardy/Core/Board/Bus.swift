@@ -20,9 +20,9 @@ open class BusCable<Input> {
         transportHandler(input)
     }
 
-    public private(set) var isValid: Bool = true
+    open private(set) var isValid: Bool = true
 
-    public func invalidate() {
+    open func invalidate() {
         isValid = false
     }
 }

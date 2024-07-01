@@ -23,21 +23,25 @@ final class DashboardInteractor {
     }
 
     // MARK: Private properties
+
+    deinit {
+        print("XXX")
+    }
 }
 
 // MARK: - As Interactor
 
 extension DashboardInteractor: DashboardInteractable {
     func didBecomeActive() {
-        delegate?.loadData()
+        delegate?.loadData(with: self)
     }
 }
 
 // MARK: - As Controller
 
 extension DashboardInteractor: DashboardControllable {
-    func updateCurrentUser(_ user: User?) {
-        presenter.map(currentUser: user)
+    func receive(currentUser: User?) {
+        presenter.map(currentUser: currentUser)
     }
 }
 

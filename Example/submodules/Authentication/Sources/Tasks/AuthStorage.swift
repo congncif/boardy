@@ -13,7 +13,9 @@ protocol AuthStateUpdater {
 }
 
 protocol AuthStateObservable {
-    func addObserver<Observer>(_ observer: Observer, handler: @escaping (Observer, User?) -> Void)
+    var currentUser: User? { get }
+
+    func addObserver(_ observer: CurrentUserInput)
 }
 
 final class AuthStateProvider: AuthStateUpdater, AuthStateObservable {
@@ -23,9 +25,8 @@ final class AuthStateProvider: AuthStateUpdater, AuthStateObservable {
         currentUser = user
     }
 
-    func addObserver<Observer>(_ observer: Observer, handler: @escaping (Observer, User?) -> Void) {
-        handler(observer, currentUser)
-        currentUserBus.connect(target: observer, handler: handler)
+    func addObserver(_ observer: CurrentUserInput) {
+        currentUserBus.connect(observer)
     }
 
     private(set) var currentUser: User? {
