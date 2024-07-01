@@ -46,11 +46,11 @@ final class DashboardBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedO
 }
 
 extension DashboardBoard: DashboardDelegate {
-    func loadData(with listener: CurrentUserListener?) {
+    func loadData(with listener: CurrentUserObserver?) {
         serviceMap.modAuthentication
             .ioCurrentUser.activation
             .activate(with:
-                CurrentUserParameter(listener: listener)
+                CurrentUserParameter(observer: listener)
             )
     }
 

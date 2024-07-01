@@ -26,9 +26,6 @@ final class CurrentUserBoard: ModernContinuableBoard, GuaranteedBoard, Guarantee
 
     /// Build and run an instance of Boardy micro-service
     func activate(withGuaranteedInput input: InputType) {
-        if let listener = input.listener {
-            listener.receive(currentUser: authStateProvider.currentUser)
-        }
         authStateProvider.addObserver(input)
     }
 

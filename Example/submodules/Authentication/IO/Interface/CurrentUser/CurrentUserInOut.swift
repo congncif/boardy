@@ -11,22 +11,11 @@ import Foundation
 
 // MARK: - Input
 
-public final class CurrentUserInput: BusCable<User?> {
-    public private(set) weak var listener: CurrentUserListener?
+public struct CurrentUserInput {
+    public private(set) weak var observer: CurrentUserObserver?
 
-    public init(listener: CurrentUserListener?) {
-        self.listener = listener
-        super.init { [weak listener] user in
-            listener?.receive(currentUser: user)
-        }
-    }
-
-    override public var isValid: Bool {
-        listener != nil
-    }
-
-    override public func invalidate() {
-        listener = nil
+    public init(observer: CurrentUserObserver?) {
+        self.observer = observer
     }
 }
 
@@ -44,6 +33,6 @@ public enum CurrentUserCommand {}
 
 public enum CurrentUserAction: BoardFlowAction {}
 
-public protocol CurrentUserListener: AnyObject {
-    func receive(currentUser: User?)
+public protocol CurrentUserObserver: AnyObject {
+    func update(currentUser: User?)
 }

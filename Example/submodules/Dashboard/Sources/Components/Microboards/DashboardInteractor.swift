@@ -40,7 +40,7 @@ extension DashboardInteractor: DashboardInteractable {
 // MARK: - As Controller
 
 extension DashboardInteractor: DashboardControllable {
-    func receive(currentUser: User?) {
+    func update(currentUser: User?) {
         presenter.map(currentUser: currentUser)
     }
 }
