@@ -23,6 +23,14 @@ public protocol BoardDynamicProducer: ActivatableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
 }
 
+public extension BoardDynamicProducer {
+    /// ⚠️ Using autoclosure board might be not good for performance of initializers
+    func registerBoard(_ boardCreator: @autoclosure () -> ActivatableBoard) {
+        let board = boardCreator()
+        registerBoard(board.identifier, factory: { _ in board })
+    }
+}
+
 public final class BoardProducer: BoardDynamicProducer {
     public private(set) var registrations = Set<BoardRegistration>()
 
