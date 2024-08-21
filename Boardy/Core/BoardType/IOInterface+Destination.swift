@@ -50,23 +50,23 @@ public extension MainboardDestination {
 }
 
 public final class MainboardGenericDestination<Input, Output, Command, Action: BoardFlowAction>: MainboardDestination {
-    public init(destinationID: BoardID, mainboard: any FlowMotherboard, inputType _: Input.Type, outputType _: Output.Type, commandType _: Command.Type, actionType _: Action.Type) {
+    public init(destinationID: BoardID, mainboard: any FlowMotherboard, inputType _: Input.Type = Input.self, outputType _: Output.Type = Output.self, commandType _: Command.Type = Command.self, actionType _: Action.Type = Action.self) {
         super.init(destinationID: destinationID, mainboard: mainboard)
     }
 
-    var activation: MainboardActivation<Input> {
+    public var activation: MainboardActivation<Input> {
         self.activation(with: Input.self)
     }
 
-    var interaction: MainboardInteraction<Command> {
+    public var interaction: MainboardInteraction<Command> {
         self.interaction(with: Command.self)
     }
 
-    var flow: FlowHandler<Output> {
+    public var flow: FlowHandler<Output> {
         self.flow(with: Output.self)
     }
 
-    var actionFlow: ActionFlowHandler<Action> {
+    public var actionFlow: ActionFlowHandler<Action> {
         self.actionFlow(with: Action.self)
     }
 }
@@ -88,15 +88,15 @@ public extension ActivatableBoard {
 }
 
 public final class BoardGenericDestination<Input, Command>: BoardDestination {
-    public init(destinationID: BoardID, source: any ActivatableBoard, inputType _: Input.Type, commandType _: Command.Type) {
+    public init(destinationID: BoardID, source: any ActivatableBoard, inputType _: Input.Type = Input.self, commandType _: Command.Type = Command.self) {
         super.init(destinationID: destinationID, source: source)
     }
 
-    var activation: BoardActivation<Input> {
+    public var activation: BoardActivation<Input> {
         activation(with: Input.self)
     }
 
-    var interaction: BoardInteraction<Command> {
+    public var interaction: BoardInteraction<Command> {
         self.interaction(with: Command.self)
     }
 }
