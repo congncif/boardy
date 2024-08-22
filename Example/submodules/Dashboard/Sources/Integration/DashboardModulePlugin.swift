@@ -1,42 +1,16 @@
 //
 //  DashboardModulePlugin.swift
-//  Dashboard
+//  DashboardPlugins
 //
-//  Created by BOARDY on 6/1/21.
-//  Compatible with Boardy 1.54 or later
+//  Created by NGUYEN CHI CONG on 22/8/24.
+//  Compatible with Boardy 1.56 or later
 //
 
 import Boardy
 import Dashboard
 import Foundation
 
-struct DashboardModulePlugin: ModulePlugin {
-    var identifier: Boardy.BoardID {
-        service.identifier
-    }
-
-    let service: DashboardModulePlugin.ServiceType
-
-    init(service: DashboardModulePlugin.ServiceType) {
-        self.service = service
-    }
-
-    func apply(for main: MainComponent) {
-        let mainProducer = main.producer
-
-        let continuousProducer = BoardProducer(externalProducer: mainProducer, registrationsBuilder: { producer in
-            // BoardRegistration
-            DashboardBoard(identifier: .modDashboard, builder: DashboardBuilder(), producer: producer)
-        })
-
-        switch service {
-        case .default:
-            mainProducer.registerBoard(service.identifier) { identifier in
-                DashboardBoardFactory.make(identifier: identifier, producer: continuousProducer)
-            }
-        }
-    }
-
+struct DashboardModulePlugin: ModuleBuilderPlugin {
     /// Each service is equivalent to one entry point
     enum ServiceType {
         case `default`
@@ -48,6 +22,35 @@ struct DashboardModulePlugin: ModulePlugin {
             }
         }
     }
+
+    func build(with identifier: Boardy.BoardID, sharedComponent _: any Boardy.SharedValueComponent, internalContinuousProducer: any Boardy.ActivatableBoardProducer) -> any Boardy.ActivatableBoard {
+        DashboardBoardFactory.make(identifier: identifier, producer: internalContinuousProducer)
+    }
+
+    func internalContinuousRegistrations(producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {
+        BoardRegistration(.modDashboard) { _ in
+            DashboardBoard(identifier: .modDashboard, builder: DashboardBuilder(), producer: producer)
+        }
+    }
+
+    let service: DashboardModulePlugin.ServiceType
+
+    var identifier: BoardID {
+        service.identifier
+    }
+}
+
+struct DashboardURLOpenerPlugin: GuaranteedURLOpenerPlugin {
+    typealias Parameter = Void
+
+    func willOpen(url _: URL) -> URLOpeningOption<Parameter> {
+        // return .yes if need to process a deep link
+        .no
+    }
+
+    func mainboard(_: any FlowMotherboard, openWith _: Parameter) {
+        // Activate corresponding board here
+    }
 }
 
 public struct DashboardLauncherPlugin: LauncherPlugin {
@@ -58,7 +61,9 @@ public struct DashboardLauncherPlugin: LauncherPlugin {
             modulePlugins: [
                 DashboardModulePlugin(service: .default),
             ],
-            urlOpenerPlugins: []
+            urlOpenerPlugins: [
+                DashboardURLOpenerPlugin(),
+            ]
         )
     }
 }

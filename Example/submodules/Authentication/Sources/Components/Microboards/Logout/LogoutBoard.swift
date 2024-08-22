@@ -13,7 +13,7 @@ import SiFUtilities
 import UIKit
 
 final class LogoutBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
-    typealias InputType = LogoutParameter
+    typealias InputType = LogoutInput
     typealias OutputType = LogoutOutput
     typealias FlowActionType = LogoutAction
     typealias CommandType = LogoutCommand

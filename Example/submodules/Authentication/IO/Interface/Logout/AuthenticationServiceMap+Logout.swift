@@ -2,8 +2,8 @@
 //  AuthenticationServiceMap+Logout.swift
 //  Authentication
 //
-//  Created by NGUYEN CHI CONG on 28/6/24.
-//  Compatible with Boardy 1.54 or later
+//  Created by NGUYEN CHI CONG on 22/8/24.
+//  Compatible with Boardy 1.55.1 or later
 //
 
 import Boardy

@@ -2,8 +2,8 @@
 //  LogoutInOut.swift
 //  Authentication
 //
-//  Created by NGUYEN CHI CONG on 28/6/24.
-//  Compatible with Boardy 1.54 or later
+//  Created by NGUYEN CHI CONG on 22/8/24.
+//  Compatible with Boardy 1.55.1 or later
 //
 
 import Boardy
@@ -13,7 +13,7 @@ import Foundation
 
 public typealias LogoutInput = Void
 
-public typealias LogoutParameter = LogoutInput
+public typealias LogoutParameter = BlockTaskParameter<LogoutInput, LogoutOutput>
 
 // MARK: - Output
 

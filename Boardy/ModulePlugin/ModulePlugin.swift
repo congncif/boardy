@@ -55,11 +55,14 @@ public struct MainOptions {
     }
 }
 
-public protocol MainComponent {
+public protocol SharedValueComponent {
     var options: MainOptions { get }
-    var producer: BoardDynamicProducer { get }
 
     func sharedValue<Value: Decodable>(_ valueType: Value.Type) -> Value?
+}
+
+public protocol MainComponent: SharedValueComponent {
+    var producer: BoardDynamicProducer { get }
 }
 
 public extension MainComponent {
@@ -80,4 +83,39 @@ public protocol ModulePluginConvertible {
 
 public extension ModulePlugin {
     var modulePlugins: [ModulePlugin] { [self] }
+}
+
+public protocol ModuleBuilderPlugin: ModulePlugin {
+    @BoardRegistrationBuilder
+    func internalContinuousRegistrations(producer: any ActivatableBoardProducer) -> [BoardRegistration]
+
+    func build(with identifier: BoardID, sharedComponent: any SharedValueComponent, internalContinuousProducer: any ActivatableBoardProducer) -> ActivatableBoard
+}
+
+public extension ModuleBuilderPlugin {
+    func apply(for main: any MainComponent) {
+        let mainProducer = main.producer
+
+        let continuousProducer = BoardProducer(externalProducer: mainProducer, registrations: [])
+        let registrations = internalContinuousRegistrations(producer: BoardDynamicProducerBox(producer: continuousProducer))
+        for registration in registrations {
+            continuousProducer.add(registration: registration)
+        }
+
+        let pluginBox = ObjectBox()
+        pluginBox.setObject(self)
+
+        let componentBox = ObjectBox()
+        componentBox.setObject(main)
+
+        mainProducer.registerBoard(identifier) { [pluginBox, componentBox] identifier in
+            guard let unboxedTarget = pluginBox.unboxed(Self.self) else {
+                preconditionFailure("\(Self.self) BAD ACCESS")
+            }
+            guard let unboxedComponent = componentBox.unboxed(SharedValueComponent.self) else {
+                preconditionFailure("\(SharedValueComponent.self) BAD ACCESS")
+            }
+            return unboxedTarget.build(with: identifier, sharedComponent: unboxedComponent, internalContinuousProducer: continuousProducer)
+        }
+    }
 }
