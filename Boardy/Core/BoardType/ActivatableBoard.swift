@@ -29,7 +29,7 @@ public extension ActivatableBoard {
     }
 }
 
-public typealias NormalBoard = InstallableBoard & ActivatableBoard
+public typealias NormalBoard = ActivatableBoard & InstallableBoard
 
 public struct ActivationBarrier {
     public let barrierIdentifier: BoardID
@@ -40,10 +40,17 @@ public struct ActivationBarrier {
 /// Control lifecycle of Activation Barrier
 public enum ActivationBarrierScope {
     /// Activation Barrier is created and lives on the current Mainboard
-    case inMain
+    case mainboard
 
     /// Activation Barrier is unique by identifier in whole the application
-    case global
+    case application
+}
+
+public extension ActivationBarrierScope {
+    @available(*, deprecated, renamed: "mainboard", message: "Use .mainboard instead")
+    static var inMain: ActivationBarrierScope { .mainboard }
+    @available(*, deprecated, renamed: "application", message: "Use .application instead")
+    static var global: ActivationBarrierScope { .application }
 }
 
 /// Enable identity Activation Barrier with the input option

@@ -56,9 +56,9 @@ enum ActivationBarrierFactory {
         let identifier = barrierActivation.identifier
 
         switch barrierActivation.scope {
-        case .inMain:
+        case .mainboard:
             return ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.barrierIdentifier)
-        case .global:
+        case .application:
             if let cachedInstance = cache[identifier] {
                 return cachedInstance
             } else {

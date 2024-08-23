@@ -22,6 +22,7 @@ TODO: Add long description of the pod here.
   s.resources = "Sources/**/*.{xib,storyboard,strings,xcassets}"
 
   s.dependency "EmployeeManagement"
+  s.dependency "Authentication"
 
   s.dependency "Boardy/ModulePlugin"
   s.dependency "SiFUtilities"

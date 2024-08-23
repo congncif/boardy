@@ -228,7 +228,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
         self.executingType = executingType
         operationQueue = OperationQueue()
         operationQueue.name = "boardy.block-task-board.operation.queue"
-        operationQueue.qualityOfService = .utility
+        operationQueue.qualityOfService = .userInitiated
 
         switch executingType {
         case let .concurrent(max):

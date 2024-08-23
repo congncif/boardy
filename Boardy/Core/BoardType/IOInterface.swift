@@ -52,6 +52,10 @@ public protocol BoardActivating {
     func activate(with input: Input)
 }
 
+public protocol BoardActivatingDestination {
+    var destinationID: BoardID { get }
+}
+
 public extension BoardActivating where Input: ExpressibleByNilLiteral {
     func activate() {
         activate(with: nil)
@@ -65,8 +69,8 @@ public extension BoardActivating where Input == Void {
 }
 
 // iOS 13+ internal
-public struct MainboardActivation<Input>: BoardActivating {
-    let destinationID: BoardID
+public struct MainboardActivation<Input>: BoardActivating, BoardActivatingDestination {
+    public let destinationID: BoardID
     let mainboard: MotherboardType
 
     /// Activate a board from its Motherboard
@@ -76,8 +80,8 @@ public struct MainboardActivation<Input>: BoardActivating {
 }
 
 // iOS 13+ internal
-public struct BoardActivation<Input>: BoardActivating {
-    let destinationID: BoardID
+public struct BoardActivation<Input>: BoardActivating, BoardActivatingDestination {
+    public let destinationID: BoardID
     let source: ActivatableBoard
 
     /// Activate the next board in the same Motherboard with the `source`
@@ -86,8 +90,15 @@ public struct BoardActivation<Input>: BoardActivating {
     }
 }
 
-public extension BoardActivation {
-    func barrier(scope: ActivationBarrierScope = .inMain, option: ActivationBarrierOption = .void) -> ActivationBarrier {
+public extension BoardActivatingDestination {
+    /// Create a new ActivationBarrier which needs to overcome before activating the target board
+    ///
+    /// - Parameter scope: The scope of the activation barrier, default is `.application`
+    /// - Parameter option: The option of the activation barrier, default is `.void`
+    /// - Returns: The activation barrier
+    ///
+    /// Make sure the barrier board calls `complete(isDone)` when it finishes checking otherwise the target board activation will not be able to continue. The flow will be stuck until the barrier board is actually completed.
+    func barrier(scope: ActivationBarrierScope = .application, option: ActivationBarrierOption = .void) -> ActivationBarrier {
         ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: option)
     }
 }

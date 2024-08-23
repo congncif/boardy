@@ -5,22 +5,22 @@ PODS:
     - Authentication
     - Boardy/ModulePlugin
     - SiFUtilities
-  - Boardy (1.54.4):
-    - Boardy/Default (= 1.54.4)
-  - Boardy/Attachable (1.54.4):
+  - Boardy (1.56.1):
+    - Boardy/Default (= 1.56.1)
+  - Boardy/Attachable (1.56.1):
     - Boardy/Core
-  - Boardy/ComponentKit (1.54.4):
+  - Boardy/ComponentKit (1.56.1):
     - Boardy/Core
-  - Boardy/Composable (1.54.4):
+  - Boardy/Composable (1.56.1):
     - Boardy/Attachable
     - UIComposable
-  - Boardy/Core (1.54.4)
-  - Boardy/Default (1.54.4):
+  - Boardy/Core (1.56.1)
+  - Boardy/Default (1.56.1):
     - Boardy/Attachable
     - Boardy/ComponentKit
     - Boardy/Core
     - Boardy/ModulePlugin
-  - Boardy/ModulePlugin (1.54.4):
+  - Boardy/ModulePlugin (1.56.1):
     - Boardy/Attachable
   - Dashboard (0.1.0):
     - Boardy
@@ -39,6 +39,7 @@ PODS:
   - EmployeeManagement (0.1.0):
     - Boardy
   - EmployeeManagementPlugins (0.1.0):
+    - Authentication
     - Boardy/ModulePlugin
     - EmployeeManagement
     - SiFUtilities
@@ -134,13 +135,13 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Authentication: c0ea01a6f5a09497839d6a64098174560b847131
   AuthenticationPlugins: 9a6528dee245fa0653a2f8d3b08cea24a9d10870
-  Boardy: 8dfc8ab0cad5a9394a239a1e14bad42b476f60d7
+  Boardy: eaf809fdb68e2d0c9ce8a46e5111584e1eee92dc
   Dashboard: e640f15290373c564879dfa771b98dbd762d52b0
   DashboardPlugins: f668cd2a6f3f9dfc47b2d7821496f03e08691537
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
   EmployeeManagement: d21900966e0813c360b74229a588d219ad292a06
-  EmployeeManagementPlugins: 35bb2cd2d925690994a6491101f1576373db2430
+  EmployeeManagementPlugins: 94bbca98227367648d6546037adfa7d265587e81
   SiFUtilities: 9224ff24e7b3fce4da0206aac9179eb386210399
   SwiftFormat: b70e3c776a74c67ce8bd140425a8c86d4a843759
   UIComposable: a002bab42cc52f8f71df1282fa4432583dd8c860
