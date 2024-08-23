@@ -6,6 +6,7 @@
 //  Compatible with Boardy 1.54 or later
 //
 
+import Authentication
 import UIKit
 
 // MARK: - Inward

@@ -25,7 +25,7 @@ struct AuthenticationModulePlugin: ModuleBuilderPlugin {
         }
     }
 
-    func internalContinuousRegistrations(producer _: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] { [] }
+    func internalContinuousRegistrations(producer _: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {}
 
     var identifier: Boardy.BoardID {
         service.identifier

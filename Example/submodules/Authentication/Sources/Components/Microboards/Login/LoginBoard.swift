@@ -6,13 +6,14 @@
 //  Compatible with Boardy 1.54 or later
 //
 
+import Authentication
 import Boardy
 import Foundation
 import SiFUtilities
 import UIKit
 
 final class LoginBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
-    typealias InputType = LoginParameter
+    typealias InputType = LoginInput
     typealias OutputType = LoginOutput
     typealias FlowActionType = LoginAction
     typealias CommandType = LoginCommand

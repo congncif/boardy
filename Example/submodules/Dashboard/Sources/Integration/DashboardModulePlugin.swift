@@ -24,14 +24,10 @@ struct DashboardModulePlugin: ModuleBuilderPlugin {
     }
 
     func build(with identifier: Boardy.BoardID, sharedComponent _: any Boardy.SharedValueComponent, internalContinuousProducer: any Boardy.ActivatableBoardProducer) -> any Boardy.ActivatableBoard {
-        DashboardBoardFactory.make(identifier: identifier, producer: internalContinuousProducer)
+        DashboardBoard(identifier: identifier, builder: DashboardBuilder(), producer: internalContinuousProducer)
     }
 
-    func internalContinuousRegistrations(producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {
-        BoardRegistration(.modDashboard) { _ in
-            DashboardBoard(identifier: .modDashboard, builder: DashboardBuilder(), producer: producer)
-        }
-    }
+    func internalContinuousRegistrations(producer _: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {}
 
     let service: DashboardModulePlugin.ServiceType
 

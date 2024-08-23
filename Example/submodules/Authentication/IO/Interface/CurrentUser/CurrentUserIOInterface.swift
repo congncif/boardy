@@ -2,7 +2,7 @@
 //  CurrentUserIOInterface.swift
 //  Authentication
 //
-//  Created by NGUYEN CHI CONG on 22/8/24.
+//  Created by NGUYEN CHI CONG on 23/8/24.
 //  Compatible with Boardy 1.55.1 or later
 //
 
@@ -17,14 +17,6 @@ public extension BoardID {
 
 // MARK: - Interface
 
-public typealias CurrentUserDestination = BoardGenericDestination<CurrentUserInput, CurrentUserCommand>
-
-extension ActivatableBoard {
-    func ioCurrentUser(_ identifier: BoardID = .pubCurrentUser) -> CurrentUserDestination {
-        CurrentUserDestination(destinationID: identifier, source: self)
-    }
-}
-
 public typealias CurrentUserMainDestination = MainboardGenericDestination<CurrentUserInput, CurrentUserOutput, CurrentUserCommand, CurrentUserAction>
 
 extension MotherboardType where Self: FlowManageable {
@@ -32,3 +24,11 @@ extension MotherboardType where Self: FlowManageable {
         CurrentUserMainDestination(destinationID: identifier, mainboard: self)
     }
 }
+
+// public typealias CurrentUserDestination = BoardGenericDestination<CurrentUserInput, CurrentUserCommand>
+//
+// public extension ActivatableBoard {
+//    func ioCurrentUser(_ identifier: BoardID = .pubCurrentUser) -> CurrentUserDestination {
+//        CurrentUserDestination(destinationID: identifier, source: self)
+//    }
+// }

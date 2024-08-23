@@ -2,7 +2,7 @@
 //  LogoutIOInterface.swift
 //  Authentication
 //
-//  Created by NGUYEN CHI CONG on 22/8/24.
+//  Created by NGUYEN CHI CONG on 23/8/24.
 //  Compatible with Boardy 1.55.1 or later
 //
 
@@ -17,14 +17,6 @@ public extension BoardID {
 
 // MARK: - Interface
 
-public typealias LogoutDestination = BoardGenericDestination<LogoutInput, LogoutCommand>
-
-extension ActivatableBoard {
-    func ioLogout(_ identifier: BoardID = .pubLogout) -> LogoutDestination {
-        LogoutDestination(destinationID: identifier, source: self)
-    }
-}
-
 public typealias LogoutMainDestination = MainboardGenericDestination<LogoutInput, LogoutOutput, LogoutCommand, LogoutAction>
 
 extension MotherboardType where Self: FlowManageable {
@@ -32,3 +24,11 @@ extension MotherboardType where Self: FlowManageable {
         LogoutMainDestination(destinationID: identifier, mainboard: self)
     }
 }
+
+// public typealias LogoutDestination = BoardGenericDestination<LogoutInput, LogoutCommand>
+//
+// extension ActivatableBoard {
+//    func ioLogout(_ identifier: BoardID = .pubLogout) -> LogoutDestination {
+//        LogoutDestination(destinationID: identifier, source: self)
+//    }
+// }

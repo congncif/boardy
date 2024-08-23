@@ -6,12 +6,13 @@
 //  Compatible with Boardy 1.54 or later
 //
 
+import Authentication
 import Boardy
 import Foundation
 import UIKit
 
 final class CurrentUserBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
-    typealias InputType = CurrentUserParameter
+    typealias InputType = CurrentUserInput
     typealias OutputType = CurrentUserOutput
     typealias FlowActionType = CurrentUserAction
     typealias CommandType = CurrentUserCommand

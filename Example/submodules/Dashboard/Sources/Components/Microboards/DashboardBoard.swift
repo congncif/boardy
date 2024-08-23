@@ -8,13 +8,14 @@
 
 import Authentication
 import Boardy
+import Dashboard
 import EmployeeManagement
 import Foundation
 import SiFUtilities
 import UIKit
 
 final class DashboardBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
-    typealias InputType = DashboardParameter
+    typealias InputType = DashboardInput
     typealias OutputType = DashboardOutput
     typealias FlowActionType = DashboardAction
     typealias CommandType = DashboardCommand

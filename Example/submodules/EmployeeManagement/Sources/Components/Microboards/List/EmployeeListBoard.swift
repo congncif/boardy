@@ -6,6 +6,7 @@
 //  Compatible with Boardy 1.54 or later
 //
 
+import Authentication
 import Boardy
 import Foundation
 import SiFUtilities
@@ -26,6 +27,10 @@ final class EmployeeListBoard: ModernContinuableBoard, GuaranteedBoard, Guarante
         super.init(identifier: identifier, boardProducer: producer)
         registerFlows()
     }
+
+//    func activationBarrier(withGuaranteedInput _: EmployeeListParameter) -> ActivationBarrier? {
+//        serviceMap.modAuthentication.ioCurrentUser.activation.barrier(with: CurrentUserInput(observer: nil))
+//    }
 
     /// Build and run an instance of Boardy micro-service
     func activate(withGuaranteedInput _: InputType) {
