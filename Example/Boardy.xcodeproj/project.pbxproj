@@ -586,6 +586,7 @@
 			baseConfigurationReference = CD6975A05E011FC51CAA37B5 /* Pods-Boardy_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = GN2TJJDQ3F;
 				INFOPLIST_FILE = Boardy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -605,6 +606,7 @@
 			baseConfigurationReference = E8F8B79072CAD035AEBD8CFE /* Pods-Boardy_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = GN2TJJDQ3F;
 				INFOPLIST_FILE = Boardy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (

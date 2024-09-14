@@ -48,12 +48,10 @@ public extension MotherboardType where Self: FlowManageable {
 
 public extension IdentifiableBoard {
     var serviceMap: ServiceMap {
-        if let continuableBoard = self as? ContinuableBoard {
-            return continuableBoard.motherboard.serviceMap
-        } else if let motherboard = delegate as? FlowMotherboard {
+        if let motherboard = delegate as? FlowMotherboard {
             return motherboard.serviceMap
         } else {
-            preconditionFailure("❌ [Boardy] The board \(identifier) was not installed into any motherboard!")
+            preconditionFailure("❌ [Boardy] Cannot be found `serviceMap` due to the board \(identifier) was not installed into any motherboard!")
         }
     }
 }

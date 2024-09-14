@@ -28,9 +28,8 @@ final class EmployeeListBoard: ModernContinuableBoard, GuaranteedBoard, Guarante
         registerFlows()
     }
 
-//    func activationBarrier(withGuaranteedInput _: EmployeeListParameter) -> ActivationBarrier? {
-//        serviceMap.modAuthentication.ioCurrentUser.activation.barrier(with: CurrentUserInput(observer: nil))
-//    }
+    /// Setup a barrier that needs to be overcome before activating
+    func activationBarrier(withGuaranteedInput _: InputType) -> ActivationBarrier? { nil }
 
     /// Build and run an instance of Boardy micro-service
     func activate(withGuaranteedInput _: InputType) {
