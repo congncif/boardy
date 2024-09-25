@@ -27,7 +27,7 @@ public typealias CurrentUserOutput = Void
 
 // MARK: - Command
 
-public enum CurrentUserCommand {}
+public typealias CurrentUserCommand = Void
 
 // MARK: - Action
 

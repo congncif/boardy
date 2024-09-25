@@ -297,6 +297,18 @@ public protocol BoardInteracting {
     func send(command: IncomeCommand)
 }
 
+public extension BoardInteracting where IncomeCommand == Void {
+    func send() {
+        send(command: ())
+    }
+}
+
+public extension BoardInteracting where IncomeCommand: ExpressibleByNilLiteral {
+    func send() {
+        send(command: nil)
+    }
+}
+
 // iOS 13+ internal
 public struct MainboardInteraction<Input>: BoardInteracting {
     let destinationID: BoardID
