@@ -67,98 +67,31 @@ pod 'Boardy/Composable'
 
 ## Install template to develop feature
 
-* Clone [module template](https://github.com/congncif/module-template.git) repo
-* Run `./install-template.sh`
-* Restart **Xcode**
+* Run script built-in **CocoaPods.Boardy**
 
-
-## Add a new feature
-
-Right click in **Xcode** to add *New File...* then choose **`Boardy`** template, enter `name` and press *Next*, choose file location and *Create*.
-
-New feature component will be created, contains a **Board**, an **IOInterface**, a **View Controller or Viewless Controller** with **Builder** pattern.
-
-**Boardy 1.19+** introduces [`IOInterface`](Boardy%20Modularization.md) to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***type-safe interaction***.
-
-> Note: You need to check and update correct Input & Output Type you would like to use for Your Component in `YourInOut.swift` *(by default the Input Ouput is Optional Any)*.
-
-From **Boardy 1.27+**, came with [`ModulePlugin`](Boardy%20Modularization.md#moduleplugin). So you just add below subspec:
-```ruby
-pod "Boardy/ModulePlugin"
+```shell
+sh Pods/Boardy/tools/install-template.sh
 ```
 
-*You might need to add a `BoardRegistration` for `Your Board` to right place in `Integration/YourModulePlugin.swift`. The place depends on your flow structure. A `Motherboard` manages a business flow, a `continuousBoard` manages a child flow.*
+* Create new module using **Boardy**
 
-***☞ Otherwise, you need to add registration to BoardProducer to provide YourBoard constructor***
-
-*`BoardProducer` is factory which helps `Motherboard` lazy initialize a child Board on the first activation. This is useful when the `Motherboard` doesn't need initialize all of its Boards at once that might cause some performance issues in case too many children.*
-
-```swift
-BoardRegistration(.yourFeature) { identifier in
-    YourBoard(identifier: identifier, builder: YourBuilder())
-}
+```shell
+cd submodules/YourEmptyModuleDirectory
+sh ../../Pods/Boardy/tools/init-module.sh YourModuleName
 ```
 
-### **You use the `Board` to communicate with other feature components:**
+The script should create 2 modules:
 
-* To activate `OtherFeature` as child flow, use `activation` in `IOInterface`:
-```swift
-func openOtherFeature() {
-    motherboard.ioOtherFeature().activation.activate()
-}
-```
-* To handle callback from `Other Feature`, register a flow, use `flow` handler in `IOInterface`:
-```swift
-func registerFlows() {
-    motherboard.ioOtherFeature().flow.addTarget(self) { target, output in
-        target.handleOutput(output)
-    }
-}
-```
-* To send a output data to `Motherboard`, use `sendOutput` method:
-```swift
-func yourFeatureDidComplete() {
-    self.sendOutput("Output data")
-}
-```
-* To interact with *Internal Controller*, use **Event Bus**:
-```swift
-...
-// Declare bus with data type String for example
-private let eventBus = Bus<String>()
-...
-
-// Bind the bus to Controller to get data
-func activate(withGuaranteedInput input: InputType) {
-    let component = builder.build(withDelegate: self)
-    let viewController = component.userInterface
-    motherboard.putIntoContext(viewController)
-    rootViewController.show(viewController)
-        
-    eventBus.connect(target: component.controller) { controller, data in
-        controller.updateSomething(data)
-    }
-}
-
-// Transport data to bus, for example from OtherFeature callback
-func registerFlows() {
-    motherboard.ioOtherFeature().flow.bind(to: eventBus)
-}
-
-// Or send a custom event
-func sendCustomEvent(value: String) {
-    eventBus.transport(value)
-}
-```
+- **YourModuleName**: Interface-only module which will be used for communicate with other microservices via public protocols (such as **ServiceMap** or public IOInterface).
+- **YourModuleNamePlugins**: Implementation module which includes internal microservices that implement protocols in the Interface module and and module plugins for integration into the main app.
 
 ## Reference
 
 * [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
-* [Boardy Modularization](Boardy%20Modularization.md)
-* [Handle URL opening / deep link](Open%20an%20URL.md)
-* [Configure Activation Barrier for your Board](Activation%20Barrier.md)
-* [Boardy ComponentKit](ComponentKit.md)
-* [HelloBoardy - A demo for Boardy: Part I+II - Basic, Part III - Boardy Modularization](https://github.com/congncif/hello-boardy/tree/master/Part-III)
+* [Boardy Modularization](docs/Boardy%20Modularization.md)
+* [Handle URL opening / deep link](docs/Open%20an%20URL.md)
+* [Configure Activation Barrier for your Board](docs/Activation%20Barrier.md)
+* [Boardy ComponentKit](docs/ComponentKit.md)
 
 ## Author
 
