@@ -21,7 +21,7 @@ public typealias AuthenticationOutput = Void
 
 // MARK: - Command
 
-public enum AuthenticationCommand {}
+public typealias AuthenticationCommand = Void
 
 // MARK: - Action
 

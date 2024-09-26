@@ -21,7 +21,7 @@ public typealias EmployeeManagementOutput = Void
 
 // MARK: - Command
 
-public enum EmployeeManagementCommand {}
+public typealias EmployeeManagementCommand = Void
 
 // MARK: - Action
 

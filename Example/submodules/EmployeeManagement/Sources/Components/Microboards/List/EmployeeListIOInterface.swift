@@ -24,11 +24,3 @@ extension MotherboardType where Self: FlowManageable {
         EmployeeListMainDestination(destinationID: identifier, mainboard: self)
     }
 }
-
-// typealias EmployeeListDestination = BoardGenericDestination<EmployeeListInput, EmployeeListCommand>
-//
-// extension ActivatableBoard {
-//    func ioEmployeeList(_ identifier: BoardID = .modEmployeeList) -> EmployeeListDestination {
-//        EmployeeListDestination(destinationID: identifier, source: self)
-//    }
-// }

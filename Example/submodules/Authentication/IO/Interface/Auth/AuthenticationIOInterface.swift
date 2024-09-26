@@ -24,11 +24,3 @@ extension MotherboardType where Self: FlowManageable {
         AuthenticationMainDestination(destinationID: identifier, mainboard: self)
     }
 }
-
-// public typealias AuthenticationDestination = BoardGenericDestination<AuthenticationInput, AuthenticationCommand>
-//
-// extension ActivatableBoard {
-//    func ioAuthentication(_ identifier: BoardID = .pubAuthentication) -> AuthenticationDestination {
-//        AuthenticationDestination(destinationID: identifier, source: self)
-//    }
-// }

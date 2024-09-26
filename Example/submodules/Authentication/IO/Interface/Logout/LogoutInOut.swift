@@ -21,7 +21,7 @@ public typealias LogoutOutput = User?
 
 // MARK: - Command
 
-public enum LogoutCommand {}
+public typealias LogoutCommand = Void
 
 // MARK: - Action
 

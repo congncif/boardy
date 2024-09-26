@@ -21,7 +21,7 @@ public typealias LoginOutput = User
 
 // MARK: - Command
 
-public enum LoginCommand {}
+public typealias LoginCommand = Void
 
 // MARK: - Action
 

@@ -24,11 +24,3 @@ extension MotherboardType where Self: FlowManageable {
         CurrentUserMainDestination(destinationID: identifier, mainboard: self)
     }
 }
-
-// public typealias CurrentUserDestination = BoardGenericDestination<CurrentUserInput, CurrentUserCommand>
-//
-// public extension ActivatableBoard {
-//    func ioCurrentUser(_ identifier: BoardID = .pubCurrentUser) -> CurrentUserDestination {
-//        CurrentUserDestination(destinationID: identifier, source: self)
-//    }
-// }

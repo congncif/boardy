@@ -21,7 +21,7 @@ public typealias DashboardOutput = Void
 
 // MARK: - Command
 
-public enum DashboardCommand {}
+public typealias DashboardCommand = Void
 
 // MARK: - Action
 

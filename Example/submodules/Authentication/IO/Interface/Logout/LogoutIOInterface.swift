@@ -24,11 +24,3 @@ extension MotherboardType where Self: FlowManageable {
         LogoutMainDestination(destinationID: identifier, mainboard: self)
     }
 }
-
-// public typealias LogoutDestination = BoardGenericDestination<LogoutInput, LogoutCommand>
-//
-// extension ActivatableBoard {
-//    func ioLogout(_ identifier: BoardID = .pubLogout) -> LogoutDestination {
-//        LogoutDestination(destinationID: identifier, source: self)
-//    }
-// }
