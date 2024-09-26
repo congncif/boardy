@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.57.1"
+  s.version = "1.57.2"
   s.swift_version = "5"
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
@@ -17,6 +17,8 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "10.0"
 
   s.default_subspec = "Default"
+
+  s.preserve_path = 'tools/*'
 
   s.subspec "Default" do |co|
     co.dependency "Boardy/Core"
