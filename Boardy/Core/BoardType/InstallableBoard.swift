@@ -62,11 +62,16 @@ public protocol WindowInstallableBoard: OriginalBoard {
 
 public extension WindowInstallableBoard {
     var window: UIWindow {
-        guard let current = context as? UIWindow else {
+        if let currentWindow = context as? UIWindow {
+            return currentWindow
+        } else if let currentWindow = (context as? UIViewController)?.view.window {
+            return currentWindow
+        } else if let currentWindow = (context as? UIView)?.window {
+            return currentWindow
+        } else {
             assertionFailure("\(String(describing: self)) \n🔥 [CONTEXT NOT FOUND] Could not access `window` because it is not set or deallocated. Make sure install \(self) into a `window` before accessing it.")
             return UIWindow()
         }
-        return current
     }
 
     func installIntoWindow(_ window: UIWindow) {
