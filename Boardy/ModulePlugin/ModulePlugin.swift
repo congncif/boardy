@@ -90,6 +90,8 @@ public protocol ModuleBuilderPlugin: ModulePlugin {
     func internalContinuousRegistrations(producer: any ActivatableBoardProducer) -> [BoardRegistration]
 
     func build(with identifier: BoardID, sharedComponent: any SharedValueComponent, internalContinuousProducer: any ActivatableBoardProducer) -> ActivatableBoard
+
+    func pluginDidLoad(with sharedComponent: any SharedValueComponent)
 }
 
 public extension ModuleBuilderPlugin {
@@ -117,5 +119,9 @@ public extension ModuleBuilderPlugin {
             }
             return unboxedTarget.build(with: identifier, sharedComponent: unboxedComponent, internalContinuousProducer: continuousProducer)
         }
+
+        pluginDidLoad(with: main)
     }
+
+    func pluginDidLoad(with _: any SharedValueComponent) {}
 }
