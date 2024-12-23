@@ -32,6 +32,10 @@ public final class NoBoard: Board, ActivatableBoard {
 public final class NoBoardProducer: ActivatableBoardProducer {
     public init() {}
 
+    public func produceGatewayBoard(identifier _: BoardID) -> (any ActivatableBoard)? {
+        nil
+    }
+
     public func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         NoBoard(identifier: anotherIdentifier)
     }

@@ -15,6 +15,7 @@ public protocol MotherboardType: IdentifiableBoard, OriginalBoard {
     func removeBoard(withIdentifier identifier: BoardID)
 
     func getBoard(identifier: BoardID) -> ActivatableBoard?
+    func getGatewayBoard(identifier: BoardID) -> ActivatableBoard?
 
     /// Remove all active boards at once
     func clearActiveBoards()
@@ -57,6 +58,39 @@ extension LazyMotherboard {
         }
         installBoard(newBoard)
         return newBoard
+    }
+
+    public func getGatewayBoard(identifier: BoardID) -> ActivatableBoard? {
+        let id = identifier.gateway
+
+        let barrierActivation = ActivationBarrier(identifier: id, scope: .mainboard, option: .void)
+
+        var barrierBoard: ActivatableBoard?
+
+        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.barrierIdentifier }) {
+            barrierBoard = installedBoard
+        } else {
+            let newBarrierBoard = ActivationBarrierFactory.makeBarrierBoard(barrierActivation)
+            installBoard(newBarrierBoard)
+            barrierBoard = newBarrierBoard
+
+            if let manager = self as? FlowManageable {
+                newBarrierBoard.registerCompletableFlow(to: manager)
+            } else {
+                assertionFailure("‼️ The Motherboard \(self) without FlowManageable conformation is unsupported for barrier activation")
+            }
+        }
+
+        if let installedBoard = boards.first(where: { $0.identifier == id }) {
+            DebugLog.logActivity(source: installedBoard, data: "[Gateway] with identifier \(identifier) was installed by \(id)")
+        } else if let newBoard = boardProducer.produceGatewayBoard(identifier: identifier) {
+            installBoard(newBoard)
+            DebugLog.logActivity(source: newBoard, data: "[Gateway] with identifier \(identifier) is installing by \(id)")
+        } else {
+            return nil
+        }
+
+        return barrierBoard
     }
 }
 

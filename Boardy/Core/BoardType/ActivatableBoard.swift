@@ -11,11 +11,16 @@ import UIKit
 public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard, BoardRegistrationsConvertible {
     func activationBarrier(withOption option: Any?) -> ActivationBarrier?
     func activate(withOption option: Any?)
+    func shouldBypassGatewayBarrier() -> Bool
 }
 
 public extension ActivatableBoard {
     func asBoardRegistrations() -> [BoardRegistration] {
         [BoardRegistration(identifier) { _ in self }]
+    }
+
+    func shouldBypassGatewayBarrier() -> Bool {
+        false
     }
 }
 
@@ -32,7 +37,7 @@ public extension ActivatableBoard {
 public typealias NormalBoard = ActivatableBoard & InstallableBoard
 
 public struct ActivationBarrier {
-    public let barrierIdentifier: BoardID
+    public let identifier: BoardID
     public let scope: ActivationBarrierScope
     public let option: ActivationBarrierOption
 }
@@ -77,8 +82,8 @@ public enum ActivationBarrierOption {
 }
 
 public extension ActivationBarrier {
-    var identifier: BoardID {
-        var privateID = barrierIdentifier.appending("___PRIVATE_BARRIER___")
+    var barrierIdentifier: BoardID {
+        var privateID = identifier.appending("___PRIVATE_BARRIER___")
 
         switch option {
         case .void:

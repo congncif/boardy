@@ -38,7 +38,7 @@ public final class LauncherComponent {
         return self
     }
 
-    public func share<Model>(value: Model) -> Self where Model: Encodable {
+    public func share(value: some Encodable) -> Self {
         let data = try? JSONEncoder().encode(value)
         return share(encodedData: data)
     }
@@ -55,6 +55,19 @@ public final class LauncherComponent {
         return self
     }
 
+    public func install(gatewayBarrierPlugin: GatewayBarrierPlugin) -> Self {
+        let gatewayBarrier = gatewayBarrierPlugin.gatewayBarrier
+        switch gatewayBarrier {
+        case .none:
+            break
+        case let .required(boardConstructor):
+            container.registerGatewayBoard(.wildcard) { identifier in
+                boardConstructor(identifier)
+            }
+        }
+        return self
+    }
+
     public func install(urlOpenerPlugins: [URLOpenerPlugin]) -> Self {
         self.urlOpenerPlugins.append(contentsOf: urlOpenerPlugins)
         return self
@@ -68,6 +81,10 @@ public final class LauncherComponent {
     @discardableResult
     public func install(launcherPlugin: LauncherPlugin) -> Self {
         let moduleComponent = launcherPlugin.prepareForLaunching(withOptions: options)
+
+        if let plugin = moduleComponent.gatewayBarrierPlugin {
+            _ = install(gatewayBarrierPlugin: plugin)
+        }
 
         return install(plugins: moduleComponent.modulePlugins)
             .install(urlOpenerPlugins: moduleComponent.urlOpenerPlugins)
@@ -142,7 +159,7 @@ public final class PluginLauncher {
         LauncherComponent(options: options)
     }
 
-    public func launch<Input>(in context: AnyObject, with input: BoardInput<Input>) {
+    public func launch(in context: AnyObject, with input: BoardInput<some Any>) {
         launch(in: context) { mainboard in
             mainboard.activateBoard(input)
         }
@@ -182,7 +199,7 @@ public final class PluginLauncher {
 
     private var urlOpeningValidator: URLOpeningValidator = { _ in .accepted }
     private lazy var urlDeniedHandler: URLDeniedHandler? = { [unowned self] in
-        self.urlNotFoundHandler?($0, $1)
+        urlNotFoundHandler?($0, $1)
     }
 
     @discardableResult
@@ -215,9 +232,9 @@ public final class PluginLauncher {
     ) -> Self {
         let plugin = BlockURLOpenerPlugin<Void>(name: name, condition: { url in
             if condition(url) {
-                return .yes(())
+                .yes(())
             } else {
-                return .no
+                .no
             }
         }, handler: { mainboard, _ in
             handler(mainboard)
@@ -330,22 +347,4 @@ public final class PluginLauncher {
 public enum URLOpeningValidationStatus {
     case accepted
     case denied
-}
-
-public protocol LauncherPlugin {
-    func prepareForLaunching(withOptions options: MainOptions) -> ModuleComponent
-}
-
-public struct ModuleComponent {
-    public init(modulePlugins: [ModulePlugin],
-                urlOpenerPlugins: [URLOpenerPlugin] = [],
-                launchSettings: @escaping (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
-        self.modulePlugins = modulePlugins
-        self.urlOpenerPlugins = urlOpenerPlugins
-        self.launchSettings = launchSettings
-    }
-
-    public let modulePlugins: [ModulePlugin]
-    public let urlOpenerPlugins: [URLOpenerPlugin]
-    public let launchSettings: (_ mainboard: FlowMotherboard) -> Void
 }

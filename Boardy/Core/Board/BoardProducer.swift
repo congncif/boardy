@@ -15,12 +15,13 @@ extension BoardRegistration: BoardRegistrationsConvertible {
     public func asBoardRegistrations() -> [BoardRegistration] { [self] }
 }
 
-extension Array: BoardRegistrationsConvertible where Element == BoardRegistration {
+extension [BoardRegistration]: BoardRegistrationsConvertible {
     public func asBoardRegistrations() -> [BoardRegistration] { self }
 }
 
 public protocol BoardDynamicProducer: ActivatableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
+    func registerGatewayBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
 }
 
 public extension BoardDynamicProducer {
@@ -33,12 +34,16 @@ public extension BoardDynamicProducer {
 
 public final class BoardProducer: BoardDynamicProducer {
     public private(set) var registrations = Set<BoardRegistration>()
+    public private(set) var gatewayRegistrations = Set<BoardRegistration>()
 
     private var externalProducer: ActivatableBoardProducer
 
-    public init(externalProducer: ActivatableBoardProducer = NoBoardProducer(), registrations: [BoardRegistration] = []) {
+    public init(externalProducer: ActivatableBoardProducer = NoBoardProducer(),
+                registrations: [BoardRegistration] = [],
+                gatewayRegistrations: [BoardRegistration] = []) {
         self.externalProducer = externalProducer
         self.registrations = Set(registrations)
+        self.gatewayRegistrations = Set(gatewayRegistrations)
     }
 
     @discardableResult
@@ -64,6 +69,28 @@ public final class BoardProducer: BoardDynamicProducer {
         return registration?.constructor(identifier) ?? externalProducer.produceBoard(identifier: identifier)
     }
 
+    public func produceGatewayBoard(identifier: BoardID) -> (any ActivatableBoard)? {
+        let id = identifier.gateway
+        let registration = gatewayRegistrations.first { $0.identifier == id } ?? gatewayRegistrations.first { $0.identifier == .wildcard.gateway }
+        return registration?.constructor(id) ?? externalProducer.produceGatewayBoard(identifier: identifier)
+    }
+
+    public func registerGatewayBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> (any ActivatableBoard)) {
+        let id = identifier.gateway
+        let registration = BoardRegistration(id, constructor: factory)
+        guard !gatewayRegistrations.contains(registration) else {
+            #if DEBUG
+                if identifier == .wildcard {
+                    print("⚠️ [GatewayBarrier] is already registered. The registration will be ignored.")
+                } else {
+                    print("⚠️ [GatewayBarrier] with identifier \(identifier) is already registered. The registration will be ignored.")
+                }
+            #endif
+            return
+        }
+        gatewayRegistrations.insert(registration)
+    }
+
     public func registerBoard(_ identifier: BoardID, factory: @escaping BoardConstructor) {
         let registration = BoardRegistration(identifier, constructor: factory)
         add(registration: registration)
@@ -71,11 +98,11 @@ public final class BoardProducer: BoardDynamicProducer {
 
     public func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         if let registration = registrations.first(where: { $0.identifier == identifier }) {
-            return registration.constructor(anotherIdentifier)
+            registration.constructor(anotherIdentifier)
         } else if let board = externalProducer.matchBoard(withIdentifier: identifier, to: anotherIdentifier) {
-            return board
+            board
         } else {
-            return nil
+            nil
         }
     }
 }
@@ -101,6 +128,14 @@ struct BoardDynamicProducerBox: BoardDynamicProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard) {
         producer?.registerBoard(identifier, factory: factory)
     }
+
+    func registerGatewayBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> (any ActivatableBoard)) {
+        producer?.registerGatewayBoard(identifier, factory: factory)
+    }
+
+    func produceGatewayBoard(identifier: BoardID) -> (any ActivatableBoard)? {
+        producer?.produceGatewayBoard(identifier: identifier)
+    }
 }
 
 public extension ActivatableBoardProducer where Self: AnyObject {
@@ -119,5 +154,9 @@ struct BoardProducerBox: ActivatableBoardProducer {
 
     func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         producer?.matchBoard(withIdentifier: identifier, to: anotherIdentifier)
+    }
+
+    func produceGatewayBoard(identifier: BoardID) -> (any ActivatableBoard)? {
+        producer?.produceGatewayBoard(identifier: identifier)
     }
 }
