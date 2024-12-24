@@ -10,6 +10,8 @@ import Foundation
 public protocol MotherboardType: IdentifiableBoard, OriginalBoard {
     var boards: [ActivatableBoard] { get }
 
+    func activateBoard(identifier: BoardID, withOption option: Any?)
+
     /// Append list of boards, this doesn't include installing board into rootObject.
     func addBoard(_ board: ActivatableBoard)
     func removeBoard(withIdentifier identifier: BoardID)

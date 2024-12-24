@@ -55,15 +55,10 @@ public final class LauncherComponent {
         return self
     }
 
-    public func install(gatewayBarrierPlugin: GatewayBarrierPlugin) -> Self {
-        let gatewayBarrier = gatewayBarrierPlugin.gatewayBarrier
-        switch gatewayBarrier {
-        case .none:
-            break
-        case let .required(boardConstructor):
-            container.registerGatewayBoard(.wildcard) { identifier in
-                boardConstructor(identifier)
-            }
+    public func install(gatewayBarrier registration: GatewayBarrierRegistration) -> Self {
+        let externalContainer = container.boxed
+        container.registerGatewayBoard(.wildcard) { [externalContainer] identifier in
+            GatewayBarrierProxy(identifier: identifier, boardProducer: externalContainer, registration: registration)
         }
         return self
     }
@@ -81,10 +76,6 @@ public final class LauncherComponent {
     @discardableResult
     public func install(launcherPlugin: LauncherPlugin) -> Self {
         let moduleComponent = launcherPlugin.prepareForLaunching(withOptions: options)
-
-        if let plugin = moduleComponent.gatewayBarrierPlugin {
-            _ = install(gatewayBarrierPlugin: plugin)
-        }
 
         return install(plugins: moduleComponent.modulePlugins)
             .install(urlOpenerPlugins: moduleComponent.urlOpenerPlugins)

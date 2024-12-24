@@ -40,7 +40,7 @@ public extension MotherboardType {
     func activateAllBoards<Input>(withInputs inputs: [BoardInput<Input>]) {
         for board in boards {
             guard let input = inputs.first(where: { $0.identifier == board.identifier }) else {
-                activateBoard(identifier: board.identifier)
+                activateBoard(identifier: board.identifier, withOption: nil)
                 return
             }
             activateBoard(input)
