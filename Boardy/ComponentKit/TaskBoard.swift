@@ -30,6 +30,7 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     private let processingHandler: ProcessingHandler
     private let errorHandler: ErrorHandler
     private let completionHandler: CompletionHandler
+    private let allowBypassGatewayBarrier: Bool
 
     @Atomic
     private var activateCount = 0
@@ -41,6 +42,7 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     public var isProcessing: Bool { activateCount != 0 }
 
     public init(identifier: BoardID,
+                allowBypassGatewayBarrier: Bool = true,
                 executor: @escaping Executor,
                 successHandler: @escaping SuccessHandler = { _, _ in },
                 processingHandler: @escaping ProcessingHandler = { _ in },
@@ -65,7 +67,12 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
         self.processingHandler = processingHandler
         self.errorHandler = errorHandler
         self.completionHandler = completionHandler
+        self.allowBypassGatewayBarrier = allowBypassGatewayBarrier
         super.init(identifier: identifier)
+    }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        allowBypassGatewayBarrier
     }
 
     public func activate(withGuaranteedInput input: Input) {
@@ -80,16 +87,16 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
         handleProgress()
 
         execute(input: input) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
 
             switch result {
             case let .success(output):
-                self.handleSuccess(output)
-                self.sendOutput(output)
-                self.endProcess(isDone: true)
+                handleSuccess(output)
+                sendOutput(output)
+                endProcess(isDone: true)
             case let .failure(error):
-                self.handleError(error)
-                self.endProcess(isDone: false)
+                handleError(error)
+                endProcess(isDone: false)
             }
         }
     }

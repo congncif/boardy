@@ -35,14 +35,21 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
     public typealias Executor = (Input, @escaping ExecutorCallback) -> Void
 
     private let executor: Executor
+    private let allowBypassGatewayBarrier: Bool
 
     @Atomic
     private var isActive = false
 
     public init(identifier: BoardID,
+                allowBypassGatewayBarrier: Bool = true,
                 executor: @escaping Executor) {
         self.executor = executor
+        self.allowBypassGatewayBarrier = allowBypassGatewayBarrier
         super.init(identifier: identifier)
+    }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        allowBypassGatewayBarrier
     }
 
     public func activate(withGuaranteedInput input: Input) {

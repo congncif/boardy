@@ -59,4 +59,8 @@ public final class BarrierBoard<Input>: Board, GuaranteedBoard, GuaranteedOutput
     private func getProcesses() -> [Process] {
         queue.sync { processes }
     }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        true
+    }
 }

@@ -70,6 +70,10 @@ public final class AdapterBoard<Destination, In, Out>: Board, GuaranteedBoard, G
             sendToMotherboard(data: rawData)
         }
     }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        true
+    }
 }
 
 public extension AdapterBoard where Destination.InputType == In {

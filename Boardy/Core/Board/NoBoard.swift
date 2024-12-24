@@ -20,12 +20,21 @@ public final class NoBoard: Board, ActivatableBoard {
 
     public func activate(withOption option: Any?) {
         let msg = message ?? "Board with identifier \(identifier) was not registered yet!!!"
-        let alert = UIAlertController(title: "Feature Not Found", message: msg, preferredStyle: .alert)
+        let title = "Feature Not Found"
+        let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Got it!", style: .cancel, handler: { [weak self] _ in
             self?.handler?(option)
             self?.complete()
         }))
         rootViewController.boardy_topPresentedViewController.present(alert, animated: true)
+
+        #if DEBUG
+            print("⚠️ [NoBoard] \(title) - \(msg) ‼️")
+        #endif
+    }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        true
     }
 }
 

@@ -24,9 +24,11 @@ open class FlowBoard<Input, Output, Command, Action: BoardFlowAction>: ModernCon
     private let flowActivation: FlowActivation
     private let flowRegistration: FlowRegistration
     private let flowInteraction: FlowInteraction
+    private let allowBypassGatewayBarrier: Bool
 
     public init(identifier: BoardID,
                 producer: ActivatableBoardProducer,
+                allowBypassGatewayBarrier: Bool = true,
                 flowRegistration: @escaping FlowRegistration,
                 flowActivation: @escaping FlowActivation,
                 flowInteraction: @escaping FlowInteraction = { board, command in
@@ -44,6 +46,7 @@ open class FlowBoard<Input, Output, Command, Action: BoardFlowAction>: ModernCon
         self.flowActivation = flowActivation
         self.flowRegistration = flowRegistration
         self.flowInteraction = flowInteraction
+        self.allowBypassGatewayBarrier = allowBypassGatewayBarrier
         super.init(identifier: identifier, boardProducer: producer)
         registerFlows()
     }
@@ -58,5 +61,9 @@ open class FlowBoard<Input, Output, Command, Action: BoardFlowAction>: ModernCon
 
     open func registerFlows() {
         flowRegistration(self)
+    }
+
+    open func shouldBypassGatewayBarrier() -> Bool {
+        allowBypassGatewayBarrier
     }
 }

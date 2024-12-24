@@ -76,6 +76,10 @@ final class AlertBoard: Board, GuaranteedBoard {
 
         rootViewController.boardy_topPresentedViewController.present(alertController, animated: true, completion: nil)
     }
+
+    func shouldBypassGatewayBarrier() -> Bool {
+        true
+    }
 }
 
 extension Alert.Style {

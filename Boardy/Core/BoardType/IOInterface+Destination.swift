@@ -13,7 +13,7 @@ public class MainboardDestination {
         self.mainboard = mainboard
     }
 
-    let destinationID: BoardID
+    public let destinationID: BoardID
     let mainboard: FlowMotherboard
 }
 
@@ -77,7 +77,7 @@ public class BoardDestination {
         self.source = source
     }
 
-    let destinationID: BoardID
+    public let destinationID: BoardID
     let source: ActivatableBoard
 }
 

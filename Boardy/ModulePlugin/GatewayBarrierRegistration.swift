@@ -25,6 +25,15 @@ public final class GatewayBarrierRegistration {
         self.flowRegistration = flowRegistration
         return self
     }
+
+    public static var ​exempt: GatewayBarrierRegistration {
+        GatewayBarrierRegistration(activation: { barrier, _ in
+            #if DEBUG
+                print("⏩ [GatewayBarrierProxy] GatewayBarrier has been bypassed by \(barrier.identifier)")
+            #endif
+            barrier.complete(true)
+        }, flowRegistration: { _ in })
+    }
 }
 
 final class GatewayBarrierProxy: ContinuousBoard, ActivatableBoard, Completable {

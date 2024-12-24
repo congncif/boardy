@@ -56,8 +56,12 @@ public final class LauncherComponent {
     }
 
     public func install(gatewayBarrier registration: GatewayBarrierRegistration) -> Self {
+        install(gatewayBarrier: registration, for: .wildcard)
+    }
+
+    public func install(gatewayBarrier registration: GatewayBarrierRegistration, for destinationID: BoardID) -> Self {
         let externalContainer = container.boxed
-        container.registerGatewayBoard(.wildcard) { [externalContainer] identifier in
+        container.registerGatewayBoard(destinationID) { [externalContainer] identifier in
             GatewayBarrierProxy(identifier: identifier, boardProducer: externalContainer, registration: registration)
         }
         return self

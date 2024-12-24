@@ -8,7 +8,7 @@
 import Foundation
 
 extension BoardID {
-    public static let wildcard: BoardID = "*"
+    static let wildcard: BoardID = "*"
 
     var gateway: BoardID {
         appending("___GATEWAY___", separator: ".")

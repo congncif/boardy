@@ -35,8 +35,13 @@ public extension MotherboardType {
             }
         }
 
+        guard !board.identifier.isGateway else {
+            activate()
+            return
+        }
+
         let gatewayBoard = getGatewayBoard(identifier: identifier)
-        if board.identifier.isGateway || board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
+        if board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
             activate()
         } else {
             let gatewayBarrierBoard = gatewayBoard!
