@@ -92,10 +92,13 @@ open class ContinuousBoard: Board, ContinuableBoard {
         motherboard.forwardActionFlow(to: self)
     }
 
-    public convenience init(identifier: BoardID,
-                            boardProducer: ActivatableBoardProducer) {
+    public init(identifier: BoardID,
+                boardProducer: ActivatableBoardProducer) {
         let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
-        self.init(identifier: identifier, motherboard: motherboard)
+
+        self.motherboard = motherboard
+        super.init(identifier: identifier)
+        motherboard.forwardActionFlow(to: self)
     }
 
     override open func putIntoContext(_ context: AnyObject) {

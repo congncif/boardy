@@ -99,7 +99,7 @@ public extension MainboardActivation {
     ///
     /// Make sure the barrier board calls `complete(isDone)` when it finishes checking otherwise the target board activation will not be able to continue. The flow will be stuck until the barrier board is actually completed.
     func barrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier {
-        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: .unidentified(input))
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .unidentified(input))
     }
 
     /// Create an unique ActivationBarrier which needs to overcome before activating the target board
@@ -110,17 +110,17 @@ public extension MainboardActivation {
     ///
     /// Make sure the barrier board calls `complete(isDone)` when it finishes checking otherwise the target board activation will not be able to continue. The flow will be stuck until the barrier board is actually completed.
     func uniqueBarrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier where Input: Hashable {
-        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: .unique(input))
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .unique(input))
     }
 }
 
 public extension BoardActivation {
     func barrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier {
-        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: .unidentified(input))
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .unidentified(input))
     }
 
     func uniqueBarrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier where Input: Hashable {
-        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: .unique(input))
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .unique(input))
     }
 }
 
@@ -133,7 +133,7 @@ public extension BoardActivatingDestination {
     ///
     /// Make sure the barrier board calls `complete(isDone)` when it finishes checking otherwise the target board activation will not be able to continue. The flow will be stuck until the barrier board is actually completed.
     func barrier(scope: ActivationBarrierScope = .application, option: ActivationBarrierOption = .void) -> ActivationBarrier {
-        ActivationBarrier(barrierIdentifier: destinationID, scope: scope, option: option)
+        ActivationBarrier(identifier: destinationID, scope: scope, option: option)
     }
 }
 

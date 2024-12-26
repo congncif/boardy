@@ -9,6 +9,7 @@ import Foundation
 
 public protocol ActivatableBoardProducer {
     func produceBoard(identifier: BoardID) -> ActivatableBoard?
+    func produceGatewayBoard(identifier: BoardID) -> ActivatableBoard?
     func matchBoard(withIdentifier identifier: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard?
 }
 

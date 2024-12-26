@@ -53,16 +53,16 @@ enum ActivationBarrierFactory {
     static var cache = SafeDictionary<BoardID, ActivatableBarrierBoard>()
 
     static func makeBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
-        let identifier = barrierActivation.identifier
+        let identifier = barrierActivation.barrierIdentifier
 
         switch barrierActivation.scope {
         case .mainboard:
-            return ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.barrierIdentifier)
+            return ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.identifier)
         case .application:
             if let cachedInstance = cache[identifier] {
                 return cachedInstance
             } else {
-                let newInstance = ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.barrierIdentifier)
+                let newInstance = ActivatableBarrierBoard(identifier: identifier, completableIdentifier: barrierActivation.identifier)
                 cache[identifier] = newInstance
                 return newInstance
             }

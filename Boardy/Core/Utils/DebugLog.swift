@@ -22,7 +22,7 @@ enum DebugLog {
                 }
 
                 print("    🎯 [\(String(describing: type(of: destination)))] ➤ \(destination.identifier.rawValue)")
-                if let data = data {
+                if let data {
                     print("    🌷 [\(String(describing: type(of: data)))] ➤ \(data)")
                 }
             }
@@ -32,7 +32,7 @@ enum DebugLog {
     static func logActivity(source: IdentifiableBoard, data: Any?) {
         #if DEBUG
             if Environment.boardyLogEnabled {
-                var icon: String = "🍁"
+                var icon = "🍁"
                 var destination: BoardID?
                 var rawData: Any?
 
@@ -64,6 +64,8 @@ enum DebugLog {
                             icon += " [Remove UI Element content]"
                             destination = BoardID(id)
                             rawData = config
+                        @unknown default:
+                            break
                         }
                 #endif
                 default:

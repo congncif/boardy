@@ -8,29 +8,51 @@
 import Foundation
 
 public extension MotherboardType {
-    func activateBoard(identifier: BoardID, withOption option: Any? = nil) {
+    func activateBoard(identifier: BoardID, withOption option: Any?) {
         guard let board = getBoard(identifier: identifier) else {
             assertionFailure("\(String(describing: self)) \n🔥 Activated Board with identifier \(identifier) which was not found in motherboard")
             return
         }
 
-        if let barrier = board.activationBarrier(withOption: option) {
-            let barrierBoard = getBarrierBoard(barrier)
+        func activate() {
+            if let barrier = board.activationBarrier(withOption: option) {
+                let barrierBoard = getBarrierBoard(barrier)
 
-            DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
+                DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
 
-            let pendingActivation: () -> Void = { [weak board, weak self] in
-                guard let self = self, let board = board else { return }
+                let pendingActivation: () -> Void = { [weak board, weak self] in
+                    guard let self, let board else { return }
+                    DebugLog.logActivation(source: self, destination: board, data: option)
+                    board.activate(withOption: option)
+                }
+
+                let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)
+
+                barrierBoard.activate(withOption: pendingTask)
+            } else {
                 DebugLog.logActivation(source: self, destination: board, data: option)
                 board.activate(withOption: option)
             }
+        }
 
-            let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)
+        guard !board.identifier.isGateway else {
+            activate()
+            return
+        }
 
-            barrierBoard.activate(withOption: pendingTask)
+        let gatewayBoard = getGatewayBoard(identifier: identifier)
+        if board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
+            activate()
         } else {
-            DebugLog.logActivation(source: self, destination: board, data: option)
-            board.activate(withOption: option)
+            let gatewayBarrierBoard = gatewayBoard!
+
+            let pendingActivation: () -> Void = {
+                activate()
+            }
+
+            let boardInputModel = GatewayInputModel(identifier: identifier, option: option)
+            let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: boardInputModel)
+            gatewayBarrierBoard.activate(withOption: pendingTask)
         }
     }
 
@@ -38,7 +60,7 @@ public extension MotherboardType {
         activateBoard(identifier: model.identifier, withOption: model.option)
     }
 
-    func activateBoard<Input>(_ input: BoardInput<Input>) {
+    func activateBoard(_ input: BoardInput<some Any>) {
         activateBoard(model: input)
     }
 
@@ -50,7 +72,7 @@ public extension MotherboardType {
 
 extension MotherboardType {
     func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBoard {
-        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.identifier }) {
+        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.barrierIdentifier }) {
             return installedBoard
         }
 
@@ -65,4 +87,9 @@ extension MotherboardType {
 
         return newBoard
     }
+}
+
+struct GatewayInputModel: BoardInputModel {
+    var identifier: BoardID
+    var option: Any?
 }

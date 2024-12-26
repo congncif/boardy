@@ -220,15 +220,18 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     private let executor: Executor
     private let executingType: ExecutingType
     private let operationQueue: OperationQueue
+    private let allowBypassGatewayBarrier: Bool
 
     public init(identifier: BoardID,
                 executingType: ExecutingType,
+                allowBypassGatewayBarrier: Bool = true,
                 executor: @escaping Executor) {
         self.executor = executor
         self.executingType = executingType
         operationQueue = OperationQueue()
         operationQueue.name = "boardy.block-task-board.operation.queue"
         operationQueue.qualityOfService = .userInitiated
+        self.allowBypassGatewayBarrier = allowBypassGatewayBarrier
 
         switch executingType {
         case let .concurrent(max):
@@ -254,6 +257,10 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             }
             return BlockTaskParameter<Input, Output>(input: input)
         }]
+    }
+
+    public func shouldBypassGatewayBarrier() -> Bool {
+        allowBypassGatewayBarrier
     }
 
     public func activate(withGuaranteedInput input: InputType) {

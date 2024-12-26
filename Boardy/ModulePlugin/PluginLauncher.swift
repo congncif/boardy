@@ -38,7 +38,7 @@ public final class LauncherComponent {
         return self
     }
 
-    public func share<Model>(value: Model) -> Self where Model: Encodable {
+    public func share(value: some Encodable) -> Self {
         let data = try? JSONEncoder().encode(value)
         return share(encodedData: data)
     }
@@ -52,6 +52,18 @@ public final class LauncherComponent {
 
     public func install(plugin: ModulePlugin) -> Self {
         _ = append(plugin: plugin)
+        return self
+    }
+
+    public func install(gatewayBarrier registration: GatewayBarrierRegistration) -> Self {
+        install(gatewayBarrier: registration, for: .wildcard)
+    }
+
+    public func install(gatewayBarrier registration: GatewayBarrierRegistration, for destinationID: BoardID) -> Self {
+        let externalContainer = container.boxed
+        container.registerGatewayBoard(destinationID) { [externalContainer] identifier in
+            GatewayBarrierProxy(identifier: identifier, boardProducer: externalContainer, registration: registration)
+        }
         return self
     }
 
@@ -142,7 +154,7 @@ public final class PluginLauncher {
         LauncherComponent(options: options)
     }
 
-    public func launch<Input>(in context: AnyObject, with input: BoardInput<Input>) {
+    public func launch(in context: AnyObject, with input: BoardInput<some Any>) {
         launch(in: context) { mainboard in
             mainboard.activateBoard(input)
         }
@@ -182,7 +194,7 @@ public final class PluginLauncher {
 
     private var urlOpeningValidator: URLOpeningValidator = { _ in .accepted }
     private lazy var urlDeniedHandler: URLDeniedHandler? = { [unowned self] in
-        self.urlNotFoundHandler?($0, $1)
+        urlNotFoundHandler?($0, $1)
     }
 
     @discardableResult
@@ -215,9 +227,9 @@ public final class PluginLauncher {
     ) -> Self {
         let plugin = BlockURLOpenerPlugin<Void>(name: name, condition: { url in
             if condition(url) {
-                return .yes(())
+                .yes(())
             } else {
-                return .no
+                .no
             }
         }, handler: { mainboard, _ in
             handler(mainboard)
@@ -330,22 +342,4 @@ public final class PluginLauncher {
 public enum URLOpeningValidationStatus {
     case accepted
     case denied
-}
-
-public protocol LauncherPlugin {
-    func prepareForLaunching(withOptions options: MainOptions) -> ModuleComponent
-}
-
-public struct ModuleComponent {
-    public init(modulePlugins: [ModulePlugin],
-                urlOpenerPlugins: [URLOpenerPlugin] = [],
-                launchSettings: @escaping (_ mainboard: FlowMotherboard) -> Void = { _ in }) {
-        self.modulePlugins = modulePlugins
-        self.urlOpenerPlugins = urlOpenerPlugins
-        self.launchSettings = launchSettings
-    }
-
-    public let modulePlugins: [ModulePlugin]
-    public let urlOpenerPlugins: [URLOpenerPlugin]
-    public let launchSettings: (_ mainboard: FlowMotherboard) -> Void
 }
