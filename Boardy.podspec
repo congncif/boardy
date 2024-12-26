@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source = { :git => "https://github.com/congncif/boardy.git", :tag => s.version.to_s }
   s.social_media_url = "https://twitter.com/congncif"
 
-  s.ios.deployment_target = "10.0"
+  s.ios.deployment_target = "12.0"
 
   s.default_subspec = "Default"
 
