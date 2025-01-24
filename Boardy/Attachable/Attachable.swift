@@ -7,21 +7,25 @@
 
 import Foundation
 
-public protocol AttachableObject: AnyObject {
+public protocol DetachableObject: AnyObject {
+    func detachObject(_ object: AnyObject)
+}
+
+public protocol AttachableObject: DetachableObject {
     func attach(to object: AnyObject)
     func attachObject(_ object: AnyObject)
+
     func attachedObjects() -> [AnyObject]
-    func detachObject(_ object: AnyObject)
     func detachAllObjects()
 }
 
-enum StaticStorage {
+enum AttachableStaticStorage {
     static let mapTable = NSMapTable<AnyObject, NSHashTable<AnyObject>>.weakToStrongObjects()
 }
 
 public extension AttachableObject {
     private var storage: NSMapTable<AnyObject, NSHashTable<AnyObject>> {
-        StaticStorage.mapTable
+        AttachableStaticStorage.mapTable
     }
 
     func attach(to object: AnyObject) {
