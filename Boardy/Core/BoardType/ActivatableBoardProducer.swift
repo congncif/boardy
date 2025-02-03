@@ -17,6 +17,8 @@ public extension ActivatableBoardProducer {
     func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
         produceBoard(identifier: anotherIdentifier)
     }
+    
+    func produceGatewayBoard(identifier: BoardID) -> ActivatableBoard? { nil }
 }
 
 @available(*, deprecated, renamed: "ActivatableBoardProducer", message: "The protocol was renamed to ActivatableBoardProducer to fix typo")
