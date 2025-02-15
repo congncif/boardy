@@ -22,10 +22,6 @@ In a mobile application development environment, it is difficult to properly imp
 
 **Boardy** helps to build mobile app microsystems like in a simple way. Inspired by computer motherboards. Boardy builds a system of microsystems based on Boards. Each Board corresponds to a microsystems contained within it is a component of the mobile application, which will perform a specific task. All boards are then integrated together into one motherboard to form complete systems. The components do not interact directly with each other, but through the standard Boardy protocol suite. The core business logic is protected from change and external impact. Just changing how boards can be integrated can create a new business so changes or scaling are made easy, ensuring both maintenance and development requirements at the same time.
 
-<p align="center">
-  <img src="https://i.imgur.com/K3P7G3f.jpg"/>
-</p>
-
 > [!IMPORTANT]
 > A board should be a stateless component, it should not hold any variables that represent the state of the context. Its lifecycle is automatically managed by its Motherboard so in most cases you do not need to care when it is created or destroyed. However, although not recommended, in some cases you can still use it as a stateful component. In that case, when you're done you need to call complete() to dispose of it to free up resources.
 
