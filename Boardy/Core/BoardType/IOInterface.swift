@@ -167,7 +167,13 @@ public protocol FlowHandling {
     func bind(to bus: Bus<Output>)
     func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output
     func handle(_ handler: @escaping (Output) -> Void)
-    func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output
+    func activate<NextActivation>(_ activation: NextActivation, where condition: @escaping (Output) -> Bool) where NextActivation: BoardActivating, NextActivation.Input == Output
+}
+
+public extension FlowHandling {
+    func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output {
+        activate(activation, where: { _ in true })
+    }
 }
 
 public extension FlowHandling {
@@ -222,9 +228,11 @@ public struct FlowHandler<Output>: FlowHandling {
         })
     }
 
-    public func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output {
+    public func activate<NextActivation>(_ activation: NextActivation, where condition: @escaping (Output) -> Bool) where NextActivation: BoardActivating, NextActivation.Input == Output {
         handle { output in
-            activation.activate(with: output)
+            if condition(output) {
+                activation.activate(with: output)
+            }
         }
     }
 
