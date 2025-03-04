@@ -5,22 +5,22 @@ PODS:
     - Authentication
     - Boardy/ModulePlugin
     - SiFUtilities
-  - Boardy (1.59.0):
-    - Boardy/Default (= 1.59.0)
-  - Boardy/Attachable (1.59.0):
+  - Boardy (1.59.4):
+    - Boardy/Default (= 1.59.4)
+  - Boardy/Attachable (1.59.4):
     - Boardy/Core
-  - Boardy/ComponentKit (1.59.0):
+  - Boardy/ComponentKit (1.59.4):
     - Boardy/Core
-  - Boardy/Composable (1.59.0):
+  - Boardy/Composable (1.59.4):
     - Boardy/Attachable
     - UIComposable
-  - Boardy/Core (1.59.0)
-  - Boardy/Default (1.59.0):
+  - Boardy/Core (1.59.4)
+  - Boardy/Default (1.59.4):
     - Boardy/Attachable
     - Boardy/ComponentKit
     - Boardy/Core
     - Boardy/ModulePlugin
-  - Boardy/ModulePlugin (1.59.0):
+  - Boardy/ModulePlugin (1.59.4):
     - Boardy/Attachable
   - Dashboard (0.1.0):
     - Boardy
@@ -133,19 +133,19 @@ EXTERNAL SOURCES:
     :path: submodules/EmployeeManagement
 
 SPEC CHECKSUMS:
-  Authentication: c0ea01a6f5a09497839d6a64098174560b847131
-  AuthenticationPlugins: 9a6528dee245fa0653a2f8d3b08cea24a9d10870
-  Boardy: 96e23211a86c8ce28df25cfad34d15c70b0b680f
-  Dashboard: e640f15290373c564879dfa771b98dbd762d52b0
-  DashboardPlugins: f668cd2a6f3f9dfc47b2d7821496f03e08691537
+  Authentication: d87578c03865995057e0951fc4bbc386236edf9d
+  AuthenticationPlugins: dbc14cded27c507a4e160d81d8561b86ab36ff08
+  Boardy: 668ef0d1f102d21cd5e9e6a0fec45d02fe0ca3b7
+  Dashboard: 6e9b7ad513f594514f4b8ee3118db5da41a572d4
+  DashboardPlugins: 89dcf3a1cfdae0345f6977fe80b1ae2b470363bd
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
   DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
-  EmployeeManagement: d21900966e0813c360b74229a588d219ad292a06
-  EmployeeManagementPlugins: 94bbca98227367648d6546037adfa7d265587e81
+  EmployeeManagement: 05353f717ea0677dc3f310da95a12ed86a3ff045
+  EmployeeManagementPlugins: f8a5ae757eace7281875ab238456bdda89fe9e05
   SiFUtilities: 9224ff24e7b3fce4da0206aac9179eb386210399
   SwiftFormat: b70e3c776a74c67ce8bd140425a8c86d4a843759
   UIComposable: a002bab42cc52f8f71df1282fa4432583dd8c860
 
 PODFILE CHECKSUM: a898972610ef644d2792230cee4af31059df0169
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.2

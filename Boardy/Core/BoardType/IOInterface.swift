@@ -164,7 +164,7 @@ public protocol FlowHandling {
     associatedtype Output
 
     func addTarget<Target>(_ target: Target, action: @escaping (Target, Output) -> Void)
-    func bind(to bus: Bus<Output>)
+    func bind(to bus: Bus<Output>, where condition: @escaping (Output) -> Bool)
     func sendOutput<OutBoard>(through board: OutBoard) where OutBoard: GuaranteedOutputSendingBoard, OutBoard.OutputType == Output
     func handle(_ handler: @escaping (Output) -> Void)
     func activate<NextActivation>(_ activation: NextActivation, where condition: @escaping (Output) -> Bool) where NextActivation: BoardActivating, NextActivation.Input == Output
@@ -174,11 +174,27 @@ public extension FlowHandling {
     func activate<NextActivation>(_ activation: NextActivation) where NextActivation: BoardActivating, NextActivation.Input == Output {
         activate(activation, where: { _ in true })
     }
+
+    func bind(to bus: Bus<Output>) {
+        bind(to: bus, where: { _ in true })
+    }
 }
 
 public extension FlowHandling {
     func bind(to bus: Bus<Output?>) {
+        bind(to: bus, where: { _ in true })
+    }
+
+    func bind(to bus: Bus<Output>, where condition: @escaping (Output) -> Bool) {
         handle { [weak bus] output in
+            guard condition(output) else { return }
+            bus?.transport(input: output)
+        }
+    }
+
+    func bind(to bus: Bus<Output?>, where condition: @escaping (Output) -> Bool) {
+        handle { [weak bus] output in
+            guard condition(output) else { return }
             bus?.transport(input: output)
         }
     }

@@ -55,6 +55,27 @@ public struct MainOptions {
     }
 }
 
+public protocol MainOption {
+    static var defaultValue: Self { get }
+    static var key: MainOptions.Key { get }
+}
+
+public extension MainOption {
+    static var key: MainOptions.Key {
+        .init(rawValue: String(describing: Self.self))
+    }
+}
+
+public extension MainOptions {
+    func value<Value: MainOption>(of type: Value.Type = Value.self) -> Value {
+        self[type.key] ?? Value.defaultValue
+    }
+
+    func with<Value: MainOption>(_ value: Value) -> Self {
+        set(value, forKey: Value.key)
+    }
+}
+
 public protocol SharedValueComponent {
     var options: MainOptions { get }
 
