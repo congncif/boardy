@@ -143,7 +143,7 @@ For the purpose of increasing efficiency, **Boardy Modularization** provides a s
 * [**Boardy Xcode templates**](https://github.com/congncif/module-template) for micro-service creation.
 
 <p align="center">
-  <img src="https://i.imgur.com/XjME39K.png" alt=""/>
+  <img src="https://i.imgur.com/JIQgtO8.png" alt=""/>
 </p>
 
 * [**Boardy Modularization template**](https://github.com/ifsolution/module-structure-template) is [Cocoapods](https://cocoapods.org) template for module using **Boardy Module Plugin** creation. When you use this template for creating new module, you will get 2 `podspecs` corresponding to 2 modules, one is Interface only (IO module), one is implementation module.
@@ -153,7 +153,7 @@ For the purpose of increasing efficiency, **Boardy Modularization** provides a s
 >We chose **CocoaPods** for its stability and support for multiple configurations, as well as its ease of generating projects using Pod development. These aspects make it significantly more stable compared to **SPM** or **Tuist**.
 
 <p align="center">
-  <img src="https://i.imgur.com/hEgeQVD.png" alt="Example notifications module"/>
+  <img src="https://i.imgur.com/UPY3kUa.png" alt="Example notifications module"/>
 </p>
 
 ### Install templates
