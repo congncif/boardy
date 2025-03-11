@@ -150,7 +150,12 @@ For the purpose of increasing efficiency, **Boardy Modularization** provides a s
 	- **Interface Module** contains *IOInterface* only of *Implementation Module*
 	- **Implementation Module** contains a *ModulePlugin*, a default `RootBoard` as module entrance and some extensions, placeholder classes.
 
->We chose **CocoaPods** for its stability and support for multiple configurations, as well as its ease of generating projects using Pod development. These aspects make it significantly more stable compared to **SPM** or **Tuist**.
+**Naming Convention for New Feature Modules:**
+
+* Interface module: <ModuleName> → e.g., XPayment
+* Implementation module: <ModuleName> + Plugins → e.g., XPaymentPlugins
+
+>We chose **CocoaPods** for its stability and support for multiple configurations, as well as its ease of >generating projects using Pod development. These aspects make it significantly more stable compared to **SPM** or >**Tuist**.
 
 <p align="center">
   <img src="https://i.imgur.com/UPY3kUa.png" alt="Example notifications module"/>
@@ -188,7 +193,7 @@ sh ../../father-scripts/init-module.sh YourModuleName
 ```ruby
 # 4. Add Your Module to Podfile
 pod "YourModule", :path => "submodules/your-module"
-pod "YourModuleIO", :path => "submodules/your-module"
+pod "YourModulePlugins", :path => "submodules/your-module"
 ```
 
 ```sh
