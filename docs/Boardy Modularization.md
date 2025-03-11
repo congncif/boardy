@@ -1,5 +1,23 @@
 # Boardy Modularization
 
+## Criteria
+
+When modularizing an application, each module must meet the following criteria:
+
+* Declare public integrations (Configs) within a single entry point.
+* Easily integrate/remove from the main application using one or a few lines of code.
+* Feature modules must declare an Interface module (Interface Target) for other modules to interact with.
+
+<p align="center">
+  <img src="https://i.imgur.com/GPUuKl5.png" alt="Boardy modular"/>
+</p>
+
+## Launcher
+
+Each Launcher represents an app (micro-app) responsible for initializing configurations and starting the entry points.
+
+By default, the shared Launcher corresponds to the executable app. Additional Launcher instances can be created to function as independent micro-apps.
+
 ## IOInterface
 
 **Boardy** is a `micro-service` architecture, it promotes flexibility, interchangeability, independent deployment. Data consistency might be a problem need to care. An approach, data between micro-services is transferable to primitive data types, things that every micro-service knows well. Output of micro-service A should be encoded to `Swift.Data`, after that the raw data will be passed to micro-service B, the micro-service then decodes data to expected pure object and make a decision to *reject* or *accept*. This approach is popular and easy to implement. But Swift appreciates type safety and compile time check. So encoding & decoding may cause data type mismatch or when a micro-service changes data, other services interacting with it are not aware of the changes at compile time and easily cause runtime errors, difficult to trace. Another approach is using `Shared Interface`. By that way, micro-service A defines its interface which contains `Input` type to other services call to A, `Output` type to other services handle callback and some template methods to interact with A type safety. The interface called `Input Output Interface` or `IOInterface` for short. 
@@ -12,70 +30,107 @@ A `IOInterface` contains 2 flies:
 
 Each of micro-service has a `IOInterface`. **Boardy Modularization** provides templates to create `IOInterface` easily.
 
-## ModulePlugin
+## ModulePlugin & LauncherPlugin
+
+For a module to integrate into a Launcher, it must define a **ModulePlugin**:
+
+* Declare the module identifier.
+* Initialize dependencies and define the entry points to corresponding features (components).
 
 Each application has a main component where all things integrated with each other. `Main Component` will soon become cumbersome and difficult to manage as the application expands. **Boardy** provides a plugin mechanism for the integration of micro-service modules. Using the plugin module, adding or replacing a module is extremely simple, make your application become scalable.
 
 **Boardy Module Plugin** is a interface to enable extending `MainComponent`. By that way, `MainComponent` expose some  open functions then module plugins can use these functions to register services which they provide.
 
-A Module Plugin looks like:
+A `Module Plugin` looks like:
 
 ```swift
 import Boardy
 import Foundation
-import PaymentIO
+import Dashboard
 
-public struct PaymentModulePlugin: ModulePlugin {
-    public let service: PaymentModulePlugin.ServiceType
+struct DashboardModulePlugin: ModuleBuilderPlugin {
+    /// Each service is equivalent to one entry point
+    enum ServiceType {
+        case `default`
 
-    public init(service: PaymentModulePlugin.ServiceType) {
-        self.service = service
-    }
-
-    public func apply(for main: MainComponent) {
-        let mainProducer = main.producer
-
-        switch service {
-        case .default:
-            mainProducer.registerBoard(identifier) { [unowned mainProducer] identifier in
-                RootBoard(
-                    identifier: identifier,
-                    producer: BoardProducer(
-                        externalProducer: mainProducer,
-                        registrationsBuilder: { producer in
-                            // <#registration code#>
-                        }
-                    )
-                )
+        var identifier: BoardID {
+            switch self {
+            case .default:
+                return .pubDashboard
             }
         }
     }
 
-    public var identifier: BoardID {
-        switch service {
-        case let .default(identifier):
-            return identifier
-        }
+    func build(with identifier: Boardy.BoardID, sharedComponent _: any Boardy.SharedValueComponent, internalContinuousProducer: any Boardy.ActivatableBoardProducer) -> any Boardy.ActivatableBoard {
+        DashboardBoard(identifier: identifier, builder: DashboardBuilder(), producer: internalContinuousProducer)
     }
 
-    /// Each service is equivalent to one entry point
-    public enum ServiceType {
-        case `default`(BoardID)
+    func internalContinuousRegistrations(producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {
+        // Registration 1.1 ...
+        // Registration 1.2 ...
     }
-}
 
-extension PaymentModulePlugin {
-    public static var bundledPlugins: [ModulePlugin] {
-        return [
-            PaymentModulePlugin(service: .default(PaymentID.default)),
-        ]
+    let service: DashboardModulePlugin.ServiceType
+
+    var identifier: BoardID {
+        service.identifier
     }
 }
 ```
 
-👉 You can use templates *(will be introduced below)* to create a Module Plugin for your module. Then you can edit `func apply(for main: MainComponent)` to register a Board as entry point of your module. When use IOInterface to `activate` YourModule, this Board will be activated corresponding.
+Declare a **URLOpenerPlugin** if the entry points need to be started via deep links.
 
-⭐️ Your Module might have multiple entry points, that is when you should define more `ServiceType` and provide correct destination Board in `func apply(for main: MainComponent)`.
+```swift
+struct DashboardURLOpenerPlugin: URLOpenerPathMatchingPlugin {
+    func mainboard(_ mainboard: any Boardy.FlowMotherboard, openURLWithParameters parameters: [String: String]) {
+        mainboard.serviceMap.modDashboard.ioDashboard.activation.activate()
+    }
+
+    var matchingPath: String {
+        "/dashboard"
+    }
+}
+```
+
+>Note that, you need implement `AppDelegate` method to **Launcher** handle opening via URL:
+
+```swift
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    !PluginLauncher.shared.open(url: url).isEmpty
+}
+```
+
+The **LauncherPlugin** collects the plugins registered by modules to create a single-point installation into the Launcher.
+
+```swift
+public struct DashboardLauncherPlugin: LauncherPlugin {
+    public init() { /**/ }
+
+    public func prepareForLaunching(withOptions _: MainOptions) -> ModuleComponent {
+        ModuleComponent(
+            modulePlugins: [
+                DashboardModulePlugin(service: .default),
+            ],
+            urlOpenerPlugins: [
+                DashboardURLOpenerPlugin(),
+            ]
+        )
+    }
+}
+```
+
+Put all to **Launcher** then launch the app (in `AppDelegate`):
+
+```swift
+PluginLauncher.with(options: .default)
+    .install(launcherPlugin: DashboardLauncherPlugin())
+    .install(launcherPlugin: AuthenticationLauncherPlugin())
+    .install(launcherPlugin: EmployeeManagementLauncherPlugin())
+    .initialize()
+    .launch(in: window!) { mainboard in
+          mainboard.serviceMap.modDashboard.ioDashboard.activation.activate()
+    }
+```
 
 ⭐️ In addition to defining the entry point, **ModulePlugin** is the best place to allocate internal instances of your module and resolve dependencies to external services.
 
@@ -86,20 +141,16 @@ extension PaymentModulePlugin {
 For the purpose of increasing efficiency, **Boardy Modularization** provides a series of templates that make creating micro-services convenient and simple.
 
 * [**Boardy Xcode templates**](https://github.com/congncif/module-template) for micro-service creation.
-	- **Boardy** for creating a Boardy micro-service with UI, Controller, Board and IOInterface.
-	- **EmptyBoard** for creating a Boardy micro-service with Board and IOInterface.
-	- **IOInterface** for creating public IOInterface only.
-	- **ModuleIntegration** for creating a ModulePlugin implementation for a module.
-	- **TaskBoard** for creating micro-service without UI, task only.
-	- **BlockTask** & **BarrierBoard** for creating other TaskBoard types.
 
 <p align="center">
   <img src="https://i.imgur.com/XjME39K.png" alt=""/>
 </p>
 
 * [**Boardy Modularization template**](https://github.com/ifsolution/module-structure-template) is [Cocoapods](https://cocoapods.org) template for module using **Boardy Module Plugin** creation. When you use this template for creating new module, you will get 2 `podspecs` corresponding to 2 modules, one is Interface only (IO module), one is implementation module.
-	- **ModuleIO** contains *IOInterface* only of *Implementation Module*
+	- **Interface Module** contains *IOInterface* only of *Implementation Module*
 	- **Implementation Module** contains a *ModulePlugin*, a default `RootBoard` as module entrance and some extensions, placeholder classes.
+
+>We chose **CocoaPods** for its stability and support for multiple configurations, as well as its ease of generating projects using Pod development. These aspects make it significantly more stable compared to **SPM** or **Tuist**.
 
 <p align="center">
   <img src="https://i.imgur.com/hEgeQVD.png" alt="Example notifications module"/>
@@ -148,47 +199,7 @@ pod install
 ## Set up App Launcher
 
 * Load all modules into `PluginLauncher` in `AppDelegate`
-```swift
-extension AppDelegate {
-    func loadPlugins() {
-        PluginLauncher.with(options: .default)
-            .install(plugins: AuthDataModulePlugin.bundledPlugins)
-            .install(plugins: ProductDataModulePlugin.bundledPlugins)
-            .install(plugin: AuthModulePlugin())
-            .install(plugin: HomeModulePlugin())
-            .install(plugin: CategoriesModulePlugin())
-            .install(plugins: NotificationsModulePlugin.bundledPlugins)
-            .install(plugin: ShoppingCartModulePlugin())
-            .install(plugin: AccountModulePlugin())
-            .install(plugin: ProductModulePlugin())
-            .install(plugins: ShoppingCartDataModulePlugin.bundledPlugins)
-            .install(plugins: ShoppingAddressDataModulePlugin.bundledPlugins)
-            .install(plugins: OrderServiceModulePlugin.bundledPlugins)
-            .install(plugin: RootContainerModulePlugin())
-            .install(plugin: ShoppingAddressModulePlugin())
-            .install(plugins: ProductDetailModulePlugin.bundledPlugins)
-            .install(plugins: ShoppingNotificationDataModulePlugin.bundledPlugins)
-            .initialize()
-    }
-}
-```
-
-* Add method to launch application and start first module as root
-
-```swift
-extension AppDelegate {
-    func launch() {
-        if let window = window {
-            PluginLauncher.shared.launch(on: window) { mainboard in
-               // Use IOInterface to call to root module
-                mainboard.ioRootContainer().activation.activate()
-            }
-        }
-    }
-}
-```
-
-* Finish your app
+* Launch your app
 
 ```swift
 @main
@@ -196,13 +207,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // 1. Load all module plugins
-        loadPlugins()
-        
-        // 2. Launch root module
-        launch()
+        PluginLauncher.with(options: .default)
+	    .install(launcherPlugin: DashboardLauncherPlugin())
+	    .install(launcherPlugin: AuthenticationLauncherPlugin())
+	    .install(launcherPlugin: EmployeeManagementLauncherPlugin())
+	    .initialize()
+	    .launch(in: window!) { mainboard in
+	          mainboard.serviceMap.modDashboard.ioDashboard.activation.activate()
+	    }
 
         return true
+    }
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        !PluginLauncher.shared.open(url: url).isEmpty
     }
 }
 
