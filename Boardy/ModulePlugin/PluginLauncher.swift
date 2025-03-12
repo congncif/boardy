@@ -154,6 +154,7 @@ public final class PluginLauncher {
         LauncherComponent(options: options)
     }
 
+    @available(*, deprecated, message: "Use launch(in: action:) instead of")
     public func launch(in context: AnyObject, with input: BoardInput<some Any>) {
         launch(in: context) { mainboard in
             mainboard.activateBoard(input)
