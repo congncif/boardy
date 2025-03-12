@@ -27,7 +27,7 @@ struct EmployeeManagementModulePlugin: ModuleBuilderPlugin {
         EmployeeManagementBoardFactory.make(identifier: identifier, producer: internalContinuousProducer)
     }
 
-    func internalContinuousRegistrations(producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {
+    func internalContinuousRegistrations(sharedComponent _: any Boardy.SharedValueComponent, producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {
         BoardRegistration(.modEmployeeList) { identifier in
             EmployeeListBoard(identifier: identifier, builder: EmployeeListBuilder(), producer: producer)
         }

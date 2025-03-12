@@ -27,7 +27,7 @@ struct DashboardModulePlugin: ModuleBuilderPlugin {
         DashboardBoard(identifier: identifier, builder: DashboardBuilder(), producer: internalContinuousProducer)
     }
 
-    func internalContinuousRegistrations(producer _: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {}
+    func internalContinuousRegistrations(sharedComponent _: any Boardy.SharedValueComponent, producer _: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration] {}
 
     let service: DashboardModulePlugin.ServiceType
 

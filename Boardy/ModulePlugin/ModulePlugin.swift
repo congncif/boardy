@@ -78,18 +78,10 @@ public extension MainOptions {
 
 public protocol SharedValueComponent {
     var options: MainOptions { get }
-
-    func sharedValue<Value: Decodable>(_ valueType: Value.Type) -> Value?
 }
 
 public protocol MainComponent: SharedValueComponent {
     var producer: BoardDynamicProducer { get }
-}
-
-public extension MainComponent {
-    func sharedValue<Value: Decodable>() -> Value? {
-        sharedValue(Value.self)
-    }
 }
 
 public protocol ModulePlugin: ModulePluginConvertible {
@@ -108,7 +100,7 @@ public extension ModulePlugin {
 
 public protocol ModuleBuilderPlugin: ModulePlugin {
     @BoardRegistrationBuilder
-    func internalContinuousRegistrations(producer: any ActivatableBoardProducer) -> [BoardRegistration]
+    func internalContinuousRegistrations(sharedComponent: any SharedValueComponent, producer: any ActivatableBoardProducer) -> [BoardRegistration]
 
     func build(with identifier: BoardID, sharedComponent: any SharedValueComponent, internalContinuousProducer: any ActivatableBoardProducer) -> ActivatableBoard
 
@@ -120,7 +112,7 @@ public extension ModuleBuilderPlugin {
         let mainProducer = main.producer
 
         let continuousProducer = BoardProducer(externalProducer: mainProducer, registrations: [])
-        let registrations = internalContinuousRegistrations(producer: BoardDynamicProducerBox(producer: continuousProducer))
+        let registrations = internalContinuousRegistrations(sharedComponent: main, producer: BoardDynamicProducerBox(producer: continuousProducer))
         for registration in registrations {
             continuousProducer.add(registration: registration)
         }

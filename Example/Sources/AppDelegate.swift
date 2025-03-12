@@ -24,4 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         launchPlugins()
         return true
     }
+
+    func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        !PluginLauncher.shared.open(url: url).isEmpty
+    }
 }
