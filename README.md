@@ -65,16 +65,10 @@ final class PaymentBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOut
     func activate(withGuaranteedInput input: InputType) {
         let component = builder.build(withDelegate: self, input: input)
         let viewController = component.userInterface
-        watch(content: component.controller)
+        
         motherboard.putIntoContext(viewController)
 
-        rootViewController.show(viewController)
-
-        completeBus.connect(target: self) { target, isDone in
-            target.rootViewController.returnHere { [weak target] in
-                target?.complete(isDone)
-            }
-        }
+        rootViewController.show(viewController)        
     }
 }
 ```
