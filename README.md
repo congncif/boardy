@@ -101,7 +101,7 @@ motherboard.ioPayment().flow.addTarget(motherboard) { target, output in
 
 ### 🔍 Inside a Board
 
-A **Board** serves as the glue between business flows and UI. It is stateless by design, delegating all logic to **Controllers** via **Event Buses** and **Delegate protocols**.
+A **Board** serves as the glue between business flows in the system. It is stateless by design, delegating all logic to **Controllers** via **Event Buses** and **Delegate protocols**.
 
 - Controllers can be built with any architecture (MVC, VIP, Clean Architecture).
 - Since boards are composable, controllers should be lightweight.
