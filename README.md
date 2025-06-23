@@ -4,95 +4,254 @@
 
 # Boardy
 
-[![Version](https://img.shields.io/cocoapods/v/Boardy.svg?style=flat)](https://cocoapods.org/pods/Boardy)
-[![License](https://img.shields.io/cocoapods/l/Boardy.svg?style=flat)](https://cocoapods.org/pods/Boardy)
-[![Platform](https://img.shields.io/cocoapods/p/Boardy.svg?style=flat)](https://cocoapods.org/pods/Boardy)
+[![Platform](https://img.shields.io/badge/platform-iOS-lightgrey)](https://developer.apple.com/ios/)  
+[![Swift](https://img.shields.io/badge/swift-5.9-orange)](https://swift.org)  
+[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) 
 
 ## Why Boardy?
 
-**Microsystems** or **microservices** is an architecture that is particularly effective at developing large, complex, and constantly changing systems in terms of requirements.
+**Microservices** is an architecture especially effective for building large, complex, and fast-evolving systems.
 
-In a mobile application development environment, it is difficult to properly implement microsystems due to technological barriers. While microsystems value independence, the components of a mobile application often operate in close cohesion. Or the fact that microsystems interact with each other dynamically and flexibly, the components of the mobile application appreciate the binding and type-safe data. However, microsystems design theories and principles can be applied in a custom way to be able to make mobile applications like microsystems. Suitable for applications with high complexity and expansion requirements.
+In mobile application development, implementing true microservices is challenging due to technical limitations. While microservices emphasize independence, mobile app components often work in high cohesion. Furthermore, while microservices favor flexible, dynamic interactions, mobile apps benefit from type-safe, well-defined contracts. However, by adapting key design principles of microservices, we can architect mobile apps with similar scalability and modularity.
 
-**Two principles** when building microsystems architecture:
+### Two principles that guide microservice-inspired design:
 
-- **Eliminate and optimize** component **dependencies** so that it becomes **isolated**.  This makes it easy to pack a component as a package and **can be shipped anywhere** in the system.
+- **Minimize and isolate dependencies**: This allows each component to be self-contained and **deployable anywhere** in the system.
+- **Unify communication protocols**: All components interact via a common interface, making them **interchangeable** without modifying core business logic.
 
-- Use a **unique set of protocols** to communicate with all components in the system.  So a component can **interact with any other component**.  From the outside they are completely similar and **can be interchangeable** without changing core business.
+**Boardy** embraces these ideas to help you build mobile microservice-like systems with ease. Inspired by the design of computer motherboards, Boardy models systems as a collection of **Boards** — each representing a self-contained business unit. Boards communicate only through a consistent protocol layer, and are coordinated by a central **Motherboard**.
 
-**Boardy** helps to build mobile app microsystems like in a simple way. Inspired by computer motherboards. Boardy builds a system of microsystems based on Boards. Each Board corresponds to a microsystems contained within it is a component of the mobile application, which will perform a specific task. All boards are then integrated together into one motherboard to form complete systems. The components do not interact directly with each other, but through the standard Boardy protocol suite. The core business logic is protected from change and external impact. Just changing how boards can be integrated can create a new business so changes or scaling are made easy, ensuring both maintenance and development requirements at the same time.
+This architecture provides:
+- Encapsulation of core logic
+- Strong type safety
+- Plug-and-play extensibility
+- Easy reconfiguration and scalability
 
-> [!IMPORTANT]
-> A board should be a stateless component, it should not hold any variables that represent the state of the context. Its lifecycle is automatically managed by its Motherboard so in most cases you do not need to care when it is created or destroyed. However, although not recommended, in some cases you can still use it as a stateful component. In that case, when you're done you need to call complete() to dispose of it to free up resources.
+> [!IMPORTANT]  
+> A Board should ideally be stateless. It should not retain context-related state internally. Its lifecycle is automatically managed by its Motherboard, so in most cases you don’t need to worry about its creation or disposal. If you opt to use a Board as a stateful component (not recommended), be sure to call `complete()` when it's no longer needed to release resources.
 
-## Example
+**Boardy** is a lightweight orchestration framework inspired by microservices architecture, tailored for modular, flow-driven applications in iOS.
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+---
 
-## Requirements
+### 🧩 Core Concepts
 
-+ iOS 10+
-+ Xcode 11+
-+ Swift 5.1+
+- **Board**: A self-contained *microservice-like unit*. It can be activated by calling its `activate` method.
+- **Motherboard**: The central *orchestrator* that activates boards and manages their workflow. It supports **Gateway Barriers** to perform pre-checks before activating a board.
 
-## Installation
+Boards and Motherboards can be installed into any **root context** (an `AnyObject`, usually a `UIViewController` or `UIWindow` in UIKit). Once installed, they can access that context for UI presentation or interactions.
 
-Boardy is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+---
 
-```ruby
-pod 'Boardy'
+### ✨ Creating a Board
+
+For example, if you're implementing a payment flow, you can create a `PaymentBoard`.
+
+Use the **Xcode template** to scaffold a new board with minimal effort. Boardy handles dependency wiring and generates useful boilerplate code.
+
+A board encapsulates a self-contained business unit. It defines:
+- **Input**: data required for activation.
+- **Output**: messages/events sent to the outside world, forwarded via the Motherboard (acting as a message broker).
+
+Here’s an overview of a simple `PaymentBoard`:
+
+```swift
+final class PaymentBoard: ModernContinuableBoard, GuaranteedBoard, GuaranteedOutputSendingBoard, GuaranteedActionSendingBoard, GuaranteedCommandBoard {
+    typealias InputType = PaymentInput
+    typealias OutputType = PaymentOutput
+    typealias FlowActionType = PaymentAction
+    typealias CommandType = PaymentCommand
+
+    func activate(withGuaranteedInput input: InputType) {
+        let component = builder.build(withDelegate: self, input: input)
+        let viewController = component.userInterface
+        watch(content: component.controller)
+        motherboard.putIntoContext(viewController)
+
+        rootViewController.show(viewController)
+
+        completeBus.connect(target: self) { target, isDone in
+            target.rootViewController.returnHere { [weak target] in
+                target?.complete(isDone)
+            }
+        }
+    }
+}
 ```
 
-Install subspecs for more features:
+This board can display a `PaymentConfirm` form to the user. Once the transaction is processed, it emits a result:
 
-```ruby
-# Utilities toolkit
-pod 'Boardy/ComponentKit'
+```swift
+enum PaymentOutput {
+    case success(transactionID: String)
+    case failure(error: Error)
+    case userCancelled
+}
 ```
 
-```ruby
-# Modularization
-pod 'Boardy/ModulePlugin'
+The Motherboard can listen and chain further boards:
+
+```swift
+motherboard.ioPayment().flow.addTarget(motherboard) { target, output in
+    switch output {
+    case let .success(transactionID: id):
+        target.ioTransactionDetails().activation.activate(with: id)
+    case ...
+    }
+}
 ```
 
-```ruby
-# Build a complex UI using Boardy
-pod 'Boardy/Composable'
+> **Note**: `IOInterface` (generated by Boardy templates) enforces type-safe communication. While uncommon in server-side microservices, type safety significantly improves developer experience in mobile apps, where type casting can otherwise become a nightmare.
+
+---
+
+### 🔍 Inside a Board
+
+A **Board** serves as the glue between business flows and UI. It is stateless by design, delegating all logic to **Controllers** via **Event Buses** and **Delegate protocols**.
+
+- Controllers can be built with any architecture (MVC, VIP, Clean Architecture).
+- Since boards are composable, controllers should be lightweight.
+- Clean or Hexagonal Architecture is recommended for clarity and maintainability.
+- The Xcode template supports:
+  - **MVC**
+  - **VIP** (a simplified Clean Architecture with unidirectional data flow)
+  - **SwiftUI Full UI Board** templates for UIKit-SwiftUI integration
+
+When a Controller finishes its job, it sends events to the Board via delegate:
+
+```swift
+protocol PaymentControlDelegate: AnyObject {
+    func paymentDidSuccess(transactionID: String)
+    func paymentDidFail(error: Error)
+    func paymentDidCancel()
+}
+
+extension PaymentBoard: PaymentDelegate {
+    func paymentDidSuccess(transactionID: String) {
+        sendOutput(.success(transactionID: transactionID))
+    }
+
+    func paymentDidFail(error: Error) {
+        sendOutput(.failure(error: error))
+    }
+
+    func paymentDidCancel() {
+        sendOutput(.userCancelled)
+    }
+}
 ```
 
-## Install template to develop feature
+A Board can also receive **commands** from external sources using `EventBus`:
 
-* Run script built-in **CocoaPods.Boardy**
+```swift
+private let outsideDataBus = Bus<String>()
 
-```shell
-sh Pods/Boardy/tools/install-template.sh
+func activate(withGuaranteedInput input: InputType) {
+    ...
+    outsideDataBus.connect(target: controller) { target, data in
+        target.updateWithOutsideData(data)
+    }
+}
+
+func interact(guaranteedCommand: CommandType) {
+    outsideDataBus.transport(input: guaranteedCommand.data)
+}
 ```
 
-* Create new module using **Boardy**
+---
 
-```shell
-cd submodules/YourEmptyModuleDirectory
-sh ../../Pods/Boardy/tools/init-module.sh YourModuleName
+### 🧠 Motherboard: The Flow Manager
+
+Think of **Motherboard** as the manager of all child Boards:
+- Decides which board to activate or remove.
+- Chains board flows for complex tasks (e.g. `ShoppingCart → Ordering → Payment`).
+- Acts as a **Flow Manager** for your app:
+
+```swift
+motherboard.registerFlowSteps(.pubShoppingCart ->> .pubOrdering ->> .pubPayment)
 ```
 
-The script should create 2 modules:
+---
 
-- **YourModuleName**: Interface-only module which will be used for communicate with other microservices via public protocols (such as **ServiceMap** or public IOInterface).
-- **YourModuleNamePlugins**: Implementation module which includes internal microservices that implement protocols in the Interface module and and module plugins for integration into the main app.
+### ♻️ ContinuousBoard: Workflow Encapsulation
 
-## Reference
+A **ContinuousBoard** wraps an internal Motherboard to manage sub-flows. It behaves like a micro-orchestrator and can be installed into the Mainboard as a single board.
 
-* [Microsystems for mobile app](https://congnc-if.medium.com/microsystems-for-mobile-app-c51708299439)
-* [Boardy Modularization](docs/Boardy%20Modularization.md)
-* [Handle URL opening / deep link](docs/Open%20an%20URL.md)
-* [Configure Activation Barrier for your Board](docs/Activation%20Barrier.md)
-* [Boardy ComponentKit](docs/ComponentKit.md)
+In the example below, `PaymentBoard` is a ContinuousBoard composed of:
+- `PaymentConfirmBoard`
+- `VouchersPickerBoard`
+- `PaymentVerificationBoard`
+- `PaymentProcessBoard`
+
+From the Mainboard, activating `PaymentBoard` starts the entire payment flow:
+
+```swift
+mainboard.ioPayment().activation.activate()
+```
+
+---
+
+### 🔧 Registration & Initialization
+
+#### ✅ Static Registration
+
+```swift
+let motherboard = Motherboard(boards: [shoppingCartBoard, orderingBoard, paymentBoard])
+```
+
+#### 🔄 Dynamic Registration with BoardProducer
+
+```swift
+let motherboard = Motherboard(boardProducer: BoardProducer(registrationsBuilder: { producer in
+    BoardRegistration(.modShoppingCart) { identifier in
+        ShoppingCartBoard(identifier: identifier, boardProducer: producer)
+    }
+
+    BoardRegistration(.modOrdering) { identifier in
+        OrderingBoard(identifier: identifier, boardProducer: producer)
+    }
+
+    BoardRegistration(.modPayment) { identifier in
+        PaymentBoard(identifier: identifier, boardProducer: producer)
+    }
+}))
+```
+
+---
+
+### 🧱 Builder Pattern
+
+The **Builder Pattern** is used to construct controllers with dependencies for **Full UI Boards**. This is highly encouraged when initializing complex modules.
+
+---
+
+### 📦 Modularization with Plugins
+
+Boardy encourages modular app design. Each module (e.g. *Authentication*, *Shopping*, *Payment*) can be bundled as a **Plugin**, registering all its boards internally.
+
+Use a **PluginLauncher** to install plugins and initialize the app:
+
+```swift
+PluginLauncher.with(options: .default)
+    .install(launcherPlugin: AuthenticationLauncherPlugin())
+    .install(launcherPlugin: DashboardLauncherPlugin())
+    .install(launcherPlugin: ProductManagementLauncherPlugin())
+    .install(launcherPlugin: ShoppingLauncherPlugin())
+    .install(launcherPlugin: PaymentLauncherPlugin())
+    .initialize()
+    .launch(in: window!) { motherboard in
+        motherboard.serviceMap.modDashboard.ioDashboard.activation.activate()
+    }
+```
+
+> Adding new features? Just drop in another plugin — it's designed for maximum **extensibility**.
+
+---
 
 ## Author
 
 congncif, congnc.if@gmail.com
 
-## License
+### 📃 License
 
-Boardy is available under the MIT license. See the LICENSE file for more info.
+Boardy is available under the MIT license. See the [LICENSE](./LICENSE) file for more info.
