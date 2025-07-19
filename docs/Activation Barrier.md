@@ -1,6 +1,10 @@
-# Activation Barrier
+# 🔐 Activation & Gateway Barriers
 
-The `ActivatableBoard` now can configure another Board as a barrier activation flow. Before the board activates, the Motherboard will check to ensure it passes the barrier successfully. Otherwise the activation will be cancelled.
+Boardy supports flexible activation control using **Activation Barriers** and **Gateway Barriers**. These features allow you to enforce preconditions—such as user authentication—before activating a given board.
+
+## 🚧 Activation Barrier
+
+An `ActivatableBoard` can define a barrier board that must complete successfully before it can be activated. This allows you to gate access to a flow, such as requiring authentication before continuing.
 
 The following code will activate `Authentication Board` before activating `SomeBoard`. If `Authentication Board` `complete(true)`, the `SomeBoard` will be activated, otherwise `complete(false)`, `SomeBoard` won't be activated.
 
@@ -19,24 +23,31 @@ final class SomeBoard: Board, GuaranteedBoard {
 }
 ```
 
-Each `Barrier` is unique by identifier in a `Motherboard`. The identifier of `Barrier` is determined by `barrierIdentifier` (Eg: `Authentication ID`) and `ActivationBarrierOption`. *See more in the source code.*
+If the `AuthenticationBoard` completes with `complete(true)`, then `SomeBoard` will proceed. Otherwise, activation is canceled.
 
-The `Barrier` lifecycle is controlled by `scope`. The `default` scope is `.inMain`, the Activation Barrier is created and lives on the current Mainboard. With scope `.global`, Activation Barrier is unique by identifier in whole the application.
+Each barrier is identified by a unique identifier within the Motherboard. The identifier is derived from the `barrierIdentifier` and optional `ActivationBarrierOption`.
 
-**Important**: The board in Barrier (eg. `Authentication`) must be a completable board, it must call `complete(true)` hoặc `complete(false)` to finish its job. If don't the barrier cannot be passed and your application will be stuck at that barrier.
+### Barrier Scoping
 
-***The activation Workflow when activate `SomeBoard` from `OtherBoard`:***
+* `.mainboard` (default): The barrier lives on the current Mainboard.
+* `.application`: The barrier is shared across the entire app, uniquely identified at the app level.
 
-- Without Activation Barrier: **`OtherBoard ->> SomeBoard`**
-- With Activation Barrier configuration is **`AuthenticationBoard`: `OtherBoard ->> AuthenticationBoard ->> SomeBoard`**
+> ⚠️ The barrier board must call complete(true|false) to resolve the flow. Failing to do so may leave your app in an unresolved state.
 
-# Gateway Barrier
+### Flow comparison:
 
+* Without Activation Barrier: `OtherBoard ->> SomeBoard`
+* With Activation Barrier: `OtherBoard ->> AuthenticationBoard ->> SomeBoard`
+
+## 🛡️ Gateway Barrier
+
+A **Gateway Barrier** applies a global or module-wide rule for pre-activation checks. You can configure them via the `ActivatableBoardProducer`.
 Thinking of the **Motherboard** as a **Gateway**, before a Board is activated, the Motherboard can check if any Gateway Barriers are configured. If so, the Board is **only** activated when the Barrier is **completed** - `complete(isDone: true)`.
 
 **Gateway Barriers** and **Activation Barriers** function similarly in that they both set conditions for activating a Board. However, they differ in scope. Activation Barriers are associated with a specific Board, while Gateway Barriers can be applied to an entire app or module through the **ActivatableBoardProducer**.
 
-### Register a Gateway Barrier for entire app
+Register a Gateway Barrier for entire app
+Example: Require authentication for most boards except onboarding.
 
 ```swift
 PluginLauncher.with(options: .default)
@@ -58,17 +69,19 @@ PluginLauncher.with(options: .default)
     }
 ```
 
-Before activating any Board, the app mandates the activation of the **AuthBoard** for authentication.
+This setup ensures all boards must pass the `AuthBoard` unless explicitly `exempted`.
 
-### Bypass GatewayBarrier
+### ⛳ Bypassing Gateway Barriers
 
-In the above example, the Gateway Barrier is configured for the entire app. This means that all Boards must complete the **Auth** process to be activated. However, there are **exceptions**. The **Welcome Board**, which displays a welcome screen for onboarding users, does not require a login. Additionally, we need to be careful not to create an infinite loop by having the **Auth Board** require itself. To accommodate these exceptions, there are two approaches: 
+You can allow specific boards to bypass the global gateway rule using either:
 
-* Using a special `exempt` Gateway Barrier to bypass the general rule *(like the above example)*
-* Enable bypass GatetewayBarrier in **AuthBoard** and **WelcomeBoard**.
+* .exempt registration (as shown above)
+* Board-level opt-out via:
 
 ```swift
 func shouldBypassGatewayBarrier() -> Bool {
     true
 }
 ```
+
+This is helpful for boards like `AuthBoard` or `WelcomeBoard` that must remain accessible without triggering their own barriers.
