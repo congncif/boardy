@@ -49,3 +49,9 @@ public extension MotherboardType {
         BlockTaskMainboardActivation(destinationID: destinationID, mainboard: self)
     }
 }
+
+public extension MainboardGenericDestination {
+    var blockActivation: BlockTaskMainboardActivation<Input, Output> {
+        mainboard.blockActivation(destinationID, with: BlockTaskParameter<Input, Output>.self)
+    }
+}

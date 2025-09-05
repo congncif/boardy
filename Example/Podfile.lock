@@ -5,22 +5,22 @@ PODS:
     - Authentication
     - Boardy/ModulePlugin
     - SiFUtilities
-  - Boardy (1.59.4):
-    - Boardy/Default (= 1.59.4)
-  - Boardy/Attachable (1.59.4):
+  - Boardy (1.60.0):
+    - Boardy/Default (= 1.60.0)
+  - Boardy/Attachable (1.60.0):
     - Boardy/Core
-  - Boardy/ComponentKit (1.59.4):
+  - Boardy/ComponentKit (1.60.0):
     - Boardy/Core
-  - Boardy/Composable (1.59.4):
+  - Boardy/Composable (1.60.0):
     - Boardy/Attachable
     - UIComposable
-  - Boardy/Core (1.59.4)
-  - Boardy/Default (1.59.4):
+  - Boardy/Core (1.60.0)
+  - Boardy/Default (1.60.0):
     - Boardy/Attachable
     - Boardy/ComponentKit
     - Boardy/Core
     - Boardy/ModulePlugin
-  - Boardy/ModulePlugin (1.59.4):
+  - Boardy/ModulePlugin (1.60.0):
     - Boardy/Attachable
   - Dashboard (0.1.0):
     - Boardy
@@ -135,7 +135,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Authentication: d87578c03865995057e0951fc4bbc386236edf9d
   AuthenticationPlugins: dbc14cded27c507a4e160d81d8561b86ab36ff08
-  Boardy: 668ef0d1f102d21cd5e9e6a0fec45d02fe0ca3b7
+  Boardy: d9b0165a4feeb33b06528bfe5c467a012e67b0e2
   Dashboard: 6e9b7ad513f594514f4b8ee3118db5da41a572d4
   DashboardPlugins: 89dcf3a1cfdae0345f6977fe80b1ae2b470363bd
   DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741

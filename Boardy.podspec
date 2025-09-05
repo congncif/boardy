@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.60.0"
+  s.version = "1.60.1"
   s.swift_version = "5"
   s.summary = "A mediator interface to integrate multiple mobile architectures."
 
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
   s.default_subspec = "Default"
 
-  s.preserve_path = 'tools/*'
+  s.preserve_path = "tools/*"
 
   s.subspec "Default" do |co|
     co.dependency "Boardy/Core"
@@ -30,24 +30,24 @@ Pod::Spec.new do |s|
   s.subspec "Core" do |co|
     co.source_files = "Boardy/Core/**/*.swift"
   end
-  
+
   s.subspec "ComponentKit" do |co|
     co.source_files = "Boardy/ComponentKit/**/*.swift"
 
     co.dependency "Boardy/Core"
   end
-  
+
   s.subspec "Attachable" do |co|
     co.source_files = "Boardy/Attachable/**/*.swift"
 
     co.dependency "Boardy/Core"
   end
-  
+
   s.subspec "Composable" do |co|
     co.source_files = "Boardy/Composable/**/*.swift"
 
     co.dependency "Boardy/Attachable"
-    
+
     co.dependency "UIComposable"
   end
 
