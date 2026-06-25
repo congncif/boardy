@@ -30,10 +30,8 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     func activate(withOption option: Any?) {
         guard let task = option as? BarrierPendingTask else { return }
 
-        if isProcessing {
-            pendingTasks.append(task)
-        } else {
-            pendingTasks.append(task)
+        let shouldStartBarrier = pendingTasks.appendAndReturnWasEmpty(task)
+        if shouldStartBarrier {
             nextToBoard(BoardInput<Any?>(target: completableIdentifier, input: task.barrierOptionValue))
         }
     }

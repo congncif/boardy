@@ -32,4 +32,20 @@ struct Atomic<Value> {
         defer { lock.unlock() }
         value = newValue
     }
+
+    mutating func mutate<Result>(_ mutation: (inout Value) -> Result) -> Result {
+        lock.lock()
+        defer { lock.unlock() }
+        return mutation(&value)
+    }
+}
+
+extension Atomic where Value: Equatable {
+    mutating func compareAndSet(expected: Value, desired: Value) -> Bool {
+        mutate { value in
+            guard value == expected else { return false }
+            value = desired
+            return true
+        }
+    }
 }

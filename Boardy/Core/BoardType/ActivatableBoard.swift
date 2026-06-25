@@ -66,6 +66,9 @@ public enum ActivationBarrierOption {
     /// Activation Barrier is unique with the hashed input. Will create a new barrier if the hash value changes.
     case unique(AnyHashable)
 
+    /// Activation Barrier is unique with a caller-provided stable key.
+    case keyed(String, Any?)
+
     /// Activation Barrier is always created with any input. When the input is `nil`, this option works similarly to `.none` option.
     case unidentified(Any?)
 
@@ -74,6 +77,8 @@ public enum ActivationBarrierOption {
         case .void:
             return ()
         case let .unique(value):
+            return value
+        case let .keyed(_, value):
             return value
         case let .unidentified(value):
             return value
@@ -91,6 +96,8 @@ public extension ActivationBarrier {
         case let .unique(value):
             let optionValue = String(value.hashValue)
             privateID = privateID.appending(optionValue)
+        case let .keyed(key, _):
+            privateID = privateID.appending(key)
         case let .unidentified(value):
             if value != nil {
                 if value is Void {

@@ -54,6 +54,6 @@ class AdapterTests: XCTestCase {
         XCTAssertEqual(result, 1)
 
         board.complete(true)
-        XCTAssertEqual(motherboard.boards.count, 0)
+        XCTAssertNil(motherboard.installedBoard(identifier: "board-to-test"))
     }
 }

@@ -21,6 +21,13 @@ public protocol AttachableObject: DetachableObject {
 
 enum AttachableStaticStorage {
     static let mapTable = NSMapTable<AnyObject, NSHashTable<AnyObject>>.weakToStrongObjects()
+    static let lock = NSRecursiveLock()
+
+    static func synchronized<Result>(_ work: () -> Result) -> Result {
+        lock.lock()
+        defer { lock.unlock() }
+        return work()
+    }
 }
 
 public extension AttachableObject {
@@ -29,26 +36,32 @@ public extension AttachableObject {
     }
 
     func attach(to object: AnyObject) {
-        if storage.object(forKey: object) == nil {
-            storage.setObject(NSHashTable<AnyObject>(), forKey: object)
+        AttachableStaticStorage.synchronized {
+            if storage.object(forKey: object) == nil {
+                storage.setObject(NSHashTable<AnyObject>(), forKey: object)
+            }
+            let value = storage.object(forKey: object)
+            value?.add(self)
         }
-        let value = storage.object(forKey: object)
-        value?.add(self)
     }
 
     func attachObject(_ object: AnyObject) {
-        if storage.object(forKey: self) == nil {
-            storage.setObject(NSHashTable<AnyObject>(), forKey: self)
+        AttachableStaticStorage.synchronized {
+            if storage.object(forKey: self) == nil {
+                storage.setObject(NSHashTable<AnyObject>(), forKey: self)
+            }
+            let value = storage.object(forKey: self)
+            value?.add(object)
         }
-        let value = storage.object(forKey: self)
-        value?.add(object)
     }
 
     func attachedObjects() -> [AnyObject] {
-        if let value = storage.object(forKey: self) {
-            return value.allObjects
+        AttachableStaticStorage.synchronized {
+            if let value = storage.object(forKey: self) {
+                return value.allObjects
+            }
+            return []
         }
-        return []
     }
 
     func attachedObjects<ObjectType>(_: ObjectType.Type = ObjectType.self) -> [ObjectType] {
@@ -64,8 +77,10 @@ public extension AttachableObject {
     }
 
     func detachObject(_ object: AnyObject) {
-        if let value = storage.object(forKey: self) {
-            value.remove(object)
+        AttachableStaticStorage.synchronized {
+            if let value = storage.object(forKey: self) {
+                value.remove(object)
+            }
         }
     }
 
@@ -87,8 +102,10 @@ public extension AttachableObject {
     }
 
     func detachAllObjects() {
-        if let value = storage.object(forKey: self) {
-            value.removeAllObjects()
+        AttachableStaticStorage.synchronized {
+            if let value = storage.object(forKey: self) {
+                value.removeAllObjects()
+            }
         }
     }
 }

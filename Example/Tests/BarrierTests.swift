@@ -72,7 +72,7 @@ class BarrierTests: XCTestCase {
             expectation.fulfill()
         }
 
-        XCTAssertEqual(motherboard.boards.count, 5) // total 5 included Barrier
+        XCTAssertNotNil(motherboard.installedBoard(identifier: "barrier"))
 
         motherboard.activateBoard(identifier: "required-board", withOption: 123)
 
@@ -86,6 +86,6 @@ class BarrierTests: XCTestCase {
 //        XCTAssertNil(client2Board.input)
 //        XCTAssertNil(client3Board.input)
 
-        XCTAssertEqual(motherboard.boards.count, 4) // Barrier removed
+        XCTAssertNil(motherboard.installedBoard(identifier: "barrier"))
     }
 }

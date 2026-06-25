@@ -26,7 +26,7 @@ public final class GatewayBarrierRegistration {
         return self
     }
 
-    public static var ​exempt: GatewayBarrierRegistration {
+    public static var exempt: GatewayBarrierRegistration {
         GatewayBarrierRegistration(activation: { barrier, _ in
             #if DEBUG
                 print("⏩ [GatewayBarrierProxy] GatewayBarrier has been bypassed by \(barrier.identifier)")

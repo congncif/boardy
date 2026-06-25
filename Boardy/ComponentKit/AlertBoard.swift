@@ -60,13 +60,18 @@ public struct Alert {
 final class AlertBoard: Board, GuaranteedBoard {
     typealias InputType = Alert
 
-    func activate(withGuaranteedInput input: Alert) {
-        let alertController = UIAlertController(title: input.title, message: input.message, preferredStyle: input.style.alertStyle)
+    private var didComplete = false
+    private var presentationDelegate: AlertPresentationDelegate?
 
-        input.actions.forEach { action in
+    func activate(withGuaranteedInput input: Alert) {
+        didComplete = false
+        let alertController = UIAlertController(title: input.title, message: input.message, preferredStyle: input.style.alertStyle)
+        let actions = input.actions.isEmpty ? [AlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil)] : input.actions
+
+        actions.forEach { action in
             let alertAction = UIAlertAction(title: action.title, style: action.style.actionStyle) { [weak self, action] _ in
                 action.handler?()
-                self?.complete(action.style != .cancel)
+                self?.completeAlert(action.style != .cancel)
             }
             alertController.addAction(alertAction)
             if action.shouldBePreferred {
@@ -74,11 +79,36 @@ final class AlertBoard: Board, GuaranteedBoard {
             }
         }
 
+        let delegate = AlertPresentationDelegate { [weak self] in
+            self?.completeAlert(false)
+        }
+        presentationDelegate = delegate
+        alertController.presentationController?.delegate = delegate
+
         rootViewController.boardy_topPresentedViewController.present(alertController, animated: true, completion: nil)
     }
 
     func shouldBypassGatewayBarrier() -> Bool {
         true
+    }
+
+    private func completeAlert(_ isDone: Bool) {
+        guard !didComplete else { return }
+        didComplete = true
+        presentationDelegate = nil
+        complete(isDone)
+    }
+}
+
+private final class AlertPresentationDelegate: NSObject, UIAdaptivePresentationControllerDelegate {
+    private let dismissHandler: () -> Void
+
+    init(dismissHandler: @escaping () -> Void) {
+        self.dismissHandler = dismissHandler
+    }
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        dismissHandler()
     }
 }
 

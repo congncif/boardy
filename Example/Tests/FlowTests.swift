@@ -193,6 +193,102 @@ final class FlowTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertEqual(result, Action.ok)
     }
+
+    func test_ioActionFlowKeepsBroadcastSemantics() {
+        let sutID: BoardID = "sut"
+        let otherID: BoardID = "other"
+        let otherBoard = SutBoard(identifier: otherID)
+        motherboard.addBoard(SutBoard(identifier: sutID))
+        motherboard.addBoard(otherBoard)
+
+        let expectation = expectation(description: #function)
+        var result: Action?
+
+        motherboard.actionFlow(sutID, with: Action.self).handle { action in
+            result = action
+            expectation.fulfill()
+        }
+
+        otherBoard.sendFlowAction(Action.nope)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(result, .nope)
+    }
+
+    func test_ioActionFlowFromSourceFiltersByImmediateSource() {
+        let sutID: BoardID = "sut"
+        let otherID: BoardID = "other"
+        let sutBoard = SutBoard(identifier: sutID)
+        let otherBoard = SutBoard(identifier: otherID)
+        motherboard.addBoard(sutBoard)
+        motherboard.addBoard(otherBoard)
+
+        let ignoredExpectation = expectation(description: "other action ignored")
+        ignoredExpectation.isInverted = true
+        var result: Action?
+
+        motherboard.actionFlow(sutID, with: Action.self).handleFromSource { action in
+            result = action
+            ignoredExpectation.fulfill()
+        }
+
+        otherBoard.sendFlowAction(Action.nope)
+        wait(for: [ignoredExpectation], timeout: 0.1)
+        XCTAssertNil(result)
+
+        let receivedExpectation = expectation(description: "sut action received")
+        motherboard.actionFlow(sutID, with: Action.self).handleFromSource { action in
+            result = action
+            receivedExpectation.fulfill()
+        }
+
+        sutBoard.sendFlowAction(Action.ok)
+        wait(for: [receivedExpectation], timeout: 1)
+        XCTAssertEqual(result, .ok)
+    }
+
+    func test_busTransportsSnapshotWhileConnectingDuringDelivery() {
+        let bus = Bus<Int>()
+        var results: [Int] = []
+
+        bus.deliver { value in
+            results.append(value)
+            bus.deliver { nextValue in
+                results.append(nextValue * 10)
+            }
+        }
+
+        bus.transport(input: 1)
+        XCTAssertEqual(results, [1])
+
+        bus.transport(input: 2)
+        XCTAssertEqual(results, [1, 2, 20])
+    }
+
+    func test_activateAllBoardsWithDefaultInputContinuesAfterMissingInput() {
+        let first = ActivatedInputBoard(identifier: "first")
+        let second = ActivatedInputBoard(identifier: "second")
+        let third = ActivatedInputBoard(identifier: "third")
+        let motherboard: MotherboardType = Motherboard(boards: [first, second, third])
+
+        motherboard.activateAllBoards(withInputs: [BoardInput<Int>(target: "first", input: 1)], defaultInput: 9)
+
+        XCTAssertEqual(first.receivedInput as? Int, 1)
+        XCTAssertEqual(second.receivedInput as? Int, 9)
+        XCTAssertEqual(third.receivedInput as? Int, 9)
+    }
+
+    func test_activateAllBoardsWithMissingInputContinuesToRemainingBoards() {
+        let first = ActivatedInputBoard(identifier: "first")
+        let second = ActivatedInputBoard(identifier: "second")
+        let third = ActivatedInputBoard(identifier: "third")
+        let motherboard: MotherboardType = Motherboard(boards: [first, second, third])
+
+        motherboard.activateAllBoards(withInputs: [BoardInput<Int>(target: "first", input: 1), BoardInput<Int>(target: "third", input: 3)])
+
+        XCTAssertEqual(first.receivedInput as? Int, 1)
+        XCTAssertNil(second.receivedInput)
+        XCTAssertEqual(third.receivedInput as? Int, 3)
+    }
 }
 
 private final class TestBoard: Board, ActivatableBoard {
@@ -211,6 +307,14 @@ private final class Test3Board: Board, ActivatableBoard {
     var activatedCount: Int = 0
     func activate(withOption _: Any?) {
         activatedCount += 1
+    }
+}
+
+private final class ActivatedInputBoard: Board, ActivatableBoard {
+    var receivedInput: Any?
+
+    func activate(withOption option: Any?) {
+        receivedInput = option
     }
 }
 

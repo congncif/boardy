@@ -12,10 +12,20 @@ final class SafeArray<Value> {
     private let queue = DispatchQueue(label: "boardy.safe-array.serial-queue")
 
     func append(_ newElement: Value) {
-        queue.async { [weak self] in
+        queue.sync { [weak self] in
             guard let self = self else { return }
             self.array.append(newElement)
         }
+    }
+
+    func appendAndReturnWasEmpty(_ newElement: Value) -> Bool {
+        var wasEmpty = false
+        queue.sync { [weak self] in
+            guard let self = self else { return }
+            wasEmpty = self.array.isEmpty
+            self.array.append(newElement)
+        }
+        return wasEmpty
     }
 
     func removeAll() {

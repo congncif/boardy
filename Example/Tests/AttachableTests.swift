@@ -22,7 +22,9 @@ class OtherObject: AttachableObject {}
 class AttachableTests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        StaticStorage.mapTable.removeAllObjects()
+        AttachableStaticStorage.synchronized {
+            AttachableStaticStorage.mapTable.removeAllObjects()
+        }
 
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
@@ -80,5 +82,24 @@ class AttachableTests: XCTestCase {
 
         let attachedObjects = mainObject.attachedObjects()
         XCTAssertEqual(attachedObjects.count, 2)
+    }
+
+    func testConcurrentAttachAndDetachDoesNotCorruptStorage() {
+        let mainObject = MainObject()
+        let objects = (0 ..< 100).map { _ in SomeObject() }
+
+        DispatchQueue.concurrentPerform(iterations: objects.count) { index in
+            mainObject.attachObject(objects[index])
+            _ = mainObject.attachedObjects()
+        }
+
+        XCTAssertEqual(mainObject.attachedObjects(SomeObject.self).count, objects.count)
+
+        DispatchQueue.concurrentPerform(iterations: objects.count) { index in
+            mainObject.detachObject(objects[index])
+            _ = mainObject.attachedObjects()
+        }
+
+        XCTAssertTrue(mainObject.attachedObjects().isEmpty)
     }
 }

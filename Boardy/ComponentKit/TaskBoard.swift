@@ -35,8 +35,19 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     @Atomic
     private var activateCount = 0
 
-    private func increaseActivateCount() { activateCount += 1 }
-    private func decreaseActivateCount() { activateCount -= 1 }
+    private func startIfIdle() -> Bool {
+        _activateCount.mutate { count in
+            guard count == 0 else { return false }
+            count += 1
+            return true
+        }
+    }
+
+    private func decreaseActivateCount() {
+        _activateCount.mutate { count in
+            count -= 1
+        }
+    }
 
     public var isCompleted: Bool { activateCount == 0 }
     public var isProcessing: Bool { activateCount != 0 }
@@ -76,14 +87,13 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     }
 
     public func activate(withGuaranteedInput input: Input) {
-        guard activateCount == 0 else {
+        guard startIfIdle() else {
             #if DEBUG
                 print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
             #endif
             return
         }
 
-        increaseActivateCount()
         handleProgress()
 
         execute(input: input) { [weak self] result in

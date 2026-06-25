@@ -34,6 +34,8 @@ public extension URLOpenerPlugin {
 
 public protocol URLOpenerPathMatchingPlugin: URLOpenerPlugin {
     var matchingPath: String { get }
+    var matchingSchemes: [String] { get }
+    var matchingHosts: [String] { get }
 
     func mainboard(_ mainboard: FlowMotherboard, openURLWithParameters parameters: [String: String])
 }
@@ -44,6 +46,9 @@ enum URLOpeningRawOption {
 }
 
 public extension URLOpenerPathMatchingPlugin {
+    var matchingSchemes: [String] { [] }
+    var matchingHosts: [String] { [] }
+
     func canOpenURL(_ url: URL) -> Bool {
         switch openingOption(forURL: url) {
         case .yes:
@@ -63,6 +68,13 @@ public extension URLOpenerPathMatchingPlugin {
     }
 
     internal func openingOption(forURL url: URL) -> URLOpeningRawOption {
+        if !matchingSchemes.isEmpty, !matchingSchemes.contains(url.scheme ?? "") {
+            return .no
+        }
+        if !matchingHosts.isEmpty, !matchingHosts.contains(url.host ?? "") {
+            return .no
+        }
+
         let matchingComponents = matchingPath.components(separatedBy: "/").filter { !$0.isEmpty }
         let urlPathComponents = url.boardy.pathComponents
 
@@ -93,12 +105,24 @@ public extension URLOpenerPathMatchingPlugin {
 
 public struct BlockURLOpenerPathMatchingPlugin: URLOpenerPathMatchingPlugin {
     public init(name: String? = nil, matchingPath: String, handler: @escaping (FlowMotherboard, [String: String]) -> Void) {
+        self.init(name: name, matchingSchemes: [], matchingHosts: [], matchingPath: matchingPath, handler: handler)
+    }
+
+    public init(name: String? = nil, matchingScheme: String?, matchingHost: String?, matchingPath: String, handler: @escaping (FlowMotherboard, [String: String]) -> Void) {
+        self.init(name: name, matchingSchemes: matchingScheme.map { [$0] } ?? [], matchingHosts: matchingHost.map { [$0] } ?? [], matchingPath: matchingPath, handler: handler)
+    }
+
+    public init(name: String? = nil, matchingSchemes: [String], matchingHosts: [String], matchingPath: String, handler: @escaping (FlowMotherboard, [String: String]) -> Void) {
+        self.matchingSchemes = matchingSchemes
+        self.matchingHosts = matchingHosts
         self.matchingPath = matchingPath
         self.handler = handler
         customName = name
     }
 
     public let matchingPath: String
+    public let matchingSchemes: [String]
+    public let matchingHosts: [String]
 
     private let customName: String?
 
