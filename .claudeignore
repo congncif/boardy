@@ -1,0 +1,38 @@
+# Build artifacts
+.build/
+DerivedData/
+.swiftpm/
+*.framework/
+*.dSYM/
+
+# Xcode user-specific files
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Dependency managers
+Pods/
+Carthage/Build/
+.carthage/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Code coverage
+*.gcda
+*.gcno
+*.gcov
+*.profdata
+*.profraw
+
+# Documentation
+docs/build/
+*.docset/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
