@@ -18,6 +18,30 @@ class ResultBoardTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testConcurrentActivationRunsExecutorOnce() throws {
+        let lock = NSLock()
+        var executeCount = 0
+        let expectation = expectation(description: #function)
+
+        let board = ResultTaskBoard<String, String, Error>(identifier: "result-board") { input, callback in
+            lock.lock()
+            executeCount += 1
+            lock.unlock()
+            callback(.progress)
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.05) {
+                callback(.success(input))
+                expectation.fulfill()
+            }
+        }
+
+        DispatchQueue.concurrentPerform(iterations: 20) { index in
+            board.activate(withGuaranteedInput: "DATA-\(index)")
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(executeCount, 1)
+    }
+
     func testExample() throws {
         let board = ResultTaskBoard<String, String, Error>(identifier: "result-board") { input, callback in
             callback(.progress)
@@ -58,6 +82,6 @@ class ResultBoardTests: XCTestCase {
         waitForExpectations(timeout: 4, handler: nil)
         XCTAssertEqual(isLoading, false)
         XCTAssertEqual(results, "DATA")
-        XCTAssertEqual(motherboard.boards.count, 0)
+        XCTAssertNil(motherboard.installedBoard(identifier: "result-board"))
     }
 }

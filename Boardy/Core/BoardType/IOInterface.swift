@@ -112,6 +112,10 @@ public extension MainboardActivation {
     func uniqueBarrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier where Input: Hashable {
         ActivationBarrier(identifier: destinationID, scope: scope, option: .unique(input))
     }
+
+    func uniqueBarrier(scope: ActivationBarrierScope = .application, key: String, with input: Input) -> ActivationBarrier {
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .keyed(key, input))
+    }
 }
 
 public extension BoardActivation {
@@ -121,6 +125,10 @@ public extension BoardActivation {
 
     func uniqueBarrier(scope: ActivationBarrierScope = .application, with input: Input) -> ActivationBarrier where Input: Hashable {
         ActivationBarrier(identifier: destinationID, scope: scope, option: .unique(input))
+    }
+
+    func uniqueBarrier(scope: ActivationBarrierScope = .application, key: String, with input: Input) -> ActivationBarrier {
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .keyed(key, input))
     }
 }
 
@@ -134,6 +142,10 @@ public extension BoardActivatingDestination {
     /// Make sure the barrier board calls `complete(isDone)` when it finishes checking otherwise the target board activation will not be able to continue. The flow will be stuck until the barrier board is actually completed.
     func barrier(scope: ActivationBarrierScope = .application, option: ActivationBarrierOption = .void) -> ActivationBarrier {
         ActivationBarrier(identifier: destinationID, scope: scope, option: option)
+    }
+
+    func barrier(scope: ActivationBarrierScope = .application, key: String, value: Any? = nil) -> ActivationBarrier {
+        ActivationBarrier(identifier: destinationID, scope: scope, option: .keyed(key, value))
     }
 }
 
@@ -282,16 +294,30 @@ public struct ActionFlowHandler<Action: BoardFlowAction> {
     let matchedIdentifier: BoardID
     let manager: FlowManageable
 
+    /// Listen to every upstream broadcast with this action type, regardless of source board.
     public func handle(_ handler: @escaping (Action) -> Void) {
         manager.registerGeneralFlow { (output: Action) in
             handler(output)
         }
     }
 
+    /// Listen to broadcasts with this action type only when the immediate source matches this handler's BoardID.
+    public func handleFromSource(_ handler: @escaping (Action) -> Void) {
+        manager.registerGuaranteedFlow(matchedIdentifiers: [matchedIdentifier], target: NoneTarget()) { _, output in
+            handler(output)
+        }
+    }
+
+    /// Add a target for every upstream broadcast with this action type, regardless of source board.
     public func addTarget<Target>(_ target: Target, action: @escaping (Target, Action) -> Void) {
         manager.registerGeneralFlow(target: target) { (target, output: Action) in
             action(target, output)
         }
+    }
+
+    /// Add a target only for broadcasts with this action type from this handler's immediate source BoardID.
+    public func addTargetFromSource<Target>(_ target: Target, action: @escaping (Target, Action) -> Void) {
+        manager.registerGuaranteedFlow(matchedIdentifiers: [matchedIdentifier], target: target, handler: action)
     }
 }
 

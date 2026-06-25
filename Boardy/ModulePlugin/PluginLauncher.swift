@@ -14,6 +14,7 @@ public final class LauncherComponent {
     private var container = BoardProducer()
 
     private var plugins: [ModulePlugin] = []
+    private var loadedPlugins: [ModulePlugin] = []
     private var urlOpenerPlugins: [URLOpenerPlugin] = []
     private var customLaunchSettings: [(FlowMotherboard) -> Void] = []
 
@@ -87,7 +88,10 @@ public final class LauncherComponent {
     }
 
     func loadPluginsIfNeeded() {
-        plugins.forEach { $0.apply(for: Component(options: options, producer: container.boxed, encodedData: sharedEncodedData)) }
+        let pendingPlugins = plugins
+        let component = Component(options: options, producer: container.boxed, encodedData: sharedEncodedData)
+        pendingPlugins.forEach { $0.apply(for: component) }
+        loadedPlugins.append(contentsOf: pendingPlugins)
         plugins.removeAll()
     }
 
@@ -106,7 +110,7 @@ public final class LauncherComponent {
 
     /// Create & return new instance of Launcher
     public func instantiate(_ launchSettings: (_ mainboard: FlowMotherboard) -> Void = { _ in }) -> PluginLauncher {
-        PluginLauncher(mainboard: generateMainboard(with: launchSettings))
+        PluginLauncher(mainboard: generateMainboard(with: launchSettings), loadedPlugins: loadedPlugins)
             .install(urlOpenerPlugins: urlOpenerPlugins)
     }
 
@@ -138,9 +142,11 @@ public final class PluginLauncher {
     static var sharedInstance: PluginLauncher?
 
     private let mainboard: Motherboard
+    private let loadedPlugins: [ModulePlugin]
 
-    fileprivate init(mainboard: Motherboard) {
+    fileprivate init(mainboard: Motherboard, loadedPlugins: [ModulePlugin] = []) {
         self.mainboard = mainboard
+        self.loadedPlugins = loadedPlugins
     }
 
     public static var shared: PluginLauncher {
@@ -245,6 +251,30 @@ public final class PluginLauncher {
         handler: @escaping (_ mainboard: FlowMotherboard, _ parameters: [String: String]) -> Void
     ) -> Self {
         let plugin = BlockURLOpenerPathMatchingPlugin(name: name, matchingPath: matchingPath, handler: handler)
+        return install(urlOpenerPlugin: plugin)
+    }
+
+    @discardableResult
+    public func installURLOpenerPlugin(
+        name: String? = nil,
+        matchingScheme: String?,
+        matchingHost: String?,
+        matchingPath: String,
+        handler: @escaping (_ mainboard: FlowMotherboard, _ parameters: [String: String]) -> Void
+    ) -> Self {
+        let plugin = BlockURLOpenerPathMatchingPlugin(name: name, matchingScheme: matchingScheme, matchingHost: matchingHost, matchingPath: matchingPath, handler: handler)
+        return install(urlOpenerPlugin: plugin)
+    }
+
+    @discardableResult
+    public func installURLOpenerPlugin(
+        name: String? = nil,
+        matchingSchemes: [String],
+        matchingHosts: [String],
+        matchingPath: String,
+        handler: @escaping (_ mainboard: FlowMotherboard, _ parameters: [String: String]) -> Void
+    ) -> Self {
+        let plugin = BlockURLOpenerPathMatchingPlugin(name: name, matchingSchemes: matchingSchemes, matchingHosts: matchingHosts, matchingPath: matchingPath, handler: handler)
         return install(urlOpenerPlugin: plugin)
     }
 

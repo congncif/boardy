@@ -114,6 +114,14 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertEqual(sutBoard.activatedValue, nil)
         XCTAssertEqual(sut2Board.activatedValue, nil)
     }
+
+    func testActivationBarrierStableKeyBuildsStableIdentifier() throws {
+        let activation = sutBoard.activation(sampleBarrierAuthID, with: String.self)
+        let barrier = activation.uniqueBarrier(key: "user-42", with: "token")
+
+        XCTAssertEqual(barrier.option.value as? String, "token")
+        XCTAssertEqual(barrier.barrierIdentifier, sampleBarrierAuthID.appending("___PRIVATE_BARRIER___").appending("user-42"))
+    }
 }
 
 let sampleBarrierAuthID: BoardID = "id.board.barrier"

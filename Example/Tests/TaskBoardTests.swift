@@ -18,6 +18,30 @@ class TaskBoardTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testConcurrentActivationRunsExecutorOnce() throws {
+        let lock = NSLock()
+        var executeCount = 0
+        let expectation = expectation(description: #function)
+
+        let board = TaskBoard<Int, String>(identifier: "test-board") { _, input, completion in
+            lock.lock()
+            executeCount += 1
+            lock.unlock()
+
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.05) {
+                completion(.success(String(input)))
+                expectation.fulfill()
+            }
+        }
+
+        DispatchQueue.concurrentPerform(iterations: 20) { index in
+            board.activate(withGuaranteedInput: index)
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(executeCount, 1)
+    }
+
     func testExample() throws {
         var isLoading = false
         var results: [String?] = []
@@ -53,6 +77,6 @@ class TaskBoardTests: XCTestCase {
 
         XCTAssertEqual(isLoading, false)
         XCTAssertEqual(results.count, 1)
-        XCTAssertEqual(motherboard.boards.count, 0)
+        XCTAssertNil(motherboard.installedBoard(identifier: "test-board"))
     }
 }

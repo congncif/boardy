@@ -116,4 +116,60 @@ class LauncherTests: XCTestCase {
         XCTAssertEqual(handlers.first, "zzz-plugin")
         XCTAssertEqual(handlers.last, "zzz-block-plugin")
     }
+
+    func testURLValidatorDeniesOpening() {
+        var deniedURL: URL?
+        launcher.setURLOpeningValidator { _ in .denied }
+            .setURLDeniedHandler { _, url in
+                deniedURL = url
+            }
+
+        let handlers = launcher.open(link: "xxx://localhost")
+
+        XCTAssertTrue(handlers.isEmpty)
+        XCTAssertEqual(deniedURL?.scheme, "xxx")
+        XCTAssertNil(xValue)
+    }
+
+    func testPathMatchingPluginCanRestrictSchemeAndHost() {
+        var parameters: [String: String]?
+        let launcher = PluginLauncher.with(options: .default)
+            .instantiate()
+            .installURLOpenerPlugin(name: "safe-path", matchingSchemes: ["boardy", "boardy-dev"], matchingHosts: ["trusted.host", "staging.trusted.host"], matchingPath: "/profile/{id}") { _, nextParameters in
+                parameters = nextParameters
+            }
+
+        XCTAssertTrue(launcher.open(link: "https://trusted.host/profile/42?tab=info").isEmpty)
+        XCTAssertNil(parameters)
+
+        let handlers = launcher.open(link: "boardy://trusted.host/profile/42?tab=info")
+        XCTAssertEqual(handlers, ["safe-path"])
+        XCTAssertEqual(parameters?["id"], "42")
+        XCTAssertEqual(parameters?["tab"], "info")
+    }
+
+    func testQueryParametersDecodeExactlyOnce() throws {
+        let url = try XCTUnwrap(URL(string: "boardy://trusted.host/profile?path=%252Ftmp%252Ffile"))
+        XCTAssertEqual(url.boardy.queryParameters["path"], "%2Ftmp%2Ffile")
+    }
+
+    func testGatewayBarrierStillAllowsActivationWhenRegistered() {
+        let launcher = PluginLauncher.with(options: .default)
+            .install(plugin: SpyModulePlugin(identifier: "test"))
+            .install(gatewayBarrier: .exempt, for: "test")
+            .instantiate()
+
+        var output: String?
+        var boardCountAfterActivation = 0
+        launcher.activateNow { mainboard in
+            mainboard.matchedFlow("test", with: String.self).handle { value in
+                output = value
+            }
+            mainboard.activation("test", with: String.self).activate(with: "GATED")
+            boardCountAfterActivation = mainboard.boards.count
+        }
+
+        XCTAssertEqual(output, "GATED")
+        XCTAssertGreaterThanOrEqual(boardCountAfterActivation, 1)
+    }
 }

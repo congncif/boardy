@@ -11,6 +11,8 @@ open class BusCable<Input> {
     public typealias Handler = (Input) -> Void
 
     let transportHandler: Handler
+    private let lock = NSRecursiveLock()
+    private var valid: Bool = true
 
     public init(transportHandler: @escaping Handler) {
         self.transportHandler = transportHandler
@@ -20,7 +22,18 @@ open class BusCable<Input> {
         transportHandler(input)
     }
 
-    open private(set) var isValid: Bool = true
+    open private(set) var isValid: Bool {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return valid
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            valid = newValue
+        }
+    }
 
     open func invalidate() {
         isValid = false
@@ -30,8 +43,11 @@ open class BusCable<Input> {
 final class ObjectBox {
     private weak var object: AnyObject?
     private var value: Any?
+    private let lock = NSRecursiveLock()
 
     func setObject(_ object: Any) {
+        lock.lock()
+        defer { lock.unlock() }
         if type(of: object as Any) is AnyClass {
             self.object = object as AnyObject
         } else {
@@ -40,16 +56,22 @@ final class ObjectBox {
     }
 
     func makeEmpty() {
+        lock.lock()
+        defer { lock.unlock() }
         object = nil
         value = nil
     }
 
     func unboxed<Object>(_: Object.Type = Object.self) -> Object? {
-        object as? Object ?? value as? Object
+        lock.lock()
+        defer { lock.unlock() }
+        return object as? Object ?? value as? Object
     }
 
     var isEmpty: Bool {
-        object == nil && value == nil
+        lock.lock()
+        defer { lock.unlock() }
+        return object == nil && value == nil
     }
 }
 
@@ -75,6 +97,7 @@ public final class TargetBusCable<Target, Input>: BusCable<Input> {
 
 public final class Bus<Input> {
     private var cables: [BusCable<Input>] = []
+    private let lock = NSRecursiveLock()
 
     public init() {}
 
@@ -83,14 +106,20 @@ public final class Bus<Input> {
     }
 
     public func connect(_ cable: BusCable<Input>) {
+        lock.lock()
+        defer { lock.unlock() }
         cleanInvalidCablesIfNeeded()
         cables.append(cable)
     }
 
     public func transport(input: Input) {
+        let currentCables: [BusCable<Input>]
+        lock.lock()
         cleanInvalidCablesIfNeeded()
+        currentCables = cables
+        lock.unlock()
 
-        cables.forEach {
+        currentCables.forEach {
             $0.transport(input: input)
         }
     }

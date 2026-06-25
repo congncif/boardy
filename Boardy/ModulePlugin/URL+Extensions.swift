@@ -20,7 +20,7 @@ public struct BoardyURLExtensions {
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
            let queryItems = components.queryItems {
             return queryItems.reduce(into: [:]) { partialResult, item in
-                partialResult[item.name] = item.value?.removingPercentEncoding
+                partialResult[item.name] = item.value
             }
         } else {
             return [:]
