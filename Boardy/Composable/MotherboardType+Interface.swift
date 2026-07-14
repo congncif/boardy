@@ -30,7 +30,7 @@ public extension MotherboardType {
             guard let input = inputs.first(where: { $0.identifier == board.identifier }) else {
                 let input = BoardInput<Input>(target: board.identifier, input: defaultInput)
                 activateBoard(input)
-                return
+                continue
             }
             activateBoard(input)
         }
@@ -41,7 +41,7 @@ public extension MotherboardType {
         for board in boards {
             guard let input = inputs.first(where: { $0.identifier == board.identifier }) else {
                 activateBoard(identifier: board.identifier, withOption: nil)
-                return
+                continue
             }
             activateBoard(input)
         }

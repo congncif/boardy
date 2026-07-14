@@ -17,6 +17,16 @@ final class SingleBoard: Board, ActivatableBoard {
     func activate(withOption _: Any?) {}
 }
 
+private final class LifecycleRecordingBoard: Board, DedicatedBoard {
+    typealias InputType = String
+
+    private(set) var receivedInputs: [String?] = []
+
+    func activate(withInput input: String?) {
+        receivedInputs.append(input)
+    }
+}
+
 class LifecycleTests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -47,5 +57,41 @@ class LifecycleTests: XCTestCase {
 
         motherboard.completer("2").complete()
         XCTAssertNil(contiBoard)
+    }
+
+    func testActivateAllBoardsWithDefaultInputContinuesAfterMissingInput() {
+        let firstBoard = LifecycleRecordingBoard(identifier: "1")
+        let secondBoard = LifecycleRecordingBoard(identifier: "2")
+        let thirdBoard = LifecycleRecordingBoard(identifier: "3")
+        let motherboard: FlowMotherboard = Motherboard(boards: [firstBoard, secondBoard, thirdBoard])
+
+        motherboard.activateAllBoards(
+            withInputs: [
+                BoardInput(target: firstBoard.identifier, input: "first"),
+                BoardInput(target: thirdBoard.identifier, input: "third")
+            ],
+            defaultInput: "default"
+        )
+
+        XCTAssertEqual(firstBoard.receivedInputs, ["first"])
+        XCTAssertEqual(secondBoard.receivedInputs, ["default"])
+        XCTAssertEqual(thirdBoard.receivedInputs, ["third"])
+    }
+
+    func testActivateAllBoardsWithoutDefaultInputContinuesAfterMissingInput() {
+        let firstBoard = LifecycleRecordingBoard(identifier: "1")
+        let secondBoard = LifecycleRecordingBoard(identifier: "2")
+        let thirdBoard = LifecycleRecordingBoard(identifier: "3")
+        let motherboard: FlowMotherboard = Motherboard(boards: [firstBoard, secondBoard, thirdBoard])
+
+        motherboard.activateAllBoards(withInputs: [
+            BoardInput(target: firstBoard.identifier, input: "first"),
+            BoardInput(target: thirdBoard.identifier, input: "third")
+        ])
+
+        XCTAssertEqual(firstBoard.receivedInputs, ["first"])
+        XCTAssertEqual(secondBoard.receivedInputs.count, 1)
+        XCTAssertNil(secondBoard.receivedInputs[0])
+        XCTAssertEqual(thirdBoard.receivedInputs, ["third"])
     }
 }
