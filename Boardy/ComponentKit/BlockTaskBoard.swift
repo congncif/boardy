@@ -210,6 +210,171 @@ public enum ExecutingType {
     public static var concurrent: ExecutingType { .concurrent(max: 3) }
 }
 
+private enum TaskTerminalReason {
+    case completed
+    case cancelled
+}
+
+private enum CancelerInstallDisposition {
+    case installed
+    case invokeImmediately
+    case discard
+}
+
+private enum DirectCancelerState {
+    case notApplicable
+    case notStarted
+    case awaitingInstallation
+    case installed(BlockTaskCanceler)
+}
+
+private struct TaskRecord<Input, Output> {
+    let taskID: String
+    let handler: BlockHandler<Input, Output>
+    var directCancelerState: DirectCancelerState
+
+    var installedDirectCanceler: BlockTaskCanceler? {
+        guard case let .installed(canceler) = directCancelerState else {
+            return nil
+        }
+        return canceler
+    }
+}
+
+private struct TaskTerminalTransition<Input, Output> {
+    let records: [TaskRecord<Input, Output>]
+    let becameTerminallyEmpty: Bool
+}
+
+private struct TaskStore<Input, Output> {
+    private var orderedTaskIDs: [String] = []
+    private var records: [String: TaskRecord<Input, Output>] = [:]
+    private var pendingInstallationTombstones: [String: TaskTerminalReason] = [:]
+    private var terminalDeliveryReservations = 0
+
+    var hasActiveTasks: Bool {
+        !orderedTaskIDs.isEmpty
+    }
+
+    var canStartQueuedTask: Bool {
+        !hasActiveTasks && terminalDeliveryReservations == 0
+    }
+
+    mutating func append(_ record: TaskRecord<Input, Output>) {
+        orderedTaskIDs.append(record.taskID)
+        records[record.taskID] = record
+    }
+
+    mutating func markDirectExecutionStarted(for taskID: String) -> TaskRecord<Input, Output>? {
+        guard var record = records[taskID], case .notStarted = record.directCancelerState else {
+            return nil
+        }
+        record.directCancelerState = .awaitingInstallation
+        records[taskID] = record
+        return record
+    }
+
+    mutating func transition(
+        _ taskID: String,
+        terminal reason: TaskTerminalReason
+    ) -> TaskTerminalTransition<Input, Output>? {
+        guard let record = records.removeValue(forKey: taskID) else {
+            return nil
+        }
+
+        orderedTaskIDs.removeAll { $0 == taskID }
+        if case .awaitingInstallation = record.directCancelerState {
+            pendingInstallationTombstones[taskID] = reason
+        }
+
+        return TaskTerminalTransition(
+            records: [record],
+            becameTerminallyEmpty: orderedTaskIDs.isEmpty
+        )
+    }
+
+    mutating func transitionAll(
+        terminal reason: TaskTerminalReason
+    ) -> TaskTerminalTransition<Input, Output> {
+        guard !orderedTaskIDs.isEmpty else {
+            return TaskTerminalTransition(records: [], becameTerminallyEmpty: false)
+        }
+
+        let transitionedRecords = orderedTaskIDs.compactMap { records[$0] }
+        for record in transitionedRecords where record.directCancelerState.isAwaitingInstallation {
+            pendingInstallationTombstones[record.taskID] = reason
+        }
+        orderedTaskIDs.removeAll()
+        records.removeAll()
+
+        return TaskTerminalTransition(records: transitionedRecords, becameTerminallyEmpty: true)
+    }
+
+    mutating func firstPending() -> TaskRecord<Input, Output>? {
+        guard let taskID = orderedTaskIDs.first else {
+            return nil
+        }
+        return records[taskID]
+    }
+
+    mutating func reserveTerminalDelivery() {
+        terminalDeliveryReservations += 1
+    }
+
+    mutating func resolveTerminalDelivery(
+        releasingReservation: Bool
+    ) -> (nextRecord: TaskRecord<Input, Output>?, isTerminallyEmpty: Bool) {
+        if releasingReservation {
+            assert(terminalDeliveryReservations > 0)
+            terminalDeliveryReservations -= 1
+        }
+
+        guard terminalDeliveryReservations == 0 else {
+            return (nil, false)
+        }
+        if let pending = firstPending() {
+            if let nextRecord = markDirectExecutionStarted(for: pending.taskID) {
+                return (nextRecord, false)
+            }
+            return (nil, false)
+        }
+        return (nil, !hasActiveTasks)
+    }
+
+    mutating func installCanceler(
+        _ canceler: BlockTaskCanceler,
+        for taskID: String
+    ) -> CancelerInstallDisposition {
+        if var record = records[taskID] {
+            guard case .awaitingInstallation = record.directCancelerState else {
+                return .discard
+            }
+            record.directCancelerState = .installed(canceler)
+            records[taskID] = record
+            return .installed
+        }
+
+        guard let reason = pendingInstallationTombstones.removeValue(forKey: taskID) else {
+            return .discard
+        }
+        switch reason {
+        case .cancelled:
+            return .invokeImmediately
+        case .completed:
+            return .discard
+        }
+    }
+}
+
+private extension DirectCancelerState {
+    var isAwaitingInstallation: Bool {
+        if case .awaitingInstallation = self {
+            return true
+        }
+        return false
+    }
+}
+
 public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = BlockTaskParameter<Input, Output>
     public typealias OutputType = Output
@@ -221,6 +386,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     private let executingType: ExecutingType
     private let operationQueue: OperationQueue
     private let allowBypassGatewayBarrier: Bool
+    private let taskStore = Locked(TaskStore<Input, Output>())
 
     public init(identifier: BoardID,
                 executingType: ExecutingType,
@@ -235,7 +401,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
         switch executingType {
         case let .concurrent(max):
-            operationQueue.maxConcurrentOperationCount = max
+            operationQueue.maxConcurrentOperationCount = Swift.max(1, max)
         case .latest:
             operationQueue.maxConcurrentOperationCount = 1
         default:
@@ -265,135 +431,157 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
 
     public func activate(withGuaranteedInput input: InputType) {
         let taskID = UUID().uuidString
-
-        func startOperationTask() {
-            saveHandler(of: input, to: taskID)
-            startProgressIfNeeded(with: taskID)
-
-            let operation = BlockTaskExecutionOperation(taskID: taskID, input: input.input, taskBoard: self)
-            operationQueue.addOperation(operation)
-        }
+        let handler = BlockHandler(
+            input: input.input,
+            successHandler: input.successHandler,
+            processingHandler: input.processingHandler,
+            errorHandler: input.errorHandler,
+            completionHandler: input.completionHandler
+        )
 
         switch executingType {
         case .latest:
             cancelPendingTasksIfNeeded()
-            startOperationTask()
-            return
+            startOperationTask(taskID: taskID, handler: handler)
         case .concurrent:
-            startOperationTask()
-            return
+            startOperationTask(taskID: taskID, handler: handler)
         case .onlyResult, .queue:
-            if !isCompleted {
-                // Add to pending tasks & wait current task complete
-                saveHandler(of: input, to: taskID)
-                startProgressIfNeeded(with: taskID)
-                return
+            let shouldStart = taskStore.withLock { store in
+                let shouldStart = store.canStartQueuedTask
+                let cancelerState: DirectCancelerState = shouldStart ? .awaitingInstallation : .notStarted
+                store.append(TaskRecord(taskID: taskID, handler: handler, directCancelerState: cancelerState))
+                return shouldStart
+            }
+            handler.processingHandler?(self, true)
+            if shouldStart {
+                executeDirectTask(taskID: taskID, input: handler.input)
             }
         case .only:
-            if !isCompleted {
+            let accepted = taskStore.withLock { store in
+                guard !store.hasActiveTasks else { return false }
+                store.append(TaskRecord(taskID: taskID, handler: handler, directCancelerState: .awaitingInstallation))
+                return true
+            }
+            guard accepted else {
                 input.completionHandler?(self, .cancelled)
                 return
             }
+            handler.processingHandler?(self, true)
+            executeDirectTask(taskID: taskID, input: handler.input)
         case .default:
-            break
+            taskStore.withLock { store in
+                store.append(TaskRecord(taskID: taskID, handler: handler, directCancelerState: .awaitingInstallation))
+            }
+            handler.processingHandler?(self, true)
+            executeDirectTask(taskID: taskID, input: handler.input)
         }
+    }
 
-        saveHandler(of: input, to: taskID)
-        startProgressIfNeeded(with: taskID)
+    private func startOperationTask(taskID: String, handler: BlockHandler<Input, Output>) {
+        taskStore.withLock { store in
+            store.append(TaskRecord(taskID: taskID, handler: handler, directCancelerState: .notApplicable))
+        }
+        handler.processingHandler?(self, true)
 
-        _ = execute(input: input.input) { [weak self] result in
+        let operation = BlockTaskExecutionOperation(taskID: taskID, input: handler.input, taskBoard: self)
+        operationQueue.addOperation(operation)
+    }
+
+    private func executeDirectTask(taskID: String, input: Input) {
+        let canceler = execute(input: input) { [weak self] result in
             self?.finishExecuting(taskID: taskID, result: result)
         }
-    }
-
-    private func saveHandler(of input: InputType, to taskID: String) {
-        let handler = BlockHandler<Input, Output>(input: input.input, successHandler: input.successHandler, processingHandler: input.processingHandler, errorHandler: input.errorHandler, completionHandler: input.completionHandler)
-        appendNewTask(taskID: taskID, handler: handler)
-    }
-
-    private func startProgressIfNeeded(with taskID: String) {
-        if let processHandler = getHandler(forKey: taskID)?.processingHandler {
-            processHandler(self, true)
+        let disposition = taskStore.withLock { store in
+            store.installCanceler(canceler, for: taskID)
+        }
+        if disposition == .invokeImmediately {
+            canceler.cancel()
         }
     }
 
-    private func endProgressIfNeeded(with taskID: String) {
-        if let processHandler = getHandler(forKey: taskID)?.processingHandler {
-            processHandler(self, false)
+    func cancelPendingTasksIfNeeded() {
+        let transition = taskStore.withLock { store in
+            store.transitionAll(terminal: .cancelled)
         }
-    }
 
-    private func cancelPendingTasksIfNeeded() {
-        // Cancel pending operations
         operationQueue.cancelAllOperations()
-
-        // Send cancel feedback to the pending tasks
-        if !isCompleted {
-            for (key, _) in completions {
-                completeTask(key, status: .cancelled)
-            }
-        }
+        transition.records.forEach { $0.installedDirectCanceler?.cancel() }
+        transition.records.forEach(deliverCancellation)
     }
 
-    private func completeTask(_ taskID: String, status: TaskCompletionStatus = .done) {
-        endProgressIfNeeded(with: taskID)
-
-        if let completionHandler = getHandler(forKey: taskID)?.completionHandler {
-            completionHandler(self, status)
-        }
-
-        if getHandler(forKey: taskID) != nil {
-            removeTask(taskID: taskID)
-        }
-    }
-
-    private func handleResult(_ result: Result<Output, Error>, with taskID: String) {
+    private func deliver(_ result: Result<Output, Error>, to record: TaskRecord<Input, Output>) {
         switch result {
         case let .success(output):
-            if let successHandler = getHandler(forKey: taskID)?.successHandler {
-                successHandler(self, output)
-            }
-
+            record.handler.successHandler?(self, output)
             sendOutput(output)
         case let .failure(error):
-            if let errorHandler = getHandler(forKey: taskID)?.errorHandler {
-                errorHandler(self, error)
-            }
+            record.handler.errorHandler?(self, error)
         }
+
+        record.handler.processingHandler?(self, false)
+        record.handler.completionHandler?(self, .done)
+    }
+
+    private func deliverCancellation(to record: TaskRecord<Input, Output>) {
+        record.handler.processingHandler?(self, false)
+        record.handler.completionHandler?(self, .cancelled)
     }
 
     func finishExecuting(taskID: String, result: Result<Output, Error>) {
-        defer {
-            if isCompleted {
-                complete(true)
-            }
-        }
-
         switch executingType {
         case .onlyResult:
-            handleResult(result, with: taskID)
-            completeTask(taskID)
+            let transition = taskStore.withLock { store in
+                guard store.firstPending()?.taskID == taskID else {
+                    return TaskTerminalTransition<Input, Output>(records: [], becameTerminallyEmpty: false)
+                }
+                let transition = store.transitionAll(terminal: .completed)
+                if transition.becameTerminallyEmpty {
+                    store.reserveTerminalDelivery()
+                }
+                return transition
+            }
+            guard !transition.records.isEmpty else { return }
+            transition.records.forEach { deliver(result, to: $0) }
 
-            // Complete pending tasks
-            for (key, _) in completions {
-                handleResult(result, with: key)
-                completeTask(key)
+            let resolution = taskStore.withLock { store in
+                store.resolveTerminalDelivery(releasingReservation: transition.becameTerminallyEmpty)
+            }
+            if let nextRecord = resolution.nextRecord {
+                executeDirectTask(taskID: nextRecord.taskID, input: nextRecord.handler.input)
+            } else if transition.becameTerminallyEmpty && resolution.isTerminallyEmpty {
+                complete(true)
             }
         case .default, .latest, .only, .concurrent:
-            handleResult(result, with: taskID)
-            completeTask(taskID)
-        case .queue:
-            handleResult(result, with: taskID)
-            completeTask(taskID)
-
-            guard let info = getFirstTaskInfo() else {
-                return // All tasks done
+            guard let transition = taskStore.withLock({ store -> TaskTerminalTransition<Input, Output>? in
+                store.transition(taskID, terminal: .completed)
+            }) else {
+                return
             }
+            transition.records.forEach { deliver(result, to: $0) }
+            if transition.becameTerminallyEmpty {
+                complete(true)
+            }
+        case .queue:
+            guard let transition = taskStore.withLock({ store -> TaskTerminalTransition<Input, Output>? in
+                guard let transition = store.transition(taskID, terminal: .completed) else {
+                    return nil
+                }
+                if transition.becameTerminallyEmpty {
+                    store.reserveTerminalDelivery()
+                }
+                return transition
+            }) else {
+                return
+            }
+            transition.records.forEach { deliver(result, to: $0) }
 
-            let nextID = info.taskID
-            let nextInput = info.handler.input
-            _ = execute(input: nextInput) { [weak self] nextResult in
-                self?.finishExecuting(taskID: nextID, result: nextResult)
+            let resolution = taskStore.withLock { store in
+                store.resolveTerminalDelivery(releasingReservation: transition.becameTerminallyEmpty)
+            }
+            if let nextRecord = resolution.nextRecord {
+                executeDirectTask(taskID: nextRecord.taskID, input: nextRecord.handler.input)
+            } else if transition.becameTerminallyEmpty && resolution.isTerminallyEmpty {
+                complete(true)
             }
         }
     }
@@ -401,56 +589,35 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
     func execute(input: Input, completion: @escaping (Result<Output, Error>) -> Void) -> BlockTaskCanceler {
         executor(self, input, completion)
     }
-
-    // MARK: - Access shared data
-
-    private var completions: [String: BlockHandler<Input, Output>] = [:]
-    private var taskIDs: [String] = []
-
-    private let syncQueue = DispatchQueue(label: "boardy.block-task-board.sync-queue")
-
-    private func removeTask(taskID: String) {
-        syncQueue.sync { [weak self] in
-            guard let self = self else { return }
-            self.taskIDs.removeAll { $0 == taskID }
-            self.completions.removeValue(forKey: taskID)
-        }
-    }
-
-    private func appendNewTask(taskID: String, handler: BlockHandler<Input, Output>) {
-        syncQueue.sync { [weak self] in
-            guard let self = self else { return }
-            self.taskIDs.append(taskID)
-            self.completions[taskID] = handler
-        }
-    }
-
-    private func getHandler(forKey key: String) -> BlockHandler<Input, Output>? {
-        syncQueue.sync {
-            completions[key]
-        }
-    }
-
-    private func getFirstTaskInfo() -> (taskID: String, handler: BlockHandler<Input, Output>)? {
-        syncQueue.sync {
-            guard let firstID = taskIDs.first, let handler = completions[firstID] else {
-                return nil
-            }
-            return (firstID, handler)
-        }
-    }
-
-    private var isCompleted: Bool {
-        syncQueue.sync {
-            completions.isEmpty
-        }
-    }
 }
 
-final class BlockTaskExecutionOperation<In, Out>: Operation {
+/// `@unchecked Sendable` is safe because `stateLock` is the sole owner of phase/canceler mutation,
+/// the board reference is weak, and executor callbacks/canceler invocation always happen outside it.
+final class BlockTaskExecutionOperation<In, Out>: Operation, @unchecked Sendable {
     private let taskID: String
     private let input: In
     private weak var taskBoard: BlockTaskBoard<In, Out>?
+
+    private enum TerminalReason {
+        case completed
+        case cancelled
+    }
+
+    private enum Phase {
+        case ready
+        case executing
+        case finishing(TerminalReason, wasExecuting: Bool)
+        case finished(TerminalReason)
+    }
+
+    private struct TerminalClaim {
+        let won: Bool
+        let cancelerToInvoke: BlockTaskCanceler?
+    }
+
+    private let stateLock = NSRecursiveLock()
+    private var phase: Phase = .ready
+    private var canceler: BlockTaskCanceler?
 
     init(taskID: String, input: In, taskBoard: BlockTaskBoard<In, Out>) {
         self.taskBoard = taskBoard
@@ -459,87 +626,184 @@ final class BlockTaskExecutionOperation<In, Out>: Operation {
         super.init()
     }
 
-    enum State: String {
-        case ready = "Ready"
-        case executing = "Executing"
-        case finished = "Finished"
-
-        fileprivate var keyPath: String { "is" + rawValue }
-    }
-
-    /// Thread-safe computed state value
-    var state: State {
-        get {
-            stateQueue.sync {
-                stateStore
-            }
-        }
-        set {
-            let oldValue = state
-            willChangeValue(forKey: state.keyPath)
-            willChangeValue(forKey: newValue.keyPath)
-            stateQueue.sync(flags: .barrier) {
-                stateStore = newValue
-            }
-            didChangeValue(forKey: state.keyPath)
-            didChangeValue(forKey: oldValue.keyPath)
-        }
-    }
-
-    private let stateQueue = DispatchQueue(label: "boardy.block-task-board.operation", attributes: .concurrent)
-
-    /// Non thread-safe state storage, use only with locks
-    private var stateStore: State = .ready
-
-    private var canceler: BlockTaskCanceler?
-
     override var isAsynchronous: Bool {
         true
     }
 
+    override var isReady: Bool {
+        stateLock.lock()
+        let phaseIsReady: Bool
+        if case .ready = phase {
+            phaseIsReady = true
+        } else {
+            phaseIsReady = false
+        }
+        stateLock.unlock()
+        return phaseIsReady && super.isReady
+    }
+
     override var isExecuting: Bool {
-        state == .executing
+        stateLock.lock()
+        let value = observableValues(for: phase).isExecuting
+        stateLock.unlock()
+        return value
     }
 
     override var isFinished: Bool {
-        state == .finished
+        stateLock.lock()
+        let value = observableValues(for: phase).isFinished
+        stateLock.unlock()
+        return value
     }
 
     override var isCancelled: Bool {
-        state == .finished
+        super.isCancelled
     }
 
     override func cancel() {
-        canceler?.cancel()
-        state = .finished
+        super.cancel()
+        let claim = claimTerminal(.cancelled)
+        claim.cancelerToInvoke?.cancel()
+        if claim.won {
+            finishClaimedTerminal()
+        }
     }
 
     override func start() {
         if isCancelled {
-            state = .finished
-        } else {
-            state = .ready
-            main()
+            let claim = claimTerminal(.cancelled)
+            claim.cancelerToInvoke?.cancel()
+            if claim.won {
+                finishClaimedTerminal()
+            }
+            return
         }
+        guard beginExecuting() else { return }
+        main()
     }
 
     override func main() {
-        if isCancelled {
-            state = .finished
-        } else {
-            if let task = taskBoard {
-                state = .executing
-                canceler = task.execute(input: input) { [weak task, weak self, taskID] nextResult in
-                    guard let currentTask = task else {
-                        self?.state = .finished
-                        return
-                    }
-                    currentTask.finishExecuting(taskID: taskID, result: nextResult)
-                    self?.state = .finished
-                }
-            } else {
-                state = .finished
+        guard canInvokeExecutor else { return }
+        guard let task = taskBoard else {
+            let claim = claimTerminal(.completed)
+            if claim.won {
+                finishClaimedTerminal()
             }
+            return
+        }
+
+        let returnedCanceler = task.execute(input: input) { [weak task, weak self, taskID] result in
+            guard let self else { return }
+            let claim = self.claimTerminal(.completed)
+            guard claim.won else { return }
+            task?.finishExecuting(taskID: taskID, result: result)
+            self.finishClaimedTerminal()
+        }
+
+        let disposition = installCanceler(returnedCanceler)
+        if disposition == .invokeImmediately {
+            returnedCanceler.cancel()
+        }
+    }
+
+    private var canInvokeExecutor: Bool {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        if case .executing = phase {
+            return true
+        }
+        return false
+    }
+
+    private func beginExecuting() -> Bool {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        guard case .ready = phase else { return false }
+        setPhaseLocked(.executing)
+        return true
+    }
+
+    private func claimTerminal(_ reason: TerminalReason) -> TerminalClaim {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
+        let wasExecuting: Bool
+        switch phase {
+        case .ready:
+            wasExecuting = false
+        case .executing:
+            wasExecuting = true
+        case .finishing, .finished:
+            return TerminalClaim(won: false, cancelerToInvoke: nil)
+        }
+
+        let cancelerToInvoke: BlockTaskCanceler?
+        switch reason {
+        case .cancelled:
+            cancelerToInvoke = canceler
+        case .completed:
+            cancelerToInvoke = nil
+        }
+        canceler = nil
+        setPhaseLocked(.finishing(reason, wasExecuting: wasExecuting))
+        return TerminalClaim(won: true, cancelerToInvoke: cancelerToInvoke)
+    }
+
+    private func finishClaimedTerminal() {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        guard case let .finishing(reason, _) = phase else { return }
+        setPhaseLocked(.finished(reason))
+    }
+
+    private func installCanceler(_ newCanceler: BlockTaskCanceler) -> CancelerInstallDisposition {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
+        switch phase {
+        case .executing:
+            guard canceler == nil else { return .discard }
+            canceler = newCanceler
+            return .installed
+        case let .finishing(reason, _), let .finished(reason):
+            switch reason {
+            case .cancelled:
+                return .invokeImmediately
+            case .completed:
+                return .discard
+            }
+        case .ready:
+            return .discard
+        }
+    }
+
+    private func setPhaseLocked(_ newPhase: Phase) {
+        let oldValues = observableValues(for: phase)
+        let newValues = observableValues(for: newPhase)
+        var changedKeys: [String] = []
+        if oldValues.isReady != newValues.isReady { changedKeys.append("isReady") }
+        if oldValues.isExecuting != newValues.isExecuting { changedKeys.append("isExecuting") }
+        if oldValues.isFinished != newValues.isFinished { changedKeys.append("isFinished") }
+
+        for key in changedKeys {
+            willChangeValue(forKey: key)
+        }
+        phase = newPhase
+        for key in changedKeys.reversed() {
+            didChangeValue(forKey: key)
+        }
+    }
+
+    private func observableValues(for phase: Phase) -> (isReady: Bool, isExecuting: Bool, isFinished: Bool) {
+        switch phase {
+        case .ready:
+            return (true, false, false)
+        case .executing:
+            return (false, true, false)
+        case let .finishing(_, wasExecuting):
+            return (false, wasExecuting, false)
+        case .finished:
+            return (false, false, true)
         }
     }
 }
