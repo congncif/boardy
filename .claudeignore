@@ -1,5 +1,8 @@
 # Build artifacts
 .build/
+.build-local/
+.codegraph/
+.claude/worktrees/
 DerivedData/
 .swiftpm/
 *.framework/
