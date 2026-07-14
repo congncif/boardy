@@ -65,24 +65,6 @@ extension LazyMotherboard {
     public func getGatewayBoard(identifier: BoardID) -> ActivatableBoard? {
         let id = identifier.gateway
 
-        let barrierActivation = ActivationBarrier(identifier: id, scope: .mainboard, option: .void)
-
-        var barrierBoard: ActivatableBoard?
-
-        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.barrierIdentifier }) {
-            barrierBoard = installedBoard
-        } else {
-            let newBarrierBoard = ActivationBarrierFactory.makeBarrierBoard(barrierActivation)
-            installBoard(newBarrierBoard)
-            barrierBoard = newBarrierBoard
-
-            if let manager = self as? FlowManageable {
-                newBarrierBoard.registerCompletableFlow(to: manager)
-            } else {
-                assertionFailure("‼️ The Motherboard \(self) without FlowManageable conformation is unsupported for barrier activation")
-            }
-        }
-
         if let installedBoard = boards.first(where: { $0.identifier == id }) {
             DebugLog.logActivity(source: installedBoard, data: "[Gateway] with identifier \(identifier) was installed by \(id)")
         } else if let newBoard = boardProducer.produceGatewayBoard(identifier: identifier) {
@@ -92,7 +74,22 @@ extension LazyMotherboard {
             return nil
         }
 
-        return barrierBoard
+        let barrierActivation = ActivationBarrier(identifier: id, scope: .mainboard, option: .void)
+        if let installedBoard = boards.first(where: {
+            $0.identifier == barrierActivation.barrierIdentifier
+        }) {
+            return installedBoard
+        }
+
+        let newBarrierBoard = ActivationBarrierFactory.makeBarrierBoard(barrierActivation)
+        installBoard(newBarrierBoard)
+
+        if let manager = self as? FlowManageable {
+            newBarrierBoard.registerCompletableFlow(to: manager)
+        } else {
+            assertionFailure("‼️ The Motherboard \(self) without FlowManageable conformation is unsupported for barrier activation")
+        }
+        return newBarrierBoard
     }
 }
 

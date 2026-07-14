@@ -26,7 +26,15 @@ public extension MotherboardType {
                     board.activate(withOption: option)
                 }
 
-                let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)
+                guard let owner = self as? BarrierOwningMotherboard else {
+                    assertionFailure("‼️ A barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
+                    return
+                }
+                let pendingTask = BarrierPendingTask(
+                    activation: pendingActivation,
+                    barrierOptionValue: barrier.option.value,
+                    ownerToken: barrierBoard.ownerToken(for: owner)
+                )
 
                 barrierBoard.activate(withOption: pendingTask)
             } else {
@@ -44,14 +52,24 @@ public extension MotherboardType {
         if board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
             activate()
         } else {
-            let gatewayBarrierBoard = gatewayBoard!
+            guard
+                let gatewayBarrierBoard = gatewayBoard as? ActivatableBarrierBoard,
+                let owner = self as? BarrierOwningMotherboard
+            else {
+                assertionFailure("‼️ A gateway barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
+                return
+            }
 
             let pendingActivation: () -> Void = {
                 activate()
             }
 
             let boardInputModel = GatewayInputModel(identifier: identifier, option: option)
-            let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: boardInputModel)
+            let pendingTask = BarrierPendingTask(
+                activation: pendingActivation,
+                barrierOptionValue: boardInputModel,
+                ownerToken: gatewayBarrierBoard.ownerToken(for: owner)
+            )
             gatewayBarrierBoard.activate(withOption: pendingTask)
         }
     }
@@ -71,21 +89,19 @@ public extension MotherboardType {
 }
 
 extension MotherboardType {
-    func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBoard {
-        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.barrierIdentifier }) {
-            return installedBoard
+    func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
+        let identifier = barrierActivation.barrierIdentifier
+        if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
+            guard let barrierBoard = installedBoard as? ActivatableBarrierBoard else {
+                preconditionFailure("A non-barrier board is installed with barrier identifier \(identifier)")
+            }
+            return barrierBoard
         }
 
-        let newBoard = ActivationBarrierFactory.makeBarrierBoard(barrierActivation)
-        installBoard(newBoard)
-
-        if let manager = self as? FlowManageable {
-            newBoard.registerCompletableFlow(to: manager)
-        } else {
-            assertionFailure("‼️ The Motherboard \(self) without FlowManageable conformation is unsupported for barrier activation")
-        }
-
-        return newBoard
+        return ActivationBarrierFactory.makeBarrierBoard(
+            barrierActivation,
+            identifier: identifier
+        )
     }
 }
 
