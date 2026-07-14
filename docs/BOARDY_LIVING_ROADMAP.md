@@ -2,15 +2,18 @@
 
 > Tài liệu tổng hợp để review, lựa chọn và theo dõi từng bước nâng cấp Boardy.
 >
-> **Trạng thái quyết định:** chưa có hạng mục implementation nào được phê duyệt. Mọi work item trong tài liệu mặc định ở trạng thái `Proposed` cho đến khi được ghi nhận trong Decision Log.
+> **Trạng thái quyết định:** Option A đang được thực thi trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; requester yêu cầu dùng Xcode 26.4.1 hiện có và chỉ phát hành qua Git/GitHub, chưa publish CocoaPods. Hosted CI và N-1 Xcode được tách sang plan sau.
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Trạng thái tài liệu | Draft for review |
-| Phiên bản tài liệu | 0.1.0 |
+| Trạng thái tài liệu | In progress — Option A execution |
+| Phiên bản tài liệu | 0.14.0 |
 | Ngày audit | 2026-07-14 |
 | Cập nhật gần nhất | 2026-07-14 |
-| Repository baseline | `master` tại commit `d62970a81432` |
+| Audit baseline | `d62970a81432` |
+| Option A source/API baseline | `bfa9579977047b6e112b40b94c4c49243eb46dc8` |
+| Immutable API-baseline commit | `53664db10ae92924a6a7ca97bf0d0b906d0a3cca` |
+| Tasks 2–8 checkpoint | `f4284278c348f279c833c32e231d39473e5dd5f1` |
 | Framework release hiện tại | `1.60.1` |
 | Owner tài liệu | Chưa chỉ định; được theo dõi bởi `D-001` |
 | Phạm vi | Vision, architecture, source, tests, documentation, distribution, OSS governance và organizational adoption |
@@ -77,6 +80,8 @@ Tuy nhiên, implementation và productization chưa theo kịp lời hứa kiế
 - Distribution chỉ dựa trên CocoaPods trong khi chưa có Swift Package Manager.
 - Release, security và community governance chưa đạt baseline của một dự án open source đáng tin cậy.
 
+**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. Swift 6 isolation, iOS 14 metadata, SwiftPM Boardy, OSS governance và release gates vẫn chưa hoàn tất; vì vậy maturity verdict tổng thể chưa được nâng.
+
 ### 1.2. Maturity verdict
 
 Boardy hiện phù hợp với nhãn:
@@ -124,6 +129,7 @@ Không khuyến nghị rewrite toàn bộ ngay lập tức. Một rewrite đồn
 Audit bao gồm:
 
 - Root documentation và toàn bộ tài liệu trong `docs/`.
+- Local repository UIComposable ở phạm vi package feasibility cho Boardy/Composable.
 - `AGENTS.md`, `.claude/CLAUDE.md` và các development instructions liên quan.
 - Toàn bộ 64 file Swift trong `Boardy/`, khoảng 6.448 dòng.
 - 15 file test với 33 test methods.
@@ -245,7 +251,7 @@ Ranh giới này giúp API nhỏ hơn và tránh để Motherboard hấp thụ m
 
 Một framework open source cần một compatibility matrix duy nhất và được CI enforce.
 
-### 4.3. Build verification ngày 2026-07-14
+### 4.3. Pre-execution build verification ngày 2026-07-14
 
 Môi trường kiểm chứng:
 
@@ -254,7 +260,11 @@ Môi trường kiểm chứng:
 - Test scheme: `Boardy_Tests`
 - Configuration: Debug
 - Simulator: iPhone 17, iOS 26.4
-- Derived data: `/tmp/BoardyDerivedData`
+- Local build root: `.build-local/` trong repo trên external drive; Git và Claude index đều ignore
+- Derived data: `.build-local/DerivedData/<verification-row>`
+- Package source checkout: `.build-local/SourcePackages`
+- Result bundles/logs: `.build-local/Results`
+- Xcode package resolution: `-clonedSourcePackagesDirPath` + `-disablePackageRepositoryCache`; không dùng empty custom `-packageCachePath` vì Xcode 26.4.1 trả package graph rỗng và thiếu Cwl products
 
 Kết quả:
 
@@ -265,7 +275,19 @@ Kết quả:
 | Test build/run | Failed trước khi chạy test | [`StaticStorage` không còn tồn tại](../Example/Tests/AttachableTests.swift#L25) |
 | Warning volume | 45 warnings toàn project/dependencies trong lần build | Cần tách Boardy-owned warning khỏi dependency warning trong CI |
 
-Kết luận: “framework build được” hiện chỉ đúng trong Swift 5 compatibility mode; chưa thể suy ra test suite hoặc Swift 6 readiness.
+Kết luận tại audit baseline: “framework build được” chỉ đúng trong Swift 5 compatibility mode; chưa thể suy ra test suite hoặc Swift 6 readiness.
+
+#### 4.3.1. Option A Tasks 0–8 checkpoint
+
+| Check | Kết quả | Evidence |
+|---|---|---|
+| Immutable `1.60.1` public API baseline | Passed; independently committed before Boardy source mutation | Commit `53664db10ae92924a6a7ca97bf0d0b906d0a3cca`; [`BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md) |
+| API verifier self-check | PASS | `.build-local/Results/boardy-1.60.1-baseline-self-verification.md` |
+| Review regressions — RED | 3 tests, 5 failures | `.build-local/Results/ReviewRegressions-RED.xcresult` |
+| Review regressions — GREEN | 3/3 passed | `.build-local/Results/ReviewRegressions-GREEN-2.xcresult` |
+| Full Boardy suite after corrective batch | 59/59 passed, 0 failed | `.build-local/Results/BoardyFullSuite-PostReview.xcresult` |
+
+Executable evidence used only destination `714C9786-1327-41DF-A093-73359C82E0C2` (iPhone 17, iOS 26.4 runtime; xcresult metadata reports patch version 26.4.1). Không simulator/device nào khác được target. Đây là checkpoint cho Tasks 0–8, không thay final joined review trong Task 13 và không chứng minh Swift 6/iOS 14/package/release readiness.
 
 ### 4.4. Public release snapshot
 
@@ -480,12 +502,12 @@ Mỗi activation có một `ActivationID`. Completion phải idempotent theo act
 
 ### 8.3. Concurrency: chọn một isolation model đơn giản
 
-#### Khuyến nghị cho 1.x
+#### Khuyến nghị cho 1.x sau compatibility Gate A1
 
-- `Board`, `Motherboard`, flow registry, UI context và plugin composition: `@MainActor`.
-- Background task executor: chạy ngoài MainActor, input/output phải `Sendable`.
-- Completion quay về isolation domain đã document trước khi thay đổi lifecycle.
-- Global cache chuyển thành actor hoặc instance-owned store.
+- `Board`, `Motherboard`, flow registry, UI context và plugin composition dùng MainActor-first internals; declaration public 1.x hiện hữu giữ source signature và đi qua compatibility boundary đã audit. Ngoại lệ duy nhất có thể được Gate A1 chấp thuận là ordered terminal path của `BlockTaskBoard` theo nhánh preserve bên dưới.
+- Background task executor có thể chạy ngoài MainActor. Trong `1.61.0`, legacy `Input`/`Output` không bị thêm public `Sendable` constraint; một internal compatibility carrier phải document invariant. Public `Sendable` constraints chỉ thuộc additive API hoặc major-update scope riêng.
+- Gate A1 chọn đúng một terminal contract từ consumer evidence: hop toàn bộ handlers + `sendOutput` + Board `complete` về MainActor, hoặc giữ toàn bộ chuỗi và observable ordering trên legacy executor nếu đổi queue sẽ break consumer. Nhánh preserve phải document `sendOutput`/`complete` là residual non-MainActor mutation; không được hop riêng Board messages vì sẽ đổi ordering. Nếu consumer cần legacy executor/order nhưng review bắt buộc Board messages ở MainActor, dừng và reopen RFC/plan. Một additive executor API mới cần RFC và plan amendment riêng, không được phát minh ngay tại gate.
+- Global cache chuyển thành actor, lock-protected storage hoặc instance-owned store theo ownership thực tế; không dùng global mutable storage không đồng bộ.
 
 Đây là lựa chọn ít migration cost nhất vì phần lớn Boardy orchestration liên quan UI và navigation.
 
@@ -574,7 +596,7 @@ Syntax cụ thể chỉ được quyết định sau RFC/prototype; đoạn code
 - Không xóa API 1.x trong hardening releases.
 - New typed core có bridge từ `BoardInputModel`/`BoardOutputModel` cũ.
 - Deprecated API phải có replacement và migration example.
-- Breaking change chỉ phát hành trong major version.
+- Source/API breaking change chỉ phát hành trong major version. Minimum-platform change có thể phát hành ở minor theo project policy, nhưng phải có consumer inventory, compatibility disclosure và migration path rõ ràng.
 - Duy trì một compatibility test app dùng API 1.x trong suốt chu kỳ Boardy 2 preview.
 
 ### 9.5. Diagnostics candidate
@@ -728,22 +750,22 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
 | `FOUND-001` Chỉ định technical owner và backup | P0 | Proposed | S | Có quyền quyết định và continuity | `REL-010`, `D-001` |
-| `FOUND-002` Inventory consumer/version đang dùng | P0 | Proposed | M | Biết migration blast radius | Trước API/deprecation decisions |
-| `FOUND-003` Chọn strategic option A/B/C | P0 | Proposed | S | Scope program rõ | `D-003` |
-| `FOUND-004` Chốt support matrix | P0 | Proposed | S | iOS/Swift/Xcode contract rõ | `DOC-002`, `D-004` |
-| `FOUND-005` Thiết lập Decision Log/RFC workflow | P1 | Proposed | S | Các quyết định kiến trúc có history | `D-011` |
+| `FOUND-002` Inventory consumer/version đang dùng | P0 | In progress | M | Biết migration blast radius | Consumer technical evidence captured; owners/dispositions pending |
+| `FOUND-003` Chọn strategic option A/B/C | P0 | Selected | S | Scope program rõ | `D-003` |
+| `FOUND-004` Chốt support matrix | P0 | Selected | S | iOS/Swift/Xcode contract rõ | `DOC-002`, `D-004` |
+| `FOUND-005` Thiết lập Decision Log/RFC workflow | P1 | In progress | S | Các quyết định kiến trúc có history | ADR-0001 tồn tại nhưng còn Proposed đến Gate A1 |
 
 ### 12.3. Build, CI và distribution
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `BUILD-001` Sửa test target compile | P0 | Proposed | S | Test suite có thể chạy | `QA-001` |
+| `BUILD-001` Sửa test target compile | P0 | Done | S | Test suite có thể chạy | Commit `dadf9a5`; full suite 59/59 |
 | `BUILD-002` Thêm GitHub Actions build/test matrix | P0 | Proposed | M | Required checks tin cậy | `REL-001`, `REL-002` |
-| `BUILD-003` Thêm `Package.swift` và products ban đầu | P0 | Proposed | M/L | SwiftPM installation | `REL-003`, `D-006` |
-| `BUILD-004` Thêm clean-consumer SPM smoke test | P0 | Proposed | M | Xác minh package dùng ngoài repo | Sau `BUILD-003` |
-| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Proposed | S | Không phá consumer CocoaPods hiện tại | `REL-011` |
-| `BUILD-006` Đồng bộ Swift/platform metadata | P0 | Proposed | S | Một compatibility contract | `DOC-002`, `FOUND-004` |
-| `BUILD-007` Thiết lập Swift API digester baseline | P1 | Proposed | M | Detect source/API break | `QA-006` |
+| `BUILD-003` Thêm `Package.swift` và products ban đầu | P0 | Selected | M/L | SwiftPM installation | `REL-003`, `D-006` |
+| `BUILD-004` Thêm clean-consumer SPM smoke test | P0 | Selected | M | Xác minh package dùng ngoài repo | Sau `BUILD-003` |
+| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Selected | S | Không phá consumer CocoaPods hiện tại | `REL-011` |
+| `BUILD-006` Đồng bộ Swift/platform metadata | P0 | Selected | S | Một compatibility contract | `DOC-002`, `FOUND-004` |
+| `BUILD-007` Thiết lập Swift API digester baseline | P1 | Done | M | Detect source/API break | Immutable commit `53664db`; self-verifier PASS |
 | `BUILD-008` Tách Boardy warnings khỏi dependency warnings | P1 | Proposed | S/M | CI ownership rõ | `CON-001`–`CON-007` |
 | `BUILD-009` Bật warnings-as-errors theo staged policy | P1 | Proposed | M | Ngăn warning debt quay lại | Sau `BUILD-008` |
 
@@ -751,28 +773,30 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `FIX-001` Sửa early `return` trong `activateAllBoards` | P0 | Proposed | S | Tất cả board được xử lý | `COR-001` |
-| `FIX-002` Refactor CombinedFlow không gọi handler trong lock | P0 | Proposed | M | Không reentrant deadlock | `COR-002` |
-| `FIX-003` Thiết kế representation cho combined optional output | P0 | Proposed | M | `nil` là value hợp lệ | `COR-003` |
-| `FIX-004` Guard BlockTask completion exactly-once | P0 | Proposed | M/L | Không double result/completion | `COR-004` |
-| `FIX-005` Làm rõ BlockTask cancellation semantics | P1 | Proposed | L | Consistent cancellation/status | `COR-005`, `D-009` |
-| `FIX-006` Thêm API `exempt` sạch và deprecate symbol zero-width | P1 | Proposed | S | API discoverable, migration an toàn | `COR-011` |
-| `FIX-007` Cấu hình action-sheet popover hoặc require presentation anchor | P1 | Proposed | S | Không crash trên iPad | `COR-008` |
+| `FIX-001` Sửa early `return` trong `activateAllBoards` | P0 | Done | S | Tất cả board được xử lý | Commit `a00b840`; lifecycle 3/3 |
+| `FIX-002` Refactor CombinedFlow không gọi handler trong lock | P0 | Done | M | Không reentrant deadlock | Commit `dd78e10`; CombinedFlow 3/3 |
+| `FIX-003` Thiết kế representation cho combined optional output | P0 | Done | M | `nil` là value hợp lệ | Commit `dd78e10`; boxed optional regression |
+| `FIX-004` Guard BlockTask completion exactly-once | P0 | Done | M/L | Không double result/completion | Commit `b755a0f`; deterministic BlockTask 12/12 × 5 |
+| `FIX-005` Làm rõ BlockTask cancellation semantics | P1 | Done | L | Consistent cancellation/status | Commit `b755a0f`; reasoned terminal/canceler regressions |
+| `FIX-006` Thêm API `exempt` sạch và deprecate symbol zero-width | P1 | Done | S | API discoverable, migration an toàn | Commit `f428427`; plugin/launcher 7/7 |
+| `FIX-007` Cấu hình action-sheet popover hoặc require presentation anchor | P1 | Done | S | Không crash trên iPad | Commit `d9cd462`; popover regressions |
 | `FIX-008` Thay synthetic context fallback bằng typed failure policy | P1 | Proposed | M | Không tiếp tục với UI object sai | `ARCH-008`, `D-010` |
 | `FIX-009` Xác định AdapterBoard context/delegate ownership | P1 | Proposed | M | Wrapped board behavior rõ | `ARCH-009` |
-| `FIX-010` Giữ class plugin đủ lifetime hoặc giới hạn plugin thành value type | P1 | Proposed | M | Lazy construction không BAD ACCESS | `COR-009` |
+| `FIX-010` Giữ class plugin đủ lifetime hoặc giới hạn plugin thành value type | P1 | Done | M | Lazy construction không BAD ACCESS | Commit `f428427`; class-plugin lifetime regression |
 | `FIX-011` Sửa URL opener result contract | P1 | Proposed | M | Return đúng plugin thực sự selected/handled | `COR-010` |
+
+Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả về toàn bộ matched candidates trước selection, không phải các plugin thực sự được chọn/xử lý. `FIX-011` vẫn ở trạng thái `Proposed` và được defer cho một async/additive result API được thiết kế riêng.
 
 ### 12.5. Concurrency
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `CONC-001` Viết concurrency ADR | P0 | Proposed | M | Isolation/executor contract rõ | `D-005` |
-| `CONC-002` MainActor-isolate orchestration và UIKit APIs | P0 | Proposed | L | UI/thread safety và Swift 6 readiness | Sau `CONC-001` |
-| `CONC-003` Loại bỏ hoặc actor-isolate global caches | P0 | Proposed | L | Không data race | `CON-002`–`CON-004` |
-| `CONC-004` Audit compound operations trong safe collections | P0 | Proposed | M/L | Check-then-act atomic | `CON-005` |
-| `CONC-005` Sendable audit cho IDs/options/routes/closures | P0 | Proposed | L | Swift 6 compile | `CON-006`, `CON-007` |
-| `CONC-006` Document callback executor và hop policy | P1 | Proposed | M | Consumer không đoán queue | `CON-008` |
+| `CONC-001` Viết concurrency ADR | P0 | In progress | M | Isolation/executor contract rõ | ADR-0001 Proposed; Gate A1 owner approval pending |
+| `CONC-002` MainActor-isolate orchestration và UIKit APIs | P0 | Selected | L | Internal-only scope; giữ public signatures | Sau `CONC-001` |
+| `CONC-003` Loại bỏ hoặc actor-isolate global caches | P0 | In progress | L | Không data race | Targeted caches locked in Tasks 2–3; Task 9 isolation pending |
+| `CONC-004` Audit compound operations trong safe collections | P0 | Done | M/L | Check-then-act atomic | Commits `dadf9a5`/`dc461ba`; reentrant factory regression green |
+| `CONC-005` Sendable audit cho IDs/options/routes/closures | P0 | Selected | L | Swift 6 compile | `CON-006`, `CON-007` |
+| `CONC-006` Document callback executor và hop policy | P1 | Selected | M | Consumer không đoán queue | `CON-008` |
 | `CONC-007` Thêm Thread Sanitizer/stress CI job định kỳ | P1 | Proposed | M | Detect race regression | Sau core fixes |
 
 ### 12.6. Lifecycle và ownership
@@ -790,13 +814,13 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `API-001` Inventory và phân loại toàn bộ public API | P1 | Proposed | L | Biết supported/SPI/deprecated surface | `ARCH-006` |
+| `API-001` Inventory và phân loại toàn bộ public API | P1 | Selected | L | Biết supported/SPI/deprecated surface | `ARCH-006` |
 | `API-002` Typed route RFC và prototype | P1 | Proposed | XL | End-to-end type safety | `ARCH-001`, `D-007` |
 | `API-003` Thiết kế 1.x compatibility bridge | P1 | Proposed | L/XL | Migration theo từng module | Sau `API-002` |
 | `API-004` Tách Foundation core khỏi UIKit | P1 | Proposed | XL | Headless-testable core | `ARCH-005`, `D-006` |
 | `API-005` Structured diagnostics API | P1 | Proposed | L | Observable, testable failures | `ARCH-007` |
 | `API-006` Async/await và cancellation contract | P1 | Proposed | XL | Modern execution API | `FIX-005`, `CONC-001` |
-| `API-007` Deprecation and semantic-version policy | P0 | Proposed | M | Breaking changes predictable | `REL-004`, `D-008` |
+| `API-007` Deprecation and semantic-version policy | P0 | In progress | M | Breaking changes predictable | Policy drafted; owner approval/final inventory pending |
 
 ### 12.8. Tests và quality engineering
 
@@ -804,9 +828,9 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 |---|---|---|---|---|---|
 | `TEST-001` Thay real-time waits bằng controllable executor/fake clock | P1 | Proposed | L | Deterministic fast tests | `QA-002` |
 | `TEST-002` Negative tests cho mismatch và Release behavior | P0 | Proposed | M | Không silent message loss | `ARCH-001` |
-| `TEST-003` Reentrancy tests cho flow/combined flow | P0 | Proposed | M | Protect `FIX-002`/`FIX-003` | `COR-002`, `COR-003` |
+| `TEST-003` Reentrancy tests cho flow/combined flow | P0 | Done | M | Protect `FIX-002`/`FIX-003` | CombinedFlow reentrancy 3/3; dictionary reentrancy 3/3 corrective set |
 | `TEST-004` Double completion/repeated activation tests | P0 | Proposed | M/L | Protect lifecycle contract | `ARCH-003` |
-| `TEST-005` Cancellation/exactly-once tests cho task boards | P0 | Proposed | L | Protect `FIX-004`/`FIX-005` | `COR-004`, `COR-005` |
+| `TEST-005` Cancellation/exactly-once tests cho task boards | P0 | Done | L | Protect `FIX-004`/`FIX-005` | BlockTask 12/12 passed five consecutive runs |
 | `TEST-006` Memory release tests | P1 | Proposed | M/L | Verify board/controller/bus deallocation | `QA-004` |
 | `TEST-007` Performance benchmark suite | P2 | Proposed | M/L | Activation/dispatch/memory baseline | `QA-005` |
 | `TEST-008` Architecture tests cho package dependency direction | P1 | Proposed | M | Ngăn UIKit quay lại core | Sau `API-004` |
@@ -815,29 +839,29 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `DOCS-001` Viết canonical architecture/terminology page | P0 | Proposed | M | Một mental model chính thức | `DOC-001`, `D-002` |
-| `DOCS-002` Rewrite README thành install + quick start + support matrix | P0 | Proposed | M | First-use path chính xác | `DOC-002` |
-| `DOCS-003` Archive/label legacy guides | P1 | Proposed | S/M | Không copy pattern cũ | `DOC-001`, `DOC-007` |
+| `DOCS-001` Viết canonical architecture/terminology page | P0 | Selected | M | Một mental model chính thức | `DOC-001`, `D-002` |
+| `DOCS-002` Rewrite README thành install + quick start + support matrix | P0 | Selected | M | First-use path chính xác | `DOC-002` |
+| `DOCS-003` Archive/label legacy guides | P1 | Selected | S/M | Không copy pattern cũ | `DOC-001`, `DOC-007` |
 | `DOCS-004` Sửa example modules thành reference implementation | P1 | Proposed | L | Sample tuân thủ stateless/lifecycle rules | `DOC-003`, `COR-006`, `COR-007` |
 | `DOCS-005` DocC API reference và tutorials | P1 | Proposed | L | Versioned discoverable docs | `DOC-004` |
-| `DOCS-006` Migration guides theo release | P0 | Proposed | M mỗi major change | Consumer biết cách nâng version | `REL-004` |
+| `DOCS-006` Migration guides theo release | P0 | Selected | M mỗi source/API hoặc platform-floor change | Consumer biết cách nâng version | `REL-004` |
 | `DOCS-007` Troubleshooting và diagnostics guide | P1 | Proposed | M | Giảm support load | Sau `API-005` |
-| `DOCS-008` Đồng bộ AGENTS/build instructions với thực tế | P0 | Proposed | S | Canonical commands chạy được | `DOC-005`, `BUILD-003` |
+| `DOCS-008` Đồng bộ AGENTS/build instructions với thực tế | P0 | Selected | S | Canonical commands chạy được | `DOC-005`, `BUILD-003` |
 
 ### 12.10. Release, security và open source
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `OSS-001` Thêm CHANGELOG và release-note template | P0 | Proposed | S/M | Release history audit được | `REL-004` |
-| `OSS-002` Thêm CONTRIBUTING/CODE_OF_CONDUCT/SUPPORT | P1 | Proposed | M | Contributor operating model | `REL-005` |
-| `OSS-003` Thêm SECURITY.md và private reporting path | P0 | Proposed | S | Security response contract | `REL-005` |
-| `OSS-004` Issue/PR templates, CODEOWNERS và labels | P1 | Proposed | M | Maintainer workflow rõ | `REL-005`, `FOUND-001` |
+| `OSS-001` Thêm CHANGELOG và release-note template | P0 | Selected | S/M | Release history audit được | `REL-004` |
+| `OSS-002` Thêm CONTRIBUTING/CODE_OF_CONDUCT/SUPPORT | P1 | Selected | M | Contributor operating model | `REL-005` |
+| `OSS-003` Thêm SECURITY.md và private reporting path | P0 | Selected | S | Security response contract | `REL-005` |
+| `OSS-004` Issue/PR templates, CODEOWNERS và labels | P1 | Selected | M | Maintainer workflow rõ | `REL-005`, `FOUND-001` |
 | `OSS-005` Automated GitHub release từ signed semantic tag | P0 | Proposed | M/L | Pod/SPM/tag/release đồng bộ | `REL-004` |
 | `OSS-006` SBOM, provenance và dependency review | P1 | Proposed | M/L | Supply-chain baseline | `REL-009` |
-| `OSS-007` Pin template repos và dependency versions | P0 | Proposed | M | Reproducible inputs | `REL-006`, `REL-007` |
-| `OSS-008` Remove/quarantine dangerous local utility scripts | P1 | Proposed | S | Safer contributor defaults | `REL-008` |
-| `OSS-009` Sửa podspec metadata/homepage | P2 | Proposed | S | Public metadata đúng | `REL-012` |
-| `OSS-010` CocoaPods-to-SPM transition communication | P0 | Proposed | M | Consumer có đường chuyển trước trunk deadline | `REL-011` |
+| `OSS-007` Pin template repos và dependency versions | P0 | Selected | M | Reproducible inputs | `REL-006`, `REL-007` |
+| `OSS-008` Remove/quarantine dangerous local utility scripts | P1 | Selected | S | Safer contributor defaults | `REL-008` |
+| `OSS-009` Sửa podspec metadata/homepage | P2 | Selected | S | Public metadata đúng | `REL-012` |
+| `OSS-010` CocoaPods-to-SPM transition communication | P0 | Selected | M | Consumer có đường chuyển trước trunk deadline | `REL-011` |
 
 ### 12.11. Organizational adoption
 
@@ -866,6 +890,7 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 ### G1 — Build-trusted
 
 - Framework và test suite build/run xanh trên supported Xcode matrix.
+- Hosted CI chạy xanh trên exact final commit SHA cho toàn supported matrix; required checks được cấu hình và không thể bị bỏ qua bởi local-only evidence.
 - Không còn test compile failure.
 - Các correctness finding P0 có regression tests.
 - SwiftPM clean-consumer smoke test xanh.
@@ -993,19 +1018,30 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 | ID | Quyết định cần đưa ra | Options chính | Khuyến nghị audit | Trạng thái |
 |---|---|---|---|---|
 | `D-001` | Ai là technical owner và backup owner? | Cá nhân, working group, platform team | Hai người có release access | Open |
-| `D-002` | Product positioning chính là gì? | Mobile microservices, orchestration framework, modular runtime | Typed modular orchestration framework | Open |
-| `D-003` | Chọn chiến lược evolution nào? | Option A, B, C | Option B | Open |
-| `D-004` | Support matrix? | iOS/Xcode/Swift versions | Current và N-1 Xcode; iOS floor theo consumer inventory | Open |
-| `D-005` | Concurrency isolation model? | MainActor-first, actor-per-motherboard, caller-controlled | MainActor-first cho 1.x | Open |
-| `D-006` | SwiftPM product structure ban đầu? | Một umbrella target, nhiều products, staged split | Nhiều products nhưng có umbrella compatibility product | Open |
+| `D-002` | Product positioning chính là gì? | Mobile microservices, orchestration framework, modular runtime | Legacy-compatible modular orchestration with typed façades | Approved for Option A |
+| `D-003` | Chọn chiến lược evolution nào? | Option A, B, C | Option A hardening | Selected for execution: Option A/pre-G1 |
+| `D-004` | Support matrix? | iOS/Xcode/Swift versions | Xcode 26.4.1 hiện có; local executable tests chỉ dùng iPhone 17/iOS 26.4; iOS floor 14+ | Approved for Option A; iOS 18.3, other-device rows và N-1 Xcode deferred với hosted CI |
+| `D-005` | Concurrency isolation model? | MainActor-first, actor-per-motherboard, caller-controlled | MainActor-first internals; preserve toàn bộ `BlockTaskBoard` terminal executor/order như residual | Provisional; Gate A1 owner approval pending |
+| `D-006` | SwiftPM product structure ban đầu? | Một umbrella target, nhiều products, staged split | Một umbrella product/module trong 1.x | Approved for Option A |
 | `D-007` | Typed route contract? | Generic route, generated IO, macro/codegen | Generic route trước; macro chỉ khi có evidence | Open |
-| `D-008` | Deprecation window? | Một minor, một major, time-based | Ít nhất một supported major migration window | Open |
-| `D-009` | Task cancellation semantics? | Best effort, cooperative, guaranteed terminal callback | Cooperative + exactly-one terminal callback | Open |
+| `D-008` | Deprecation/version contract? | Một minor, một major, time-based | Project policy: platform-floor change có thể ở minor; major dành cho big update | Approved: 1.61.0 for iOS 14 floor |
+| `D-009` | Task cancellation semantics? | Best effort, cooperative, guaranteed terminal callback | Cooperative + exactly-one terminal callback | Approved for Option A |
 | `D-010` | Missing context policy? | Precondition, optional/result, injected presenter | Typed failure cho public APIs; precondition chỉ invariant nội bộ | Open |
-| `D-011` | Architecture governance? | ADR, RFC, maintainer vote | ADR cho local decision, RFC cho public API | Open |
+| `D-011` | Architecture governance? | ADR, RFC, maintainer vote | ADR cho local decision, RFC cho public API | Approved for Option A |
 | `D-012` | Khi nào Boardy không nên được dùng? | Không có exception, team discretion, adoption rubric | Adoption rubric + exception process | Open |
-| `D-013` | Có tiếp tục hỗ trợ Composable/Attachable? | Core, optional, deprecate | Optional products; quyết định sau usage inventory | Open |
+| `D-013` | Có tiếp tục hỗ trợ Composable/Attachable? | Core, optional, deprecate | Giữ trong Boardy umbrella; SwiftPM dùng UIComposableCore | Approved for Option A |
 | `D-014` | Public launch timing? | Ngay sau G1, sau G3, sau G4 | Marketing launch sau G4; repo vẫn public trong quá trình hardening | Open |
+
+### 17.1. Gate A1 status
+
+**Blocked trước Task 9.** Consumer inventory và executor blast-radius evidence đã có, nhưng còn thiếu:
+
+- technical owner được chỉ định rõ;
+- backup owner được chỉ định rõ;
+- private security contact/channel;
+- owner approval cho `docs/API_STABILITY_1X.md`, ADR-0001, iOS 14 support matrix và việc preserve toàn bộ legacy `BlockTaskBoard` terminal executor/order.
+
+Cho đến khi đủ bốn nhóm input trên, ADR-0001 giữ `Proposed`, `D-005` giữ `Provisional`, Task 9 không được bắt đầu, và không tag/release.
 
 ---
 
@@ -1014,6 +1050,17 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 | Date | Decision | Rationale | Consequences | Owner |
 |---|---|---|---|---|
 | 2026-07-14 | Tạo một living document tổng hợp trước khi chọn work item | Cần baseline chung để review và quyết định theo từng phần | Tất cả backlog giữ trạng thái `Proposed`; chưa authorize implementation | Requester + audit author |
+| 2026-07-14 | Chọn Option A làm hướng lập implementation plan | Ưu tiên khôi phục trust cho Boardy 1.x với migration cost thấp trước khi cân nhắc typed core | Draft plan tập trung pre-G1 technical candidate; runtime `Any?` và v2 work được giữ ngoài scope; chưa authorize implementation | Requester |
+| 2026-07-14 | Tách hosted CI khỏi plan Option A hiện tại | Hạ tầng CI chưa sẵn sàng | `BUILD-002`, final-SHA hosted matrix và required checks giữ `Proposed` cho plan sau; plan hiện tại không được claim G1 | Requester |
+| 2026-07-14 | Nâng Boardy deployment floor lên iOS 14+ | Requester chọn bỏ hỗ trợ iOS 12/13 để mở đường cho Swift concurrency runtime | Consumer inventory phải ghi migration impact; implementation vẫn chưa được authorize | Requester |
+| 2026-07-14 | Giữ release ở minor `1.61.0` | Project dành major cho một big update thay vì chỉ thay đổi minimum iOS | Versioning policy này không được mô tả là strict SemVer; iOS 12/13 drop phải nổi bật trong compatibility matrix, migration guide và release notes | Requester |
+| 2026-07-14 | Approve Option A decision package | Bắt đầu hardening 1.x mà không mở typed-core/major scope | Approve `D-002`, `D-003`, `D-004`, `D-006`, `D-008`, `D-009`, `D-011`, `D-013`; `D-005` giữ provisional đến Gate A1 owner approval | Requester + integrator |
+| 2026-07-14 | Thực thi trực tiếp trên branch, không dùng worktree | Requester chọn workflow đơn giản cho hai repository | Dùng `codex/boardy-1.61.0` và `codex/uicomposable-1.1.0`; commit/push/tag/GitHub Release được authorize sau khi gates xanh | Requester |
+| 2026-07-14 | Git/GitHub-only release và dùng Xcode hiện có | CocoaPods chưa cần publish; máy chỉ có Xcode 26.4.1 | Podspec vẫn được lint/chuẩn bị nhưng không push trunk; local executable tests chỉ dùng iPhone 17/iOS 26.4; iOS 18.3, other-device rows và N-1 Xcode deferred cùng hosted CI | Requester |
+| 2026-07-14 | Giữ project-scoped build/cache dưới repo external drive | Tránh ghi DerivedData/temp/package checkout vào ổ hệ thống và tránh xin quyền ngoài workspace | Dùng ignored `.build-local/`; Xcode 26.4.1 dùng repo-local DerivedData/SourcePackages và `-disablePackageRepositoryCache`, không dùng empty custom `-packageCachePath`; CoreSimulator system state không di chuyển | Requester + integrator |
+| 2026-07-14 | Chốt checkpoint Tasks 0–8 trước Gate A1 | Correctness fixes độc lập với concurrency-boundary decision của Task 9 | Immutable API baseline + bảy semantic commits; corrective review regressions 3/3 và full suite 59/59; Gate A1 vẫn blocked | Integrator |
+
+Draft chi tiết để review: [Boardy Option A — 1.x Hardening Implementation Plan](superpowers/plans/2026-07-14-boardy-option-a-1x-hardening.md).
 
 ---
 
@@ -1026,9 +1073,9 @@ Quy trình review đề xuất:
 3. Review P0 findings; đánh dấu finding nào cần thêm evidence.
 4. Trả lời `D-001` đến `D-006` để xác lập governance và technical baseline.
 5. Chọn strategic Option A/B/C.
-6. Chuyển các work item đầu tiên từ `Proposed` sang `Selected`.
-7. Chỉ sau đó mới tạo implementation plan chi tiết cho nhóm work item được chọn.
-8. Sau mỗi phase, cập nhật gates, metrics, risks và Decision Log trong tài liệu này.
+6. Có thể tạo implementation-plan draft để hỗ trợ review; draft không tự chuyển work item và không authorize execution.
+7. Khi requester phê duyệt execution, chuyển đầy đủ decision/work item liên quan từ `Proposed` sang `Selected` và ghi rationale/consequences/owner trong Decision Log.
+8. Sau mỗi phase, cập nhật gates, metrics, risks và Decision Log trong tài liệu này; không mark G1 khi `BUILD-002` chưa hoàn tất.
 
 ### Candidate first selection nếu chọn Option B
 
@@ -1092,11 +1139,34 @@ Danh sách này là recommendation, không phải selection.
 - [GitHub dependency review](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review)
 - [GitHub repository security quickstart](https://docs.github.com/en/code-security/getting-started/quickstart-for-securing-your-repository)
 
+### 20.5. Option A execution checkpoint
+
+- [API stability policy](API_STABILITY_1X.md)
+- [API baseline provenance](api/BASELINE_PROVENANCE.md)
+- [Concurrency ADR](adr/0001-boardy-1x-main-actor.md)
+- [Consumer inventory](governance/CONSUMER_INVENTORY.md)
+- [Ownership blockers](governance/OWNERSHIP.md)
+- [Option A implementation plan](superpowers/plans/2026-07-14-boardy-option-a-1x-hardening.md)
+
+| Scope | Commit |
+|---|---|
+| Immutable API baseline | `53664db10ae92924a6a7ca97bf0d0b906d0a3cca` |
+| Test baseline + attachment locking | `dadf9a5aee4783d33d39f21ee5eeef45d49ac1db` |
+| Atomic collection/barrier lifecycle | `dc461ba19fbaa06186791f614bc1a1ad377121ec` |
+| Generic activation lifecycle | `a00b840c5538186e281231ede83ef1b1425a8beb` |
+| CombinedFlow nil/reentrancy | `dd78e106b1d8db0e2f1c786e7c239f4d8647ba55` |
+| BlockTask exactly-once/cancellation | `b755a0f2978f43d448cce0521d2d50594bbaec51` |
+| Action-sheet popover safety | `d9cd462272f2f2710f48f70a1cb6863103cf0020` |
+| Plugin lifetime/API compatibility | `f4284278c348f279c833c32e231d39473e5dd5f1` |
+| UIComposable Core package prerequisite | `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94` in sibling repository |
+
 ---
 
 ## 21. Audit verification record
 
-Các hoạt động đã được thực hiện cho baseline này:
+### 21.1. Pre-execution audit baseline
+
+Các hoạt động dưới đây mô tả trạng thái tại audit baseline, trước khi Option A sửa source:
 
 | Activity | Result |
 |---|---|
@@ -1111,10 +1181,37 @@ Các hoạt động đã được thực hiện cho baseline này:
 | Public GitHub/CocoaPods/release review | Completed ngày 2026-07-14 |
 | Source modifications trong audit | None |
 
+### 21.2. Option A Tasks 0–8 execution checkpoint
+
+| Activity | Result |
+|---|---|
+| API baseline capture/provenance | PASS; immutable commit `53664db` |
+| UIComposable Core package prerequisite | Swift 5 + Swift 6 strict tests and pod lint passed at `ee043840` |
+| Boardy semantic commits | Tasks 2–8 committed through `f428427` |
+| Review RED | 3 tests, 5 failures — expected reproduction of reentrant factory and partial/mismatched barrier installation defects |
+| Review GREEN | 3/3 passed after corrective batch |
+| Final checkpoint full test | 59/59 passed, zero failures, iPhone 17 only |
+| Xcode project-scoped data | `.build-local/` ignored; DerivedData, SourcePackages, temp and results stored on external workspace |
+| Hosted CI / older runtime-device matrix | Deferred; not claimed |
+| Gate A1 / Task 9 | Blocked / not started |
+
 ---
 
 ## 22. Change log
 
 | Document version | Date | Change |
 |---|---|---|
+| 0.14.0 | 2026-07-14 | Ghi nhận immutable API baseline và semantic commits Tasks 2–8; checkpoint review RED 3/5 → GREEN 3/3, full suite 59/59; chuẩn hóa Xcode data dưới `.build-local/` với `-disablePackageRepositoryCache`; giữ Gate A1 blocked và Task 9 chưa bắt đầu |
+| 0.13.0 | 2026-07-14 | Chuyển toàn bộ project-scoped temporary/build cache vào `.build-local/` ngay trong repo trên external drive; thêm Git/Claude ignore và đổi API tools sang local temp root mặc định |
+| 0.12.0 | 2026-07-14 | Làm rõ Task 8 chỉ document URL matched-candidate semantics và giữ `FIX-011` Proposed/deferred; giới hạn local executable tests ở iPhone 17/iOS 26.4, defer iOS 18.3, other-device rows và N-1 Xcode |
+| 0.11.0 | 2026-07-14 | Chuyển Option A sang execution: branch trực tiếp không worktree, Git/GitHub-only release, chưa publish CocoaPods; support matrix dùng Xcode 26.4.1 với simulator iOS 18.3/26.4 và defer N-1 Xcode |
+| 0.10.0 | 2026-07-14 | Làm rõ MainActor-first không che nhánh Gate-A1 preserve toàn bộ BlockTask terminal ordering/Board messages; đồng bộ Option A plan 0.18.0 với reasoned cancellation tombstones và barrier dead-owner recovery |
+| 0.9.0 | 2026-07-14 | Đồng bộ link review với Option A plan 0.17.0: final API evidence sau dependency lock, UIComposable tag gắn reviewed SHA, barrier owner/handoff và cancellation race trở thành execution/DoD gates; không thay đổi authorization hoặc hosted-CI scope |
+| 0.8.0 | 2026-07-14 | Giới hạn Gate A1 ở MainActor hop hoặc preserve/defer legacy callback; additive executor API phải có RFC và plan amendment riêng |
+| 0.7.0 | 2026-07-14 | Đồng bộ concurrency recommendation 1.x với Gate A1: MainActor-first internals, không thêm public Sendable constraint vào legacy generic và callback executor phụ thuộc consumer evidence |
+| 0.6.0 | 2026-07-14 | Làm rõ compatibility strategy: source/API break dành cho major; minimum-platform change có thể ở minor theo project policy nhưng phải có inventory và migration disclosure |
+| 0.5.0 | 2026-07-14 | Theo quyết định requester, giữ minor 1.61.0 cho iOS 14 floor và dành major cho big updates; ghi rõ đây là project versioning policy, không phải strict SemVer |
+| 0.4.0 | 2026-07-14 | Ghi nhận đề xuất ban đầu iOS 14+ bằng semantic-major 2.0.0; quyết định version này đã bị thay thế bởi minor `1.61.0` ở revision 0.5.0, còn typed-core vẫn ngoài scope và hosted final-SHA check vẫn thuộc G1 |
+| 0.3.0 | 2026-07-14 | Theo quyết định requester, tách hosted CI/`BUILD-002` sang plan sau, đổi Option A draft thành pre-G1 target và làm rõ draft-plan không đồng nghĩa selection/execution |
+| 0.2.0 | 2026-07-14 | Ghi nhận Option A được chọn cho planning, liên kết implementation-plan draft và thêm UIComposable package-feasibility evidence; chưa chọn implementation work item |
 | 0.1.0 | 2026-07-14 | Tạo baseline living assessment, finding register, candidate architecture, roadmap, backlog, gates, risks và decisions |
