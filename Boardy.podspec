@@ -1,20 +1,20 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.60.1"
-  s.swift_version = "5"
-  s.summary = "A mediator interface to integrate multiple mobile architectures."
+  s.version = "1.61.0"
+  s.swift_version = "5.0"
+  s.summary = "A modular orchestration framework for flow-driven iOS applications."
 
   s.description = <<-DESC
   Integrate components which was developed using different architectures.
   DESC
 
-  s.homepage = "https://github.com/congncif"
+  s.homepage = "https://github.com/congncif/boardy"
   s.license = { :type => "MIT", :file => "LICENSE" }
   s.author = { "congncif" => "congnc.if@gmail.com" }
   s.source = { :git => "https://github.com/congncif/boardy.git", :tag => s.version.to_s }
   s.social_media_url = "https://twitter.com/congncif"
 
-  s.ios.deployment_target = "12.0"
+  s.ios.deployment_target = "14.0"
 
   s.default_subspec = "Default"
 
@@ -48,7 +48,7 @@ Pod::Spec.new do |s|
 
     co.dependency "Boardy/Attachable"
 
-    co.dependency "UIComposable"
+    co.dependency "UIComposable", "~> 1.0.1"
   end
 
   s.subspec "ModulePlugin" do |co|

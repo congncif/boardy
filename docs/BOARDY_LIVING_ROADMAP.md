@@ -2,12 +2,12 @@
 
 > Tài liệu tổng hợp để review, lựa chọn và theo dõi từng bước nâng cấp Boardy.
 >
-> **Trạng thái quyết định:** Option A đang được thực thi trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; requester yêu cầu dùng Xcode 26.4.1 hiện có và chỉ phát hành qua Git/GitHub, chưa publish CocoaPods. GitHub-only 1.61.0 có thể release sau local gates nhưng không đạt G1; hosted CI, N-1 Xcode và toàn bộ MainActor/Swift 6 isolation được tách sang các plan sau.
+> **Trạng thái quyết định:** Option A đã materialize candidate implementation trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; execution đã hoàn tất lượt SPM-first build/test compile và API/inventory artifacts để maintainer review. Chưa tạo Boardy tag/GitHub Release và chưa publish/test CocoaPods; hosted CI, N-1 Xcode và toàn bộ MainActor/Swift 6 isolation được tách sang các plan sau.
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Trạng thái tài liệu | In progress — Option A execution |
-| Phiên bản tài liệu | 0.17.0 |
+| Trạng thái tài liệu | Candidate prepared — maintainer review pending |
+| Phiên bản tài liệu | 0.20.0 |
 | Ngày audit | 2026-07-14 |
 | Cập nhật gần nhất | 2026-07-14 |
 | Audit baseline | `d62970a81432` |
@@ -80,7 +80,7 @@ Tuy nhiên, implementation và productization chưa theo kịp lời hứa kiế
 - Distribution chỉ dựa trên CocoaPods trong khi chưa có Swift Package Manager.
 - Release, security và community governance chưa đạt baseline của một dự án open source đáng tin cậy.
 
-**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline và single-owner `CODEOWNERS` đã được thêm. Requester đã chuyển toàn bộ MainActor/Swift 6 isolation và backup continuity khỏi 1.61.0; Gate A1 được approve để triển khai iOS 14 metadata, SwiftPM Boardy và release gates.
+**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline và single-owner `CODEOWNERS` đã được thêm. Requester đã chuyển toàn bộ MainActor/Swift 6 isolation và backup continuity khỏi 1.61.0; Gate A1 được approve. Task 9–11 đã materialize iOS 14 metadata, exact UIComposable dependency, Boardy SwiftPM umbrella, clean consumer, migration docs và API/inventory artifacts. Một lượt SwiftPM build/test-target compile pass trên Xcode 26.4.1/iOS 26.4 simulator SDK; runtime test execution bị giới hạn bởi CoreSimulatorService unavailable và không target thiết bị khác. API verifier pass khi dùng normalized graph dump nhất quán từ immutable baseline interface; raw 1.60.1 graph giữ nguyên và mismatch đã được ghi trong provenance. CocoaPods test/lint và Boardy release publication chưa thực hiện.
 
 ### 1.2. Maturity verdict
 
@@ -777,10 +777,10 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 |---|---|---|---|---|---|
 | `BUILD-001` Sửa test target compile | P0 | Done | S | Test suite có thể chạy | Commit `dadf9a5`; full suite 59/59 |
 | `BUILD-002` Thêm GitHub Actions build/test matrix | P0 | Proposed | M | Required checks tin cậy | `REL-001`, `REL-002` |
-| `BUILD-003` Thêm `Package.swift` và products ban đầu | P0 | Selected | M/L | SwiftPM installation | `REL-003`, `D-006` |
-| `BUILD-004` Thêm clean-consumer SPM smoke test | P0 | Selected | M | Xác minh package dùng ngoài repo | Sau `BUILD-003` |
-| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Selected | S | Không phá consumer CocoaPods hiện tại | `REL-011` |
-| `BUILD-006` Đồng bộ Swift/platform metadata | P0 | Selected | S | Một compatibility contract | `DOC-002`, `FOUND-004` |
+| `BUILD-003` Thêm `Package.swift` và products ban đầu | P0 | Done | M/L | SwiftPM installation | Exact UIComposable `1.1.0`; root package test target compile pass |
+| `BUILD-004` Thêm clean-consumer SPM smoke test | P0 | Done | M | Xác minh package dùng ngoài repo | `Examples/SwiftPMSmoke` imports/builds Boardy via local path |
+| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Deferred | S | Không phá consumer CocoaPods hiện tại | Requester defer CocoaPods test/lint; later transition pass |
+| `BUILD-006` Đồng bộ Swift/platform metadata | P0 | Done | S | Một compatibility contract | iOS 14 metadata, Swift 5 mode, README/compat/migration/release docs aligned |
 | `BUILD-007` Thiết lập Swift API digester baseline | P1 | Done | M | Detect source/API break | Immutable commit `53664db`; self-verifier PASS |
 | `BUILD-008` Tách Boardy warnings khỏi dependency warnings | P1 | Proposed | S/M | CI ownership rõ | `CON-001`–`CON-007` |
 | `BUILD-009` Bật warnings-as-errors theo staged policy | P1 | Proposed | M | Ngăn warning debt quay lại | Sau `BUILD-008` |
@@ -1078,6 +1078,7 @@ bắt đầu.
 | 2026-07-14 | Chuyển MainActor/Swift 6 isolation khỏi 1.61.0 | MainActor tạo quá nhiều source/behavior concerns cho một minor release | 1.61 giữ caller-controlled execution, không thêm actor annotation/precondition/queue hop; Swift 6 language mode, Sendable và isolation chuyển sang follow-up riêng; Gate A1 chỉ còn platform/consumer/API policy | Requester |
 | 2026-07-14 | Cho phép GitHub-only 1.61.0 release trước G1 | Requester đã authorize tag/GitHub Release và defer hosted CI | Sau local gates có thể publish annotated tag/GitHub Release với evidence boundary rõ; không claim G1, organization production support, signed release hoặc CocoaPods availability | Requester + integrator |
 | 2026-07-14 | Dùng một owner và đóng Gate A1 | Backup procedure không được phép làm chậm vấn đề kỹ thuật chính | Sole owner/release actor `congnc.if@gmail.com` / `@congncif`; backup continuity deferred; consumer opt-in disposition, API policy và iOS 14 matrix approved; Task 9 unblocked | Requester |
+| 2026-07-14 | SPM-first preparation trước maintainer review | Config/package tasks nên được gom lại và tránh build CocoaPods khi chưa cần | Exact UIComposable 1.1.0 tag đã verify; Boardy Package.swift, smoke consumer, iOS 14 metadata và migration docs được materialize; một lượt SwiftPM build/test sẽ là evidence chính; CocoaPods test/lint và Boardy tag/release deferred | Requester + integrator |
 
 Draft chi tiết để review: [Boardy Option A — 1.x Hardening Implementation Plan](superpowers/plans/2026-07-14-boardy-option-a-1x-hardening.md).
 
@@ -1226,12 +1227,28 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 | Unsafe helper | `claude-dangerous.sh` removed |
 | Project-scoped side effects | Confined to ignored `.build-local/`; cleanup traps left no checkout work directories |
 
+### 21.4. Task 9–13 SPM candidate checkpoint
+
+| Activity | Result |
+|---|---|
+| iOS floor metadata | PASS; `Boardy.podspec`, Example Podfile/project and SwiftPM manifests require iOS 14+ |
+| UIComposable prerequisite | PASS; annotated remote tag `1.1.0` peeled to `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94` |
+| Boardy SwiftPM root | PASS; exact URL dependency resolves `UIComposableCore` `1.1.0`; package and test targets compile in Swift 5 mode for `arm64-apple-ios14.0-simulator` |
+| Clean consumer | PASS; `Examples/SwiftPMSmoke` imports `Boardy` through a local path and compiles for the same simulator SDK |
+| Runtime simulator test | Not executed; CoreSimulatorService was unavailable during the final check. No other simulator/device was started or targeted. Existing Tasks 0–8 evidence remains 59/59 on the approved iPhone 17 destination |
+| Executor characterization | Added as a deterministic `DispatchSpecificKey` regression; included in the package test target compile. Runtime assertion awaits a working approved simulator service |
+| Public API artifacts | PASS against normalized interface-derived baseline: no source/API break, no new global-actor annotation; `PUBLIC_API_1_61.md` verifies 822 eligible declarations including synthetic `->>` |
+| Raw API graph caveat | Raw immutable `Boardy-1.60.1.api.json` is retained; its mismatch with the paired interface is documented in `api/BASELINE_PROVENANCE.md` and is not hidden by an allowlist |
+| CocoaPods/CI/release | Deferred by requester; no CocoaPods test/lint, hosted CI, Boardy tag or GitHub Release executed |
+
 ---
 
 ## 22. Change log
 
 | Document version | Date | Change |
 |---|---|---|
+| 0.20.0 | 2026-07-14 | Hoàn tất batch config/package/docs; SPM root + clean consumer compile pass, API/inventory artifacts và normalized baseline comparison được ghi nhận; CoreSimulator runtime unavailable, CocoaPods/CI/tag/release vẫn deferred |
+| 0.19.0 | 2026-07-14 | User đổi objective thành hoàn thành implementation và chuẩn bị candidate chờ review; gom config/package tasks, chuyển verification sang SPM-first một lượt, defer CocoaPods test/lint và chưa tạo Boardy tag/release |
 | 0.18.0 | 2026-07-14 | Theo quyết định requester, chuyển sang sole owner/release actor `congnc.if@gmail.com` / `@congncif`, defer backup continuity; approve opt-in consumer disposition, API policy và iOS 14/minor matrix; đóng Gate A1 và tạo single-owner CODEOWNERS |
 | 0.17.0 | 2026-07-14 | Phân tách GitHub release khỏi G1: local gates có thể publish annotated 1.61.0 theo authority đã cấp; hosted CI tiếp tục block organization production-support claim; signed release và CocoaPods publish vẫn deferred |
 | 0.16.0 | 2026-07-14 | Theo quyết định requester, remove toàn bộ MainActor/Swift 6 isolation khỏi Option A 1.61.0; approve caller-controlled/no-precondition/no-hop `D-005`; defer `CONC-001`/`CONC-002`/`CONC-005` và strict-language-mode verification sang follow-up; Gate A1 chỉ còn backup access, consumer disposition và API/platform approval |

@@ -1,5 +1,7 @@
 import Boardy
+#if canImport(CwlPreconditionTesting)
 import CwlPreconditionTesting
+#endif
 import XCTest
 
 final class FlowTests: XCTestCase {
@@ -64,6 +66,7 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(validResult.0, self)
         XCTAssertEqual(validResult.1, "text")
 
+#if canImport(CwlPreconditionTesting)
         var assertionCalled = false
         var assertionPassed = false
 
@@ -78,6 +81,9 @@ final class FlowTests: XCTestCase {
         XCTAssertNotNil(exceptionGuard)
         XCTAssertTrue(assertionCalled)
         XCTAssertFalse(assertionPassed)
+#else
+        throw XCTSkip("CwlPreconditionTesting is only available in the CocoaPods/Xcode test host")
+#endif
     }
 
     func test_completeFlow() {

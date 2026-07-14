@@ -17,23 +17,23 @@ an implementation contract for 1.61.0.
 
 ## Local setup
 
-The approved 1.61 candidate toolchain is Xcode 26.4.1 with an iPhone 17 simulator on iOS 26.4, and
-the selected release floor is iOS 14. Until the candidate metadata and distribution tasks land,
-these values describe the target contract rather than a published package. Local executable tests
-for this candidate must not target or start another simulator or device.
+The approved 1.61 candidate toolchain is Xcode 26.4.1 with the fixed iPhone 17 simulator
+(`714C9786-1327-41DF-A093-73359C82E0C2`) on the installed iOS 26.4.x runtime, and the selected
+release floor is iOS 14. The current review cycle is SPM-first; CocoaPods test/lint is intentionally
+deferred. Local executable tests must not target or start another simulator or device.
 
-Clone the repository and select the installed Xcode explicitly:
+Clone the repository and confirm the installed Xcode selected by `xcode-select`:
 
 ```sh
 git clone https://github.com/congncif/boardy.git
 cd boardy
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+xcode-select -p
 xcodebuild -version
 ```
 
-The version output must be `Xcode 26.4.1`. If that path selects another version, set
-`DEVELOPER_DIR` to the actual Xcode 26.4.1 developer directory rather than changing the candidate
-matrix.
+The version output must be `Xcode 26.4.1`. `DEVELOPER_DIR` is optional and is only needed when
+multiple Xcode installations are present; this repository uses the default `xcode-select` path
+when it is unset.
 
 Keep project-scoped build products, package checkouts and result bundles on the repository's drive:
 
@@ -74,10 +74,9 @@ available or a hosted/CI-enforced support matrix. Current execution evidence is 
 
 | Integration | Language mode | Destination | Expected signal |
 |---|---|---|---|
-| CocoaPods `Boardy_Tests` | Swift 5 language mode | iPhone 17 / iOS 26.4 | All workspace tests pass |
 | SwiftPM `Boardy` | Swift 5 language mode | iPhone 17 / iOS 26.4 | All package tests pass |
 | SwiftPM clean consumer | Swift 5 language mode | Generic iOS Simulator | Consumer imports and builds Boardy |
-| Distribution metadata | CocoaPods Swift 5 / iOS 14+ | No executable destination | `pod lib lint` and package resolution pass |
+| Distribution metadata | SwiftPM Swift 5 / iOS 14+ | No executable destination | Package resolution and metadata checks pass |
 
 Use this common Xcode configuration for repository-local outputs:
 
@@ -97,7 +96,7 @@ destinations:
 -maximum-concurrent-test-simulator-destinations 1
 ```
 
-Canonical full commands and the release-only checks live in [`RELEASING.md`](RELEASING.md).
+Canonical SPM commands and the deferred release-only checks live in [`RELEASING.md`](RELEASING.md).
 Swift 6 language mode, MainActor isolation, older runtime/device rows, N-1 Xcode and hosted CI are
 intentionally deferred; do not describe local success as G1 or production support.
 

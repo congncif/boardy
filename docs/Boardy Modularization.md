@@ -155,7 +155,10 @@ For the purpose of increasing efficiency, **Boardy Modularization** provides a s
 * Interface module: <ModuleName> → e.g., XPayment
 * Implementation module: <ModuleName> + Plugins → e.g., XPaymentPlugins
 
->We chose **CocoaPods** for its stability and support for multiple configurations, as well as its ease of >generating projects using Pod development. These aspects make it significantly more stable compared to **SPM** or >**Tuist**.
+> Historical note: this document describes the original CocoaPods-first workflow. Boardy 1.61.0
+> recommends SwiftPM for new integrations; CocoaPods remains a transition path while its publication
+> and compatibility verification are handled separately. Neither manager is declared universally
+> more stable—the consuming app's constraints determine the appropriate choice.
 
 <p align="center">
   <img src="https://i.imgur.com/UPY3kUa.png" alt="Example notifications module"/>

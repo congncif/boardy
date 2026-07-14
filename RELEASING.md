@@ -4,11 +4,10 @@ This document is the maintainer checklist for Boardy 1.x. It separates candidate
 the requester-authorized pre-G1 GitHub release, later production-support designation and CocoaPods
 publication because each has a different gate and authority.
 
-Boardy 1.61.0 is currently a release candidate. The requester authorized a GitHub-only release after
-the local gates pass even though hosted CI is deferred. That release remains pre-G1 and must not be
-described as organization production support. Final publication requires the local technical gates;
-the requester explicitly accepted a single-owner release model and approved the consumer
-disposition for this GitHub-only release. The owner and private security contact are recorded in
+Boardy 1.61.0 is currently a release candidate being prepared for maintainer review. No Boardy tag
+or GitHub Release is created in the current execution. A later GitHub-only release may proceed after
+the local gates even though hosted CI is deferred; it would remain pre-G1 and must not be described
+as organization production support. The owner and private security contact are recorded in
 [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md). The current execution is
 Git/GitHub-only and does not authorize CocoaPods trunk publication.
 
@@ -68,7 +67,7 @@ Use Xcode 26.4.1 explicitly and keep project-scoped state under the ignored `.bu
 directory on the repository drive:
 
 ```sh
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+xcode-select -p
 xcodebuild -version
 mkdir -p .build-local/DerivedData
 mkdir -p .build-local/SourcePackages
@@ -94,23 +93,20 @@ start another runtime or device.
 Run these rows with `-clonedSourcePackagesDirPath .build-local/SourcePackages` and
 `-disablePackageRepositoryCache`:
 
-1. CocoaPods `Boardy_Tests` in Swift 5 language mode.
-2. SwiftPM `Boardy` tests in Swift 5 language mode.
-3. Generic iOS Simulator build with `IPHONEOS_DEPLOYMENT_TARGET=14.0` and Swift 5 language mode.
-4. `Examples/SwiftPMSmoke` generic consumer build in Swift 5 language mode.
-5. UIComposable 1.1.0 package tests in its already-validated Swift 5 and Swift 6 modes.
+1. SwiftPM `Boardy` tests in Swift 5 language mode.
+2. Generic iOS Simulator build with `IPHONEOS_DEPLOYMENT_TARGET=14.0` and Swift 5 language mode.
+3. `Examples/SwiftPMSmoke` generic consumer build in Swift 5 language mode.
+4. UIComposable 1.1.0 package tests in its already-validated modes.
 
 Boardy Swift 6 language mode, MainActor isolation and Sendable migration are not 1.61.0 release
 gates. They belong to the separately approved follow-up plan and must not be simulated with unsafe
 annotations or warning suppression.
 
-Then validate CocoaPods metadata without publishing:
-
-```sh
-pod lib lint Boardy.podspec --verbose
-git diff --check
-git status --short
-```
+Do not run CocoaPods tests, `pod lib lint` or `pod trunk push` in the current review cycle. The
+Example lock may still record the prior 1.60.1 local-development pod state; refresh it only in the
+later CocoaPods transition pass. The
+podspec and iOS 14 project metadata remain prepared for a separate transition pass. Always finish
+with `git diff --check` and `git status --short`.
 
 Retain Xcode version, destination, logs and result bundles under `.build-local/Results`. Local results
 are evidence for the candidate only; older-runtime/device, N-1 Xcode and hosted results must not be

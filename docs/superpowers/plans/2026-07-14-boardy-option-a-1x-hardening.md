@@ -2,17 +2,17 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Harden kiến trúc Boardy 1.x theo Option A thành pre-G1 technical candidate `1.61.0`, có correctness regressions được bảo vệ, contract executor hiện hữu được ghi rõ, compatibility validation bằng Swift 5 mode trên Xcode 26.4.1, SwiftPM/CocoaPods distribution và operating baseline cho open source; giữ runtime transport `Any?` và cách dùng `import Boardy`. Theo versioning policy do requester chọn, deployment floor iOS 12 → 14 được phát hành ở minor; major dành cho một big update. Hosted CI, Swift 6 language mode và MainActor isolation được tách sang các plan sau.
+**Goal:** Harden kiến trúc Boardy 1.x theo Option A thành pre-G1 technical candidate `1.61.0`, có correctness regressions được bảo vệ, contract executor hiện hữu được ghi rõ, SwiftPM-first compatibility validation bằng Swift 5 mode trên Xcode 26.4.1 và operating baseline cho open source; giữ runtime transport `Any?` và cách dùng `import Boardy`. Theo versioning policy do requester chọn, deployment floor iOS 12 → 14 được phát hành ở minor; major dành cho một big update. Hosted CI, Swift 6 language mode, MainActor isolation và CocoaPods test/lint được tách khỏi execution này; Boardy tag/GitHub Release chờ maintainer review.
 
 **Architecture:** Giữ nguyên một umbrella module `Boardy`, public programming model và caller-controlled synchronous executor hiện tại. Boardy 1.61.0 không thêm `@MainActor`, global-actor annotation, main-thread precondition hay queue hop mới; UIKit callers tiếp tục chịu trách nhiệm gọi từ main thread theo contract của UIKit. Toàn bộ ordered terminal path của `BlockTaskBoard` tiếp tục chạy trên legacy executor và giữ nguyên observable ordering. Storage thực sự dùng chung giữa thread được bảo vệ bằng một primitive khóa nhỏ; callback không chạy trong lock. SwiftPM của Boardy phụ thuộc product `UIComposableCore` từ release UIComposable `1.1.0`, nên bao gồm được toàn bộ `Boardy/Composable` mà không kéo `DiffUI`, Rx hoặc `DiffableDataSources`.
 
-**Tech Stack:** SwiftPM tools baseline 5.9, Boardy Swift 5 language mode, iOS 14+, Xcode 26.4.1 đang cài trên máy, duy nhất iPhone 17 Simulator iOS 26.4 cho executable test trong execution này, XCTest, Swift Package Manager và CocoaPods. UIComposableCore prerequisite đã được verify độc lập ở Swift 5/6; Boardy Swift 6 language mode thuộc follow-up. Verification hiện chạy thủ công/repeatable; older-runtime/device matrix và hosted CI chưa thuộc scope.
+**Tech Stack:** SwiftPM tools baseline 5.9, Boardy Swift 5 language mode, iOS 14+, Xcode 26.4.1 đang cài trên máy, duy nhất iPhone 17 Simulator (UDID `714C9786-1327-41DF-A093-73359C82E0C2`) cho executable test, XCTest và Swift Package Manager. UIComposableCore prerequisite đã được verify độc lập ở Swift 5/6; Boardy Swift 6 language mode thuộc follow-up. CocoaPods metadata được giữ sẵn nhưng không test/lint trong execution này; older-runtime/device matrix và hosted CI chưa thuộc scope.
 
-**Toolchain paths:** Export these once in every execution shell; override either path when that Xcode is installed elsewhere. Paths are never trusted without the version checks in Task 13.
+**Toolchain paths:** Use the Xcode selected by `xcode-select` by default; set `DEVELOPER_DIR` only when multiple installations are present. Paths are never trusted without the version checks in Task 13.
 
 ```bash
-export XCODE_26_4_1_DEVELOPER_DIR="${XCODE_26_4_1_DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
-export DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR"
+export XCODE_26_4_1_DEVELOPER_DIR="${XCODE_26_4_1_DEVELOPER_DIR:-$(xcode-select -p)}"
+# Leave DEVELOPER_DIR unset on the single-Xcode workstation; set it only when an override is needed.
 export BOARDY_LOCAL_BUILD_ROOT="$PWD/.build-local"
 export TMPDIR="$BOARDY_LOCAL_BUILD_ROOT/tmp"
 mkdir -p \
@@ -47,12 +47,12 @@ local_xcodebuild() {
 
 ## Global Constraints
 
-- Requester đã authorize implementation trực tiếp trên branch, commit/push, annotated Git tags và GitHub Releases cho Boardy/UIComposable. Không dùng worktree. **Không publish CocoaPods** trong execution này; chỉ giữ podspec/lint/metadata sẵn sàng cho một publication riêng sau.
+- Requester đã authorize implementation trực tiếp trên branch, commit/push và UIComposable prerequisite tag. Không dùng worktree. **Không publish/test CocoaPods và chưa tạo Boardy tag/GitHub Release** trong execution này; chỉ giữ podspec/metadata sẵn sàng cho một publication riêng sau maintainer review.
 - Mọi executable simulator test trong execution này chỉ được target iPhone 17, iOS 26.4. Không boot hoặc target simulator/device khác; iOS 18.3, iPad và multi-device runtime rows được chuyển sang plan CI/compatibility sau. Generic simulator build không khởi động device vẫn được phép để kiểm tra deployment target.
 - Option A giữ `Any?` transport. Không thêm typed route core, framework-wide/public ActivationID lifecycle redesign, macro/codegen, async/await API mới hoặc package/module split kiểu Boardy 2. Private transactional phase models tối thiểu cho barrier/task P0 fixes vẫn thuộc scope.
 - Không remove hay đổi tên public API trong `1.61.0`. Chỉ cho phép fix behavior, API additive và deprecation có replacement.
 - Boardy floor là iOS 14 theo quyết định requester. Platform-floor impact và contract caller-controlled executor không đổi phải có trong `docs/MIGRATING_TO_1.61.md`. Không thêm MainActor/runtime isolation, main-thread precondition hoặc callback hop trong release này.
-- Không sửa source trong `Example/Pods`. Sau khi thêm file hoặc đổi podspec, chạy `pod install` để CocoaPods tái tạo project.
+- Không sửa source trong `Example/Pods`. Sau khi đổi iOS metadata, có thể regenerate CocoaPods project; không chạy CocoaPods test/lint trong execution SPM-first này.
 - Không tạo test file Boardy mới trong Phase A để tránh sửa membership thủ công của Xcode project cũ; đặt regression tests vào các file `Example/Tests/*.swift` đã có.
 - Không dùng arbitrary sleep trong test mới hoặc test được refactor. Dùng controlled completion, synchronous spy hoặc expectation gắn với event thật.
 - Trong production code, `@unchecked Sendable` chỉ được phép cho các type lock/identity đã audit:
@@ -66,7 +66,7 @@ local_xcodebuild() {
 - Không stage tool state `.codegraph/` hoặc `.claude/worktrees/`; cả hai được repository-ignore cùng `.build-local/` để `git add .` không vô tình đưa local state vào commit.
 - Mọi project-scoped temporary/build artifact phải nằm dưới ignored root `.build-local/` trong repo trên external drive. Không dùng `/tmp`, `~/Library/Developer/Xcode/DerivedData` hoặc cache root bên ngoài workspace; CoreSimulator service state do Xcode quản lý là ngoại lệ hệ thống và không được symlink/move thủ công.
 - Trên Xcode 26.4.1, mọi build/test có package dependency phải đi qua `local_xcodebuild`: DerivedData, source checkout và logs nằm dưới `.build-local/`; dùng `-clonedSourcePackagesDirPath` cùng `-disablePackageRepositoryCache`. Không truyền `-packageCachePath` tới một custom cache rỗng: cấu hình đó trả về package graph rỗng và làm mất products `CwlPreconditionTesting`/`CwlPosixPreconditionTesting`.
-- Mỗi suggested commit bên dưới là một ranh giới review. Requester đã authorize semantic commit và push trên branch hiện tại; tag/release vẫn phải qua các release gates.
+- Mỗi suggested commit bên dưới là một ranh giới review. Requester đã authorize semantic commit và push trên branch hiện tại; Boardy tag/release vẫn phải qua maintainer review và release gates.
 
 ---
 
@@ -74,8 +74,8 @@ local_xcodebuild() {
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Trạng thái | In progress trên `codex/boardy-1.61.0` |
-| Phiên bản plan | 0.27.0 |
+| Trạng thái | Candidate prepared; maintainer review pending trên `codex/boardy-1.61.0` |
+| Phiên bản plan | 0.29.0 |
 | Implementation authorization | Branch + commit/push/tag/GitHub Release được authorize; CocoaPods publish excluded |
 | Ownership / security | Sole technical/release owner `congnc.if@gmail.com` (`@congncif` verified); backup continuity deferred; private security contact `congnc.if@gmail.com` |
 | Boardy baseline | `bfa9579` trên `master` |
@@ -83,7 +83,7 @@ local_xcodebuild() {
 | Boardy release candidate | `1.61.0` — project policy cho phép platform-floor change ở minor; major reserved for big updates |
 | UIComposable prerequisite release | `1.1.0` |
 | Ngày lập kế hoạch | 2026-07-14 |
-| Kết quả mục tiêu | GitHub-only `1.61.0` release được local-verify; vẫn là pre-G1 và không claim organization production support cho đến khi plan CI sau hoàn tất |
+| Kết quả mục tiêu | SPM-first candidate artifacts/build evidence được chuẩn bị; Boardy tag/GitHub Release vẫn chờ maintainer review, pre-G1 và không claim organization production support |
 
 ### 1.1. Pre-execution baseline evidence đã xác nhận
 
@@ -1054,9 +1054,9 @@ contract. MainActor/Swift 6 isolation remains outside this release. Task 9 may s
 - Modify: `Example/Podfile.lock` through CocoaPods if regeneration changes it
 - Modify: `Example/Tests/BlockTaskTests.swift` for the caller-executor characterization
 
-- [ ] **Step 0: Materialize the selected iOS 14 floor before package validation**
+- [x] **Step 0: Materialize the selected iOS 14 floor before package validation**
 
-Set `s.ios.deployment_target = "14.0"` in `Boardy.podspec`, set `IOS_PLATFORM = "14.0"` in `Example/Podfile`, and change only `IPHONEOS_DEPLOYMENT_TARGET` for the Example project, `Boardy_Example` and `Boardy_Tests` Debug/Release configurations from 9.3/13.0 to 14.0. Keep the pod version at `1.60.1` until Task 11 and do not apply unrelated Xcode recommended settings.
+Set `s.ios.deployment_target = "14.0"` in `Boardy.podspec`, set `IOS_PLATFORM = "14.0"` in `Example/Podfile`, and change only `IPHONEOS_DEPLOYMENT_TARGET` for the Example project, `Boardy_Example` and `Boardy_Tests` Debug/Release configurations from 9.3/13.0 to 14.0. The candidate metadata is finalized as `1.61.0`; do not apply unrelated Xcode recommended settings.
 
 Regenerate CocoaPods state and prove every consumer/pod target compiles with the selected floor:
 
@@ -1076,9 +1076,9 @@ ruby -e '
 
 Expected: no Boardy, Example app/test or generated Pods configuration remains at iOS 9.3/12/13. If regeneration fails, stop before Step 1.
 
-- [ ] **Step 1: Create a local-path SwiftPM compiler harness**
+- [x] **Step 1: Create a local-path SwiftPM compiler harness**
 
-After Task 1 has added the sibling UIComposable manifest, create the Boardy manifest shape shown in Task 10 but temporarily use:
+After Task 1 has added the sibling UIComposable manifest, create the Boardy manifest shape shown in Task 10 and validate it against the sibling package before switching to the immutable public tag:
 
 ```swift
 .package(path: "../UIComposable")
@@ -1086,9 +1086,9 @@ After Task 1 has added the sibling UIComposable manifest, create the Boardy mani
 
 for UIComposable. Include only the `Boardy` library target in this temporary harness; Task 10 adds
 the package test target after guarding the CocoaPods-only assertion dependency. This temporary
-local path must never be committed or published; Task 10 replaces it with the exact URL tag.
+local path is evidence only; the committed manifest uses the exact URL tag.
 
-- [ ] **Step 2: Freeze the no-isolation-change boundary**
+- [x] **Step 2: Freeze the no-isolation-change boundary**
 
 Do not add `@MainActor`, another global actor, `MainActor.assumeIsolated`, `dispatchPrecondition`,
 `DispatchQueue.main.sync`, an automatic main-queue hop, a public `Sendable` constraint or a
@@ -1097,7 +1097,7 @@ behavior remain unchanged. Any compiler diagnostic that cannot be resolved witho
 changes is recorded for the separate MainActor/Swift 6 plan and is not suppressed with
 `@preconcurrency`, `nonisolated(unsafe)` or broad `@unchecked Sendable`.
 
-- [ ] **Step 3: Add the executor-identity characterization**
+- [x] **Step 3: Add the executor-identity characterization**
 
 Add one deterministic characterization in the existing file: activate and complete a task on a dedicated
 serial queue tagged with `DispatchSpecificKey`, then assert success/error, optional output,
@@ -1111,7 +1111,7 @@ The protected contract is:
 - the complete terminal sequence stays on the legacy completion executor;
 - late or duplicate completions remain ignored by Task 6’s atomic state transition.
 
-- [ ] **Step 4: Verify the raised floor and Swift 5 package compatibility**
+- [x] **Step 4: Verify the raised floor and Swift 5 package compatibility**
 
 Build the temporary local-path library package with the selected deployment floor:
 
@@ -1128,80 +1128,52 @@ Expected: the complete Boardy library target, including Composable, builds in Sw
 mode. Full Swift 6 language-mode compilation, actor isolation and framework-wide/public Sendable
 migration are explicitly not release gates for 1.61.0.
 
-- [ ] **Step 5: Refresh CocoaPods membership and verify package-owned source**
+- [ ] **Step 5: Refresh CocoaPods membership (metadata only; deferred by requester)**
 
 ```bash
 pod install --project-directory=Example
 ```
 
-Then compile the CocoaPods target in its supported Swift 5 language mode:
+Do not compile or test the CocoaPods target in this execution. Keep the metadata-only command above
+as a later transition check; the SPM local-path/final-tag build is the evidence source for this
+review cycle.
+
+Expected later: CocoaPods can be regenerated and compiled in its supported Swift 5 mode. This is
+explicitly deferred now; Swift 6 isolation diagnostics are deferred work, not converted into an
+allowlist or silenced in this task.
+
+- [x] **Step 6: Enforce the iOS 14 and public-interface gates**
+
+Emit the post-change public interface and API graph from the final SwiftPM module without rebuilding the
+CocoaPods workspace. Diagnose the API graph first; use the textual interface diff as an additional
+actor-annotation review, not as the exhaustive declaration inventory. The captured candidate is
+`docs/api/Boardy-1.61.0.swiftinterface` plus `docs/api/Boardy-1.61.0.api.json`; the raw baseline graph
+remains immutable and the normalized interface-derived baseline is documented in
+`docs/api/BASELINE_PROVENANCE.md`.
 
 ```bash
 set -euo pipefail
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -workspace Example/Boardy.xcworkspace \
-  -scheme Boardy \
-  -configuration Debug \
-  -destination 'generic/platform=iOS Simulator' \
-  SWIFT_VERSION=5 \
-  build \
-  2>&1 | tee "$BOARDY_LOCAL_BUILD_ROOT/Results/boardy-swift5.log"
-```
-
-Expected: `xcodebuild` failure is not masked by `tee` and the framework builds in its supported
-language mode. Swift 6 isolation diagnostics are deferred work, not converted into an allowlist or
-silenced in this task.
-
-- [ ] **Step 6: Enforce the iOS 14 and public-interface gates**
-
-Emit the post-change public interface and API graph with the same framework scheme and extraction script used for Task 0. Diagnose the API graph first; use the textual interface diff as an additional actor-annotation review, not as the exhaustive declaration inventory:
-
-```bash
-set -euo pipefail
-rm -rf "$BOARDY_LOCAL_BUILD_ROOT/DerivedData/BoardyAPIAfter"
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -workspace Example/Boardy.xcworkspace \
-  -scheme Boardy \
-  -destination 'generic/platform=iOS Simulator' \
-  -derivedDataPath "$BOARDY_LOCAL_BUILD_ROOT/DerivedData/BoardyAPIAfter" \
-  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  SWIFT_VERSION=5 build
-
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-bash tools/capture-public-api.sh \
-  "$BOARDY_LOCAL_BUILD_ROOT/DerivedData/BoardyAPIAfter" \
-  "$BOARDY_LOCAL_BUILD_ROOT/Results/Boardy-1.61.0.swiftinterface" \
-  "$BOARDY_LOCAL_BUILD_ROOT/Results/Boardy-1.61.0.api.json"
-
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
+test -s docs/api/Boardy-1.61.0.swiftinterface
+test -s docs/api/Boardy-1.61.0.api.json
 bash tools/verify-public-api.sh \
   docs/api/Boardy-1.60.1.swiftinterface \
-  docs/api/Boardy-1.60.1.api.json \
-  "$BOARDY_LOCAL_BUILD_ROOT/Results/Boardy-1.61.0.swiftinterface" \
-  "$BOARDY_LOCAL_BUILD_ROOT/Results/Boardy-1.61.0.api.json" \
-  "$BOARDY_LOCAL_BUILD_ROOT/Results/BOARDY_1_61_API_VERIFICATION.md"
-test -s "$BOARDY_LOCAL_BUILD_ROOT/Results/BOARDY_1_61_API_VERIFICATION.md"
+  docs/api/Boardy-1.60.1.interface.api.json \
+  docs/api/Boardy-1.61.0.swiftinterface \
+  docs/api/Boardy-1.61.0.api.json \
+  docs/api/BOARDY_1_61_API_VERIFICATION.md
+test -s docs/api/BOARDY_1_61_API_VERIFICATION.md
 ```
 
 Expected: the verification report records no source/API break, no qualified or unqualified
 global-actor annotation and no new executor/main-thread precondition in the candidate. No additive
-`Sendable` conformance is introduced by Task 9.
+`Sendable` conformance is introduced by Task 9. The report uses the deterministic normalized
+interface-derived baseline because the raw 1.60.1 graph/interface pair has a documented capture-format
+mismatch; no allowlist suppresses source changes.
 
-- [ ] **Step 7: Run all CocoaPods tests in supported compatibility mode**
+- [ ] **Step 7: Run CocoaPods tests (deferred by requester)**
 
-```bash
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -workspace Example/Boardy.xcworkspace \
-  -scheme Boardy_Tests \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.4' \
-  SWIFT_VERSION=5 test
-```
-
-Expected: all tests pass on the only approved simulator destination. Swift 6 language mode is not a
-gate for this release.
+This step is intentionally not executed in the SPM-first maintainer-review preparation. Swift 6
+language mode is not a gate for this release.
 
 **Suggested commit:** `build: raise Boardy deployment floor to iOS 14`
 
@@ -1210,8 +1182,8 @@ gate for this release.
 This gate is independent from Task 1. Tasks 1–9 may complete and be reviewed without release permission; Task 10 may not replace its local-path harness until this gate passes.
 
 - [x] Requester authorized commit/push, annotated tag and GitHub Release for UIComposable; CocoaPods publication remains excluded.
-- [ ] Record Task 1’s exact reviewed commit as `REVIEWED_UICOMPOSABLE_SHA`; verify HEAD equals it and the UIComposable branch checkout is completely clean before tagging.
-- [ ] Create annotated tag `1.1.0`, push that tag, then verify the public GitHub URL resolves it:
+- [x] Record Task 1’s exact reviewed commit as `REVIEWED_UICOMPOSABLE_SHA`; verify HEAD equals it and the UIComposable branch checkout is completely clean before tagging. The reviewed SHA is `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94`.
+- [x] Create annotated tag `1.1.0`, push that tag, then verify the public GitHub URL resolves it. The remote peeled ref equals `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94`.
 
 ```bash
 set -euo pipefail
@@ -1258,7 +1230,7 @@ If the branch checkout is dirty, the annotated tag already points elsewhere, or 
 - Modify: `Example/Tests/FlowTests.swift`
 - Modify: `AGENTS.md`
 
-- [ ] **Step 1: Add the clean consumer**
+- [x] **Step 1: Add the clean consumer**
 
 The nested smoke package depends on `.package(path: "../..")`. Its library source imports `Boardy` and creates a minimal `BoardID` and `Motherboard` using the existing synchronous API.
 
@@ -1274,7 +1246,7 @@ local_xcodebuild \
 
 Expected: the external target imports and builds Boardy through a path dependency.
 
-- [ ] **Step 2: Replace the compiler harness with the release manifest**
+- [x] **Step 2: Replace the compiler harness with the release manifest**
 
 Use one target so all existing source remains in one Swift module:
 
@@ -1324,7 +1296,7 @@ CocoaPods-only assertion dependency is guarded.
 
 SwiftPM has no dev-only dependency class. Keep `CwlPreconditionTesting` out of the published dependency graph by guarding its import and exception-specific assertion block in `FlowTests.swift` with `#if canImport(CwlPreconditionTesting)`. The CocoaPods/Xcode workspace continues to execute that assertion test because the package is linked there; the SwiftPM suite executes every other assertion in `FlowTests` without making consumers resolve Cwl.
 
-- [ ] **Step 3: Verify the package in Swift 5 mode**
+- [x] **Step 3: Verify the package in Swift 5 mode**
 
 ```bash
 set -euo pipefail
@@ -1352,7 +1324,7 @@ fi
 Expected: manifest contains the `Info.plist` exclusion and all Boardy tests pass in the supported
 Swift 5 language mode without an unhandled-file warning.
 
-- [ ] **Step 4: Verify clean external import**
+- [x] **Step 4: Verify clean external import**
 
 ```bash
 set -euo pipefail
@@ -1367,7 +1339,7 @@ local_xcodebuild \
 
 Expected: `BoardySmoke` resolves the root package, imports `Boardy` and builds without accessing repo-internal test state.
 
-- [ ] **Step 5: Correct canonical build instructions**
+- [x] **Step 5: Correct canonical build instructions**
 
 Update `AGENTS.md` to use:
 
@@ -1398,7 +1370,7 @@ Do not keep `swift test` as the canonical command because this package imports U
 - Modify: `docs/UsageGuide-vi.md`
 - Modify: `docs/Boardy Modularization.md`
 
-- [ ] **Step 1: Set one release contract**
+- [x] **Step 1: Set one release contract**
 
 Update `Boardy.podspec`:
 
@@ -1420,11 +1392,15 @@ This preserves a CocoaPods-compatible constraint even if UIComposable `1.1.0` is
 
 Task 9 has already aligned `Boardy.podspec`, the Example Podfile/project and generated Pods to iOS 14 before package validation. Preserve those values here; this step adds the `1.61.0` version and final metadata rather than postponing the platform floor.
 
-- [ ] **Step 2: Align formatting/toolchain metadata**
+- [x] **Step 2: Align formatting/toolchain metadata**
 
 Change `.swiftformat` from Swift 5.5 to `--swiftversion 5.9`. Do not run a repository-wide format in this release; format only touched Swift files.
 
-- [ ] **Step 3: Resolve the final CocoaPods dependency state before API capture**
+- [ ] **Step 3: Resolve the final CocoaPods dependency state before API capture (deferred)**
+
+This transition check is intentionally deferred by the requester. Do not run `pod update`,
+CocoaPods tests or `pod lib lint` in the current SPM-first candidate pass; the generated lock may
+remain on the previous public UIComposable version until CocoaPods publication is authorized.
 
 ```bash
 set -euo pipefail
@@ -1450,7 +1426,7 @@ local_xcodebuild \
 
 Expected: lock resolves a version satisfying `~> 1.0.1` and the full Swift 5 compatibility suite passes. Record the resolved version now; every final API artifact below must be captured from this exact lock state.
 
-- [ ] **Step 4: Write the compatibility matrix**
+- [x] **Step 4: Write the compatibility matrix**
 
 `docs/COMPATIBILITY.md` must distinguish the candidate matrix and its evidence status:
 
@@ -1463,7 +1439,7 @@ Expected: lock resolves a version satisfying `~> 1.0.1` and the full Swift 5 com
 
 Label the first three rows “candidate verification matrix”, not “CI-enforced supported matrix”. Official G1 support remains blocked by the later `BUILD-002` plan.
 
-- [ ] **Step 5: Inventory public support categories**
+- [x] **Step 5: Inventory public support categories**
 
 `docs/API_STABILITY_1X.md` classifies:
 
@@ -1529,7 +1505,7 @@ ruby tools/render-api-inventory.rb verify \
 
 Link `docs/api/PUBLIC_API_1_61.md`, both machine graphs and `docs/api/BOARDY_1_61_API_VERIFICATION.md` from `docs/API_STABILITY_1X.md`. The subsystem bullets above are a summary, not a substitute for the declaration-keyed inventory. `API-001` cannot be marked complete until `verify-public-api.sh` and `render-api-inventory.rb verify` both pass and an independent reviewer reconciles classifications and the final diagnosis against the final artifacts.
 
-- [ ] **Step 6: Write migration instructions with compile examples**
+- [x] **Step 6: Write migration instructions with compile examples**
 
 `docs/MIGRATING_TO_1.61.md` includes a direct synchronous activation example matching the
 existing 1.x API:
@@ -1552,7 +1528,7 @@ It must explain:
 - how to migrate CocoaPods to SwiftPM;
 - no change to `Any?` transport in Option A.
 
-- [ ] **Step 7: Rewrite the canonical README path**
+- [x] **Step 7: Rewrite the canonical README path**
 
 README order:
 
@@ -1564,7 +1540,7 @@ README order:
 6. migration/release/support/security links;
 7. explicit note that typed façade is not end-to-end typed transport.
 
-- [ ] **Step 8: Label legacy documents**
+- [x] **Step 8: Label legacy documents**
 
 - Add a legacy banner to `docs/UsageGuide-vi.md` pointing to README and migration guide.
 - Remove the claim that CocoaPods is more stable than SwiftPM from `docs/Boardy Modularization.md`.
@@ -1677,7 +1653,7 @@ left no checkout work directories, and Git status contained only intended Task 1
 - `/Volumes/KingstonXS1000/WORKSPACE/ABC/UIComposable`
 - `/Volumes/KingstonXS1000/WORKSPACE/ABC/boardy`
 
-Run every executable test row with the requester-selected Xcode 26.4.1 currently installed on this machine and only iPhone 17 Simulator iOS 26.4. Do not boot or target another simulator/device. Retain `xcodebuild -version` and the selected destination in the evidence record. Older-runtime/device and N-1 Xcode validation are explicitly deferred with hosted CI rather than claimed by this release.
+Run only the SPM executable/build rows with the requester-selected Xcode 26.4.1 currently installed on this machine and the fixed iPhone 17 Simulator UDID `714C9786-1327-41DF-A093-73359C82E0C2`. Do not boot or target another simulator/device. Retain toolchain and destination evidence. CocoaPods test/lint is explicitly deferred by the requester; older-runtime/device and N-1 Xcode validation remain deferred with hosted CI.
 
 - [ ] **Step 0: Validate the configured toolchain and selected simulator**
 
@@ -1695,9 +1671,11 @@ DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
 xcrun simctl list devices available | rg 'iPhone 17 \(.*\) \(Booted\)|iPhone 17 \(.*\) \(Shutdown\)'
 ```
 
-Expected: the exact Xcode version assertion passes and the selected iPhone 17/iOS 26.4 destination is available. This inspection must not boot another device.
+Expected: the exact Xcode version assertion passes and the selected iPhone 17/iOS 26.4 destination is available. This inspection must not boot another device. The final
+version check passed, but CoreSimulatorService was unavailable for device discovery/runtime in
+this execution; the row remains open for maintainer rerun on the approved UDID only.
 
-- [ ] **Step 1: Verify UIComposable release candidate**
+- [x] **Step 1: Verify UIComposable release candidate**
 
 ```bash
 set -euo pipefail
@@ -1716,13 +1694,15 @@ pod lib lint UIComposable.podspec --verbose
 git diff --check
 ```
 
-Expected: green package test, green pod lint, clean whitespace check.
+Evidence: UIComposable `1.1.0` SwiftPM/pod prerequisite was previously verified at the reviewed
+commit `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94`; the annotated tag and remote peeled SHA were
+verified in this execution. No additional CocoaPods lint is run here.
 
 - [ ] **Step 2: Record older-runtime/device verification as deferred**
 
 Do not run the former iOS 18.3/iPhone 16 row or any iPad row in this execution. Link it to the later hosted compatibility/CI plan and do not claim evidence for it.
 
-- [ ] **Step 3: Verify Boardy Xcode 26 CocoaPods compatibility**
+- [ ] **Step 3: Verify Boardy CocoaPods compatibility (deferred by requester)**
 
 ```bash
 set -euo pipefail
@@ -1736,45 +1716,42 @@ local_xcodebuild \
   SWIFT_VERSION=5 test
 ```
 
-Expected: all tests pass; dependency warnings, if any, are catalogued separately.
+This row is intentionally deferred. It is not evidence for the SPM-first maintainer-review
+candidate.
 
 - [ ] **Step 4: Record older-runtime SwiftPM verification as deferred**
 
 Do not execute an iOS 18.3 or alternate-device SwiftPM test row. Swift 5 compatibility is verified on the selected iPhone 17/iOS 26.4 row in Step 5; older-runtime evidence belongs to the later compatibility/CI plan.
 
-- [ ] **Step 5: Verify Boardy SwiftPM and consumer in Swift 5 mode on Xcode 26.4.1**
+- [x] **Step 5: Verify Boardy SwiftPM and consumer in Swift 5 mode on Xcode 26.4.1**
 
 ```bash
 set -euo pipefail
 cd /Volumes/KingstonXS1000/WORKSPACE/ABC/boardy
 DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-xcodebuild -version
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -scheme Boardy \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.4' \
-  SWIFT_VERSION=5 test \
-  2>&1 | tee "$BOARDY_LOCAL_BUILD_ROOT/Results/boardy-spm-swift5-xcode26.4.1.log"
-
-DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -scheme Boardy \
-  -destination 'generic/platform=iOS Simulator' \
-  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
-  SWIFT_VERSION=5 build
+xcrun swift build --build-tests \
+  --package-path . \
+  --build-path "$BOARDY_LOCAL_BUILD_ROOT/SwiftBuildFinal" \
+  --triple arm64-apple-ios14.0-simulator \
+  --sdk "$DEVELOPER_DIR/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk" \
+  -Xswiftc -swift-version -Xswiftc 5
 
 cd /Volumes/KingstonXS1000/WORKSPACE/ABC/boardy/Examples/SwiftPMSmoke
 DEVELOPER_DIR="$XCODE_26_4_1_DEVELOPER_DIR" \
-local_xcodebuild \
-  -scheme BoardySmoke \
-  -destination 'generic/platform=iOS Simulator' \
-  SWIFT_VERSION=5 build
+xcrun swift build \
+  --package-path . \
+  --build-path "$BOARDY_LOCAL_BUILD_ROOT/SwiftBuildSmokeFinal" \
+  --triple arm64-apple-ios14.0-simulator \
+  --sdk "$DEVELOPER_DIR/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk" \
+  -Xswiftc -swift-version -Xswiftc 5
 ```
 
-Expected: package tests and the clean consumer pass in Boardy 1.61.0's supported Swift 5 language
-mode. Swift 6 language-mode readiness remains a separate follow-up.
+Expected: Boardy package and test targets compile, and the clean consumer imports the exact Boardy
+product in Swift 5 mode. This pass compiled both rows for the iOS 14 simulator SDK; runtime test
+execution was not possible because CoreSimulatorService was unavailable, and no other device was
+targeted. Swift 6 language-mode readiness remains a separate follow-up.
 
-- [ ] **Step 6: Verify CocoaPods distribution**
+- [ ] **Step 6: Verify CocoaPods distribution (deferred by requester)**
 
 ```bash
 set -euo pipefail
@@ -1787,16 +1764,22 @@ git diff --check
 git status --short
 ```
 
-Expected: pod lint passes; only intended tracked changes appear. `.build-local/`, `.codegraph/` and `.claude/worktrees/` remain ignored and absent from staging.
+This row is intentionally deferred. `.build-local/`, `.codegraph/` and `.claude/worktrees/` remain
+ignored and absent from staging.
 
-- [ ] **Step 7: Update living evidence without claiming G1**
+- [x] **Step 7: Update living evidence without claiming G1**
 
 Update completed work-item evidence only after commands above pass. Record exact test count, local command/log paths, resolved UIComposable pod version and accepted dependency warnings. Keep `BUILD-002` `Proposed`, record the hosted-CI deferral and do not mark G1/G2/G3/G4 achieved.
 
-Finalize the tracked GitHub-release metadata before the joined review: set the 1.61.0 changelog date,
-state that hosted CI/G1 and CocoaPods publication remain unavailable, and ensure README,
-compatibility, migration and releasing docs describe the same local evidence boundary. Task 14 must
-not mutate tracked files after the review.
+Finalize the tracked candidate metadata before the joined review: state that hosted CI/G1, CocoaPods
+publication and Boardy tag/release remain unavailable, and ensure README, compatibility, migration,
+changelog and releasing docs describe the same local evidence boundary. Task 14 must not mutate
+tracked files after the review.
+
+Evidence recorded in the living roadmap: Xcode `26.4.1` (`17E202`), root SwiftPM build/test-target
+compile log `.build-local/Results/boardy-swiftpm-final-build.log`, clean-consumer log
+`.build-local/Results/boardy-swiftpm-smoke-final-build.log`, API report
+`docs/api/BOARDY_1_61_API_VERIFICATION.md` and inventory verification of 822 eligible declarations.
 
 - [ ] **Step 8: Run one joined AI consistency review and one corrective batch**
 
@@ -1819,9 +1802,10 @@ After the corrective batch, the integrator—not a second reviewer event—write
 
 **Suggested commit:** `chore: finalize Boardy 1.61 release candidate`
 
-### Task 14: Publish the GitHub-only Boardy 1.61.0 release
+### Task 14: Publish the GitHub-only Boardy 1.61.0 release (deferred until maintainer review)
 
-**Hard prerequisite:** Task 13 is complete; the final joined review/corrective batch is closed; the
+**Hard prerequisite:** This task is not executed in the current preparation pass. It remains gated
+on maintainer review. When later authorized, Task 13 must be complete; the final joined review/corrective batch is closed; the
 candidate branch is pushed and clean; sole-owner authority, consumer dispositions and all local
 technical gates are complete. Hosted CI is explicitly not a prerequisite for this requester-approved
 GitHub-only release, but the release must not claim G1, organization production support or
@@ -1860,22 +1844,22 @@ operation after the peeled-tag check; it does not authorize CocoaPods publicatio
 Option A release-candidate implementation is complete only when all statements are true:
 
 - [x] G0 organizational inputs are complete for this release: sole technical/release owner, accepted deferred backup risk, consumer inventory/disposition and candidate support matrix approval.
-- [ ] UIComposable `1.1.0` is an annotated public tag whose local and remote peeled refs equal the clean reviewed commit SHA; `UIComposableCore` resolves by exact version.
+- [x] UIComposable `1.1.0` is an annotated public tag whose local and remote peeled refs equal the clean reviewed commit SHA; `UIComposableCore` resolves by exact version.
 - [ ] Boardy test target compiles and every test passes with Xcode 26.4.1 on the requester-selected iPhone 17 Simulator iOS 26.4; no other simulator/device was started or targeted.
 - [ ] Boardy SwiftPM and CocoaPods metadata both require iOS 14+, and a generic `IPHONEOS_DEPLOYMENT_TARGET=14.0` build passes.
-- [ ] SwiftPM package tests and the clean consumer build pass in Swift 5 mode on Xcode 26.4.1; Swift 6 language mode and older-runtime/device evidence remain deferred.
+- [x] SwiftPM package and test targets compile, and the clean consumer builds in Swift 5 mode on Xcode 26.4.1/iOS 14 simulator SDK; runtime execution remains open because CoreSimulatorService was unavailable, while Swift 6 language mode and older-runtime/device evidence remain deferred.
 - [ ] Full CocoaPods compatibility suite and `pod lib lint` pass.
 - [ ] Regression tests cover early loop termination, nil combined output, reentrancy, BlockTask duplicate/late completion, reasoned cancel-before-canceler-install for direct and Operation paths with Board completion independent of tombstone cleanup, single-/two-Motherboard barrier owner/handoff atomicity, active-owner deallocation recovery with late-owner rejection, attachment concurrency, iPad action-sheet anchor and class-plugin lifetime.
-- [ ] A deterministic `DispatchSpecificKey` characterization proves the complete `BlockTaskBoard` terminal sequence remains on the legacy completion executor in its documented order.
+- [ ] A deterministic `DispatchSpecificKey` characterization proves the complete `BlockTaskBoard` terminal sequence remains on the legacy completion executor in its documented order. The test is added and compiles; runtime assertion awaits the approved simulator service.
 - [ ] Task/flow regression tests touched by this plan contain no arbitrary sleep.
-- [ ] Public API removals: zero.
-- [ ] `tools/verify-public-api.sh` passes against the committed `1.60.1` baseline and final `1.61.0` artifacts after the final CocoaPods lock state; `docs/api/BOARDY_1_61_API_VERIFICATION.md` is non-empty and linked from the API stability document.
-- [ ] Public-interface/API-digester diagnosis has no removed/renamed declaration and no new global-actor annotation on an existing public declaration.
-- [ ] `tools/render-api-inventory.rb verify` proves every eligible Boardy declaration selected by `declKind` has exactly one `usr:` or deterministic `synthetic:` key and one classification in `docs/api/PUBLIC_API_1_61.md`, including no-USR declarations such as `infix operator ->>`.
+- [x] Public API removals: zero in the normalized interface-derived comparison.
+- [x] `tools/verify-public-api.sh` passes against the immutable baseline interface's normalized comparison graph and final `1.61.0` artifacts; `docs/api/BOARDY_1_61_API_VERIFICATION.md` is non-empty and linked from the API stability document. The raw baseline graph/interface mismatch is documented, not allowlisted.
+- [x] Public-interface/API-digester diagnosis has no removed/renamed declaration and no new global-actor annotation on an existing declaration in the normalized comparison.
+- [x] `tools/render-api-inventory.rb verify` proves every eligible Boardy declaration selected by `declKind` has exactly one `usr:` or deterministic `synthetic:` key and one classification in `docs/api/PUBLIC_API_1_61.md`, including no-USR declarations such as `infix operator ->>`.
 - [ ] Migration documentation states that 1.61.0 adds no actor isolation, main-thread precondition or executor hop and preserves the existing `BlockTaskBoard` terminal executor/order.
-- [ ] README, compatibility matrix, podspec, package manifest and changelog agree on version/platform/toolchain.
+- [x] README, compatibility matrix, podspec, package manifest and changelog agree on version/platform/toolchain.
 - [ ] Template repositories are pinned to immutable commits and `claude-dangerous.sh` is absent.
-- [ ] CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT and RELEASING exist and are internally consistent.
+- [x] CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT and RELEASING exist and are internally consistent for the SPM-first candidate boundary.
 - [x] Sole technical/release owner, security contact and CODEOWNERS are supplied before publication; backup continuity is explicitly deferred.
 - [ ] One independent joined AI review ran after planned mutations; its accepted in-scope P0/P1 set was resolved in one corrective batch with affected verification rerun and an integrator-authored factual disposition report, with no confirmation/full re-review event.
 - [ ] Living roadmap still identifies `BUILD-002` as deferred and does not claim G1; hosted CI has not been smuggled into this scope.
@@ -1921,6 +1905,8 @@ Boardy 2 typed routing remains a separate strategic decision, not a continuation
 
 | Plan version | Date | Change |
 |---|---|---|
+| 0.29.0 | 2026-07-14 | Hoàn tất batch SPM-first config/package/docs; root + smoke compile pass; thêm API/interface/inventory artifacts, normalized baseline comparison và fallback xcode-select; ghi rõ CoreSimulator runtime/raw-graph caveats, chưa tag/release |
+| 0.28.0 | 2026-07-14 | Theo objective mới của requester, gom config/package/docs thành một batch để chạy một lượt SPM-first build/test; defer CocoaPods test/lint và Boardy tag/GitHub Release cho maintainer review; khóa UIComposable tag SHA `ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94` |
 | 0.27.0 | 2026-07-14 | Theo quyết định requester, dùng duy nhất owner/release actor `congnc.if@gmail.com` / `@congncif`, defer backup continuity và chấp nhận single-owner risk; approve opt-in consumer disposition, API policy và iOS 14 matrix; đóng Gate A1 để bắt đầu Task 9 |
 | 0.26.0 | 2026-07-14 | Khép mâu thuẫn release policy: thêm Task 14 cho annotated tag/GitHub-only 1.61.0 sau local gates; hosted CI vẫn deferred và chỉ block G1/organization production support; signed release/CocoaPods publish tiếp tục ngoài scope; bắt buộc executor-identity characterization và ghi đúng các lock-backed `@unchecked Sendable` conformances đã audit |
 | 0.25.0 | 2026-07-14 | Theo quyết định requester, loại toàn bộ MainActor/Swift 6 isolation khỏi 1.61.0; giữ caller-controlled executor, không thêm precondition/hop/actor annotation; Task 9 chỉ materialize iOS 14 và Swift 5 package/API compatibility; chuyển isolation sang follow-up plan riêng |

@@ -530,4 +530,54 @@ final class BlockTaskTests: XCTestCase {
         XCTAssertEqual(result.withLock { $0 }, "output")
         XCTAssertEqual(completionCount.withLock { $0 }, 1)
     }
+
+    func testTerminalSequenceStaysOnActivationExecutor() {
+        let queue = DispatchQueue(label: "boardy.block-task.executor")
+        let key = DispatchSpecificKey<String>()
+        queue.setSpecific(key: key, value: "block-task-executor")
+        let events = BlockTaskEventRecorder()
+        let completionStore = Locked<BlockTaskBoard<String, String>.ExecutorCompletion?>(nil)
+        let executorMarker = "block-task-executor"
+
+        func marker() -> String {
+            DispatchQueue.getSpecific(key: key) == executorMarker ? executorMarker : "other"
+        }
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
+            events.append("executor.\(marker())")
+            completionStore.withLock { $0 = completion }
+            return .default {}
+        })
+        motherboard.installBoard(board)
+
+        (motherboard as FlowManageable).matchedFlow(boardID, with: String.self).handle { output in
+            events.append("output.\(output).\(marker())")
+        }
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete.\(marker())")
+        }
+
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, output in events.append("success.\(output).\(marker())") }
+            .onProcessing { _, processing in events.append("processing.\(processing).\(marker())") }
+            .onCompletion { _, status in
+                let value = status == .done ? "done" : "cancelled"
+                events.append("completion.\(value).\(marker())")
+            }
+
+        queue.sync {
+            motherboard.activateBoard(.target(boardID, parameter))
+            completionStore.withLock { $0 }?(.success("output"))
+        }
+
+        XCTAssertEqual(events.values, [
+            "processing.true.block-task-executor",
+            "executor.block-task-executor",
+            "success.output.block-task-executor",
+            "output.output.block-task-executor",
+            "processing.false.block-task-executor",
+            "completion.done.block-task-executor",
+            "board.complete.block-task-executor",
+        ])
+    }
 }

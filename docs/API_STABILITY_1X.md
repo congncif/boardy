@@ -17,6 +17,8 @@ The exhaustive declaration-keyed inventory is generated from the Swift API Diges
 
 - [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface)
 - [`api/Boardy-1.60.1.api.json`](api/Boardy-1.60.1.api.json)
+- [`api/Boardy-1.60.1.interface.api.json`](api/Boardy-1.60.1.interface.api.json) (normalized
+  comparison graph; see [`BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md))
 - [`api/BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md)
 
 ## Compatibility rules
@@ -54,4 +56,23 @@ selected contract is:
   separately approved follow-up plan; narrowly audited lock-backed internal conformances remain.
   Swift 6 readiness is not a 1.61.0 release claim.
 
-The final 1.61.0 interface and API graph must be compared to the immutable baseline with `tools/verify-public-api.sh` before tagging.
+The final 1.61.0 interface and API graph must be compared to the immutable baseline with
+`tools/verify-public-api.sh` before tagging. The current report uses the normalized
+interface-derived comparison graph because the raw 1.60.1 graph and interface have a documented
+capture-format mismatch; the raw graph remains unchanged for auditability.
+
+## 1.61.0 inventory and migration artifacts
+
+The candidate declaration inventory is maintained in [`api/PUBLIC_API_1_61.md`](api/PUBLIC_API_1_61.md)
+and is generated from [`api/Boardy-1.61.0.api.json`](api/Boardy-1.61.0.api.json), not by grepping
+the textual interface. The machine-readable compatibility result is
+[`api/BOARDY_1_61_API_VERIFICATION.md`](api/BOARDY_1_61_API_VERIFICATION.md); the durable candidate
+interface is [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface). These files are
+prepared on the final candidate build and must be regenerated if a public declaration or package
+dependency changes.
+
+New deprecations remain available through at least the next supported major migration window.
+The requester-approved project policy allows a minimum-platform change in a minor release, while
+major versions are reserved for a big update; this is not strict Semantic Versioning. See
+[`COMPATIBILITY.md`](COMPATIBILITY.md) and [`MIGRATING_TO_1.61.md`](MIGRATING_TO_1.61.md) for the
+consumer-facing impact and the explicit no-isolation-change contract.

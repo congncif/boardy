@@ -1,0 +1,31 @@
+# Boardy 1.61 compatibility
+
+This document describes the release candidate, not a CI-enforced support promise. The current
+candidate is prepared for review on Xcode 26.4.1 with Swift 5 language mode and iOS 14 or newer.
+Hosted CI, older runtimes, alternate devices and Swift 6 isolation are deliberately deferred.
+
+## Candidate verification matrix
+
+| Integration | Product | Language | Toolchain/destination | Platform floor | Evidence status |
+| --- | --- | --- | --- | --- | --- |
+| SwiftPM | `Boardy` umbrella, including Composable | Swift 5 | Xcode 26.4.1; selected iPhone 17 simulator only | iOS 14+ | Package + test-target compile pass; runtime row awaits CoreSimulatorService |
+| SwiftPM consumer | `BoardySmoke` imports `Boardy` | Swift 5 | Xcode 26.4.1; generic iOS Simulator build | iOS 14+ | Consumer compile pass via local path |
+| CocoaPods metadata | `Boardy` podspec and Example project settings | Swift 5 metadata | Podfile/project values set to iOS 14; lock refresh deferred | iOS 14+ | Prepared only; CocoaPods test/lint intentionally deferred for this review cycle |
+| UIComposable prerequisite | `UIComposableCore` | Swift 5/6 already verified | Release tag `1.1.0` | iOS 12+ | Annotated tag and peeled remote SHA verified |
+
+The matrix is an evidence boundary. It does not claim G1, organization-wide production support,
+older-runtime support, N-1 Xcode support or hosted-CI coverage.
+
+## Dependency contract
+
+SwiftPM resolves `UIComposableCore` from the exact public tag `1.1.0`; Boardy keeps one umbrella
+product and preserves `import Boardy`. The CocoaPods constraint remains `~> 1.0.1` so the current
+podspec does not require a CocoaPods trunk publication of UIComposable 1.1.0.
+
+## Compatibility policy
+
+Boardy 1.61.0 raises the deployment floor from iOS 12 to iOS 14 under the project policy that a
+minimum-platform increase may ship in a minor release. Major versions remain reserved for a big
+update. Existing synchronous APIs, `Any?` transport and the caller-controlled `BlockTaskBoard`
+executor/order remain unchanged; no MainActor annotation, main-thread precondition or automatic
+queue hop is introduced.

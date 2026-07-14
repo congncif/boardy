@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-    echo "Usage: DEVELOPER_DIR=/path/to/Xcode.app/Contents/Developer $0 <baseline-interface> <baseline-api-json> <candidate-interface> <candidate-api-json> <report-output>" >&2
+    echo "Usage: [DEVELOPER_DIR=/path/to/Xcode.app/Contents/Developer] $0 <baseline-interface> <baseline-api-json> <candidate-interface> <candidate-api-json> <report-output>" >&2
 }
 
 if [ "$#" -ne 5 ]; then
@@ -50,9 +50,7 @@ finish_failure() {
     exit 1
 }
 
-if [ -z "${DEVELOPER_DIR:-}" ]; then
-    finish_failure "DEVELOPER_DIR must be set explicitly."
-fi
+DEVELOPER_DIR="${DEVELOPER_DIR:-$(xcode-select -p)}"
 
 if [ ! -d "$DEVELOPER_DIR" ]; then
     finish_failure "DEVELOPER_DIR does not exist: $DEVELOPER_DIR"

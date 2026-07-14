@@ -17,10 +17,22 @@ above before any Task 2–8 Boardy source mutation. They are committed separatel
 from those source changes so the compatibility reference remains independently
 auditable.
 
+The raw API graph is retained unchanged for provenance. During the 1.61.0 review,
+the raw graph was found to contain declarations and type spellings that are not
+present in its paired textual interface (including synthesized `Equatable`
+members). `Boardy-1.60.1.interface.api.json` is therefore an additional,
+deterministic comparison graph dumped from that immutable interface with the same
+Xcode toolchain and interface-loading mode used for the candidate. It does not
+replace the raw capture; it prevents a tooling-format mismatch from being
+reported as a source compatibility break.
+
 Artifacts:
 
 - `Boardy-1.60.1.swiftinterface`: public, host-compatible simulator interface.
 - `Boardy-1.60.1.api.json`: authoritative Swift API Digester graph.
+- `Boardy-1.60.1.interface.api.json`: normalized interface-derived comparison graph;
+  SHA-256 `4a756df2debb2be8e071ed389914121c97474687d7aa1436b6d3e7967b26a1f1`; the raw graph above
+  remains immutable and authoritative for capture provenance.
 
 Extraction and comparison use `tools/capture-public-api.sh` and
 `tools/verify-public-api.sh`. Project-scoped temporary files and build products

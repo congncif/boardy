@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "uicomposable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/congncif/UIComposable.git",
+      "state" : {
+        "revision" : "ee04384063fcd0ebdd3d3b4e12a15d62cd0f3b94",
+        "version" : "1.1.0"
+      }
+    }
+  ],
+  "version" : 2
+}

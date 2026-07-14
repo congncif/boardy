@@ -14,10 +14,11 @@ No changes have been assigned beyond the 1.61.0 candidate.
 
 ## [1.61.0] - Unreleased release candidate
 
-Boardy 1.61.0 has not passed the hosted-CI/G1 organization-support gate. The requester-authorized
-GitHub-only release may proceed after local gates, but verification is limited to Xcode 26.4.1 on
-an iPhone 17 simulator running iOS 26.4; older runtimes, other devices, N-1 Xcode and hosted CI
-remain deferred. The current evidence boundary is recorded in the
+Boardy 1.61.0 is a maintainer-review candidate and has not passed the hosted-CI/G1
+organization-support gate. It is not tagged or published. Verification is limited to Xcode
+26.4.1 on an iPhone 17 simulator running iOS 26.4; older runtimes, other devices, N-1 Xcode and
+hosted CI remain deferred. SwiftPM is the current verification path; CocoaPods test/lint and
+publication remain deferred. The current evidence boundary is recorded in the
 [`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
 
 ### Added
@@ -30,7 +31,8 @@ remain deferred. The current evidence boundary is recorded in the
 ### Changed
 
 - Selected iOS 14 as the 1.61 candidate floor under the project-specific minor-version policy;
-  metadata and migration work remain pending before release.
+  SwiftPM metadata, a local consumer smoke package and migration documentation are prepared for
+  maintainer review.
 - Recorded preservation of the legacy `BlockTaskBoard` executor and complete terminal-event order
   as the approved 1.x compatibility branch.
 - Deferred MainActor, framework-wide/public Sendable migration and Swift 6 language-mode readiness
