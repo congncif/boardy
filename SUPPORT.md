@@ -39,7 +39,7 @@ proprietary logs. Reduce reproductions to the minimum needed and remove sensitiv
 
 Maintainers may acknowledge, request a reproduction, label, close or defer an item according to
 impact and available capacity. No acknowledgement, triage, fix or release deadline is guaranteed
-until the technical owner and backup owner adopt an explicit SLA.
+until the technical owner adopts an explicit SLA.
 
 Opening an issue does not make a proposed behavior part of the supported public contract. Accepted
 behavior is defined by released code, API stability documentation, migration notes and accepted ADRs.

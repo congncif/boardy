@@ -75,9 +75,9 @@ local_xcodebuild() {
 | Thuộc tính | Giá trị |
 |---|---|
 | Trạng thái | In progress trên `codex/boardy-1.61.0` |
-| Phiên bản plan | 0.26.0 |
+| Phiên bản plan | 0.27.0 |
 | Implementation authorization | Branch + commit/push/tag/GitHub Release được authorize; CocoaPods publish excluded |
-| Ownership / security | Technical owner `congnc.if@gmail.com` (`@congncif` verified); backup `congnc1@gmail.com` (GitHub handle/access pending); private security contact `congnc.if@gmail.com` |
+| Ownership / security | Sole technical/release owner `congnc.if@gmail.com` (`@congncif` verified); backup continuity deferred; private security contact `congnc.if@gmail.com` |
 | Boardy baseline | `bfa9579` trên `master` |
 | UIComposable baseline | `c31acaf569b8e10d365ba6af0b88d174c646e5b3` trên `master` |
 | Boardy release candidate | `1.61.0` — project policy cho phép platform-floor change ở minor; major reserved for big updates |
@@ -116,11 +116,11 @@ Phê duyệt plan này đồng nghĩa chọn scope và execution constraints dư
 | `D-011` Governance | ADR cho architecture cục bộ; RFC trước public API mới | Decision history audit được |
 | `D-013` Composable | Boardy SwiftPM umbrella bao gồm Composable qua `UIComposableCore`; UIComposable UIKit/DiffUI/RxUI SPM để phase riêng | Không kéo dependency Swift 6 lỗi vào Boardy |
 
-### 2.1. Organizational inputs không được tự suy đoán
+### 2.1. Organizational inputs
 
-- Đã nhận `D-001`: technical owner `congnc.if@gmail.com` và backup owner `congnc1@gmail.com`; GitHub handle/release access của backup vẫn cần xác nhận.
-- Đã capture danh sách consumer/app/module và Boardy version; owner/disposition của từng consumer vẫn cần xác nhận.
-- Đã verify technical-owner handle `@congncif`; không suy đoán backup handle nên `CODEOWNERS` chưa được tạo.
+- Đã nhận `D-001`: sole technical/release owner `congnc.if@gmail.com` / `@congncif`; requester chuyển backup continuity sang plan sau và chấp nhận single-owner risk cho 1.61.0.
+- Đã capture danh sách consumer/app/module và Boardy version. Release-level disposition được owner duyệt: GitHub-only/opt-in, không CocoaPods publication; consumer hiện hữu giữ version hiện tại cho đến khi owner ứng dụng migrate, pin `< 1.61` hoặc retire.
+- `CODEOWNERS` chỉ định đúng confirmed handle `@congncif`; không suy đoán thêm account.
 - Đã xác nhận private security contact `congnc.if@gmail.com`; GitHub Private Vulnerability Reporting hiện chưa bật và không được quảng bá như một channel hoạt động.
 
 Sau khi plan được approve, Task 0 và Task 1 ở sibling repo có thể bắt đầu song song. Không Boardy-mutating Task 2–8 nào được bắt đầu trước khi Task 0 đã capture/validate xong immutable `1.60.1` interface + API graph; sau mốc đó chúng có thể hoàn tất trong khi Gate A1 còn pending vì không thay đổi executor contract. Không được bắt đầu Task 9, mark G0/G1, tag hoặc publish khi các organizational input trên chưa được ghi nhận.
@@ -129,8 +129,8 @@ Sau khi plan được approve, Task 0 và Task 1 ở sibling repo có thể bắ
 
 Trước Task 9, tất cả điều kiện sau phải cùng đạt:
 
-- `D-001` có technical owner và backup owner thật; support matrix đã được owner xác nhận, tức G0 organizational inputs hoàn tất;
-- consumer inventory có owner, version/toolchain, integration path và migration-risk classification cho mọi consumer đã biết;
+- `D-001` có confirmed technical/release owner; backup continuity được ghi rõ là deferred risk và không block release; support matrix đã được owner xác nhận, tức G0 organizational inputs hoàn tất;
+- consumer inventory có version/toolchain, integration path, migration-risk classification và release-level disposition cho mọi consumer đã biết; app-level owner assignment không block GitHub-only publication vì adoption là opt-in và CocoaPods không được publish;
 - `docs/API_STABILITY_1X.md` và release/deprecation policy được owner duyệt;
 - ADR-0001 ghi nhận quyết định defer MainActor/Swift 6 isolation và giữ caller-controlled executor; `D-004`/`D-008` ghi rõ iOS 14 + minor `1.61.0` và major-reserved policy của requester;
 - design review cam kết giữ nguyên declaration signature, executor behavior và không thêm global-actor annotation/main-thread precondition/queue hop; public interface đã được chụp ở Task 0;
@@ -294,7 +294,7 @@ After execution approval, ADR-0001 was created with status `Proposed` to capture
 
 - [x] **Step 2: Create truthful governance records**
 
-`OWNERSHIP.md` must state release publication is disabled until technical owner, backup and GitHub handles are recorded. `CONSUMER_INVENTORY.md` starts with an explicit “No consumer inventory has been supplied as of 2026-07-14” record and the columns:
+`OWNERSHIP.md` must state release publication is disabled until the technical/release owner and confirmed GitHub handle are recorded; backup continuity may be explicitly deferred as accepted risk. `CONSUMER_INVENTORY.md` starts with an explicit “No consumer inventory has been supplied as of 2026-07-14” record and the columns:
 
 ```text
 Application/module | Owner | Boardy version | Integration method | Swift/Xcode | Migration risk | Validation status
@@ -1025,20 +1025,19 @@ This checkpoint review validates Tasks 2–8 only. It does not replace the singl
 
 This is a blocking decision gate, not part of Task 0. Task 1 may run after approval; Tasks 2–8 and their commits may complete while Gate A1 is pending only after Task 0’s immutable API artifacts are captured and validated. Task 9 may not start.
 
-- [x] Supply technical owner, backup owner emails and the known-consumer technical inventory.
-- [ ] Confirm the backup owner's GitHub identity/release access and owner for each known consumer.
-- [ ] Identify every consumer below iOS 14 and record migration, version ceiling or retirement before adopting the selected floor.
+- [x] Supply the sole technical/release owner and the known-consumer technical inventory; defer backup continuity as accepted operational debt.
+- [x] Record release-level ownership/disposition for every known consumer: GitHub-only/opt-in release; no CocoaPods publication or automatic upgrade.
+- [x] Identify every consumer below iOS 14 and require migration, explicit `< 1.61` ceiling or retirement before any later CocoaPods publication.
 - [x] Preserve caller-controlled synchronous behavior without a new main-thread trap or queue hop.
 - [x] Preserve the entire Task 6 terminal sequence—including `sendOutput`/Board `complete`—on the legacy executor and keep its observable order. Any actor isolation or additive executor API requires the separate follow-up plan/RFC.
-- [ ] Approve `docs/API_STABILITY_1X.md` and confirm the already-selected `D-004`/`D-008` consequences and owners. ADR-0001 remains deferred and cannot block this release.
+- [x] Approve `docs/API_STABILITY_1X.md` and confirm the already-selected `D-004`/`D-008` consequences and owner. ADR-0001 remains deferred and cannot block this release.
 
 If any checkbox cannot pass, record the blocker in the living roadmap and stop before Task 9. Do not mark the earlier independent tasks incomplete.
 
-**Current status: BLOCKED.** Technical owner, backup owner, private security contact and the
-caller-controlled/`BlockTaskBoard` executor contract are recorded. MainActor is no longer a
-blocker because it is outside this release. Remaining blockers are the backup owner's confirmed
-GitHub identity/release access, owner/disposition for every known consumer and explicit approval of
-the API/versioning policy and iOS 14 support matrix. Task 9 has not started.
+**Current status: APPROVED on 2026-07-14.** The requester designated `congnc.if@gmail.com` /
+`@congncif` as the sole owner and release actor, deferred backup continuity, approved the opt-in
+consumer disposition, iOS 14 support matrix, minor `1.61.0` version policy and API stability
+contract. MainActor/Swift 6 isolation remains outside this release. Task 9 may start.
 
 **Suggested commit after gate approval:** `docs: approve Boardy 1.61 platform contract`
 
@@ -1583,7 +1582,7 @@ README order:
 - Create: `SECURITY.md`
 - Create: `SUPPORT.md`
 - Create: `RELEASING.md`
-- Create after owner input: `.github/CODEOWNERS`
+- Create: `.github/CODEOWNERS`
 - Create: `.github/ISSUE_TEMPLATE/bug_report.yml`
 - Create: `.github/ISSUE_TEMPLATE/feature_request.yml`
 - Create: `.github/ISSUE_TEMPLATE/config.yml`
@@ -1614,12 +1613,12 @@ README order:
 
 - [ ] **Step 3: Add structured issue/PR intake**
 
-Issue forms and the pull-request template are complete. `CODEOWNERS` remains intentionally pending
-until the backup owner's GitHub handle is confirmed.
+Issue forms and the pull-request template are complete. `CODEOWNERS` records the sole confirmed
+owner handle `@congncif`; backup continuity remains follow-up governance work.
 
 Bug template requires Boardy version, integration method, Xcode/Swift/iOS matrix, minimal reproduction and logs. Feature template asks why the capability belongs in Boardy 1.x versus an app/plugin. PR template links tests, migration impact and ADR/RFC.
 
-Create `CODEOWNERS` only after `D-001` provides confirmed GitHub handles. Absence of that input blocks release readiness but does not authorize guessing.
+Create `CODEOWNERS` only from the handle confirmed by `D-001`; do not guess or add an unverified account.
 
 - [x] **Step 4: Pin template repositories**
 
@@ -1823,7 +1822,7 @@ After the corrective batch, the integrator—not a second reviewer event—write
 ### Task 14: Publish the GitHub-only Boardy 1.61.0 release
 
 **Hard prerequisite:** Task 13 is complete; the final joined review/corrective batch is closed; the
-candidate branch is pushed and clean; backup identity/access, consumer dispositions and all local
+candidate branch is pushed and clean; sole-owner authority, consumer dispositions and all local
 technical gates are complete. Hosted CI is explicitly not a prerequisite for this requester-approved
 GitHub-only release, but the release must not claim G1, organization production support or
 CocoaPods availability.
@@ -1860,7 +1859,7 @@ operation after the peeled-tag check; it does not authorize CocoaPods publicatio
 
 Option A release-candidate implementation is complete only when all statements are true:
 
-- [ ] G0 organizational inputs are complete: technical owner, backup owner, consumer inventory and candidate support matrix approval.
+- [x] G0 organizational inputs are complete for this release: sole technical/release owner, accepted deferred backup risk, consumer inventory/disposition and candidate support matrix approval.
 - [ ] UIComposable `1.1.0` is an annotated public tag whose local and remote peeled refs equal the clean reviewed commit SHA; `UIComposableCore` resolves by exact version.
 - [ ] Boardy test target compiles and every test passes with Xcode 26.4.1 on the requester-selected iPhone 17 Simulator iOS 26.4; no other simulator/device was started or targeted.
 - [ ] Boardy SwiftPM and CocoaPods metadata both require iOS 14+, and a generic `IPHONEOS_DEPLOYMENT_TARGET=14.0` build passes.
@@ -1877,7 +1876,7 @@ Option A release-candidate implementation is complete only when all statements a
 - [ ] README, compatibility matrix, podspec, package manifest and changelog agree on version/platform/toolchain.
 - [ ] Template repositories are pinned to immutable commits and `claude-dangerous.sh` is absent.
 - [ ] CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT and RELEASING exist and are internally consistent.
-- [ ] Technical owner, backup owner, security contact and CODEOWNERS are supplied before publication.
+- [x] Sole technical/release owner, security contact and CODEOWNERS are supplied before publication; backup continuity is explicitly deferred.
 - [ ] One independent joined AI review ran after planned mutations; its accepted in-scope P0/P1 set was resolved in one corrective batch with affected verification rerun and an integrator-authored factual disposition report, with no confirmation/full re-review event.
 - [ ] Living roadmap still identifies `BUILD-002` as deferred and does not claim G1; hosted CI has not been smuggled into this scope.
 - [ ] The annotated Boardy `1.61.0` tag and GitHub Release resolve to the final reviewed SHA and
@@ -1922,6 +1921,7 @@ Boardy 2 typed routing remains a separate strategic decision, not a continuation
 
 | Plan version | Date | Change |
 |---|---|---|
+| 0.27.0 | 2026-07-14 | Theo quyết định requester, dùng duy nhất owner/release actor `congnc.if@gmail.com` / `@congncif`, defer backup continuity và chấp nhận single-owner risk; approve opt-in consumer disposition, API policy và iOS 14 matrix; đóng Gate A1 để bắt đầu Task 9 |
 | 0.26.0 | 2026-07-14 | Khép mâu thuẫn release policy: thêm Task 14 cho annotated tag/GitHub-only 1.61.0 sau local gates; hosted CI vẫn deferred và chỉ block G1/organization production support; signed release/CocoaPods publish tiếp tục ngoài scope; bắt buộc executor-identity characterization và ghi đúng các lock-backed `@unchecked Sendable` conformances đã audit |
 | 0.25.0 | 2026-07-14 | Theo quyết định requester, loại toàn bộ MainActor/Swift 6 isolation khỏi 1.61.0; giữ caller-controlled executor, không thêm precondition/hop/actor annotation; Task 9 chỉ materialize iOS 14 và Swift 5 package/API compatibility; chuyển isolation sang follow-up plan riêng |
 | 0.24.0 | 2026-07-14 | Ghi nhận technical owner, backup owner và private security contact; verify `@congncif`, giữ backup handle/access pending; requester approve toàn bộ legacy `BlockTaskBoard` executor/order; mở rộng Task 12 để loại mutable clone trùng ở `Example/init-module.sh`; Gate A1 vẫn blocked bởi consumer dispositions và full policy/ADR approval |

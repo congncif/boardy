@@ -6,9 +6,9 @@ publication because each has a different gate and authority.
 
 Boardy 1.61.0 is currently a release candidate. The requester authorized a GitHub-only release after
 the local gates pass even though hosted CI is deferred. That release remains pre-G1 and must not be
-described as organization production support. Final publication is still blocked until the backup
-owner's GitHub identity/release access is confirmed, consumer dispositions are approved and all
-local technical gates pass. The technical owner, backup owner and private security contact are recorded in
+described as organization production support. Final publication requires the local technical gates;
+the requester explicitly accepted a single-owner release model and approved the consumer
+disposition for this GitHub-only release. The owner and private security contact are recorded in
 [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md). The current execution is
 Git/GitHub-only and does not authorize CocoaPods trunk publication.
 
@@ -33,10 +33,10 @@ See [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) for the normative con
 
 Before creating the Boardy 1.61.0 tag or GitHub Release:
 
-- [ ] The technical owner and backup owner are explicitly designated in
+- [ ] The sole technical owner and release actor are explicitly designated in
       [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
 - [ ] A private security reporting contact/channel exists in `SECURITY.md`.
-- [ ] `CODEOWNERS` contains confirmed GitHub handles; no handle was inferred from repository access.
+- [ ] `CODEOWNERS` contains the confirmed owner handle.
 - [ ] The compatibility matrix and consumer dispositions are owner-approved.
 - [ ] Release notes explicitly state that hosted CI/G1, older-runtime/device evidence and
       organization production support are deferred.

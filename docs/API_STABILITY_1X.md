@@ -37,9 +37,11 @@ Source/API removals still require a major-update decision. The platform exceptio
 
 ## Concurrency policy for 1.61.0
 
-The owner is designated and the requester approved the caller-controlled compatibility contract on
-2026-07-14. Gate A1 remains open for consumer dispositions and complete policy/platform approval.
-The selected candidate contract is:
+The sole owner is designated and approved this policy, the iOS 14 support matrix and the
+caller-controlled compatibility contract on 2026-07-14. Known consumers below iOS 14 remain on
+their current release line because 1.61.0 is GitHub-only; a later CocoaPods publication requires
+their migration, `< 1.61` ceiling or retirement disposition. Gate A1 is therefore approved. The
+selected contract is:
 
 - No MainActor/global-actor isolation, main-thread precondition or automatic queue hop is added in
   1.61.0.

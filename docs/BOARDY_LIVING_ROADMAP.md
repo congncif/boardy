@@ -80,7 +80,7 @@ Tuy nhiên, implementation và productization chưa theo kịp lời hứa kiế
 - Distribution chỉ dựa trên CocoaPods trong khi chưa có Swift Package Manager.
 - Release, security và community governance chưa đạt baseline của một dự án open source đáng tin cậy.
 
-**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline đã được thêm, trừ `CODEOWNERS` đang chờ backup handle. Requester đã chuyển toàn bộ MainActor/Swift 6 isolation khỏi 1.61.0 sang follow-up riêng; iOS 14 metadata, SwiftPM Boardy và release gates vẫn chưa hoàn tất, vì vậy maturity verdict tổng thể chưa được nâng.
+**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline và single-owner `CODEOWNERS` đã được thêm. Requester đã chuyển toàn bộ MainActor/Swift 6 isolation và backup continuity khỏi 1.61.0; Gate A1 được approve để triển khai iOS 14 metadata, SwiftPM Boardy và release gates.
 
 ### 1.2. Maturity verdict
 
@@ -675,7 +675,7 @@ Roadmap là sequencing proposal. Timeline giả định một nhóm nhỏ có ow
 **Exit criteria:**
 
 - `D-001` đến `D-006` được quyết định.
-- Có technical owner và backup owner.
+- Có technical/release owner; continuity risk và kế hoạch bổ sung backup được ghi rõ.
 - Chọn Option A, B hoặc C.
 - Có supported toolchain/platform matrix.
 - Có danh sách consumer hiện hữu và version đang dùng.
@@ -765,8 +765,8 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `FOUND-001` Chỉ định technical owner và backup | P0 | In progress | S | Có quyền quyết định và continuity | Emails được chỉ định; backup GitHub handle/release access pending |
-| `FOUND-002` Inventory consumer/version đang dùng | P0 | In progress | M | Biết migration blast radius | Consumer technical evidence captured; owners/dispositions pending |
+| `FOUND-001` Chỉ định technical/release owner | P0 | Done | S | Có quyền quyết định/release | Sole owner `congnc.if@gmail.com` / `@congncif`; backup continuity accepted and deferred |
+| `FOUND-002` Inventory consumer/version đang dùng | P0 | Done for release disposition | M | Biết migration blast radius | Technical evidence captured; GitHub-only release is opt-in, later CocoaPods publication requires migrate/`< 1.61`/retire |
 | `FOUND-003` Chọn strategic option A/B/C | P0 | Selected | S | Scope program rõ | `D-003` |
 | `FOUND-004` Chốt support matrix | P0 | Selected | S | iOS/Swift/Xcode contract rõ | `DOC-002`, `D-004` |
 | `FOUND-005` Thiết lập Decision Log/RFC workflow | P1 | In progress | S | Các quyết định kiến trúc có history | ADR-0001 lưu proposal đã deferred; follow-up cần ADR mới hoặc revision được duyệt |
@@ -836,7 +836,7 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 | `API-004` Tách Foundation core khỏi UIKit | P1 | Proposed | XL | Headless-testable core | `ARCH-005`, `D-006` |
 | `API-005` Structured diagnostics API | P1 | Proposed | L | Observable, testable failures | `ARCH-007` |
 | `API-006` Async/await và cancellation contract | P1 | Proposed | XL | Modern execution API | `FIX-005`, `CONC-001` |
-| `API-007` Deprecation and semantic-version policy | P0 | In progress | M | Breaking changes predictable | Policy drafted; owner approval/final inventory pending |
+| `API-007` Deprecation and project-version policy | P0 | Done | M | Breaking changes predictable | Owner approved iOS 14 minor policy and legacy executor contract; final API inventory remains `API-001` |
 
 ### 12.8. Tests và quality engineering
 
@@ -871,7 +871,7 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 | `OSS-001` Thêm CHANGELOG và release-note template | P0 | Done | S/M | Release history audit được | Task 12 baseline; release entry remains candidate until final gate |
 | `OSS-002` Thêm CONTRIBUTING/CODE_OF_CONDUCT/SUPPORT | P1 | Done | M | Contributor operating model | Task 12 baseline |
 | `OSS-003` Thêm SECURITY.md và private reporting path | P0 | Done | S | Security response contract | Private contact `congnc.if@gmail.com`; GitHub PVR not advertised while disabled |
-| `OSS-004` Issue/PR templates, CODEOWNERS và labels | P1 | In progress | M | Maintainer workflow rõ | Forms/PR template done; CODEOWNERS waits for backup handle; label policy deferred |
+| `OSS-004` Issue/PR templates, CODEOWNERS và labels | P1 | In progress | M | Maintainer workflow rõ | Forms/PR template and sole-owner CODEOWNERS done; label policy deferred |
 | `OSS-005` Automated GitHub release từ signed semantic tag | P0 | Proposed | M/L | Pod/SPM/tag/release đồng bộ | `REL-004` |
 | `OSS-006` SBOM, provenance và dependency review | P1 | Proposed | M/L | Supply-chain baseline | `REL-009` |
 | `OSS-007` Pin template repos và dependency versions | P0 | In progress | M | Reproducible inputs | Template revisions verified end-to-end under `.build-local/tmp`; package dependency pin remains Task 10 |
@@ -899,7 +899,7 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 
 - Living document được review.
 - Strategic option được chọn.
-- Technical owner và backup owner được chỉ định.
+- Technical/release owner được chỉ định; deferred backup continuity risk được chấp nhận và ghi rõ.
 - Consumer inventory hoàn tất.
 - Support matrix được quyết định.
 
@@ -1018,7 +1018,7 @@ Targets cụ thể cần được quyết định sau consumer baseline. Dưới
 | Type-safe v2 tạo hai ecosystem lâu dài | Medium | High | Time-box bridge và deprecation policy | Open |
 | Consumer 1.x không được inventory | High | High | `FOUND-002` trước breaking decision | Open |
 | CocoaPods trunk đóng trước khi SPM adoption hoàn tất | High | High | Ưu tiên `BUILD-003`, `OSS-010` | Open |
-| Maintainer duy nhất trở thành bottleneck | High | High | Owner + backup + documented release process | Open |
+| Maintainer duy nhất trở thành bottleneck | High | High | Documented single-owner release process now; add/test backup continuity later | Accepted for 1.61; follow-up open |
 | Test stabilization kéo dài do real-time assumptions | Medium | Medium | Fake clock/executor và incremental conversion | Open |
 | Public API quá rộng ngăn refactor | High | High | API inventory, SPI/internalization, major-version policy | Open |
 | Samples tiếp tục truyền pattern cũ | High | Medium | Reference sample gate trong docs CI | Open |
@@ -1034,7 +1034,7 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 
 | ID | Quyết định cần đưa ra | Options chính | Khuyến nghị audit | Trạng thái |
 |---|---|---|---|---|
-| `D-001` | Ai là technical owner và backup owner? | Cá nhân, working group, platform team | Technical `congnc.if@gmail.com` / `@congncif`; backup `congnc1@gmail.com` | Designated; backup GitHub handle/release access pending |
+| `D-001` | Ai là technical/release owner? | Cá nhân, working group, platform team | Sole owner `congnc.if@gmail.com` / `@congncif`; backup later | Approved; backup continuity deferred and non-blocking |
 | `D-002` | Product positioning chính là gì? | Mobile microservices, orchestration framework, modular runtime | Legacy-compatible modular orchestration with typed façades | Approved for Option A |
 | `D-003` | Chọn chiến lược evolution nào? | Option A, B, C | Option A hardening | Selected for execution: Option A/pre-G1 |
 | `D-004` | Support matrix? | iOS/Xcode/Swift versions | Xcode 26.4.1 hiện có; local executable tests chỉ dùng iPhone 17/iOS 26.4; iOS floor 14+ | Approved for Option A; iOS 18.3, other-device rows và N-1 Xcode deferred với hosted CI |
@@ -1051,16 +1051,12 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 
 ### 17.1. Gate A1 status
 
-**Blocked trước Task 9.** Technical owner, backup owner, private security contact và quyết định giữ
-caller-controlled execution/toàn bộ legacy `BlockTaskBoard` executor-order đã được ghi nhận.
-MainActor không còn là blocker vì đã được chuyển khỏi 1.61.0. Còn thiếu:
-
-- GitHub handle và release access được xác nhận cho backup owner;
-- owner/disposition cho từng consumer trong inventory, đặc biệt mọi consumer dưới iOS 14;
-- explicit owner approval cho toàn bộ `docs/API_STABILITY_1X.md` và iOS 14 support matrix.
-
-Cho đến khi đủ ba nhóm input trên, Task 9 không được bắt đầu và không tag/release. ADR-0001 giữ
-`Deferred`; `D-005` đã được approve theo contract caller-controlled/no-isolation-change.
+**Approved ngày 2026-07-14.** Requester chọn `congnc.if@gmail.com` / `@congncif` làm owner và
+release actor duy nhất, defer backup continuity, approve `docs/API_STABILITY_1X.md`, iOS 14/minor
+1.61.0 matrix và release-level consumer disposition. GitHub-only release là opt-in và không publish
+CocoaPods; mọi consumer dưới iOS 14 giữ version hiện tại cho đến khi migrate, pin `< 1.61` hoặc
+retire. ADR-0001 giữ `Deferred`; `D-005` giữ caller-controlled/no-isolation-change. Task 9 được phép
+bắt đầu.
 
 ---
 
@@ -1081,6 +1077,7 @@ Cho đến khi đủ ba nhóm input trên, Task 9 không được bắt đầu v
 | 2026-07-14 | Chỉ định owner/security và chọn nhánh executor 1.x | Cần continuity, private reporting và compatibility contract trước Task 9 | Technical owner `congnc.if@gmail.com` / `@congncif`; backup `congnc1@gmail.com` với handle/access pending; security contact `congnc.if@gmail.com`; preserve toàn bộ legacy `BlockTaskBoard` executor/order; full Gate A1 vẫn pending | Requester + integrator |
 | 2026-07-14 | Chuyển MainActor/Swift 6 isolation khỏi 1.61.0 | MainActor tạo quá nhiều source/behavior concerns cho một minor release | 1.61 giữ caller-controlled execution, không thêm actor annotation/precondition/queue hop; Swift 6 language mode, Sendable và isolation chuyển sang follow-up riêng; Gate A1 chỉ còn platform/consumer/API policy | Requester |
 | 2026-07-14 | Cho phép GitHub-only 1.61.0 release trước G1 | Requester đã authorize tag/GitHub Release và defer hosted CI | Sau local gates có thể publish annotated tag/GitHub Release với evidence boundary rõ; không claim G1, organization production support, signed release hoặc CocoaPods availability | Requester + integrator |
+| 2026-07-14 | Dùng một owner và đóng Gate A1 | Backup procedure không được phép làm chậm vấn đề kỹ thuật chính | Sole owner/release actor `congnc.if@gmail.com` / `@congncif`; backup continuity deferred; consumer opt-in disposition, API policy và iOS 14 matrix approved; Task 9 unblocked | Requester |
 
 Draft chi tiết để review: [Boardy Option A — 1.x Hardening Implementation Plan](superpowers/plans/2026-07-14-boardy-option-a-1x-hardening.md).
 
@@ -1215,14 +1212,14 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 | Final checkpoint full test | 59/59 passed, zero failures, iPhone 17 only |
 | Xcode project-scoped data | `.build-local/` ignored; DerivedData, SourcePackages, temp and results stored on external workspace |
 | Hosted CI / older runtime-device matrix | Deferred; not claimed |
-| Gate A1 / Task 9 | Blocked by platform/consumer/API-policy inputs / not started; MainActor removed from scope |
+| Gate A1 / Task 9 | Gate approved with sole owner and opt-in consumer disposition; Task 9 authorized; MainActor removed from scope |
 
 ### 21.3. Task 12 governance/tooling checkpoint
 
 | Activity | Result |
 |---|---|
 | Governance/community files | CHANGELOG, contributing, conduct, support, security and releasing baselines created |
-| GitHub intake | Bug/feature forms and PR template parse successfully; CODEOWNERS pending confirmed backup handle |
+| GitHub intake | Bug/feature forms and PR template parse successfully; CODEOWNERS designates sole confirmed owner `@congncif` |
 | Template installer | Pinned revision `892828b9c003d1194fb044921000708345e00493`; runtime verification passed with repo-local synthetic HOME |
 | Module generator | Pinned revision `62e618beba9900a26970deb722f12163c77c319f`; sample module generated in repo-local disposable directory |
 | Duplicate mutable path | `Example/init-module.sh` delegates to the canonical pinned generator |
@@ -1235,6 +1232,7 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 
 | Document version | Date | Change |
 |---|---|---|
+| 0.18.0 | 2026-07-14 | Theo quyết định requester, chuyển sang sole owner/release actor `congnc.if@gmail.com` / `@congncif`, defer backup continuity; approve opt-in consumer disposition, API policy và iOS 14/minor matrix; đóng Gate A1 và tạo single-owner CODEOWNERS |
 | 0.17.0 | 2026-07-14 | Phân tách GitHub release khỏi G1: local gates có thể publish annotated 1.61.0 theo authority đã cấp; hosted CI tiếp tục block organization production-support claim; signed release và CocoaPods publish vẫn deferred |
 | 0.16.0 | 2026-07-14 | Theo quyết định requester, remove toàn bộ MainActor/Swift 6 isolation khỏi Option A 1.61.0; approve caller-controlled/no-precondition/no-hop `D-005`; defer `CONC-001`/`CONC-002`/`CONC-005` và strict-language-mode verification sang follow-up; Gate A1 chỉ còn backup access, consumer disposition và API/platform approval |
 | 0.15.0 | 2026-07-14 | Ghi nhận technical/backup/security contacts, verify technical handle `@congncif`, giữ backup handle/access pending; approve nhánh preserve toàn bộ legacy `BlockTaskBoard` executor/order; thêm Task 12 governance/community baseline, pinned tooling runtime evidence và xóa unsafe helper; Gate A1 còn consumer dispositions và full API/ADR/support-matrix approval |

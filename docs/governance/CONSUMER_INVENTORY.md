@@ -2,7 +2,12 @@
 
 Captured: 2026-07-14 from local sibling repositories under `/Volumes/KingstonXS1000/WORKSPACE/ABC`.
 
-Consumer owners were not supplied and must be confirmed before organization-wide adoption. The inventory is sufficient to show that Boardy 1.61.0 is not a drop-in upgrade for every current consumer.
+Application owners were not supplied. The Boardy owner approved the release-level disposition on
+2026-07-14: the GitHub-only 1.61.0 release is opt-in, CocoaPods is not published, and every existing
+consumer stays on its current Boardy line until its own owner schedules an iOS 14 migration. Before
+any later CocoaPods publication, every unbounded dependency below iOS 14 must add a `< 1.61` ceiling,
+raise its floor, or be retired. This inventory therefore closes the release blast-radius decision
+without claiming that application migrations are complete.
 
 | Application/module | Owner | Boardy version | Integration method | Swift/Xcode | Migration risk | Validation status |
 |---|---|---|---|---|---|---|
@@ -28,4 +33,4 @@ rest of Boardy; that design is deferred to a separate plan.
 
 ## Release disposition
 
-This execution creates Git tags/GitHub Releases only and does not publish CocoaPods, so existing pod consumers will not resolve 1.61.0 automatically. Before a later CocoaPods publication, each unbounded dependency below iOS 14 must either migrate its platform floor or add an explicit version ceiling.
+This execution creates Git tags/GitHub Releases only and does not publish CocoaPods, so existing pod consumers will not resolve 1.61.0 automatically. Before a later CocoaPods publication, each unbounded dependency below iOS 14 must either migrate its platform floor, add an explicit `< 1.61` version ceiling, or record retirement. The Boardy owner owns this publication gate; application owners own their eventual migrations.
