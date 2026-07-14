@@ -37,13 +37,19 @@ Source/API removals still require a major-update decision. The platform exceptio
 
 ## Concurrency policy for 1.61.0
 
-The owner is designated and the requester approved the legacy `BlockTaskBoard` executor branch on
-2026-07-14. Gate A1 remains provisional until consumer dispositions and the complete policy/ADR
-approval are recorded. The selected candidate contract is:
+The owner is designated and the requester approved the caller-controlled compatibility contract on
+2026-07-14. Gate A1 remains open for consumer dispositions and complete policy/platform approval.
+The selected candidate contract is:
 
-- MainActor-first internal orchestration and UIKit state behind source-compatible entry boundaries.
-- No `@MainActor` added to an existing public declaration.
-- The full `BlockTaskBoard` terminal sequence preserves its legacy completion executor and observable order, including Board messages; this residual is documented rather than split across executors.
+- No MainActor/global-actor isolation, main-thread precondition or automatic queue hop is added in
+  1.61.0.
+- Existing synchronous APIs preserve caller-controlled execution. UIKit callers remain responsible
+  for main-thread use according to UIKit's contract.
+- The full `BlockTaskBoard` terminal sequence preserves its legacy completion executor and
+  observable order, including Board messages.
 - Shared synchronous storage uses audited compound lock operations and never invokes handlers while locked.
+- Swift 6 language-mode, framework-wide/public Sendable and actor-isolation work is deferred to a
+  separately approved follow-up plan; narrowly audited lock-backed internal conformances remain.
+  Swift 6 readiness is not a 1.61.0 release claim.
 
 The final 1.61.0 interface and API graph must be compared to the immutable baseline with `tools/verify-public-api.sh` before tagging.

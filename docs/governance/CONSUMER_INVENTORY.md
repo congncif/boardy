@@ -13,7 +13,7 @@ Consumer owners were not supplied and must be confirmed before organization-wide
 | SiFUtilities `Boardy` subspec | Not confirmed | Unbounded `Boardy/ComponentKit`; example lock 1.36.1 | CocoaPods | Root iOS 10; example iOS 11 | **High:** give subspec an iOS 14 floor or constrain Boardy `< 1.61` | Podspec/source/lock confirmed |
 | `module-structure-template` | Not confirmed | Unbounded Boardy dependency | CocoaPods template | Generated podspecs iOS 11 | **High:** template must stop generating incompatible unbounded metadata before later pod publication | Two podspec templates confirmed |
 | `module-template` | Not confirmed | Generated imports | Source template | Platform varies | **Medium:** generated modules need an iOS 14 compatibility rule | 73 template Swift imports found |
-| Boardy Example | Boardy maintainers | 1.60.0 lock at audit time | Local CocoaPods development pod | Repository example | Internal migration is part of 1.61 work | Baseline confirmed |
+| Boardy Example | Boardy maintainers | 1.60.1 current lock; 1.60.0 at initial audit | Local CocoaPods development pod | Repository example | Internal migration is part of 1.61 work | Current lock rechecked 2026-07-14 |
 
 ## Executor compatibility evidence
 
@@ -22,7 +22,9 @@ Consumer owners were not supplied and must be confirmed before organization-wide
 - Multiple consumers explicitly dispatch task completion work to the main queue.
 - `PhotoUploadServiceBoard` combines `.concurrent`, `DispatchQueue.global` execution and an explicit main-queue completion hop.
 
-This evidence supports Gate A1 selecting **preserve legacy executor and complete terminal ordering** for `BlockTaskBoard` in the minor release. MainActor-hardening other Boardy orchestration internals remains compatible with that residual path.
+This evidence supports preserving the legacy executor and complete terminal ordering for
+`BlockTaskBoard` in the minor release. It does not establish a safe actor-isolation model for the
+rest of Boardy; that design is deferred to a separate plan.
 
 ## Release disposition
 

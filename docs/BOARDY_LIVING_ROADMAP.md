@@ -2,12 +2,12 @@
 
 > Tài liệu tổng hợp để review, lựa chọn và theo dõi từng bước nâng cấp Boardy.
 >
-> **Trạng thái quyết định:** Option A đang được thực thi trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; requester yêu cầu dùng Xcode 26.4.1 hiện có và chỉ phát hành qua Git/GitHub, chưa publish CocoaPods. Hosted CI và N-1 Xcode được tách sang plan sau.
+> **Trạng thái quyết định:** Option A đang được thực thi trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; requester yêu cầu dùng Xcode 26.4.1 hiện có và chỉ phát hành qua Git/GitHub, chưa publish CocoaPods. GitHub-only 1.61.0 có thể release sau local gates nhưng không đạt G1; hosted CI, N-1 Xcode và toàn bộ MainActor/Swift 6 isolation được tách sang các plan sau.
 
 | Thuộc tính | Giá trị |
 |---|---|
 | Trạng thái tài liệu | In progress — Option A execution |
-| Phiên bản tài liệu | 0.15.0 |
+| Phiên bản tài liệu | 0.17.0 |
 | Ngày audit | 2026-07-14 |
 | Cập nhật gần nhất | 2026-07-14 |
 | Audit baseline | `d62970a81432` |
@@ -80,7 +80,7 @@ Tuy nhiên, implementation và productization chưa theo kịp lời hứa kiế
 - Distribution chỉ dựa trên CocoaPods trong khi chưa có Swift Package Manager.
 - Release, security và community governance chưa đạt baseline của một dự án open source đáng tin cậy.
 
-**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline đã được thêm, trừ `CODEOWNERS` đang chờ backup handle. Swift 6 isolation, iOS 14 metadata, SwiftPM Boardy và release gates vẫn chưa hoàn tất; vì vậy maturity verdict tổng thể chưa được nâng.
+**Execution update 2026-07-14:** các nhận định trên là audit baseline. Option A Tasks 0–8 đã khôi phục test target, cố định API baseline và hoàn tất correctness/locking regressions với full suite 59/59. OSS governance/reproducible-tooling baseline đã được thêm, trừ `CODEOWNERS` đang chờ backup handle. Requester đã chuyển toàn bộ MainActor/Swift 6 isolation khỏi 1.61.0 sang follow-up riêng; iOS 14 metadata, SwiftPM Boardy và release gates vẫn chưa hoàn tất, vì vậy maturity verdict tổng thể chưa được nâng.
 
 ### 1.2. Maturity verdict
 
@@ -347,7 +347,7 @@ MIT license, nhiều version tag, examples và test assets tạo nền tảng t�
 | Stateless Board | Một phần | Weak context, README guidance | Content lookup, repeated subscriptions, không có lifecycle state machine |
 | Separation of concerns | Khá | Board/controller split, event buses | Samples đưa navigation/business decision vào UI state |
 | Plug-and-play composition | Khá | LauncherPlugin, BoardRegistration, ServiceMap | Global singleton, lifetime assumptions, URL selection ambiguity |
-| Scalable execution | Thấp | Một số synchronized collections | Không có actor/MainActor contract, compound race, cancellation ambiguity |
+| Scalable execution | Thấp | Một số synchronized collections | Caller-controlled legacy contract; chưa có isolation model dài hạn, compound race và cancellation ambiguity |
 | Enterprise maintainability | Thấp | Small codebase, subspecs | CI/test/API compatibility/documentation chưa đủ |
 | Open-source readiness | Thấp | MIT, public repo, CocoaPods | Thiếu SPM, governance, security, changelog, release automation |
 
@@ -390,7 +390,7 @@ MIT license, nhiều version tag, examples và test assets tạo nền tảng t�
 
 | ID | Priority | Confidence | Finding | Impact | Evidence |
 |---|---|---|---|---|---|
-| `CON-001` | P0 | Confirmed | UI orchestration không được cô lập bằng `@MainActor` | Swift 6 errors và UI access từ sai executor | Strict-concurrency build warnings trong AlertBoard, NoBoard và InstallableBoard |
+| `CON-001` | P0 | Confirmed | UI orchestration chưa có explicit isolation/executor contract | Swift 6 errors và UI access từ sai executor | Strict-concurrency build warnings trong AlertBoard, NoBoard và InstallableBoard |
 | `CON-002` | P0 | Confirmed | Global mutable barrier cache | Shared application state không có actor isolation | [`ActivationBarrierFactory.cache`](../Boardy/Core/BoardType/ActivatableBarrierBoard.swift#L53) |
 | `CON-003` | P0 | Confirmed | Global mutable attachment table | NSMapTable không có documented synchronization ở đây | [`AttachableStaticStorage`](../Boardy/Attachable/Attachable.swift#L22) |
 | `CON-004` | P0 | Confirmed | Mutable singleton launcher | Race, test contamination và non-resettable global lifecycle | [`PluginLauncher.sharedInstance`](../Boardy/ModulePlugin/PluginLauncher.swift#L137) |
@@ -500,27 +500,41 @@ Mỗi activation có một `ActivationID`. Completion phải idempotent theo act
 - Subscription ownership gắn với activation hoặc board lifetime.
 - Leak/lifetime tests xác nhận board, controller và bus cable được release.
 
-### 8.3. Concurrency: chọn một isolation model đơn giản
+### 8.3. Concurrency: giữ contract 1.61, thiết kế isolation ở plan sau
 
-#### Khuyến nghị cho 1.x sau compatibility Gate A1
+#### Quyết định cho 1.61.0
 
-- `Board`, `Motherboard`, flow registry, UI context và plugin composition dùng MainActor-first internals; declaration public 1.x hiện hữu giữ source signature và đi qua compatibility boundary đã audit. Ngoại lệ duy nhất có thể được Gate A1 chấp thuận là ordered terminal path của `BlockTaskBoard` theo nhánh preserve bên dưới.
-- Background task executor có thể chạy ngoài MainActor. Trong `1.61.0`, legacy `Input`/`Output` không bị thêm public `Sendable` constraint; một internal compatibility carrier phải document invariant. Public `Sendable` constraints chỉ thuộc additive API hoặc major-update scope riêng.
-- Gate A1 chọn đúng một terminal contract từ consumer evidence: hop toàn bộ handlers + `sendOutput` + Board `complete` về MainActor, hoặc giữ toàn bộ chuỗi và observable ordering trên legacy executor nếu đổi queue sẽ break consumer. Nhánh preserve phải document `sendOutput`/`complete` là residual non-MainActor mutation; không được hop riêng Board messages vì sẽ đổi ordering. Nếu consumer cần legacy executor/order nhưng review bắt buộc Board messages ở MainActor, dừng và reopen RFC/plan. Một additive executor API mới cần RFC và plan amendment riêng, không được phát minh ngay tại gate.
-- Global cache chuyển thành actor, lock-protected storage hoặc instance-owned store theo ownership thực tế; không dùng global mutable storage không đồng bộ.
+- `Board`, `Motherboard`, flow registry, plugin composition và URL routing giữ synchronous
+  caller-controlled execution hiện tại.
+- Không thêm `@MainActor`, global actor, main-thread runtime precondition hoặc automatic queue hop.
+  UIKit callers tiếp tục chịu trách nhiệm gọi từ main thread theo UIKit contract.
+- Background task execution tiếp tục được hỗ trợ. Toàn bộ terminal sequence của `BlockTaskBoard`
+  giữ legacy completion executor và observable ordering.
+- Shared mutable storage đã xác định dùng lock/transaction nhỏ và không gọi callback trong lock.
+- Không thêm public `Sendable` constraints hoặc compatibility carrier chỉ để đạt Swift 6 language
+  mode.
 
-Đây là lựa chọn ít migration cost nhất vì phần lớn Boardy orchestration liên quan UI và navigation.
+#### Follow-up độc lập
+
+MainActor chỉ là một option trong
+[`MainActor/Swift 6 follow-up`](superpowers/plans/2026-07-14-boardy-mainactor-swift6-follow-up.md),
+không còn là kiến trúc đã chọn cho 1.61. Follow-up phải inventory call sites, chọn isolation model,
+định nghĩa executor migration, đánh giá source/behavior break và quyết định minor/major scope trước
+khi sửa source.
 
 #### Không khuyến nghị
 
 - Đánh dấu hàng loạt `@unchecked Sendable` để làm hết warning mà không chứng minh invariants.
-- Mỗi Motherboard là một actor độc lập ngay trong 1.x; cách này sẽ tạo nhiều `await` và reentrancy semantics mới.
+- Thêm synchronous main-thread trap hoặc queue hop phía sau API hiện hữu mà không có consumer
+  migration.
+- Mỗi Motherboard là một actor độc lập ngay trong 1.x mà chưa đánh giá `await` và reentrancy
+  semantics mới.
 
-#### Exit criteria
+#### Exit criteria của follow-up
 
-- Framework build trong Swift 6 language mode không có Boardy-owned concurrency warning.
-- Public callback documentation nêu rõ actor/executor.
-- Stress tests cho barrier, flow và task cancellation chạy dưới Thread Sanitizer.
+- Một isolation/executor ADR được phê duyệt bằng consumer evidence.
+- Public API và behavioral compatibility được phân loại trước implementation.
+- Swift 6 language-mode build, executor tests và stress/TSan rows xanh theo matrix được duyệt.
 
 ### 8.4. Build trust và release trust
 
@@ -616,7 +630,9 @@ Thay `print`/emoji assertion bằng một abstraction tối thiểu:
 
 ### Option A — Chỉ harden Boardy 1.x
 
-**Phạm vi:** sửa correctness, Swift 6, CI, SPM, docs và release; giữ runtime `Any?`.
+**Phạm vi:** sửa correctness và shared-state races, thêm SPM/docs/release baseline, xác nhận Swift 5
+compatibility trên Xcode hiện tại; giữ runtime `Any?`. MainActor/Swift 6 language mode thuộc
+follow-up riêng.
 
 **Ưu điểm:** migration cost thấp, sớm có bản ổn định.
 
@@ -675,7 +691,7 @@ Roadmap là sequencing proposal. Timeline giả định một nhóm nhỏ có ow
 - Sửa test compile và correctness P0.
 - CI trên Xcode matrix.
 - Swift Package Manager.
-- Swift 6 concurrency baseline.
+- Ghi nhận Swift 6 diagnostic baseline; không claim language-mode readiness.
 - Canonical README/compatibility matrix.
 - Changelog, security và release automation.
 - Pin external dependencies/template inputs.
@@ -690,7 +706,7 @@ Roadmap là sequencing proposal. Timeline giả định một nhóm nhỏ có ow
 
 **Phạm vi candidate:**
 
-- `@MainActor` orchestration model.
+- Isolation-model RFC; MainActor là một option cần consumer evidence, không phải quyết định mặc định.
 - Activation state machine và idempotent completion.
 - Deterministic tests, fake clock và lifetime tests.
 - Structured diagnostics.
@@ -753,7 +769,7 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 | `FOUND-002` Inventory consumer/version đang dùng | P0 | In progress | M | Biết migration blast radius | Consumer technical evidence captured; owners/dispositions pending |
 | `FOUND-003` Chọn strategic option A/B/C | P0 | Selected | S | Scope program rõ | `D-003` |
 | `FOUND-004` Chốt support matrix | P0 | Selected | S | iOS/Swift/Xcode contract rõ | `DOC-002`, `D-004` |
-| `FOUND-005` Thiết lập Decision Log/RFC workflow | P1 | In progress | S | Các quyết định kiến trúc có history | ADR-0001 tồn tại nhưng còn Proposed đến Gate A1 |
+| `FOUND-005` Thiết lập Decision Log/RFC workflow | P1 | In progress | S | Các quyết định kiến trúc có history | ADR-0001 lưu proposal đã deferred; follow-up cần ADR mới hoặc revision được duyệt |
 
 ### 12.3. Build, CI và distribution
 
@@ -791,12 +807,12 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
-| `CONC-001` Viết concurrency ADR | P0 | In progress | M | Isolation/executor contract rõ | ADR-0001 Proposed; Gate A1 owner approval pending |
-| `CONC-002` MainActor-isolate orchestration và UIKit APIs | P0 | Selected | L | Internal-only scope; giữ public signatures | Sau `CONC-001` |
-| `CONC-003` Loại bỏ hoặc actor-isolate global caches | P0 | In progress | L | Không data race | Targeted caches locked in Tasks 2–3; Task 9 isolation pending |
+| `CONC-001` Viết concurrency ADR | P0 | Deferred | M | Isolation/executor contract rõ | ADR-0001 proposal đã deferred khỏi 1.61; follow-up plan cần consumer evidence |
+| `CONC-002` Chọn và triển khai isolation model cho orchestration/UIKit | P0 | Deferred | L | Swift 6-safe ownership model | MainActor chỉ là một option trong follow-up riêng |
+| `CONC-003` Loại bỏ hoặc cô lập global caches | P0 | In progress | L | Không data race | Targeted caches đã lock trong Tasks 2–3; broader isolation deferred |
 | `CONC-004` Audit compound operations trong safe collections | P0 | Done | M/L | Check-then-act atomic | Commits `dadf9a5`/`dc461ba`; reentrant factory regression green |
-| `CONC-005` Sendable audit cho IDs/options/routes/closures | P0 | Selected | L | Swift 6 compile | `CON-006`, `CON-007` |
-| `CONC-006` Document callback executor và hop policy | P1 | Selected | M | Consumer không đoán queue | `CON-008` |
+| `CONC-005` Sendable audit cho IDs/options/routes/closures | P0 | Deferred | L | Swift 6 compile | Follow-up; không thêm public constraint trong 1.61 |
+| `CONC-006` Document callback executor và hop policy | P1 | In progress | M | Consumer không đoán queue | 1.61 documents unchanged caller-controlled behavior; future hop policy deferred |
 | `CONC-007` Thêm Thread Sanitizer/stress CI job định kỳ | P1 | Proposed | M | Detect race regression | Sau core fixes |
 
 ### 12.6. Lifecycle và ownership
@@ -896,7 +912,8 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 - SwiftPM clean-consumer smoke test xanh.
 - CocoaPods lint xanh trong transition period.
 - Changelog, SECURITY.md và release process tồn tại.
-- Không có Boardy-owned warning bị định nghĩa là error trong Swift 6 mode.
+- Candidate build/test xanh trong language mode được support; Swift 6 language-mode warning gate chỉ
+  áp dụng sau khi follow-up isolation plan được duyệt.
 
 ### G2 — Pilot-ready
 
@@ -935,9 +952,9 @@ Task 8 chỉ làm rõ contract 1.x hiện tại: giá trị synchronous trả v�
 | Flow engine | Order, matching, reentrancy, nil output, batch/latest strategy tests |
 | Task engine | Exactly-once, cancellation, queue/latest/only/concurrent semantics |
 | Plugin system | Lazy construction, class/value plugin lifetime, duplicate registration, reset/test isolation |
-| UI adapters | MainActor enforcement, missing context behavior, iPad action sheet test |
+| UI adapters | Current UIKit caller responsibility, missing context behavior, iPad action sheet test; actor enforcement deferred |
 | Memory | Weak target release, controller/board deallocation, global storage cleanup |
-| Concurrency | Swift 6 compile, Thread Sanitizer stress suite, actor-boundary tests |
+| Concurrency | 1.61 lock/executor characterization; Swift 6 compile, TSan và actor-boundary tests deferred |
 | Distribution | Clean SwiftPM consumer, CocoaPods lint, package product import tests |
 | Release | Tag/version/changelog consistency, SBOM/provenance validation |
 
@@ -997,7 +1014,7 @@ Targets cụ thể cần được quyết định sau consumer baseline. Dưới
 | Risk | Likelihood | Impact | Mitigation candidate | Status |
 |---|---|---|---|---|
 | Rewrite scope vượt capacity | Medium | High | Chọn staged strategy, gate theo phase | Open |
-| Swift 6 migration phá callback/API behavior | High | High | MainActor-first ADR, compatibility tests | Open |
+| Swift 6 migration phá callback/API behavior | High | High | Tách khỏi 1.61; follow-up isolation RFC + consumer compatibility tests | Deferred from current release |
 | Type-safe v2 tạo hai ecosystem lâu dài | Medium | High | Time-box bridge và deprecation policy | Open |
 | Consumer 1.x không được inventory | High | High | `FOUND-002` trước breaking decision | Open |
 | CocoaPods trunk đóng trước khi SPM adoption hoàn tất | High | High | Ưu tiên `BUILD-003`, `OSS-010` | Open |
@@ -1005,7 +1022,7 @@ Targets cụ thể cần được quyết định sau consumer baseline. Dưới
 | Test stabilization kéo dài do real-time assumptions | Medium | Medium | Fake clock/executor và incremental conversion | Open |
 | Public API quá rộng ngăn refactor | High | High | API inventory, SPI/internalization, major-version policy | Open |
 | Samples tiếp tục truyền pattern cũ | High | Medium | Reference sample gate trong docs CI | Open |
-| Global state gây flaky tests và data races | High | High | Instance ownership/actor isolation | Open |
+| Global state gây flaky tests và data races | High | High | Lock/transaction hiện tại; instance ownership hoặc approved isolation ở follow-up | Open |
 | Optional Composable dependency làm chậm package split | Medium | Medium | Tách product optional, pin version | Open |
 | Open-source launch trước khi support model sẵn sàng | Medium | High | Chỉ đạt Public-stable sau G4 | Open |
 
@@ -1021,7 +1038,7 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 | `D-002` | Product positioning chính là gì? | Mobile microservices, orchestration framework, modular runtime | Legacy-compatible modular orchestration with typed façades | Approved for Option A |
 | `D-003` | Chọn chiến lược evolution nào? | Option A, B, C | Option A hardening | Selected for execution: Option A/pre-G1 |
 | `D-004` | Support matrix? | iOS/Xcode/Swift versions | Xcode 26.4.1 hiện có; local executable tests chỉ dùng iPhone 17/iOS 26.4; iOS floor 14+ | Approved for Option A; iOS 18.3, other-device rows và N-1 Xcode deferred với hosted CI |
-| `D-005` | Concurrency isolation model? | MainActor-first, actor-per-motherboard, caller-controlled | MainActor-first internals; preserve toàn bộ `BlockTaskBoard` terminal executor/order như residual | Executor branch approved; full ADR/policy Gate A1 approval pending |
+| `D-005` | Concurrency isolation model? | MainActor-first, actor-per-motherboard, caller-controlled | Giữ caller-controlled trong 1.61; không thêm actor/precondition/hop; preserve toàn bộ `BlockTaskBoard` terminal executor/order | Approved for Option A; isolation redesign deferred to separate plan |
 | `D-006` | SwiftPM product structure ban đầu? | Một umbrella target, nhiều products, staged split | Một umbrella product/module trong 1.x | Approved for Option A |
 | `D-007` | Typed route contract? | Generic route, generated IO, macro/codegen | Generic route trước; macro chỉ khi có evidence | Open |
 | `D-008` | Deprecation/version contract? | Một minor, một major, time-based | Project policy: platform-floor change có thể ở minor; major dành cho big update | Approved: 1.61.0 for iOS 14 floor |
@@ -1034,13 +1051,16 @@ Không decision nào dưới đây được coi là đã chốt nếu chưa có 
 
 ### 17.1. Gate A1 status
 
-**Blocked trước Task 9.** Technical owner, backup owner, private security contact và nhánh preserve toàn bộ legacy `BlockTaskBoard` executor/order đã được ghi nhận. Còn thiếu:
+**Blocked trước Task 9.** Technical owner, backup owner, private security contact và quyết định giữ
+caller-controlled execution/toàn bộ legacy `BlockTaskBoard` executor-order đã được ghi nhận.
+MainActor không còn là blocker vì đã được chuyển khỏi 1.61.0. Còn thiếu:
 
 - GitHub handle và release access được xác nhận cho backup owner;
-- owner/disposition cho từng consumer trong inventory, đặc biệt các consumer iOS 12/13;
-- explicit owner approval cho toàn bộ `docs/API_STABILITY_1X.md`, ADR-0001 và iOS 14 support matrix.
+- owner/disposition cho từng consumer trong inventory, đặc biệt mọi consumer dưới iOS 14;
+- explicit owner approval cho toàn bộ `docs/API_STABILITY_1X.md` và iOS 14 support matrix.
 
-Cho đến khi đủ ba nhóm input trên, ADR-0001 giữ `Proposed`, phần MainActor-first của `D-005` giữ `Provisional`, Task 9 không được bắt đầu, và không tag/release.
+Cho đến khi đủ ba nhóm input trên, Task 9 không được bắt đầu và không tag/release. ADR-0001 giữ
+`Deferred`; `D-005` đã được approve theo contract caller-controlled/no-isolation-change.
 
 ---
 
@@ -1059,6 +1079,8 @@ Cho đến khi đủ ba nhóm input trên, ADR-0001 giữ `Proposed`, phần Mai
 | 2026-07-14 | Giữ project-scoped build/cache dưới repo external drive | Tránh ghi DerivedData/temp/package checkout vào ổ hệ thống và tránh xin quyền ngoài workspace | Dùng ignored `.build-local/`; Xcode 26.4.1 dùng repo-local DerivedData/SourcePackages và `-disablePackageRepositoryCache`, không dùng empty custom `-packageCachePath`; CoreSimulator system state không di chuyển | Requester + integrator |
 | 2026-07-14 | Chốt checkpoint Tasks 0–8 trước Gate A1 | Correctness fixes độc lập với concurrency-boundary decision của Task 9 | Immutable API baseline + bảy semantic commits; corrective review regressions 3/3 và full suite 59/59; Gate A1 vẫn blocked | Integrator |
 | 2026-07-14 | Chỉ định owner/security và chọn nhánh executor 1.x | Cần continuity, private reporting và compatibility contract trước Task 9 | Technical owner `congnc.if@gmail.com` / `@congncif`; backup `congnc1@gmail.com` với handle/access pending; security contact `congnc.if@gmail.com`; preserve toàn bộ legacy `BlockTaskBoard` executor/order; full Gate A1 vẫn pending | Requester + integrator |
+| 2026-07-14 | Chuyển MainActor/Swift 6 isolation khỏi 1.61.0 | MainActor tạo quá nhiều source/behavior concerns cho một minor release | 1.61 giữ caller-controlled execution, không thêm actor annotation/precondition/queue hop; Swift 6 language mode, Sendable và isolation chuyển sang follow-up riêng; Gate A1 chỉ còn platform/consumer/API policy | Requester |
+| 2026-07-14 | Cho phép GitHub-only 1.61.0 release trước G1 | Requester đã authorize tag/GitHub Release và defer hosted CI | Sau local gates có thể publish annotated tag/GitHub Release với evidence boundary rõ; không claim G1, organization production support, signed release hoặc CocoaPods availability | Requester + integrator |
 
 Draft chi tiết để review: [Boardy Option A — 1.x Hardening Implementation Plan](superpowers/plans/2026-07-14-boardy-option-a-1x-hardening.md).
 
@@ -1193,7 +1215,7 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 | Final checkpoint full test | 59/59 passed, zero failures, iPhone 17 only |
 | Xcode project-scoped data | `.build-local/` ignored; DerivedData, SourcePackages, temp and results stored on external workspace |
 | Hosted CI / older runtime-device matrix | Deferred; not claimed |
-| Gate A1 / Task 9 | Blocked / not started |
+| Gate A1 / Task 9 | Blocked by platform/consumer/API-policy inputs / not started; MainActor removed from scope |
 
 ### 21.3. Task 12 governance/tooling checkpoint
 
@@ -1213,6 +1235,8 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 
 | Document version | Date | Change |
 |---|---|---|
+| 0.17.0 | 2026-07-14 | Phân tách GitHub release khỏi G1: local gates có thể publish annotated 1.61.0 theo authority đã cấp; hosted CI tiếp tục block organization production-support claim; signed release và CocoaPods publish vẫn deferred |
+| 0.16.0 | 2026-07-14 | Theo quyết định requester, remove toàn bộ MainActor/Swift 6 isolation khỏi Option A 1.61.0; approve caller-controlled/no-precondition/no-hop `D-005`; defer `CONC-001`/`CONC-002`/`CONC-005` và strict-language-mode verification sang follow-up; Gate A1 chỉ còn backup access, consumer disposition và API/platform approval |
 | 0.15.0 | 2026-07-14 | Ghi nhận technical/backup/security contacts, verify technical handle `@congncif`, giữ backup handle/access pending; approve nhánh preserve toàn bộ legacy `BlockTaskBoard` executor/order; thêm Task 12 governance/community baseline, pinned tooling runtime evidence và xóa unsafe helper; Gate A1 còn consumer dispositions và full API/ADR/support-matrix approval |
 | 0.14.0 | 2026-07-14 | Ghi nhận immutable API baseline và semantic commits Tasks 2–8; checkpoint review RED 3/5 → GREEN 3/3, full suite 59/59; chuẩn hóa Xcode data dưới `.build-local/` với `-disablePackageRepositoryCache`; giữ Gate A1 blocked và Task 9 chưa bắt đầu |
 | 0.13.0 | 2026-07-14 | Chuyển toàn bộ project-scoped temporary/build cache vào `.build-local/` ngay trong repo trên external drive; thêm Git/Claude ignore và đổi API tools sang local temp root mặc định |

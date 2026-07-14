@@ -14,9 +14,10 @@ No changes have been assigned beyond the 1.61.0 candidate.
 
 ## [1.61.0] - Unreleased release candidate
 
-Boardy 1.61.0 has not yet passed the hosted-CI/G1 production-release gate. Candidate verification
-is limited to Xcode 26.4.1 on an iPhone 17 simulator running iOS 26.4; older runtimes, other
-devices, N-1 Xcode and hosted CI remain deferred. The current evidence boundary is recorded in the
+Boardy 1.61.0 has not passed the hosted-CI/G1 organization-support gate. The requester-authorized
+GitHub-only release may proceed after local gates, but verification is limited to Xcode 26.4.1 on
+an iPhone 17 simulator running iOS 26.4; older runtimes, other devices, N-1 Xcode and hosted CI
+remain deferred. The current evidence boundary is recorded in the
 [`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
 
 ### Added
@@ -32,6 +33,9 @@ devices, N-1 Xcode and hosted CI remain deferred. The current evidence boundary 
   metadata and migration work remain pending before release.
 - Recorded preservation of the legacy `BlockTaskBoard` executor and complete terminal-event order
   as the approved 1.x compatibility branch.
+- Deferred MainActor, framework-wide/public Sendable migration and Swift 6 language-mode readiness
+  to a separate follow-up; 1.61.0 preserves caller-controlled synchronous behavior and adds no
+  main-thread precondition or queue hop. Narrow lock-backed conformances remain audited internals.
 - Documented `PluginLauncher` URL results as matched candidates and introduced the clean
   `GatewayBarrierRegistration.exempt` spelling while retaining the deprecated legacy spelling.
 - Pinned template inputs to immutable revisions and removed the permission-bypassing helper script.

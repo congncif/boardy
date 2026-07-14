@@ -1,12 +1,14 @@
 # Releasing Boardy
 
 This document is the maintainer checklist for Boardy 1.x. It separates candidate preparation,
-production release and CocoaPods publication because each has a different gate and authority.
+the requester-authorized pre-G1 GitHub release, later production-support designation and CocoaPods
+publication because each has a different gate and authority.
 
-Boardy 1.61.0 is currently a release candidate. Local success is not G1: production publication
-remains blocked until the later hosted-CI plan is approved and green, the backup owner's GitHub
-identity/release access is confirmed, consumer dispositions are approved and all final gates pass.
-The technical owner, backup owner and private security contact are recorded in
+Boardy 1.61.0 is currently a release candidate. The requester authorized a GitHub-only release after
+the local gates pass even though hosted CI is deferred. That release remains pre-G1 and must not be
+described as organization production support. Final publication is still blocked until the backup
+owner's GitHub identity/release access is confirmed, consumer dispositions are approved and all
+local technical gates pass. The technical owner, backup owner and private security contact are recorded in
 [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md). The current execution is
 Git/GitHub-only and does not authorize CocoaPods trunk publication.
 
@@ -29,20 +31,22 @@ See [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) for the normative con
 
 ## 1. Confirm authority and gates
 
-Before creating a production tag or GitHub Release:
+Before creating the Boardy 1.61.0 tag or GitHub Release:
 
 - [ ] The technical owner and backup owner are explicitly designated in
       [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
 - [ ] A private security reporting contact/channel exists in `SECURITY.md`.
 - [ ] `CODEOWNERS` contains confirmed GitHub handles; no handle was inferred from repository access.
 - [ ] The compatibility matrix and consumer dispositions are owner-approved.
-- [ ] The hosted-CI plan is approved, green on the exact candidate SHA and satisfies G1.
+- [ ] Release notes explicitly state that hosted CI/G1, older-runtime/device evidence and
+      organization production support are deferred.
 - [ ] The final joined consistency review and its single corrective batch are complete.
-- [ ] The release actor has explicit authority for commit, push, signed tag and GitHub Release.
+- [ ] The release actor has explicit authority for commit, push, annotated tag and GitHub Release.
 - [ ] Any CocoaPods publication, if planned later, has separate explicit authority.
 
-If any item is missing, continue candidate work but do not claim production support or create the
-production release.
+If any item is missing, continue candidate work but do not create the GitHub release. Hosted CI is
+required before a later G1/organization-production-support claim, not before this explicitly
+authorized GitHub-only release.
 
 ## 2. Set the release contract
 
@@ -90,13 +94,15 @@ start another runtime or device.
 Run these rows with `-clonedSourcePackagesDirPath .build-local/SourcePackages` and
 `-disablePackageRepositoryCache`:
 
-1. CocoaPods `Boardy_Tests` in Swift 5 with complete strict-concurrency checking.
-2. SwiftPM `Boardy` tests in Swift 5 with complete strict-concurrency checking and no Boardy-owned
-   warning.
-3. SwiftPM `Boardy` tests in Swift 6 strict mode with warnings as errors.
-4. Generic iOS Simulator build with `IPHONEOS_DEPLOYMENT_TARGET=14.0`.
-5. `Examples/SwiftPMSmoke` generic consumer build in Swift 6 strict mode with warnings as errors.
-6. UIComposable 1.1.0 package tests in Swift 5 and Swift 6 strict modes.
+1. CocoaPods `Boardy_Tests` in Swift 5 language mode.
+2. SwiftPM `Boardy` tests in Swift 5 language mode.
+3. Generic iOS Simulator build with `IPHONEOS_DEPLOYMENT_TARGET=14.0` and Swift 5 language mode.
+4. `Examples/SwiftPMSmoke` generic consumer build in Swift 5 language mode.
+5. UIComposable 1.1.0 package tests in its already-validated Swift 5 and Swift 6 modes.
+
+Boardy Swift 6 language mode, MainActor isolation and Sendable migration are not 1.61.0 release
+gates. They belong to the separately approved follow-up plan and must not be simulated with unsafe
+annotations or warning suppression.
 
 Then validate CocoaPods metadata without publishing:
 
@@ -120,9 +126,9 @@ inferred from them.
 - [ ] Generate `docs/api/PUBLIC_API_1_61.md` and run
       `tools/render-api-inventory.rb verify` so every eligible declaration is classified exactly
       once.
-- [ ] Confirm migration guidance covers the iOS floor, MainActor compatibility boundary,
-      callback executors/order, `BlockTaskBoard`, `GatewayBarrierRegistration.exempt`, URL matching
-      and CocoaPods-to-SwiftPM migration.
+- [ ] Confirm migration guidance covers the iOS floor, unchanged caller-controlled execution,
+      absence of new main-thread preconditions/hops, `BlockTaskBoard` executor/order,
+      `GatewayBarrierRegistration.exempt`, URL matching and CocoaPods-to-SwiftPM migration.
 - [ ] Confirm no document describes the typed façade over `Any?` as end-to-end typed transport.
 
 Any source, package dependency or public-declaration correction invalidates the corresponding API
@@ -137,33 +143,37 @@ capture. Recapture and rerun the affected verification before selecting the rele
 - [ ] Run the one final independent consistency review over the complete branch diff.
 - [ ] Apply accepted in-scope P0/P1 findings in one corrective batch and rerun only affected
       executable/API checks.
-- [ ] Record the final reviewed SHA and verify hosted G1 checks ran against that exact SHA.
+- [ ] Record the final reviewed SHA and verify the local matrix/review ran against that exact SHA.
 
-Do not tag an earlier green commit after a corrective change. Do not replace hosted final-SHA
-evidence with local logs.
+Do not tag an earlier green commit after a corrective change. Local logs support only this
+pre-G1 GitHub release and do not replace future hosted final-SHA evidence.
 
 ## 7. Finalize changelog and create the GitHub release
 
-Only after all production gates pass:
+Finalize changelog/release metadata before the plan's one joined consistency review. After that
+review and its corrective batch, tracked files must remain unchanged. Only after all local
+GitHub-release gates pass:
 
-1. Replace `Release candidate` in the 1.61.0 changelog heading with the actual release date.
+1. Confirm the joined review included the actual 1.61.0 release date and final release metadata.
 2. Verify release notes prominently disclose the iOS 14 floor, migration guide, compatibility
    evidence boundary, executor contract and absence of CocoaPods publication.
-3. Commit the release metadata and rerun required final-SHA checks if the protected workflow treats
-   that commit as a new candidate.
-4. Create a cryptographically signed annotated tag at the reviewed release SHA and verify it locally:
+3. Verify the branch is clean and HEAD equals the final reviewed SHA.
+4. Create an annotated tag at the reviewed release SHA and verify it locally. Cryptographic signing
+   is deferred with `OSS-005`/`OSS-006`; do not describe this tag as signed:
 
    ```sh
-   git tag -s 1.61.0 <reviewed-release-sha> -m 'Boardy 1.61.0'
-   git tag -v 1.61.0
+   git tag -a 1.61.0 <reviewed-release-sha> -m 'Boardy 1.61.0'
+   test "$(git cat-file -t refs/tags/1.61.0)" = tag
+   test "$(git rev-parse 'refs/tags/1.61.0^{}')" = "<reviewed-release-sha>"
    ```
 
 5. Push the tag without force, verify the remote peeled tag equals the reviewed SHA, then create the
    GitHub Release from that exact tag.
-6. Verify the public release URL and attached release notes. Never move or replace a published tag.
+6. Verify the public release URL and attached release notes explicitly say hosted CI/G1 and
+   CocoaPods publication are deferred. Never move or replace a published tag.
 
-If signing is unavailable or an existing tag points elsewhere, stop. Do not downgrade to a
-lightweight tag, force-push or silently create a release from another SHA.
+If an existing tag points elsewhere, stop. Do not use a lightweight tag, force-push or silently
+create a release from another SHA.
 
 ## 8. CocoaPods transition checklist
 
@@ -177,7 +187,7 @@ For a later, separately approved CocoaPods publication:
       [`docs/governance/CONSUMER_INVENTORY.md`](docs/governance/CONSUMER_INVENTORY.md).
 - [ ] Re-resolve the Example lock, rerun the CocoaPods test row and pass `pod lib lint` from a clean
       tagged checkout.
-- [ ] Confirm the podspec source tag is the signed public `1.61.0` tag and its peeled SHA matches the
+- [ ] Confirm the podspec source tag is the annotated public `1.61.0` tag and its peeled SHA matches the
       reviewed release commit.
 - [ ] Obtain explicit CocoaPods publication authority and record the release actor.
 - [ ] Publish through the approved CocoaPods process, then verify the public podspec and install it
@@ -188,7 +198,7 @@ publication.
 
 ## 9. Post-release verification
 
-- [ ] Verify local and remote signed tag objects peel to the reviewed SHA.
+- [ ] Verify local and remote annotated tag objects peel to the reviewed SHA.
 - [ ] Verify the GitHub Release is public and its notes match the changelog.
 - [ ] Resolve SwiftPM by exact version from a clean external consumer.
 - [ ] Record any deferred CocoaPods publication and hosted compatibility follow-up without rewriting

@@ -2,8 +2,9 @@
 
 Thank you for helping improve Boardy. This guide describes the contributor contract for the 1.61.0
 release candidate. The canonical architecture and compatibility constraints are documented in
-[`AGENTS.md`](AGENTS.md), [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) and
-[`docs/adr/0001-boardy-1x-main-actor.md`](docs/adr/0001-boardy-1x-main-actor.md).
+[`AGENTS.md`](AGENTS.md) and [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md).
+The [actor-isolation ADR](docs/adr/0001-boardy-1x-main-actor.md) is deferred decision history, not
+an implementation contract for 1.61.0.
 
 ## Before you start
 
@@ -73,10 +74,9 @@ available or a hosted/CI-enforced support matrix. Current execution evidence is 
 
 | Integration | Language mode | Destination | Expected signal |
 |---|---|---|---|
-| CocoaPods `Boardy_Tests` | Swift 5 with complete strict-concurrency checking | iPhone 17 / iOS 26.4 | All workspace tests pass |
-| SwiftPM `Boardy` | Swift 5 with complete strict-concurrency checking | iPhone 17 / iOS 26.4 | All package tests pass; no Boardy-owned warning |
-| SwiftPM `Boardy` | Swift 6 strict, warnings as errors | iPhone 17 / iOS 26.4 | All package tests pass |
-| SwiftPM clean consumer | Swift 6 strict, warnings as errors | Generic iOS Simulator | Consumer imports and builds Boardy |
+| CocoaPods `Boardy_Tests` | Swift 5 language mode | iPhone 17 / iOS 26.4 | All workspace tests pass |
+| SwiftPM `Boardy` | Swift 5 language mode | iPhone 17 / iOS 26.4 | All package tests pass |
+| SwiftPM clean consumer | Swift 5 language mode | Generic iOS Simulator | Consumer imports and builds Boardy |
 | Distribution metadata | CocoaPods Swift 5 / iOS 14+ | No executable destination | `pod lib lint` and package resolution pass |
 
 Use this common Xcode configuration for repository-local outputs:
@@ -97,9 +97,9 @@ destinations:
 -maximum-concurrent-test-simulator-destinations 1
 ```
 
-Canonical full commands and the release-only checks live in [`RELEASING.md`](RELEASING.md). Older
-runtime/device rows, N-1 Xcode and hosted CI are intentionally deferred; do not describe local
-success as G1 or production support.
+Canonical full commands and the release-only checks live in [`RELEASING.md`](RELEASING.md).
+Swift 6 language mode, MainActor isolation, older runtime/device rows, N-1 Xcode and hosted CI are
+intentionally deferred; do not describe local success as G1 or production support.
 
 ## Development and testing expectations
 
