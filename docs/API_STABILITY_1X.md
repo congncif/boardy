@@ -37,7 +37,9 @@ Source/API removals still require a major-update decision. The platform exceptio
 
 ## Concurrency policy for 1.61.0
 
-Gate A1 is provisional until ownership is designated. Current consumer evidence selects this candidate contract:
+The owner is designated and the requester approved the legacy `BlockTaskBoard` executor branch on
+2026-07-14. Gate A1 remains provisional until consumer dispositions and the complete policy/ADR
+approval are recorded. The selected candidate contract is:
 
 - MainActor-first internal orchestration and UIKit state behind source-compatible entry boundaries.
 - No `@MainActor` added to an existing public declaration.

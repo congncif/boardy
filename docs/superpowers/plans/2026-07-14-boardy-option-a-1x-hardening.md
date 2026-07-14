@@ -71,9 +71,9 @@ local_xcodebuild() {
 | Thuộc tính | Giá trị |
 |---|---|
 | Trạng thái | In progress trên `codex/boardy-1.61.0` |
-| Phiên bản plan | 0.23.0 |
+| Phiên bản plan | 0.24.0 |
 | Implementation authorization | Branch + commit/push/tag/GitHub Release được authorize; CocoaPods publish excluded |
-| Technical owner / backup | Authenticated admin `@congncif` là release actor; technical-owner designation, backup và security contact vẫn cần ghi rõ trước final GitHub Release |
+| Ownership / security | Technical owner `congnc.if@gmail.com` (`@congncif` verified); backup `congnc1@gmail.com` (GitHub handle/access pending); private security contact `congnc.if@gmail.com` |
 | Boardy baseline | `bfa9579` trên `master` |
 | UIComposable baseline | `c31acaf569b8e10d365ba6af0b88d174c646e5b3` trên `master` |
 | Boardy release candidate | `1.61.0` — project policy cho phép platform-floor change ở minor; major reserved for big updates |
@@ -98,14 +98,14 @@ local_xcodebuild() {
 
 ## 2. Decision package submitted for approval
 
-Phê duyệt plan này đồng nghĩa chọn scope và execution constraints dưới đây. `D-004` iOS 14+ và `D-008` minor `1.61.0`/major-reserved-for-big-updates phản ánh quyết định của requester; `D-005` vẫn **provisional** cho đến khi Gate A1 xác nhận consumer blast radius và executor behavior.
+Phê duyệt plan này đồng nghĩa chọn scope và execution constraints dưới đây. `D-004` iOS 14+ và `D-008` minor `1.61.0`/major-reserved-for-big-updates phản ánh quyết định của requester. Requester đã approve nhánh preserve toàn bộ legacy `BlockTaskBoard` executor/order của `D-005`; phần MainActor-first còn lại vẫn **provisional** cho đến khi Gate A1 xác nhận consumer dispositions và toàn bộ policy/ADR.
 
 | Decision | Proposed decision cho Option A | Consequence |
 |---|---|---|
 | `D-002` Product positioning | “Legacy-compatible modular orchestration framework with typed façades over a runtime `Any?` transport” | Không claim end-to-end type safety |
 | `D-003` Evolution | Option A: harden 1.x only | Boardy 2 work được deferred |
 | `D-004` Candidate matrix | iOS 14+; Xcode 26.4.1 đang cài; executable tests chỉ trên iPhone 17 Simulator iOS 26.4; CocoaPods Swift 5 language mode; SwiftPM verified ở Swift 5 compatibility và Swift 6 strict modes | Requester yêu cầu không start/target device khác; older-runtime/device, N-1 Xcode và CI-enforced support đều deferred |
-| `D-005` Concurrency | Provisional: MainActor-first internals; existing public declarations giữ source signature; lock cho shared storage; Gate A1 chọn MainActor hop cho toàn bộ `BlockTaskBoard` terminal path hoặc giữ toàn bộ legacy executor + ordering, gồm residual non-MainActor Board messages | Additive executor API cần RFC + plan amendment riêng; cấm hybrid split; Gate A1, behavior tests và public-interface diff phải xanh |
+| `D-005` Concurrency | MainActor-first internals còn provisional; existing public declarations giữ source signature; lock cho shared storage; requester đã chọn giữ toàn bộ legacy `BlockTaskBoard` executor + ordering, gồm residual non-MainActor Board messages | Additive executor API cần RFC + plan amendment riêng; cấm hybrid split; Gate A1, behavior tests và public-interface diff phải xanh |
 | `D-006` SwiftPM structure | Một umbrella product/module `Boardy`; không split public modules trong 1.x | Giữ `import Boardy` và giảm migration |
 | `D-008` Compatibility | `1.61.0`; project policy cho phép drop iOS 12/13 trong minor; major chỉ dùng cho big update; không remove/rename public declarations | Không gọi policy này là strict SemVer; migration/platform impact phải explicit |
 | `D-009` Task cancellation | Cooperative cancellation, exactly one terminal callback, late callback bị bỏ qua | Fix `BlockTaskBoard` có behavior contract đo được |
@@ -114,10 +114,10 @@ Phê duyệt plan này đồng nghĩa chọn scope và execution constraints dư
 
 ### 2.1. Organizational inputs không được tự suy đoán
 
-- `D-001`: tên technical owner và backup owner có release access.
-- Danh sách consumer/app/module hiện hữu và Boardy version đang dùng.
-- GitHub handle chính xác để tạo `CODEOWNERS`.
-- Xác nhận kênh private security report và người trực.
+- Đã nhận `D-001`: technical owner `congnc.if@gmail.com` và backup owner `congnc1@gmail.com`; GitHub handle/release access của backup vẫn cần xác nhận.
+- Đã capture danh sách consumer/app/module và Boardy version; owner/disposition của từng consumer vẫn cần xác nhận.
+- Đã verify technical-owner handle `@congncif`; không suy đoán backup handle nên `CODEOWNERS` chưa được tạo.
+- Đã xác nhận private security contact `congnc.if@gmail.com`; GitHub Private Vulnerability Reporting hiện chưa bật và không được quảng bá như một channel hoạt động.
 
 Sau khi plan được approve, Task 0 và Task 1 ở sibling repo có thể bắt đầu song song. Không Boardy-mutating Task 2–8 nào được bắt đầu trước khi Task 0 đã capture/validate xong immutable `1.60.1` interface + API graph; sau mốc đó chúng có thể hoàn tất trong khi Gate A1 còn pending vì chưa đổi public concurrency contract. Không được bắt đầu Task 9, mark G0/G1, tag hoặc publish khi các organizational input trên chưa được ghi nhận.
 
@@ -300,9 +300,9 @@ When the user approves execution, update the living roadmap atomically:
 
 - `D-003` → `Selected for execution: Option A/pre-G1`; hosted CI/G1 remains a separate future selection;
 - `D-002`, `D-004`, `D-006`, `D-008`, `D-009`, `D-011`, `D-013` → `Approved for Option A`, each with rationale, consequences and owner in the Decision Log; `D-004` records iOS 14+ and `D-008` records minor `1.61.0` plus major-reserved policy;
-- `D-005` → `Provisional; Gate A1 pending`, then `Approved for Option A` only after Gate A1 confirms executor behavior;
+- `D-005` → `Provisional; Gate A1 pending`; record the approved legacy `BlockTaskBoard` branch, then move the whole decision to `Approved for Option A` only after Gate A1 confirms the remaining policy;
 - every ID listed in section 3.1 → `Selected`; do not mark any item `In progress` or `Done` merely because the plan was approved;
-- `D-001` and consumer-inventory precondition remain open/blocking until real people and applications are recorded.
+- `D-001` remains in progress until GitHub identity/release access is confirmed for both owners; the consumer-inventory precondition remains blocking until application owners/dispositions are recorded.
 
 - [x] **Step 5: Capture the public API before any Boardy source mutation**
 
@@ -1018,12 +1018,12 @@ This is a blocking decision gate, not part of Task 0. Task 1 may run after appro
 - [ ] Exercise representative main-queue and off-main orchestration call sites plus callback assumptions.
 - [ ] Confirm from existing public docs/evidence which UIKit APIs are already main-only. A new `dispatchPrecondition` may be added only at those proven boundaries.
 - [ ] For any other synchronous API, preserve caller behavior with lock-based safety; do not introduce a new off-main crash in a minor release.
-- [ ] Review executor identity and observable ordering together. If a consumer depends on worker-queue behavior, preserve the entire Task 6 terminal sequence—including `sendOutput`/Board `complete`—on that executor and document the non-MainActor residual; do not silently split or reorder it. If reviewers instead require those Board messages on MainActor, stop and reopen the scoped RFC/plan. Any additive executor API also requires that separate approval before Task 9.
+- [x] Review executor identity and observable ordering together. Consumer evidence and requester approval select preservation of the entire Task 6 terminal sequence—including `sendOutput`/Board `complete`—on the legacy executor as a documented non-MainActor residual; do not silently split or reorder it. Any additive executor API requires a separate scoped RFC/plan.
 - [ ] Approve `docs/API_STABILITY_1X.md`, mark ADR-0001 `Accepted`, and move `D-005` from `Provisional` to `Approved for Option A`; confirm the already-selected `D-004`/`D-008` consequences and owners.
 
 If any checkbox cannot pass, record the blocker in the living roadmap and stop before Task 9. Do not mark the earlier independent tasks incomplete.
 
-**Current status: BLOCKED.** Known consumer evidence exists, but technical owner, backup owner and private security contact remain undesignated; owner approval of the API policy, ADR and full legacy `BlockTaskBoard` executor/order contract is also missing. Task 9 has not started and must remain untouched until every Gate A1 checkbox is approved.
+**Current status: BLOCKED.** Technical owner, backup owner, private security contact and the full legacy `BlockTaskBoard` executor/order branch are now recorded. Remaining blockers are the backup owner's confirmed GitHub identity/release access, owner/disposition for every known consumer and explicit approval of the complete API policy, ADR and iOS 14 support matrix. Task 9 has not started and must remain untouched until every Gate A1 checkbox is approved.
 
 **Suggested commit after gate approval:** `docs: approve Boardy 1.x executor contract`
 
@@ -1665,9 +1665,10 @@ README order:
 - Create: `.github/pull_request_template.md`
 - Modify: `tools/install-template.sh`
 - Modify: `tools/init-module.sh`
+- Modify: `Example/init-module.sh`
 - Delete: `claude-dangerous.sh`
 
-- [ ] **Step 1: Establish release history**
+- [x] **Step 1: Establish release history**
 
 `CHANGELOG.md` follows Keep a Changelog headings and includes:
 
@@ -1675,7 +1676,7 @@ README order:
 - `1.61.0` sections for Added, Changed, Fixed and Security;
 - a note that older releases did not have complete public release notes rather than fabricating history.
 
-- [ ] **Step 2: Establish contributor and support contracts**
+- [x] **Step 2: Establish contributor and support contracts**
 
 - `CONTRIBUTING.md`: setup, local candidate test matrix, TDD expectation for core, semantic commits, PR checklist and ADR/RFC rule.
 - `CODE_OF_CONDUCT.md`: Contributor Covenant with an explicit enforcement contact supplied by the owner before merge.
@@ -1685,11 +1686,14 @@ README order:
 
 - [ ] **Step 3: Add structured issue/PR intake**
 
+Issue forms and the pull-request template are complete. `CODEOWNERS` remains intentionally pending
+until the backup owner's GitHub handle is confirmed.
+
 Bug template requires Boardy version, integration method, Xcode/Swift/iOS matrix, minimal reproduction and logs. Feature template asks why the capability belongs in Boardy 1.x versus an app/plugin. PR template links tests, migration impact and ADR/RFC.
 
 Create `CODEOWNERS` only after `D-001` provides confirmed GitHub handles. Absence of that input blocks release readiness but does not authorize guessing.
 
-- [ ] **Step 4: Pin template repositories**
+- [x] **Step 4: Pin template repositories**
 
 Use the immutable revisions observed on 2026-07-14:
 
@@ -1703,6 +1707,10 @@ Both scripts must:
 3. quote arguments;
 4. clone, checkout the exact revision detached and verify `git rev-parse HEAD`;
 5. exit non-zero on checksum/revision mismatch.
+
+The historical `Example/init-module.sh` copy must delegate to the pinned canonical script so no
+mutable clone path remains. Validate module and prefix inputs as Swift identifiers before using
+them in template substitutions.
 
 Representative pattern:
 
@@ -1719,13 +1727,19 @@ git -C "$WORK_DIR/module-template" checkout --detach "$REVISION"
 test "$(git -C "$WORK_DIR/module-template" rev-parse HEAD)" = "$REVISION"
 ```
 
-- [ ] **Step 5: Remove the unsafe default utility**
+- [x] **Step 5: Remove the unsafe default utility**
 
 Delete tracked `claude-dangerous.sh`. Do not replace it with another script that bypasses permission checks. Personal local automation remains outside the open-source repository.
 
-- [ ] **Step 6: Verify scripts without modifying the repository**
+- [x] **Step 6: Verify scripts without modifying the repository**
 
 Run `tools/install-template.sh` in a disposable directory. Run `tools/init-module.sh` only inside another disposable directory with a sample module name. Assert both checked-out revisions match the constants and the Boardy branch checkout remains unchanged except intended plan changes.
+
+Evidence on 2026-07-14: both scripts passed `bash -n`; the installer verified
+`892828b9c003d1194fb044921000708345e00493` with `HOME` redirected under `.build-local/tmp`, and
+the module generator verified `62e618beba9900a26970deb722f12163c77c319f` and produced the
+expected sample podspec/IO/plugin files in a separate `.build-local/tmp` directory. Cleanup traps
+left no checkout work directories, and Git status contained only intended Task 12 changes.
 
 **Suggested commit:** `docs: add open-source governance and pin tooling inputs`
 
@@ -1956,6 +1970,7 @@ Boardy 2 typed routing remains a separate strategic decision, not a continuation
 
 | Plan version | Date | Change |
 |---|---|---|
+| 0.24.0 | 2026-07-14 | Ghi nhận technical owner, backup owner và private security contact; verify `@congncif`, giữ backup handle/access pending; requester approve toàn bộ legacy `BlockTaskBoard` executor/order; mở rộng Task 12 để loại mutable clone trùng ở `Example/init-module.sh`; Gate A1 vẫn blocked bởi consumer dispositions và full policy/ADR approval |
 | 0.23.0 | 2026-07-14 | Chốt Tasks 0–8 bằng các semantic commit và evidence 59/59; sửa double-checked `SafeDictionary` + transactional barrier cleanup từ checkpoint review; chuẩn hóa mọi Xcode command qua repo-local wrapper với `-disablePackageRepositoryCache`, cấm empty custom `-packageCachePath`; giữ Gate A1 blocked trước Task 9 |
 | 0.22.0 | 2026-07-14 | Chuyển project-scoped temp, DerivedData, source checkout và result logs vào ignored root `.build-local/` trong chính repo trên external drive; API tools mặc định dùng local temp root và không còn dùng `/tmp` |
 | 0.21.0 | 2026-07-14 | Ghi nhận latent full-suite regression trong gateway lookup: chỉ tạo gateway barrier sau khi xác nhận gateway tồn tại, thêm regression ngăn phantom internal board; giữ thay đổi trong Task 3 barrier correctness |

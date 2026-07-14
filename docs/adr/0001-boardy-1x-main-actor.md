@@ -1,9 +1,9 @@
 # ADR-0001 — Boardy 1.x MainActor and compatibility boundary
 
-- Status: Proposed — Gate A1 approval pending
+- Status: Proposed — executor branch approved; remaining Gate A1 approval pending
 - Date: 2026-07-14
 - Release: Boardy 1.61.0
-- Decision owner: Not yet designated
+- Decision owner: `congnc.if@gmail.com`
 - Release actor: `@congncif` (authenticated repository administrator)
 
 ## Context
@@ -18,11 +18,11 @@ The selected Option A release raises Boardy to iOS 14 while preserving the 1.x p
 2. Use MainActor-first internal helpers for Motherboard mutation, flow/plugin composition, URL routing and UIKit presentation after an audited compatibility boundary.
 3. Do not add a global-actor annotation to an existing public declaration in 1.61.0.
 4. Protect truly cross-thread synchronous storage with a minimal `Locked<Value>` primitive. No callback, handler, delegate call or Board message may execute while its lock is held.
-5. Provisionally preserve the complete legacy `BlockTaskBoard` terminal path on its captured completion executor: success/error, optional `sendOutput`, processing/completion handlers and optional Board `complete` retain their existing order. This is a documented non-MainActor residual, not a hybrid split.
+5. Preserve the complete legacy `BlockTaskBoard` terminal path on its captured completion executor: success/error, optional `sendOutput`, processing/completion handlers and optional Board `complete` retain their existing order. The requester approved this branch on 2026-07-14. This is a documented non-MainActor residual, not a hybrid split.
 6. Keep legacy task `Input`/`Output` unconstrained. A narrowly scoped internal compatibility carrier may be `@unchecked Sendable`; public generic constraints do not change.
 7. Raise Boardy metadata and examples to iOS 14. UIComposable publishes an additive `UIComposableCore` SwiftPM product at 1.1.0, with an iOS 12 package floor, so Boardy can ship one complete SwiftPM target without pulling DiffUI/Rx dependencies.
 
-Gate A1 may mark this ADR Accepted only after owner designation, consumer dispositions, public API baseline capture and executor behavior tests are all recorded. If review requires Board messages on MainActor while consumers require legacy executor/order, execution stops and the public-contract decision returns to planning.
+Gate A1 may mark this ADR Accepted only after consumer owners/dispositions, explicit policy approval, public API baseline capture and executor behavior tests are all recorded. If review requires Board messages on MainActor while consumers require legacy executor/order, execution stops and the public-contract decision returns to planning.
 
 ## Lock boundaries
 

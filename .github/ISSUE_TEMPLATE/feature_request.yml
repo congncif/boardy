@@ -1,0 +1,108 @@
+name: Feature request
+description: Propose a capability that belongs in Boardy rather than an application or plugin
+title: "[Feature]: "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Boardy 1.x prioritizes a small, legacy-compatible orchestration core. Public API additions require an RFC before implementation.
+
+        **Do not include security vulnerability details in this form.** Use the repository's [private security reporting flow](https://github.com/congncif/boardy/security/policy).
+
+  - type: checkboxes
+    id: existing-request
+    attributes:
+      label: Existing request check
+      description: Search open and closed issues before filing a duplicate.
+      options:
+        - label: I searched the existing issues and did not find this request.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Describe the concrete user or architecture problem, without prescribing a solution first.
+    validations:
+      required: true
+
+  - type: textarea
+    id: boardy-scope
+    attributes:
+      label: Why this belongs in Boardy 1.x
+      description: Explain why the capability belongs in the framework core rather than an application, a Boardy board/plugin, or a separate extension package.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed capability
+      description: Describe the desired behavior and, if relevant, sketch the smallest compatible API.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include app-local, board/plugin, composition, and extension-package alternatives where applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and migration impact
+      description: Cover existing Boardy 1.x source behavior, iOS 14+, Swift 5/6 language modes, and SwiftPM/CocoaPods consumers.
+      placeholder: State "None identified" only after considering each area.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: public-contract
+    attributes:
+      label: Expected public-contract impact
+      options:
+        - No public API or observable behavior change
+        - Additive public API
+        - Observable behavior change
+        - Deprecation with replacement
+        - Unsure
+    validations:
+      required: true
+
+  - type: input
+    id: rfc
+    attributes:
+      label: ADR or RFC
+      description: Link the proposal if one exists. Public API additions require an accepted RFC before implementation.
+      placeholder: "URL, issue reference, or: Not written yet"
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: Success criteria
+      description: Describe observable acceptance criteria and the tests or consumer sample that would validate the capability.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to help design or implement this capability after scope approval.
+          required: false
+
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the project's [Code of Conduct](https://github.com/congncif/boardy/blob/master/CODE_OF_CONDUCT.md).
+          required: true
