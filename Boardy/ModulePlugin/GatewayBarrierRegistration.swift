@@ -26,13 +26,22 @@ public final class GatewayBarrierRegistration {
         return self
     }
 
-    public static var ​exempt: GatewayBarrierRegistration {
+    private static func makeExemptRegistration() -> GatewayBarrierRegistration {
         GatewayBarrierRegistration(activation: { barrier, _ in
             #if DEBUG
                 print("⏩ [GatewayBarrierProxy] GatewayBarrier has been bypassed by \(barrier.identifier)")
             #endif
             barrier.complete(true)
         }, flowRegistration: { _ in })
+    }
+
+    public static var exempt: GatewayBarrierRegistration {
+        makeExemptRegistration()
+    }
+
+    @available(*, deprecated, renamed: "exempt")
+    public static var ​exempt: GatewayBarrierRegistration {
+        exempt
     }
 }
 

@@ -117,20 +117,16 @@ public extension ModuleBuilderPlugin {
             continuousProducer.add(registration: registration)
         }
 
-        let pluginBox = ObjectBox()
-        pluginBox.setObject(self)
+        let plugin = self
 
         let componentBox = ObjectBox()
         componentBox.setObject(main)
 
-        mainProducer.registerBoard(identifier) { [pluginBox, componentBox] identifier in
-            guard let unboxedTarget = pluginBox.unboxed(Self.self) else {
-                preconditionFailure("\(Self.self) BAD ACCESS")
-            }
+        mainProducer.registerBoard(identifier) { [plugin, componentBox, continuousProducer] identifier in
             guard let unboxedComponent = componentBox.unboxed(SharedValueComponent.self) else {
                 preconditionFailure("\(SharedValueComponent.self) BAD ACCESS")
             }
-            return unboxedTarget.build(with: identifier, sharedComponent: unboxedComponent, internalContinuousProducer: continuousProducer)
+            return plugin.build(with: identifier, sharedComponent: unboxedComponent, internalContinuousProducer: continuousProducer)
         }
 
         pluginDidLoad(with: main)

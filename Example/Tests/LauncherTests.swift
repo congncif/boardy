@@ -95,25 +95,67 @@ class LauncherTests: XCTestCase {
     }
 
     func testBlockURLOpenerPlugin() {
-        let handlers = launcher.open(link: "xxx://localhost")
-        XCTAssertTrue(handlers.count == 1)
+        let matchedCandidates = launcher.open(link: "xxx://localhost")
+        XCTAssertTrue(matchedCandidates.count == 1)
         XCTAssertEqual(xValue, "localhost")
-        XCTAssertEqual(handlers.first, "xxx-plugin")
+        XCTAssertEqual(matchedCandidates.first, "xxx-plugin")
     }
 
     func testURLOpenerPlugin() {
-        let handlers = launcher.open(link: "yyy://localhost")
-        XCTAssertTrue(handlers.count == 1)
+        let matchedCandidates = launcher.open(link: "yyy://localhost")
+        XCTAssertTrue(matchedCandidates.count == 1)
         XCTAssertEqual(xValue, "localhost")
-        XCTAssertEqual(handlers.first, "yyy-plugin")
+        XCTAssertEqual(matchedCandidates.first, "yyy-plugin")
     }
 
     func testMultipleURLOpenerPlugin() {
-        let handlers = launcher.open(link: "zzz://localhost")
-        XCTAssertTrue(handlers.count == 2)
+        let matchedCandidates = launcher.open(link: "zzz://localhost")
+        XCTAssertTrue(matchedCandidates.count == 2)
         XCTAssertEqual(xValue, "localhost")
         XCTAssertTrue(zValue)
-        XCTAssertEqual(handlers.first, "zzz-plugin")
-        XCTAssertEqual(handlers.last, "zzz-block-plugin")
+        XCTAssertEqual(matchedCandidates.first, "zzz-plugin")
+        XCTAssertEqual(matchedCandidates.last, "zzz-block-plugin")
+    }
+
+    func testMultipleURLOpenerReturnsAllMatchedCandidatesWhileOnlySelectionExecutes() {
+        var selectedCandidateNames: [String] = []
+        launcher.setURLOpenerSelectionHandler { _, _, candidates, select in
+            let selectedCandidates = Array(candidates.suffix(1))
+            selectedCandidateNames = selectedCandidates.map(\.name)
+            select(selectedCandidates)
+        }
+
+        let matchedCandidates = launcher.open(link: "zzz://localhost")
+
+        XCTAssertEqual(matchedCandidates, ["zzz-plugin", "zzz-block-plugin"])
+        XCTAssertEqual(selectedCandidateNames, ["zzz-block-plugin"])
+        XCTAssertNil(xValue)
+        XCTAssertTrue(zValue)
+    }
+
+    func testCleanGatewayBarrierExemptCompletesAndAllowsActivation() {
+        let destinationID: BoardID = "gateway-exempt-destination"
+        let exemptLauncher = PluginLauncher.with(options: .default)
+            .install(plugin: SpyModulePlugin(identifier: destinationID))
+            .install(gatewayBarrier: .exempt, for: destinationID)
+            .instantiate { mainboard in
+                mainboard.matchedFlow(destinationID, with: String.self)
+                    .addTarget(self) { target, value in
+                        target.xValue = value
+                    }
+            }
+
+        exemptLauncher.activateNow { mainboard in
+            mainboard.activation(destinationID, with: String.self)
+                .activate(with: "allowed")
+        }
+
+        XCTAssertEqual(xValue, "allowed")
+    }
+
+    func testLegacyZeroWidthGatewayBarrierExemptRemainsSourceCompatible() {
+        let registration = GatewayBarrierRegistration.​exempt
+
+        XCTAssertNotNil(registration)
     }
 }
