@@ -82,6 +82,11 @@ public enum ActivationBarrierOption {
 }
 
 public extension ActivationBarrier {
+    /// Identifier of the barrier board that guards this activation.
+    ///
+    /// The value is derived purely from `identifier` and `option`, so repeated reads of the same
+    /// `ActivationBarrier` always agree. A non-deterministic value would make `.application`-scope
+    /// barriers miss their cache and retain one extra barrier board per activation.
     var barrierIdentifier: BoardID {
         var privateID = identifier.appending("___PRIVATE_BARRIER___")
 
@@ -96,7 +101,7 @@ public extension ActivationBarrier {
                 if value is Void {
                     break
                 } else {
-                    privateID = privateID.appending(UUID().uuidString)
+                    privateID = privateID.appending("unidentified")
                 }
             } else {
                 privateID = privateID.appending("none")

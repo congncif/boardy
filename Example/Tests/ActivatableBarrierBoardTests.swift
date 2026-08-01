@@ -496,6 +496,72 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertEqual(managerB.duplicateRemovalAttempts, 0)
     }
 
+    /// `resetFlows()` wipes the barrier's completion flow. `Motherboard` must restore it, otherwise
+    /// the gate completes with nobody listening and every pending activation hangs forever.
+    func testBarrierRecoversAfterResetFlows() {
+        let activation = sutBoard.activation(sampleBarrierAuthID, with: Void.self)
+        sutBoard.stubActivationBarrier = activation.barrier()
+
+        sutMotherboard.activateBoard(identifier: sampleBarrierSutID, withOption: sampleInputValue)
+
+        let barrierBoard = sutMotherboard.getBoard(
+            identifier: sampleBarrierAuthID.appending("___PRIVATE_BARRIER___")
+        ) as? ActivatableBarrierBoard
+        XCTAssertEqual(barrierBoard?.pendingTasks.count, 1)
+        XCTAssertNil(sutBoard.activatedValue)
+
+        // Drops the barrier's completion flow along with everything else.
+        sutMotherboard.resetFlows()
+
+        let expectation = expectation(description: #function)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+
+        XCTAssertTrue(authBoard.activated)
+        XCTAssertEqual(
+            sutBoard.activatedValue,
+            sampleInputValue,
+            "Pending activation stayed stuck because the completion flow was never restored"
+        )
+    }
+
+    /// `barrierIdentifier` must be a stable value, not a fresh UUID on every read.
+    func testBarrierIdentifierIsStableAcrossReads() {
+        let barrier = ActivationBarrier(
+            identifier: .random(),
+            scope: .application,
+            option: .unidentified("payload")
+        )
+
+        XCTAssertEqual(barrier.barrierIdentifier, barrier.barrierIdentifier)
+    }
+
+    /// Two barriers built from the same destination and input must address the same barrier board,
+    /// otherwise the `.application` cache grows by one retained board per activation.
+    func testApplicationScopeBarrierReusesCachedBoard() {
+        let destination: BoardID = .random()
+
+        let first = ActivationBarrier(
+            identifier: destination,
+            scope: .application,
+            option: .unidentified("payload")
+        )
+        let second = ActivationBarrier(
+            identifier: destination,
+            scope: .application,
+            option: .unidentified("payload")
+        )
+
+        XCTAssertEqual(first.barrierIdentifier, second.barrierIdentifier)
+
+        let firstBoard = ActivationBarrierFactory.makeBarrierBoard(first)
+        let secondBoard = ActivationBarrierFactory.makeBarrierBoard(second)
+
+        XCTAssertTrue(firstBoard === secondBoard, "Application-scope barrier leaked a second board")
+    }
+
     func testActivationBarrierDone() throws {
         let activation = sutBoard.activation(sampleBarrierAuthID, with: Void.self)
         sutBoard.stubActivationBarrier = activation.barrier()
