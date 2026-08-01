@@ -22,6 +22,13 @@ SwiftPM resolves `UIComposableCore` from the exact public tag `1.1.0`; Boardy ke
 product and preserves `import Boardy`. The CocoaPods constraint remains `~> 1.0.1` so the current
 podspec does not require a CocoaPods trunk publication of UIComposable 1.1.0.
 
+## Threading contract
+
+Motherboard board and flow storage is not synchronized. Call `addBoard`, `removeBoard`,
+`clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows` on the main thread. DEBUG builds
+assert this contract; release builds keep the existing caller-controlled execution and do not hop
+queues or add a release precondition.
+
 ## Compatibility policy
 
 Boardy 1.61.0 raises the deployment floor from iOS 12 to iOS 14 under the project policy that a

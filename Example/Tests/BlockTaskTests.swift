@@ -434,15 +434,17 @@ final class BlockTaskTests: XCTestCase {
     }
 
     func testCompletionBeforeDirectCancelerInstallationCompletesImmediatelyAndDiscardsCanceler() {
-        let completionDelivered = DispatchSemaphore(value: 0)
+        typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
+        let executorEntered = DispatchSemaphore(value: 0)
         let allowCancelerReturn = DispatchSemaphore(value: 0)
+        let completionStore = Locked<Completion?>(nil)
         let cancellationCount = Locked(0)
         let activationReturned = expectation(description: "activation returned")
         let events = BlockTaskEventRecorder()
 
-        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, input, completion in
-            completion(.success(input))
-            completionDelivered.signal()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
+            completionStore.withLock { $0 = completion }
+            executorEntered.signal()
             _ = allowCancelerReturn.wait(timeout: .now() + 5)
             return .default { cancellationCount.withLock { $0 += 1 } }
         })
@@ -461,7 +463,15 @@ final class BlockTaskTests: XCTestCase {
             board.activate(withGuaranteedInput: parameter)
             activationReturned.fulfill()
         }
-        XCTAssertEqual(completionDelivered.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(executorEntered.wait(timeout: .now() + 2), .success)
+
+        let completionDelivered = expectation(description: "completion delivered on main")
+        DispatchQueue.main.async {
+            completionStore.withLock { $0 }?(.success("input"))
+            completionDelivered.fulfill()
+        }
+        wait(for: [completionDelivered], timeout: 2)
+
         XCTAssertEqual(events.values, [
             "processing.true",
             "success.input",

@@ -15,7 +15,7 @@ class MockRequiredBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: InputType) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.sendOutput(String(input))
         }
     }

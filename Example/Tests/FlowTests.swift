@@ -249,7 +249,7 @@ private final class CompletionBoard: Board, GuaranteedBoard, GuaranteedOutputSen
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: String) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.sendOutput(input)
             self?.complete(true)
         }
