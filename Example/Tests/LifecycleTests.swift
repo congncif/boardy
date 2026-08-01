@@ -109,6 +109,38 @@ class LifecycleTests: XCTestCase {
         XCTAssertEqual(thirdBoard.receivedInputs, ["third"])
     }
 
+    /// `getBoard(identifier:)` is a lookup and must have no side effect.
+    ///
+    /// It used to produce and permanently install a board. With the default `NoBoardProducer` that
+    /// means a single read of a mistyped identifier installs a placeholder `NoBoard`, which then
+    /// shadows the real board forever — every later activation of that identifier finds the
+    /// placeholder first and shows "Feature Not Found".
+    func testGetBoardDoesNotInstallBoardForUnknownIdentifier() {
+        let motherboard = Motherboard(boards: [SingleBoard(identifier: "known")])
+
+        _ = motherboard.getBoard(identifier: "mistyped")
+
+        XCTAssertEqual(
+            motherboard.boards.map(\.identifier),
+            ["known"],
+            "A read path installed a placeholder board"
+        )
+    }
+
+    /// The activation path still produces on demand — lazy registration must keep working.
+    func testGetOrProduceBoardStillInstallsProducedBoard() {
+        let producer = BoardProducer()
+        producer.registerBoard("lazy") { identifier in
+            SingleBoard(identifier: identifier)
+        }
+        let motherboard = Motherboard(boardProducer: producer)
+
+        let produced = motherboard.getOrProduceBoard(identifier: "lazy")
+
+        XCTAssertNotNil(produced)
+        XCTAssertEqual(motherboard.boards.map(\.identifier), ["lazy"])
+    }
+
     /// A gateway barrier that never completes must not retain its Motherboard.
     ///
     /// The pending activation closure captured `board` and `self` strongly, forming

@@ -16,7 +16,13 @@ public protocol MotherboardType: IdentifiableBoard, OriginalBoard {
     func addBoard(_ board: ActivatableBoard)
     func removeBoard(withIdentifier identifier: BoardID)
 
+    /// Look up an already-installed board. This is a pure read: it must not install anything.
     func getBoard(identifier: BoardID) -> ActivatableBoard?
+
+    /// Look up a board, producing and installing it when the motherboard supports lazy registration.
+    /// Use this on activation paths only; read paths must use `getBoard(identifier:)`.
+    func getOrProduceBoard(identifier: BoardID) -> ActivatableBoard?
+
     func getGatewayBoard(identifier: BoardID) -> ActivatableBoard?
 
     /// Remove all active boards at once
@@ -44,6 +50,11 @@ public extension MotherboardType {
     func installedBoard(identifier: BoardID) -> ActivatableBoard? {
         boards.first(where: { $0.identifier == identifier })
     }
+
+    /// Conformances without lazy registration resolve production to a plain lookup.
+    func getOrProduceBoard(identifier: BoardID) -> ActivatableBoard? {
+        getBoard(identifier: identifier)
+    }
 }
 
 extension MotherboardType where Self: FlowManageable {
@@ -66,6 +77,10 @@ protocol LazyMotherboard: MotherboardType {
 
 extension LazyMotherboard {
     public func getBoard(identifier: BoardID) -> ActivatableBoard? {
+        boards.first(where: { $0.identifier == identifier })
+    }
+
+    public func getOrProduceBoard(identifier: BoardID) -> ActivatableBoard? {
         if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
             return installedBoard
         }
