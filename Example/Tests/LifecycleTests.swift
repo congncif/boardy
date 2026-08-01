@@ -6,7 +6,7 @@
 //  Copyright © 2021 [iF] Solution. All rights reserved.
 //
 
-import Boardy
+@testable import Boardy
 import XCTest
 
 final class ContiBoard: ContinuousBoard, ActivatableBoard {
@@ -15,6 +15,20 @@ final class ContiBoard: ContinuousBoard, ActivatableBoard {
 
 final class SingleBoard: Board, ActivatableBoard {
     func activate(withOption _: Any?) {}
+}
+
+/// Gateway barrier that never calls `complete()`, leaving the pending activation queued forever.
+private final class StuckGatewayBoard: Board, ActivatableBoard {
+    func activate(withOption _: Any?) {}
+}
+
+/// Destination guarded by the stuck gateway. It must not be activated while the gate is pending.
+private final class GuardedBoard: Board, ActivatableBoard {
+    private(set) var activationCount = 0
+
+    func activate(withOption _: Any?) {
+        activationCount += 1
+    }
 }
 
 private final class LifecycleRecordingBoard: Board, DedicatedBoard {
@@ -68,7 +82,7 @@ class LifecycleTests: XCTestCase {
         motherboard.activateAllBoards(
             withInputs: [
                 BoardInput(target: firstBoard.identifier, input: "first"),
-                BoardInput(target: thirdBoard.identifier, input: "third")
+                BoardInput(target: thirdBoard.identifier, input: "third"),
             ],
             defaultInput: "default"
         )
@@ -86,12 +100,44 @@ class LifecycleTests: XCTestCase {
 
         motherboard.activateAllBoards(withInputs: [
             BoardInput(target: firstBoard.identifier, input: "first"),
-            BoardInput(target: thirdBoard.identifier, input: "third")
+            BoardInput(target: thirdBoard.identifier, input: "third"),
         ])
 
         XCTAssertEqual(firstBoard.receivedInputs, ["first"])
         XCTAssertEqual(secondBoard.receivedInputs.count, 1)
         XCTAssertNil(secondBoard.receivedInputs[0])
         XCTAssertEqual(thirdBoard.receivedInputs, ["third"])
+    }
+
+    /// A gateway barrier that never completes must not retain its Motherboard.
+    ///
+    /// The pending activation closure captured `board` and `self` strongly, forming
+    /// motherboard -> mainboard -> gatewayBarrierBoard -> pendingTask -> closure -> motherboard.
+    func testStuckGatewayBarrierDoesNotRetainMotherboard() {
+        let guardedID: BoardID = "guarded"
+
+        weak var weakMotherboard: Motherboard?
+        weak var weakGuardedBoard: GuardedBoard?
+
+        autoreleasepool {
+            let producer = BoardProducer()
+            producer.registerGatewayBoard(guardedID) { identifier in
+                StuckGatewayBoard(identifier: identifier)
+            }
+
+            let guardedBoard = GuardedBoard(identifier: guardedID)
+            let motherboard = Motherboard(boardProducer: producer, boards: [guardedBoard])
+
+            weakMotherboard = motherboard
+            weakGuardedBoard = guardedBoard
+
+            // The gateway never completes, so this activation stays pending forever.
+            motherboard.activateBoard(identifier: guardedID, withOption: "payload")
+
+            XCTAssertEqual(guardedBoard.activationCount, 0, "Gate is still pending")
+        }
+
+        XCTAssertNil(weakMotherboard, "Motherboard leaked through the pending gateway activation")
+        XCTAssertNil(weakGuardedBoard, "Guarded board leaked through the pending gateway activation")
     }
 }

@@ -14,43 +14,14 @@ public extension MotherboardType {
             return
         }
 
-        func activate() {
-            if let barrier = board.activationBarrier(withOption: option) {
-                let barrierBoard = getBarrierBoard(barrier)
-
-                DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
-
-                let pendingActivation: () -> Void = { [weak board, weak self] in
-                    guard let self, let board else { return }
-                    DebugLog.logActivation(source: self, destination: board, data: option)
-                    board.activate(withOption: option)
-                }
-
-                guard let owner = self as? BarrierOwningMotherboard else {
-                    assertionFailure("‼️ A barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
-                    return
-                }
-                let pendingTask = BarrierPendingTask(
-                    activation: pendingActivation,
-                    barrierOptionValue: barrier.option.value,
-                    ownerToken: barrierBoard.ownerToken(for: owner)
-                )
-
-                barrierBoard.activate(withOption: pendingTask)
-            } else {
-                DebugLog.logActivation(source: self, destination: board, data: option)
-                board.activate(withOption: option)
-            }
-        }
-
         guard !board.identifier.isGateway else {
-            activate()
+            performActivation(of: board, withOption: option)
             return
         }
 
         let gatewayBoard = getGatewayBoard(identifier: identifier)
         if board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
-            activate()
+            performActivation(of: board, withOption: option)
         } else {
             guard
                 let gatewayBarrierBoard = gatewayBoard as? ActivatableBarrierBoard,
@@ -60,8 +31,11 @@ public extension MotherboardType {
                 return
             }
 
-            let pendingActivation: () -> Void = {
-                activate()
+            // Must not capture `self` or `board` strongly: a gateway that never completes keeps this
+            // task queued forever, which would retain the whole motherboard graph.
+            let pendingActivation: () -> Void = { [weak self, weak board] in
+                guard let self, let board else { return }
+                performActivation(of: board, withOption: option)
             }
 
             let boardInputModel = GatewayInputModel(identifier: identifier, option: option)
@@ -89,6 +63,41 @@ public extension MotherboardType {
 }
 
 extension MotherboardType {
+    /// Activates `board`, routing through its own activation barrier when it declares one.
+    ///
+    /// `board` is passed in rather than captured so that deferred callers (gateway barriers) can
+    /// hold it weakly. See `activateBoard(identifier:withOption:)`.
+    func performActivation(of board: ActivatableBoard, withOption option: Any?) {
+        guard let barrier = board.activationBarrier(withOption: option) else {
+            DebugLog.logActivation(source: self, destination: board, data: option)
+            board.activate(withOption: option)
+            return
+        }
+
+        let barrierBoard = getBarrierBoard(barrier)
+
+        DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
+
+        guard let owner = self as? BarrierOwningMotherboard else {
+            assertionFailure("‼️ A barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
+            return
+        }
+
+        let pendingActivation: () -> Void = { [weak self, weak board] in
+            guard let self, let board else { return }
+            DebugLog.logActivation(source: self, destination: board, data: option)
+            board.activate(withOption: option)
+        }
+
+        let pendingTask = BarrierPendingTask(
+            activation: pendingActivation,
+            barrierOptionValue: barrier.option.value,
+            ownerToken: barrierBoard.ownerToken(for: owner)
+        )
+
+        barrierBoard.activate(withOption: pendingTask)
+    }
+
     func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
         let identifier = barrierActivation.barrierIdentifier
         if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
