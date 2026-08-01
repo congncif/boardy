@@ -46,6 +46,20 @@ public extension MotherboardType {
     }
 }
 
+extension MotherboardType where Self: FlowManageable {
+    /// Re-registers the completion flow of every installed barrier board.
+    ///
+    /// Barrier boards listen for their gate's `CompleteAction` through a flow on this motherboard.
+    /// Wiping the flow list (`resetFlows()`) would otherwise leave an in-flight barrier with nobody
+    /// listening, stranding its pending activations forever.
+    func restoreBarrierCompletionFlows() {
+        guard let owner = self as? BarrierOwningMotherboard else { return }
+        for barrierBoard in boards.compactMap({ $0 as? ActivatableBarrierBoard }) {
+            barrierBoard.registerCompletableFlow(to: owner, ownerToken: barrierBoard.ownerToken(for: owner))
+        }
+    }
+}
+
 protocol LazyMotherboard: MotherboardType {
     var boardProducer: ActivatableBoardProducer { get }
 }

@@ -200,7 +200,9 @@ private struct BarrierCycleState {
 
 private struct BarrierFlowRegistration {
     let token: BarrierOwnerToken
-    var isRegistered: Bool
+    /// Identifier of the completion flow registered on the owner, when one is currently installed.
+    /// Checked against the owner's live flows so that `resetFlows()` does not strand the barrier.
+    var flowIdentifier: String?
 }
 
 final class ActivatableBarrierBoard: Board, ActivatableBoard {
@@ -232,7 +234,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
             let token = BarrierOwnerToken(owner: owner)
             registrations[identity] = BarrierFlowRegistration(
                 token: token,
-                isRegistered: false
+                flowIdentifier: nil
             )
             return token
         }
@@ -256,22 +258,37 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         let identity = ObjectIdentifier(manager)
         guard token.identity == identity else { return }
 
+        // Deduplicate against the owner's live flows rather than a one-shot latch: `resetFlows()`
+        // drops the flow, and the barrier must be able to register a replacement.
+        let liveFlowIdentifiers = Set(manager.flows.map { $0.identifier })
+        let flowIdentifier = completionFlowIdentifier
+
         let shouldRegister = registrations.withLock { registrations -> Bool in
             guard var registration = registrations[identity], registration.token === token else {
                 return false
             }
-            guard registration.isRegistered == false else { return false }
-            registration.isRegistered = true
+            if let registered = registration.flowIdentifier, liveFlowIdentifiers.contains(registered) {
+                return false
+            }
+            registration.flowIdentifier = flowIdentifier
             registrations[identity] = registration
             return true
         }
         guard shouldRegister else { return }
 
-        manager.registerCompletionFlow(
-            matchedIdentifiers: completableIdentifier
-        ) { [weak self, token] isDone in
-            self?.completePendingTasks(from: token, isDone: isDone)
+        let flow = BoardActivateFlow(
+            identifier: flowIdentifier,
+            matchedIdentifiers: [completableIdentifier]
+        ) { [weak self, token] data in
+            guard let completionAction = data as? CompleteAction else { return }
+            self?.completePendingTasks(from: token, isDone: completionAction.isDone)
         }
+        manager.registerFlow(flow)
+    }
+
+    /// Stable identifier so a re-registered completion flow can be recognised as the same flow.
+    private var completionFlowIdentifier: String {
+        "boardy.barrier.completion.\(identifier.rawValue)"
     }
 
     func activate(withOption option: Any?) {
@@ -385,8 +402,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         removeExactInstallation(from: intendedOwner)
 
         if let currentDelegateOwner,
-           ObjectIdentifier(currentDelegateOwner) != ObjectIdentifier(intendedOwner)
-        {
+           ObjectIdentifier(currentDelegateOwner) != ObjectIdentifier(intendedOwner) {
             removeExactInstallation(from: currentDelegateOwner)
         }
         delegate = nil

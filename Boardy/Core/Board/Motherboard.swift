@@ -92,6 +92,7 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     public func resetFlows() {
         flows = []
         registerDefaultFlows()
+        restoreBarrierCompletionFlows()
     }
 
     public func removeFlow(by identifier: String) {
