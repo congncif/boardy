@@ -7,39 +7,41 @@
 
 import Foundation
 
-final class SafeArray<Value> {
-    private var array = [Value]()
-    private let queue = DispatchQueue(label: "boardy.safe-array.serial-queue")
+final class SafeArray<Value>: @unchecked Sendable {
+    private let storage = Locked<[Value]>([])
 
-    func append(_ newElement: Value) {
-        queue.async { [weak self] in
-            guard let self = self else { return }
-            self.array.append(newElement)
+    @discardableResult
+    func append(_ newElement: Value) -> Bool {
+        storage.withLock { values in
+            let wasEmpty = values.isEmpty
+            values.append(newElement)
+            return wasEmpty
         }
     }
 
     func removeAll() {
-        queue.sync { [weak self] in
-            guard let self = self else { return }
-            self.array.removeAll()
+        storage.withLock { values in
+            values.removeAll()
+        }
+    }
+
+    func takeAll() -> [Value] {
+        storage.withLock { values in
+            let result = values
+            values.removeAll(keepingCapacity: true)
+            return result
         }
     }
 
     var isEmpty: Bool {
-        var result = true
-        queue.sync { [weak self] in
-            guard let self = self else { return }
-            result = self.array.isEmpty
+        storage.withLock { values in
+            values.isEmpty
         }
-        return result
     }
 
     var elements: [Value] {
-        var result: [Value] = []
-        queue.sync { [weak self] in
-            guard let self = self else { return }
-            result = self.array
+        storage.withLock { values in
+            values
         }
-        return result
     }
 }

@@ -9,49 +9,41 @@ import Foundation
 
 public extension MotherboardType {
     func activateBoard(identifier: BoardID, withOption option: Any?) {
-        guard let board = getBoard(identifier: identifier) else {
+        guard let board = getOrProduceBoard(identifier: identifier) else {
             assertionFailure("\(String(describing: self)) \n🔥 Activated Board with identifier \(identifier) which was not found in motherboard")
             return
         }
 
-        func activate() {
-            if let barrier = board.activationBarrier(withOption: option) {
-                let barrierBoard = getBarrierBoard(barrier)
-
-                DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
-
-                let pendingActivation: () -> Void = { [weak board, weak self] in
-                    guard let self, let board else { return }
-                    DebugLog.logActivation(source: self, destination: board, data: option)
-                    board.activate(withOption: option)
-                }
-
-                let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: barrier.option.value)
-
-                barrierBoard.activate(withOption: pendingTask)
-            } else {
-                DebugLog.logActivation(source: self, destination: board, data: option)
-                board.activate(withOption: option)
-            }
-        }
-
         guard !board.identifier.isGateway else {
-            activate()
+            performActivation(of: board, withOption: option)
             return
         }
 
         let gatewayBoard = getGatewayBoard(identifier: identifier)
         if board.shouldBypassGatewayBarrier() || gatewayBoard == nil {
-            activate()
+            performActivation(of: board, withOption: option)
         } else {
-            let gatewayBarrierBoard = gatewayBoard!
+            guard
+                let gatewayBarrierBoard = gatewayBoard as? ActivatableBarrierBoard,
+                let owner = self as? BarrierOwningMotherboard
+            else {
+                assertionFailure("‼️ A gateway barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
+                return
+            }
 
-            let pendingActivation: () -> Void = {
-                activate()
+            // Must not capture `self` or `board` strongly: a gateway that never completes keeps this
+            // task queued forever, which would retain the whole motherboard graph.
+            let pendingActivation: () -> Void = { [weak self, weak board] in
+                guard let self, let board else { return }
+                performActivation(of: board, withOption: option)
             }
 
             let boardInputModel = GatewayInputModel(identifier: identifier, option: option)
-            let pendingTask = BarrierPendingTask(activation: pendingActivation, barrierOptionValue: boardInputModel)
+            let pendingTask = BarrierPendingTask(
+                activation: pendingActivation,
+                barrierOptionValue: boardInputModel,
+                ownerToken: gatewayBarrierBoard.ownerToken(for: owner)
+            )
             gatewayBarrierBoard.activate(withOption: pendingTask)
         }
     }
@@ -71,21 +63,54 @@ public extension MotherboardType {
 }
 
 extension MotherboardType {
-    func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBoard {
-        if let installedBoard = boards.first(where: { $0.identifier == barrierActivation.barrierIdentifier }) {
-            return installedBoard
+    /// Activates `board`, routing through its own activation barrier when it declares one.
+    ///
+    /// `board` is passed in rather than captured so that deferred callers (gateway barriers) can
+    /// hold it weakly. See `activateBoard(identifier:withOption:)`.
+    func performActivation(of board: ActivatableBoard, withOption option: Any?) {
+        guard let barrier = board.activationBarrier(withOption: option) else {
+            DebugLog.logActivation(source: self, destination: board, data: option)
+            board.activate(withOption: option)
+            return
         }
 
-        let newBoard = ActivationBarrierFactory.makeBarrierBoard(barrierActivation)
-        installBoard(newBoard)
+        let barrierBoard = getBarrierBoard(barrier)
 
-        if let manager = self as? FlowManageable {
-            newBoard.registerCompletableFlow(to: manager)
-        } else {
-            assertionFailure("‼️ The Motherboard \(self) without FlowManageable conformation is unsupported for barrier activation")
+        DebugLog.logActivation(source: self, destination: barrierBoard, data: option)
+
+        guard let owner = self as? BarrierOwningMotherboard else {
+            assertionFailure("‼️ A barrier owner must conform to MotherboardType, BoardDelegate and FlowManageable")
+            return
         }
 
-        return newBoard
+        let pendingActivation: () -> Void = { [weak self, weak board] in
+            guard let self, let board else { return }
+            DebugLog.logActivation(source: self, destination: board, data: option)
+            board.activate(withOption: option)
+        }
+
+        let pendingTask = BarrierPendingTask(
+            activation: pendingActivation,
+            barrierOptionValue: barrier.option.value,
+            ownerToken: barrierBoard.ownerToken(for: owner)
+        )
+
+        barrierBoard.activate(withOption: pendingTask)
+    }
+
+    func getBarrierBoard(_ barrierActivation: ActivationBarrier) -> ActivatableBarrierBoard {
+        let identifier = barrierActivation.barrierIdentifier
+        if let installedBoard = boards.first(where: { $0.identifier == identifier }) {
+            guard let barrierBoard = installedBoard as? ActivatableBarrierBoard else {
+                preconditionFailure("A non-barrier board is installed with barrier identifier \(identifier)")
+            }
+            return barrierBoard
+        }
+
+        return ActivationBarrierFactory.makeBarrierBoard(
+            barrierActivation,
+            identifier: identifier
+        )
     }
 }
 

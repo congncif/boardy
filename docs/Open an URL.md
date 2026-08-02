@@ -7,14 +7,16 @@ The **Boardy** `1.42+` enables to activate a `Board` via an URL. This feature is
 
 /// Open an URL using URLOpenerPlugin
 /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
-/// - Returns: A array of strings name of matched plugins that handled the URL
+/// - Returns: The names of plugins that matched the URL before selection. When multiple plugins match, this synchronous value does not report the later selection result.
 public func open(url: URL) -> [String]
 
 /// Open a link using URLOpenerPlugin
 /// - Parameter link: Might be a deep link, universal link or any income URL to the app
-/// - Returns: A array of strings name of matched plugins that handled the link
+/// - Returns: The names of plugins that matched the URL before selection. When multiple plugins match, this synchronous value does not report the later selection result.
 public func open(link: String) -> [String]
 ```
+
+The returned names are the candidates matched synchronously before `URLOpenerSelectionHandler` selects plugins. If multiple plugins match, the selection handler may execute only a subset (or none), but the return value still contains every matched candidate. It is not a report of which plugin eventually handled the URL.
 
 You need to install `URLOpenerPlugin` into `PluginLauncher` for matching an URL with an activation.
 

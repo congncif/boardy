@@ -20,35 +20,48 @@ public protocol AttachableObject: DetachableObject {
 }
 
 enum AttachableStaticStorage {
-    static let mapTable = NSMapTable<AnyObject, NSHashTable<AnyObject>>.weakToStrongObjects()
+    private static let storage = Locked(
+        NSMapTable<AnyObject, NSHashTable<AnyObject>>.weakToStrongObjects()
+    )
+
+    static func withLock<Result>(
+        _ body: (NSMapTable<AnyObject, NSHashTable<AnyObject>>) throws -> Result
+    ) rethrows -> Result {
+        try storage.withLock { table in
+            try body(table)
+        }
+    }
+
+    static func removeAll() {
+        withLock { table in
+            table.removeAllObjects()
+        }
+    }
 }
 
 public extension AttachableObject {
-    private var storage: NSMapTable<AnyObject, NSHashTable<AnyObject>> {
-        AttachableStaticStorage.mapTable
-    }
-
     func attach(to object: AnyObject) {
-        if storage.object(forKey: object) == nil {
-            storage.setObject(NSHashTable<AnyObject>(), forKey: object)
+        AttachableStaticStorage.withLock { storage in
+            if storage.object(forKey: object) == nil {
+                storage.setObject(NSHashTable<AnyObject>(), forKey: object)
+            }
+            storage.object(forKey: object)?.add(self)
         }
-        let value = storage.object(forKey: object)
-        value?.add(self)
     }
 
     func attachObject(_ object: AnyObject) {
-        if storage.object(forKey: self) == nil {
-            storage.setObject(NSHashTable<AnyObject>(), forKey: self)
+        AttachableStaticStorage.withLock { storage in
+            if storage.object(forKey: self) == nil {
+                storage.setObject(NSHashTable<AnyObject>(), forKey: self)
+            }
+            storage.object(forKey: self)?.add(object)
         }
-        let value = storage.object(forKey: self)
-        value?.add(object)
     }
 
     func attachedObjects() -> [AnyObject] {
-        if let value = storage.object(forKey: self) {
-            return value.allObjects
+        AttachableStaticStorage.withLock { storage in
+            storage.object(forKey: self)?.allObjects ?? []
         }
-        return []
     }
 
     func attachedObjects<ObjectType>(_: ObjectType.Type = ObjectType.self) -> [ObjectType] {
@@ -64,8 +77,8 @@ public extension AttachableObject {
     }
 
     func detachObject(_ object: AnyObject) {
-        if let value = storage.object(forKey: self) {
-            value.remove(object)
+        AttachableStaticStorage.withLock { storage in
+            storage.object(forKey: self)?.remove(object)
         }
     }
 
@@ -87,8 +100,8 @@ public extension AttachableObject {
     }
 
     func detachAllObjects() {
-        if let value = storage.object(forKey: self) {
-            value.removeAllObjects()
+        AttachableStaticStorage.withLock { storage in
+            storage.object(forKey: self)?.removeAllObjects()
         }
     }
 }

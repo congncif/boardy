@@ -32,6 +32,41 @@ This architecture provides:
 
 **Boardy** is a lightweight orchestration framework inspired by microservices architecture, tailored for modular, flow-driven applications in iOS.
 
+## Candidate installation (1.61.0)
+
+Boardy 1.61.0 is currently prepared for maintainer review; it has not been tagged or published yet.
+The candidate targets iOS 14+ and Swift 5 language mode on Xcode 26.4.1.
+
+### Swift Package Manager (recommended)
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/congncif/boardy.git", exact: "1.61.0")
+]
+```
+
+Import the umbrella module with `import Boardy`. The package includes the Composable surface through
+the exact `UIComposableCore` 1.1.0 dependency and does not pull in the legacy DiffUI/Rx products.
+
+### CocoaPods transition
+
+The podspec and Example project are prepared for iOS 14, but CocoaPods publication and CocoaPods
+test/lint verification are intentionally deferred in this review cycle. Existing iOS 12/13
+consumers should remain on their current release line until they explicitly migrate.
+
+## Execution and type-safety contract
+
+Boardy keeps the existing synchronous, caller-controlled executor. No MainActor annotation,
+release main-thread precondition or automatic queue hop is introduced in 1.61.0; UIKit callers remain
+responsible for main-thread use. DEBUG builds assert Motherboard storage mutations occur on the main
+thread. `BlockTaskBoard` preserves its legacy terminal executor and observable callback order. Typed
+façades improve call-site safety, but the central runtime transport remains `Any?`; this is not
+end-to-end static type safety.
+
+See [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md), [`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md),
+[`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md), [`RELEASING.md`](RELEASING.md),
+[`SECURITY.md`](SECURITY.md) and [`SUPPORT.md`](SUPPORT.md) before adopting the candidate.
+
 ---
 
 ### 🧩 Core Concepts

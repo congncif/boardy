@@ -21,7 +21,7 @@ class ResultBoardTests: XCTestCase {
     func testExample() throws {
         let board = ResultTaskBoard<String, String, Error>(identifier: "result-board") { input, callback in
             callback(.progress)
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 callback(.success(input))
             }
         }

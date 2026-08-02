@@ -9,9 +9,15 @@ import Foundation
 
 public extension MotherboardType {
     /// Interact with a child board which this motherboard directly manages.
+    ///
+    /// Interaction targets a board that is already active, so this is a pure lookup: an unknown
+    /// identifier is reported rather than silently producing and installing a placeholder board.
     func interactWithBoard(command: BoardCommandModel) {
         let identifier = command.identifier
-        let board = getBoard(identifier: identifier)
+        guard let board = getBoard(identifier: identifier) else {
+            assertionFailure("⚠️ [\(identifier)] received an interaction command but no board with that identifier is installed in \(String(describing: self))!")
+            return
+        }
         guard let interactBoard = board as? InteractableBoard else {
             assertionFailure("⚠️ [\(identifier)] received an interaction command but it needs to conform \(InteractableBoard.self) to continue process!")
             return

@@ -1,5 +1,5 @@
 --exclude Pods, **/*/Generated/*, **/*/Example/*
---swiftversion 5.5
+--swiftversion 5.9
 
 --disable numberFormatting
 --disable wrapMultilineStatementBraces

@@ -7,24 +7,37 @@
 
 import Foundation
 
-final class SafeDictionary<Key: Hashable, Value> {
-    private var dictionary: [Key: Value] = [:]
-    private let queue = DispatchQueue(label: "boardy.safe-dictionary.serial-queue")
+final class SafeDictionary<Key: Hashable, Value>: @unchecked Sendable {
+    private let storage = Locked<[Key: Value]>([:])
 
     subscript(key: Key) -> Value? {
         get {
-            var result: Value?
-            queue.sync { [weak self] in
-                guard let self = self else { return }
-                result = self.dictionary[key]
+            storage.withLock { dictionary in
+                dictionary[key]
             }
-            return result
         }
         set(newValue) {
-            queue.sync { [weak self] in
-                guard let self = self else { return }
-                self.dictionary[key] = newValue
+            storage.withLock { dictionary in
+                dictionary[key] = newValue
             }
+        }
+    }
+
+    func value(
+        forKey key: Key,
+        orInsert makeValue: () -> Value
+    ) -> Value {
+        if let existing = storage.withLock({ $0[key] }) {
+            return existing
+        }
+
+        let candidate = makeValue()
+        return storage.withLock { dictionary in
+            if let existing = dictionary[key] {
+                return existing
+            }
+            dictionary[key] = candidate
+            return candidate
         }
     }
 }

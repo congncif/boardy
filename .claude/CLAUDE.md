@@ -70,9 +70,9 @@ Wraps internal Motherboard for complex multi-step flows. Appears as single board
 - **No tests**: Type definitions, configuration
 
 ### Build Verification
-- Use `swift build` or Xcode's build for type checking
-- Run targeted tests: `swift test --filter TestName`
-- Full suite before completion: `swift test`
+- Boardy is iOS/UIKit-only. Use Xcode's iOS simulator build, not host `swift build`.
+- Build and run targeted tests: `xcodebuild test -workspace Example/Boardy.xcworkspace -scheme Boardy-Example -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:Boardy_Tests/TestClass/testName`
+- Full suite before completion: `xcodebuild test -workspace Example/Boardy.xcworkspace -scheme Boardy-Example -destination 'platform=iOS Simulator,name=iPhone 17'`
 
 ### Naming Conventions
 - Boards: `{Feature}Board` (e.g., `PaymentBoard`, `ShoppingCartBoard`)
@@ -84,7 +84,8 @@ Wraps internal Motherboard for complex multi-step flows. Appears as single board
 ## Key Files to Know
 
 - `Boardy/Core/`: Framework core (Board, Motherboard, protocols)
-- `Boardy/Plugins/`: Plugin system implementation
+- `Boardy/ModulePlugin/`: Plugin system implementation
+- `Example/Podfile`: CocoaPods integration and test workspace
 - Xcode templates in project for scaffolding
 
 ## Common Tasks

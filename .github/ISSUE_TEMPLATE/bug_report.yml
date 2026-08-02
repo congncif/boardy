@@ -1,0 +1,135 @@
+name: Bug report
+description: Report a reproducible problem in Boardy
+title: "[Bug]: "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Boardy.
+
+        **Do not report security vulnerabilities here.** Use the repository's [private security reporting flow](https://github.com/congncif/boardy/security/policy). Never include vulnerability details in a public issue.
+
+  - type: checkboxes
+    id: existing-issue
+    attributes:
+      label: Existing issue check
+      description: Search open and closed issues before filing a duplicate.
+      options:
+        - label: I searched the existing issues and did not find this problem.
+          required: true
+
+  - type: input
+    id: boardy-version
+    attributes:
+      label: Boardy version
+      description: Provide an exact release, branch and commit SHA, or package revision.
+      placeholder: "For example: 1.60.1 or abc1234"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: integration-method
+    attributes:
+      label: Integration method
+      description: How is Boardy integrated into the affected project?
+      options:
+        - Swift Package Manager
+        - CocoaPods
+        - Direct source or Xcode project reference
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: xcode-version
+    attributes:
+      label: Xcode version
+      description: Copy the Xcode version and build number from `xcodebuild -version`.
+      placeholder: "Xcode 26.4.1, build ..."
+    validations:
+      required: true
+
+  - type: input
+    id: swift-version
+    attributes:
+      label: Swift version and language mode
+      description: Include the compiler version and whether the target builds in Swift 5 or Swift 6 mode.
+      placeholder: "Swift 6.x compiler, Swift 5 language mode"
+    validations:
+      required: true
+
+  - type: textarea
+    id: ios-matrix
+    attributes:
+      label: iOS environment
+      description: Provide the deployment target, runtime OS, and physical-device or simulator model.
+      placeholder: |
+        Deployment target: iOS 14.0
+        Runtime: iOS 26.4
+        Device/simulator: iPhone 17 Simulator
+    validations:
+      required: true
+
+  - type: textarea
+    id: minimal-reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a minimal project or provide the smallest self-contained code sample that demonstrates the problem.
+      placeholder: Include a repository link or minimal code and configuration.
+      render: swift
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Configure ...
+        2. Activate ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe the observable result you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: Describe what happened instead, including frequency and timing when relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or diagnostics
+      description: Redact secrets and personal data. If no relevant logs exist, write "No relevant logs" and explain why.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add related issues, screenshots, regression range, or other useful context.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the project's [Code of Conduct](https://github.com/congncif/boardy/blob/master/CODE_OF_CONDUCT.md).
+          required: true

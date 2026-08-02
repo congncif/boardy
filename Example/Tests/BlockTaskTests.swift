@@ -9,334 +9,585 @@
 @testable import Boardy
 import XCTest
 
-class BlockTaskTests: XCTestCase {
-    var motherboard: Motherboard!
+private final class BlockTaskEventRecorder {
+    private let storage = Locked<[String]>([])
+
+    var values: [String] {
+        storage.withLock { $0 }
+    }
+
+    func append(_ value: String) {
+        storage.withLock { $0.append(value) }
+    }
+}
+
+private final class ControlledBlockTaskExecutor {
+    typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
+
+    private struct Invocation {
+        let input: String
+        let completion: Completion
+    }
+
+    private struct State {
+        var invocations: [Invocation] = []
+        var cancellationCounts: [String: Int] = [:]
+        var startObserver: ((String) -> Void)?
+    }
+
+    private let state = Locked(State())
+
+    var executor: BlockTaskBoard<String, String>.Executor {
+        { [weak self] _, input, completion in
+            guard let self else { return .none }
+
+            let observer = state.withLock { state -> ((String) -> Void)? in
+                state.invocations.append(Invocation(input: input, completion: completion))
+                return state.startObserver
+            }
+            observer?(input)
+
+            return .default { [weak self] in
+                self?.state.withLock { state in
+                    state.cancellationCounts[input, default: 0] += 1
+                }
+            }
+        }
+    }
+
+    var startedInputs: [String] {
+        state.withLock { $0.invocations.map(\.input) }
+    }
+
+    func observeStarts(_ observer: @escaping (String) -> Void) {
+        state.withLock { $0.startObserver = observer }
+    }
+
+    func cancellationCount(for input: String) -> Int {
+        state.withLock { $0.cancellationCounts[input, default: 0] }
+    }
+
+    @discardableResult
+    func complete(_ input: String, with result: Result<String, Error>) -> Bool {
+        guard let completion = state.withLock({ state in
+            state.invocations.last { $0.input == input }?.completion
+        }) else {
+            return false
+        }
+        completion(result)
+        return true
+    }
+}
+
+private enum BlockTaskTestError: Error {
+    case failed
+}
+
+final class BlockTaskTests: XCTestCase {
+    private let boardID: BoardID = "block-task"
+    private var motherboard: Motherboard!
 
     override func setUpWithError() throws {
         motherboard = Motherboard()
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        motherboard = nil
     }
 
-    func testBlockTask() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .onlyResult, executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
-            }
-            return BlockTaskCanceler.none
-        })
+    func testDuplicateCompletionDeliversSuccessAndTerminalSequenceOnce() {
+        let executor = ControlledBlockTaskExecutor()
+        let events = BlockTaskEventRecorder()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: executor.executor)
+        motherboard.installBoard(board)
 
-        motherboard.installBoard(blockTask)
-
-        let expectation = expectation(description: "block-task-expectation")
-        var result: String?
-        let input = "ABC"
-        var status: TaskCompletionStatus?
-
-        let parameter = BlockTaskParameter<String, String>(input: input)
-            .onSuccess { _, output in
-                result = output
-            }
-            .onCompletion { newStatus in
-                status = newStatus
-                expectation.fulfill()
-            }
-
-        let expectation2 = self.expectation(description: "block-task-expectation-2")
-        var result2: String?
-        let input2 = "ABC2"
-        var status2: TaskCompletionStatus?
-
-        let parameter2 = BlockTaskParameter<String, String>(input: input2)
-            .onSuccess { _, output in
-                result2 = output
-            }
-            .onCompletion { newStatus in
-                status2 = newStatus
-                expectation2.fulfill()
-            }
-
-        motherboard.activateBoard(.target("block-task", parameter))
-        motherboard.activateBoard(.target("block-task", parameter2))
-
-        waitForExpectations(timeout: 3, handler: nil)
-
-        XCTAssertEqual(status, .done)
-        XCTAssertEqual(result, input)
-
-        XCTAssertEqual(status2, .done)
-        XCTAssertEqual(result2, input)
-    }
-
-    func testBlockTaskLatest() throws {
-        var invokedCancelCount = 0
-        var invokedCancelParameters: [String] = []
-
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .latest, executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
-            }
-            return .default {
-                invokedCancelCount += 1
-                invokedCancelParameters.append(input)
-            }
-        })
-
-        motherboard.installBoard(blockTask)
-
-        let expectation = expectation(description: "block-task-expectation")
-        var result: String?
-        let input = "ABC"
-        var status: TaskCompletionStatus?
-
-        let parameter = BlockTaskParameter<String, String>(input: input)
-            .onSuccess { _, output in
-                result = output
-            }
-            .onCompletion { newStatus in
-                status = newStatus
-                expectation.fulfill()
-            }
-
-        let expectation2 = self.expectation(description: "block-task-expectation-2")
-        var result2: String?
-        let input2 = "ABC2"
-        var status2: TaskCompletionStatus?
-
-        let parameter2 = BlockTaskParameter<String, String>(input: input2)
-            .onSuccess { _, output in
-                result2 = output
-            }
-            .onCompletion { newStatus in
-                status2 = newStatus
-                expectation2.fulfill()
-            }
-
-        motherboard.activateBoard(.target("block-task", parameter))
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak motherboard] in
-            motherboard?.activateBoard(.target("block-task", parameter2))
+        (motherboard as FlowManageable).matchedFlow(boardID, with: String.self).handle { output in
+            events.append("output.\(output)")
+        }
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete")
         }
 
-        waitForExpectations(timeout: 3, handler: nil)
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, output in events.append("success.\(output)") }
+            .onProcessing { _, processing in events.append("processing.\(processing)") }
+            .onError { _, _ in events.append("error") }
+            .onCompletion { _, status in
+                events.append(status == .done ? "completion.done" : "completion.cancelled")
+            }
 
-        XCTAssertEqual(status, .cancelled)
-        XCTAssertNil(result)
-        XCTAssertEqual(invokedCancelCount, 1)
-        XCTAssertEqual(invokedCancelParameters.first, input)
+        motherboard.activateBoard(.target(boardID, parameter))
+        XCTAssertEqual(events.values, ["processing.true"])
 
-        XCTAssertEqual(status2, .done)
-        XCTAssertEqual(result2, input2)
+        XCTAssertTrue(executor.complete("input", with: .success("output")))
+        XCTAssertEqual(events.values, [
+            "processing.true",
+            "success.output",
+            "output.output",
+            "processing.false",
+            "completion.done",
+            "board.complete",
+        ])
+
+        XCTAssertTrue(executor.complete("input", with: .failure(BlockTaskTestError.failed)))
+        XCTAssertEqual(events.values, [
+            "processing.true",
+            "success.output",
+            "output.output",
+            "processing.false",
+            "completion.done",
+            "board.complete",
+        ])
     }
 
-    func testBlockTaskDefault() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default, executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
-            }
-            return .none
-        })
+    func testFailurePreservesErrorProcessingCompletionAndBoardOrder() {
+        let executor = ControlledBlockTaskExecutor()
+        let events = BlockTaskEventRecorder()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: executor.executor)
+        motherboard.installBoard(board)
 
-        motherboard.installBoard(blockTask)
-
-        let expectation = expectation(description: "block-task-expectation")
-        var result: String?
-        let input = "ABC"
-        var status: TaskCompletionStatus?
-
-        let parameter = BlockTaskParameter<String, String>(input: input)
-            .onSuccess { _, output in
-                result = output
-            }
-            .onCompletion { newStatus in
-                status = newStatus
-                expectation.fulfill()
-            }
-
-        let expectation2 = self.expectation(description: "block-task-expectation-2")
-        var result2: String?
-        let input2 = "ABC2"
-        var status2: TaskCompletionStatus?
-
-        let parameter2 = BlockTaskParameter<String, String>(input: input2)
-            .onSuccess { _, output in
-                result2 = output
-            }
-            .onCompletion { newStatus in
-                status2 = newStatus
-                expectation2.fulfill()
-            }
-
-        motherboard.activateBoard(.target("block-task", parameter))
-        motherboard.activateBoard(.target("block-task", parameter2))
-
-        waitForExpectations(timeout: 3, handler: nil)
-
-        XCTAssertEqual(status, .done)
-        XCTAssertEqual(result, input)
-
-        XCTAssertEqual(status2, .done)
-        XCTAssertEqual(result2, input2)
-    }
-
-    func testBlockTaskQueue() throws {
-        var blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .queue, executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
-            }
-            return .none
-        })
-
-        motherboard.installBoard(blockTask!)
-
-        let expectation = expectation(description: "block-task-expectation")
-        var result: String?
-        let input = "ABC"
-        var status: TaskCompletionStatus?
-
-        let parameter = BlockTaskParameter<String, String>(input: input)
-            .onSuccess { _, output in
-                result = output
-            }
-            .onCompletion { newStatus in
-                status = newStatus
-                expectation.fulfill()
-            }
-
-        let expectation2 = self.expectation(description: "block-task-expectation-2")
-        var result2: String?
-        let input2 = "ABC2"
-        var status2: TaskCompletionStatus?
-
-        let parameter2 = BlockTaskParameter<String, String>(input: input2)
-            .onSuccess { _, output in
-                result2 = output
-            }
-            .onCompletion { newStatus in
-                status2 = newStatus
-                expectation2.fulfill()
-            }
-
-        motherboard.activateBoard(.target("block-task", parameter))
-        motherboard.activateBoard(.target("block-task", parameter2))
-
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { [weak motherboard] in
-            motherboard?.removeBoard(withIdentifier: "block-task")
-            blockTask = nil
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete")
         }
 
-        waitForExpectations(timeout: 3, handler: nil)
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, _ in events.append("success") }
+            .onProcessing { _, processing in events.append("processing.\(processing)") }
+            .onError { _, _ in events.append("error") }
+            .onCompletion { _, status in
+                events.append(status == .done ? "completion.done" : "completion.cancelled")
+            }
 
-        XCTAssertEqual(status, .done)
-        XCTAssertEqual(result, input)
+        motherboard.activateBoard(.target(boardID, parameter))
+        XCTAssertTrue(executor.complete("input", with: .failure(BlockTaskTestError.failed)))
 
-        XCTAssertEqual(status2, .cancelled)
-        XCTAssertNil(result2)
+        let expectedEvents = [
+            "processing.true",
+            "error",
+            "processing.false",
+            "completion.done",
+            "board.complete",
+        ]
+        XCTAssertEqual(events.values, expectedEvents)
+
+        XCTAssertTrue(executor.complete("input", with: .success("late")))
+        XCTAssertEqual(events.values, expectedEvents)
     }
 
-    func testConcurrentExecuting() {
-        let blockTask: BlockTaskBoard<String, String>? = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .concurrent(max: 2), executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
-            }
-            return .none
-        })
-        motherboard.installBoard(blockTask!)
+    func testDirectCancellationInvokesRetainedCancelerAndIgnoresLateCompletion() {
+        let executor = ControlledBlockTaskExecutor()
+        let events = BlockTaskEventRecorder()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: executor.executor)
+        motherboard.installBoard(board)
 
-        let expectation = expectation(description: "block-task-expectation")
-        var result: String?
-        let input = "ABC"
-        var status: TaskCompletionStatus?
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete")
+        }
 
-        let parameter = BlockTaskParameter<String, String>(input: input)
-            .onSuccess { _, output in
-                result = output
-            }
-            .onCompletion { newStatus in
-                status = newStatus
-                expectation.fulfill()
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, _ in events.append("success") }
+            .onProcessing { _, processing in events.append("processing.\(processing)") }
+            .onError { _, _ in events.append("error") }
+            .onCompletion { _, status in
+                events.append(status == .done ? "completion.done" : "completion.cancelled")
             }
 
-        let expectation2 = self.expectation(description: "block-task-expectation-2")
-        var result2: String?
-        let input2 = "ABC2"
-        var status2: TaskCompletionStatus?
+        motherboard.activateBoard(.target(boardID, parameter))
+        board.cancelPendingTasksIfNeeded()
 
-        let parameter2 = BlockTaskParameter<String, String>(input: input2)
-            .onSuccess { _, output in
-                result2 = output
-            }
-            .onCompletion { newStatus in
-                status2 = newStatus
-                expectation2.fulfill()
-            }
+        XCTAssertEqual(executor.cancellationCount(for: "input"), 1)
+        XCTAssertEqual(events.values, [
+            "processing.true",
+            "processing.false",
+            "completion.cancelled",
+        ])
 
-        let expectation3 = self.expectation(description: "block-task-expectation-3")
-        var result3: String?
-        let input3 = "ABC3"
-        var status3: TaskCompletionStatus?
-
-        let parameter3 = BlockTaskParameter<String, String>(input: input3)
-            .onSuccess { _, output in
-                result3 = output
-            }
-            .onCompletion { newStatus in
-                status3 = newStatus
-                expectation3.fulfill()
-            }
-
-        motherboard.activateBoard(.target("block-task", parameter))
-        motherboard.activateBoard(.target("block-task", parameter2))
-        motherboard.activateBoard(.target("block-task", parameter3))
-
-//        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { [weak motherboard] in
-//            motherboard?.removeBoard(withIdentifier: "block-task")
-//            blockTask = nil
-//        }
-
-        waitForExpectations(timeout: 3, handler: nil)
-
-        XCTAssertEqual(status, .done)
-        XCTAssertEqual(result, input)
-
-        XCTAssertEqual(status2, .done)
-        XCTAssertEqual(result2, input2)
-
-        XCTAssertEqual(status3, .done)
-        XCTAssertEqual(result3, input3)
+        XCTAssertTrue(executor.complete("input", with: .success("late")))
+        XCTAssertEqual(executor.cancellationCount(for: "input"), 1)
+        XCTAssertEqual(events.values, [
+            "processing.true",
+            "processing.false",
+            "completion.cancelled",
+        ])
     }
 
-    func testBlockTaskInputAdapter() throws {
-        let blockTask = BlockTaskBoard<String, String>(identifier: "block-task", executingType: .default, executor: { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                completion(.success(input))
+    func testLatestCancelsEveryOlderStartedTaskExactlyOnce() {
+        let executor = ControlledBlockTaskExecutor()
+        let firstStarted = expectation(description: "first started")
+        let secondStarted = expectation(description: "second started")
+        let thirdStarted = expectation(description: "third started")
+        executor.observeStarts { input in
+            switch input {
+            case "first": firstStarted.fulfill()
+            case "second": secondStarted.fulfill()
+            case "third": thirdStarted.fulfill()
+            default: break
             }
-            return .none
+        }
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .latest, executor: executor.executor)
+        motherboard.installBoard(board)
+        let statuses = Locked<[String: TaskCompletionStatus]>([:])
+
+        func parameter(_ input: String) -> BlockTaskParameter<String, String> {
+            BlockTaskParameter<String, String>(input: input)
+                .onCompletion { status in statuses.withLock { $0[input] = status } }
+        }
+
+        motherboard.activateBoard(.target(boardID, parameter("first")))
+        wait(for: [firstStarted], timeout: 2)
+        motherboard.activateBoard(.target(boardID, parameter("second")))
+        wait(for: [secondStarted], timeout: 2)
+        motherboard.activateBoard(.target(boardID, parameter("third")))
+        wait(for: [thirdStarted], timeout: 2)
+        XCTAssertTrue(executor.complete("third", with: .success("third")))
+
+        XCTAssertEqual(statuses.withLock { $0["first"] }, .cancelled)
+        XCTAssertEqual(statuses.withLock { $0["second"] }, .cancelled)
+        XCTAssertEqual(statuses.withLock { $0["third"] }, .done)
+        XCTAssertEqual(executor.cancellationCount(for: "first"), 1)
+        XCTAssertEqual(executor.cancellationCount(for: "second"), 1)
+        XCTAssertEqual(executor.cancellationCount(for: "third"), 0)
+    }
+
+    func testQueueStartsNextOnlyAfterCurrentTerminalTransition() {
+        let executor = ControlledBlockTaskExecutor()
+        let events = BlockTaskEventRecorder()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .queue, executor: executor.executor)
+        motherboard.installBoard(board)
+
+        func parameter(_ input: String) -> BlockTaskParameter<String, String> {
+            BlockTaskParameter<String, String>(input: input)
+                .onSuccess { _, output in events.append("success.\(input).\(output)") }
+                .onCompletion { status in
+                    events.append(status == .done ? "completion.\(input).done" : "completion.\(input).cancelled")
+                }
+        }
+
+        motherboard.activateBoard(.target(boardID, parameter("first")))
+        motherboard.activateBoard(.target(boardID, parameter("second")))
+        XCTAssertEqual(executor.startedInputs, ["first"])
+
+        XCTAssertTrue(executor.complete("first", with: .success("one")))
+        XCTAssertEqual(executor.startedInputs, ["first", "second"])
+        XCTAssertEqual(events.values, ["success.first.one", "completion.first.done"])
+
+        XCTAssertTrue(executor.complete("second", with: .success("two")))
+        XCTAssertEqual(events.values, [
+            "success.first.one",
+            "completion.first.done",
+            "success.second.two",
+            "completion.second.done",
+        ])
+    }
+
+    func testQueueReentrantActivationDefersBoardCompletionUntilReentrantTaskFinishes() {
+        let executor = ControlledBlockTaskExecutor()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .queue, executor: executor.executor)
+        motherboard.installBoard(board)
+        let completionCount = Locked(0)
+        let statuses = Locked<[String: TaskCompletionStatus]>([:])
+
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            completionCount.withLock { $0 += 1 }
+        }
+
+        let second = BlockTaskParameter<String, String>(input: "second")
+            .onCompletion { status in statuses.withLock { $0["second"] = status } }
+        let first = BlockTaskParameter<String, String>(input: "first")
+            .onSuccess { [motherboard, boardID] _, _ in
+                motherboard?.activateBoard(.target(boardID, second))
+            }
+            .onCompletion { status in statuses.withLock { $0["first"] = status } }
+
+        motherboard.activateBoard(.target(boardID, first))
+        XCTAssertTrue(executor.complete("first", with: .success("first")))
+
+        XCTAssertEqual(executor.startedInputs, ["first", "second"])
+        XCTAssertEqual(statuses.withLock { $0["first"] }, .done)
+        XCTAssertEqual(completionCount.withLock { $0 }, 0)
+
+        XCTAssertTrue(executor.complete("second", with: .success("second")))
+        XCTAssertEqual(statuses.withLock { $0["second"] }, .done)
+        XCTAssertEqual(completionCount.withLock { $0 }, 1)
+    }
+
+    func testOnlyResultFansResultToPendingHandlersOnceInActivationOrder() {
+        let executor = ControlledBlockTaskExecutor()
+        let events = BlockTaskEventRecorder()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .onlyResult, executor: executor.executor)
+        motherboard.installBoard(board)
+
+        (motherboard as FlowManageable).matchedFlow(boardID, with: String.self).handle { output in
+            events.append("output.\(output)")
+        }
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete")
+        }
+
+        func parameter(_ input: String) -> BlockTaskParameter<String, String> {
+            BlockTaskParameter<String, String>(input: input)
+                .onSuccess { _, output in events.append("success.\(input).\(output)") }
+                .onProcessing { _, processing in events.append("processing.\(input).\(processing)") }
+                .onCompletion { status in
+                    events.append(status == .done ? "completion.\(input).done" : "completion.\(input).cancelled")
+                }
+        }
+
+        motherboard.activateBoard(.target(boardID, parameter("first")))
+        motherboard.activateBoard(.target(boardID, parameter("second")))
+        XCTAssertEqual(executor.startedInputs, ["first"])
+
+        XCTAssertTrue(executor.complete("first", with: .success("shared")))
+        XCTAssertEqual(events.values, [
+            "processing.first.true",
+            "processing.second.true",
+            "success.first.shared",
+            "output.shared",
+            "processing.first.false",
+            "completion.first.done",
+            "success.second.shared",
+            "output.shared",
+            "processing.second.false",
+            "completion.second.done",
+            "board.complete",
+        ])
+
+        XCTAssertTrue(executor.complete("first", with: .failure(BlockTaskTestError.failed)))
+        XCTAssertEqual(events.values.count, 11)
+    }
+
+    func testConcurrentZeroIsClampedToOneAndDoesNotStall() {
+        let executor = ControlledBlockTaskExecutor()
+        let firstStarted = expectation(description: "first started")
+        let secondStarted = expectation(description: "second started")
+        executor.observeStarts { input in
+            if input == "first" {
+                firstStarted.fulfill()
+            } else if input == "second" {
+                secondStarted.fulfill()
+            }
+        }
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .concurrent(max: 0), executor: executor.executor)
+        motherboard.installBoard(board)
+        let statuses = Locked<[String: TaskCompletionStatus]>([:])
+
+        func parameter(_ input: String) -> BlockTaskParameter<String, String> {
+            BlockTaskParameter<String, String>(input: input)
+                .onCompletion { status in statuses.withLock { $0[input] = status } }
+        }
+
+        motherboard.activateBoard(.target(boardID, parameter("first")))
+        motherboard.activateBoard(.target(boardID, parameter("second")))
+        wait(for: [firstStarted], timeout: 2)
+        XCTAssertEqual(executor.startedInputs, ["first"])
+
+        XCTAssertTrue(executor.complete("first", with: .success("first")))
+        wait(for: [secondStarted], timeout: 2)
+        XCTAssertEqual(executor.startedInputs, ["first", "second"])
+        XCTAssertTrue(executor.complete("second", with: .success("second")))
+
+        XCTAssertEqual(statuses.withLock { $0["first"] }, .done)
+        XCTAssertEqual(statuses.withLock { $0["second"] }, .done)
+    }
+
+    func testCancellationBeforeDirectCancelerInstallationWinsExactlyOnce() {
+        typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
+        let enteredExecutor = DispatchSemaphore(value: 0)
+        let allowCancelerReturn = DispatchSemaphore(value: 0)
+        let completionStore = Locked<Completion?>(nil)
+        let cancellationCount = Locked(0)
+        let activationReturned = expectation(description: "activation returned")
+        let events = BlockTaskEventRecorder()
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
+            completionStore.withLock { $0 = completion }
+            enteredExecutor.signal()
+            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            return .default { cancellationCount.withLock { $0 += 1 } }
         })
-
-        motherboard.installBoard(blockTask)
-
-        let expectation = expectation(description: #function)
-        var result: String?
-        let input = "ABC"
-
-        (motherboard as FlowManageable).matchedFlow("block-task", with: String.self)
-            .handle { value in
-                result = value
+        motherboard.installBoard(board)
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onProcessing { processing in events.append("processing.\(processing)") }
+            .onCompletion { status in
+                events.append(status == .done ? "completion.done" : "completion.cancelled")
             }
 
-        (motherboard as FlowManageable).completionFlow("block-task").handle { _ in
-            expectation.fulfill()
+        DispatchQueue.global().async {
+            board.activate(withGuaranteedInput: parameter)
+            activationReturned.fulfill()
+        }
+        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + 2), .success)
+
+        board.cancelPendingTasksIfNeeded()
+        XCTAssertEqual(events.values, ["processing.true", "processing.false", "completion.cancelled"])
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
+
+        allowCancelerReturn.signal()
+        wait(for: [activationReturned], timeout: 2)
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 1)
+
+        completionStore.withLock { $0 }?(.success("late"))
+        XCTAssertEqual(events.values, ["processing.true", "processing.false", "completion.cancelled"])
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 1)
+    }
+
+    func testCompletionBeforeDirectCancelerInstallationCompletesImmediatelyAndDiscardsCanceler() {
+        typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
+        let executorEntered = DispatchSemaphore(value: 0)
+        let allowCancelerReturn = DispatchSemaphore(value: 0)
+        let completionStore = Locked<Completion?>(nil)
+        let cancellationCount = Locked(0)
+        let activationReturned = expectation(description: "activation returned")
+        let events = BlockTaskEventRecorder()
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
+            completionStore.withLock { $0 = completion }
+            executorEntered.signal()
+            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            return .default { cancellationCount.withLock { $0 += 1 } }
+        })
+        motherboard.installBoard(board)
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete")
+        }
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, output in events.append("success.\(output)") }
+            .onProcessing { processing in events.append("processing.\(processing)") }
+            .onCompletion { status in
+                events.append(status == .done ? "completion.done" : "completion.cancelled")
+            }
+
+        DispatchQueue.global().async {
+            board.activate(withGuaranteedInput: parameter)
+            activationReturned.fulfill()
+        }
+        XCTAssertEqual(executorEntered.wait(timeout: .now() + 2), .success)
+
+        let completionDelivered = expectation(description: "completion delivered on main")
+        DispatchQueue.main.async {
+            completionStore.withLock { $0 }?(.success("input"))
+            completionDelivered.fulfill()
+        }
+        wait(for: [completionDelivered], timeout: 2)
+
+        XCTAssertEqual(events.values, [
+            "processing.true",
+            "success.input",
+            "processing.false",
+            "completion.done",
+            "board.complete",
+        ])
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
+
+        allowCancelerReturn.signal()
+        wait(for: [activationReturned], timeout: 2)
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
+        XCTAssertEqual(events.values.last, "board.complete")
+    }
+
+    func testOperationCancellationBeforeCancelerInstallationInvokesCancelerAndFinishesOnce() {
+        let enteredExecutor = DispatchSemaphore(value: 0)
+        let allowCancelerReturn = DispatchSemaphore(value: 0)
+        let cancellationCount = Locked(0)
+        let startReturned = expectation(description: "operation start returned")
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, _ in
+            enteredExecutor.signal()
+            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            return .default { cancellationCount.withLock { $0 += 1 } }
+        })
+        let operation = BlockTaskExecutionOperation(taskID: "task", input: "input", taskBoard: board)
+
+        DispatchQueue.global().async {
+            operation.start()
+            startReturned.fulfill()
+        }
+        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + 2), .success)
+
+        operation.cancel()
+        operation.cancel()
+        XCTAssertTrue(operation.isCancelled)
+        XCTAssertTrue(operation.isFinished)
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
+
+        allowCancelerReturn.signal()
+        wait(for: [startReturned], timeout: 2)
+        XCTAssertEqual(cancellationCount.withLock { $0 }, 1)
+        XCTAssertTrue(operation.isFinished)
+    }
+
+    func testBlockTaskInputAdapterUsesControlledExecutor() {
+        let executor = ControlledBlockTaskExecutor()
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: executor.executor)
+        motherboard.installBoard(board)
+        let result = Locked<String?>(nil)
+        let completionCount = Locked(0)
+
+        (motherboard as FlowManageable).matchedFlow(boardID, with: String.self).handle { value in
+            result.withLock { $0 = value }
+        }
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            completionCount.withLock { $0 += 1 }
         }
 
         (motherboard as MotherboardType)
-            .blockActivation("block-task", with: BlockTaskParameter<String, String>.self)
-            .activate(with: input)
+            .blockActivation(boardID, with: BlockTaskParameter<String, String>.self)
+            .activate(with: "input")
+        XCTAssertEqual(executor.startedInputs, ["input"])
+        XCTAssertTrue(executor.complete("input", with: .success("output")))
 
-        waitForExpectations(timeout: 3, handler: nil)
+        XCTAssertEqual(result.withLock { $0 }, "output")
+        XCTAssertEqual(completionCount.withLock { $0 }, 1)
+    }
 
-        XCTAssertEqual(result, input)
+    func testTerminalSequenceStaysOnActivationExecutor() {
+        let queue = DispatchQueue(label: "boardy.block-task.executor")
+        let key = DispatchSpecificKey<String>()
+        queue.setSpecific(key: key, value: "block-task-executor")
+        let events = BlockTaskEventRecorder()
+        let completionStore = Locked<BlockTaskBoard<String, String>.ExecutorCompletion?>(nil)
+        let executorMarker = "block-task-executor"
+
+        func marker() -> String {
+            DispatchQueue.getSpecific(key: key) == executorMarker ? executorMarker : "other"
+        }
+
+        let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
+            events.append("executor.\(marker())")
+            completionStore.withLock { $0 = completion }
+            return .default {}
+        })
+        motherboard.installBoard(board)
+
+        (motherboard as FlowManageable).matchedFlow(boardID, with: String.self).handle { output in
+            events.append("output.\(output).\(marker())")
+        }
+        (motherboard as FlowManageable).completionFlow(boardID).handle { _ in
+            events.append("board.complete.\(marker())")
+        }
+
+        let parameter = BlockTaskParameter<String, String>(input: "input")
+            .onSuccess { _, output in events.append("success.\(output).\(marker())") }
+            .onProcessing { _, processing in events.append("processing.\(processing).\(marker())") }
+            .onCompletion { _, status in
+                let value = status == .done ? "done" : "cancelled"
+                events.append("completion.\(value).\(marker())")
+            }
+
+        queue.sync {
+            motherboard.activateBoard(.target(boardID, parameter))
+            completionStore.withLock { $0 }?(.success("output"))
+        }
+
+        XCTAssertEqual(events.values, [
+            "processing.true.block-task-executor",
+            "executor.block-task-executor",
+            "success.output.block-task-executor",
+            "output.output.block-task-executor",
+            "processing.false.block-task-executor",
+            "completion.done.block-task-executor",
+            "board.complete.block-task-executor",
+        ])
     }
 }

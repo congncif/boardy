@@ -1,5 +1,7 @@
 import Boardy
-import CwlPreconditionTesting
+#if canImport(CwlPreconditionTesting)
+    import CwlPreconditionTesting
+#endif
 import XCTest
 
 final class FlowTests: XCTestCase {
@@ -64,20 +66,24 @@ final class FlowTests: XCTestCase {
         XCTAssertEqual(validResult.0, self)
         XCTAssertEqual(validResult.1, "text")
 
-        var assertionCalled = false
-        var assertionPassed = false
+        #if canImport(CwlPreconditionTesting)
+            var assertionCalled = false
+            var assertionPassed = false
 
-        let exceptionGuard: CwlPreconditionTesting.BadInstructionException? = CwlPreconditionTesting.catchBadInstruction { [unowned self] in
-            assertionCalled = true
+            let exceptionGuard: CwlPreconditionTesting.BadInstructionException? = CwlPreconditionTesting.catchBadInstruction { [unowned self] in
+                assertionCalled = true
 
-            self.testBoard.sendToMotherboard()
+                self.testBoard.sendToMotherboard()
 
-            assertionPassed = true
-        }
+                assertionPassed = true
+            }
 
-        XCTAssertNotNil(exceptionGuard)
-        XCTAssertTrue(assertionCalled)
-        XCTAssertFalse(assertionPassed)
+            XCTAssertNotNil(exceptionGuard)
+            XCTAssertTrue(assertionCalled)
+            XCTAssertFalse(assertionPassed)
+        #else
+            throw XCTSkip("CwlPreconditionTesting is only available in the CocoaPods/Xcode test host")
+        #endif
     }
 
     func test_completeFlow() {
@@ -243,7 +249,7 @@ private final class CompletionBoard: Board, GuaranteedBoard, GuaranteedOutputSen
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: String) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.sendOutput(input)
             self?.complete(true)
         }

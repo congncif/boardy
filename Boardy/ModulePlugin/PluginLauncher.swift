@@ -274,7 +274,7 @@ public final class PluginLauncher {
 
     /// Open an URL using URLOpenerPlugin
     /// - Parameter url: The input URL which might be a deep link, universal link or any income URL to the app
-    /// - Returns: A array of strings name of matched plugins that handled the URL
+    /// - Returns: The names of plugins that matched the URL before selection. When multiple plugins match, this synchronous value does not report the later selection result.
     @discardableResult
     public func open(url: URL) -> [String] {
         switch urlOpeningValidator(url) {
@@ -288,7 +288,7 @@ public final class PluginLauncher {
 
     /// Open a link using URLOpenerPlugin
     /// - Parameter link: Might be a deep link, universal link or any income URL to the app
-    /// - Returns: A array of strings name of matched plugins that handled the link
+    /// - Returns: The names of plugins that matched the URL before selection. When multiple plugins match, this synchronous value does not report the later selection result.
     @discardableResult
     public func open(link: String) -> [String] {
         if let url = URL(string: link) {
@@ -300,20 +300,20 @@ public final class PluginLauncher {
     }
 
     func handleOpen(url: URL) -> [String] {
-        let handlers = urlOpenerPlugins.filter { plugin in
+        let matchedCandidates = urlOpenerPlugins.filter { plugin in
             plugin.canOpenURL(url)
         }
 
-        let numberOfHandlers = handlers.count
+        let numberOfMatchedCandidates = matchedCandidates.count
 
-        switch numberOfHandlers {
+        switch numberOfMatchedCandidates {
         case 0:
             urlNotFoundHandler?(mainboard, url)
             #if DEBUG
                 print("⚠️ [\(String(describing: self))] URL has not opened because there are no plugins that handle the URL ➤ \(url)")
             #endif
-        case _ where numberOfHandlers > 1:
-            urlOpenerSelectionHandler(mainboard, url, handlers) { [mainboard] selectedPlugins in
+        case _ where numberOfMatchedCandidates > 1:
+            urlOpenerSelectionHandler(mainboard, url, matchedCandidates) { [mainboard] selectedPlugins in
                 for plugin in selectedPlugins {
                     plugin.mainboard(mainboard, open: url)
                 }
@@ -323,20 +323,20 @@ public final class PluginLauncher {
                     case 0:
                         print("⚠️ [\(String(describing: self))] URL cancelled ➤ \(url)")
                     case let count where count > 1:
-                        print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(handlers.map { $0.name }) that handles the URL ➤ \(url)")
+                        print("🌕 [\(String(describing: self))] URL opened multiple times with the warning there is more than one plugin: \(matchedCandidates.map { $0.name }) that handles the URL ➤ \(url)")
                     default:
                         print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
                     }
                 #endif
             }
         default:
-            handlers[0].mainboard(mainboard, open: url)
+            matchedCandidates[0].mainboard(mainboard, open: url)
             #if DEBUG
                 print("🌏 [\(String(describing: self))] URL opened ➤ \(url)")
             #endif
         }
 
-        return handlers.map { $0.name }
+        return matchedCandidates.map { $0.name }
     }
 }
 

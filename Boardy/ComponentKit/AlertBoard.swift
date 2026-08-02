@@ -74,7 +74,26 @@ final class AlertBoard: Board, GuaranteedBoard {
             }
         }
 
-        rootViewController.boardy_topPresentedViewController.present(alertController, animated: true, completion: nil)
+        let presenter = rootViewController.boardy_topPresentedViewController
+        Self.configurePopover(for: alertController, sourceView: presenter.view)
+        presenter.present(alertController, animated: true, completion: nil)
+    }
+
+    static func configurePopover(
+        for alertController: UIAlertController,
+        sourceView: UIView
+    ) {
+        guard let popover = alertController.popoverPresentationController else {
+            return
+        }
+        popover.sourceView = sourceView
+        popover.sourceRect = CGRect(
+            x: sourceView.bounds.midX,
+            y: sourceView.bounds.midY,
+            width: 0,
+            height: 0
+        )
+        popover.permittedArrowDirections = []
     }
 
     func shouldBypassGatewayBarrier() -> Bool {

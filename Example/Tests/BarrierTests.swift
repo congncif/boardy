@@ -6,7 +6,8 @@
 //  Copyright © 2021 [iF] Solution. All rights reserved.
 //
 
-import Boardy
+@testable import Boardy
+import UIKit
 import XCTest
 
 class MockRequiredBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
@@ -14,7 +15,7 @@ class MockRequiredBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: InputType) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.sendOutput(String(input))
         }
     }
@@ -87,5 +88,40 @@ class BarrierTests: XCTestCase {
 //        XCTAssertNil(client3Board.input)
 
         XCTAssertEqual(motherboard.boards.count, 4) // Barrier removed
+    }
+
+    func testMissingGatewayDoesNotInstallPhantomBarrier() {
+        let client = ClientBoard(identifier: "client")
+        let motherboard = Motherboard(boards: [client])
+
+        motherboard.activateBoard(identifier: client.identifier, withOption: "value")
+
+        XCTAssertEqual(client.input as? String, "value")
+        XCTAssertEqual(motherboard.boards.count, 1)
+        XCTAssertTrue(motherboard.boards.first === client)
+    }
+
+    func testConfigurePopoverAnchorsActionSheetToSourceView() throws {
+        let sourceView = UIView(frame: CGRect(x: 0, y: 0, width: 240, height: 120))
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        AlertBoard.configurePopover(for: alertController, sourceView: sourceView)
+
+        let popover = try XCTUnwrap(alertController.popoverPresentationController)
+        XCTAssertTrue(popover.sourceView === sourceView)
+        XCTAssertEqual(
+            popover.sourceRect,
+            CGRect(x: sourceView.bounds.midX, y: sourceView.bounds.midY, width: 0, height: 0)
+        )
+        XCTAssertEqual(popover.permittedArrowDirections, [])
+    }
+
+    func testConfigurePopoverLeavesAlertWithoutPopoverConfiguration() {
+        let sourceView = UIView(frame: CGRect(x: 0, y: 0, width: 240, height: 120))
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+
+        AlertBoard.configurePopover(for: alertController, sourceView: sourceView)
+
+        XCTAssertNil(alertController.popoverPresentationController)
     }
 }

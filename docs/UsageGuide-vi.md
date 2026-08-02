@@ -1,5 +1,9 @@
 # Boardy
 
+> **Tài liệu legacy:** hướng dẫn này giữ lại để tham chiếu lịch sử. Với Boardy 1.61.0, hãy đọc
+> [README](../README.md), [compatibility](COMPATIBILITY.md) và
+> [migration guide](MIGRATING_TO_1.61.md) trước khi tích hợp.
+
 ## Triển khai Microsystems những điểm cần chú ý
 
 ### Khi nào cần tạo Board?

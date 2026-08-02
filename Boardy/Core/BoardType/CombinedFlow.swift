@@ -54,7 +54,7 @@ public class OutputCombinedFlow: BoardFlow {
 
     let handler: ([Any]) -> Void
 
-    private let syncQueue = DispatchQueue(label: "boardy.combined-flow.sync-queue")
+    private let outputValues = Locked<[BoardID: Any]>([:])
 
     public var matchedIdentifiers: [BoardID] {
         specifications.map { $0.identifier }
@@ -80,8 +80,6 @@ public class OutputCombinedFlow: BoardFlow {
         self.identifier = identifier
     }
 
-    private var _outputValues: [BoardID: Any] = [:]
-
     public func match(with output: BoardOutputModel) -> Bool {
         guard matchedIdentifiers.contains(output.identifier) else { return false }
         guard let spec = specifications.first(where: { $0.identifier == output.identifier }) else {
@@ -91,29 +89,24 @@ public class OutputCombinedFlow: BoardFlow {
     }
 
     public func doNext(with output: BoardOutputModel) {
-        syncQueue.sync {
-            let data = filterValidOutputData(output)
-            _outputValues[output.identifier] = data
+        let result: [Any]? = outputValues.withLock { values in
+            values[output.identifier] = filterValidOutputData(output) as Any
 
-            var isDone = true
-            for id in matchedIdentifiers {
-                isDone = isDone && _outputValues.keys.contains(id)
+            guard matchedIdentifiers.allSatisfy({
+                values[$0] != nil
+            }) else {
+                return nil
             }
 
-            if isDone {
-                let result = matchedIdentifiers.compactMap {
-                    _outputValues[$0]
-                }
-
-                handler(result)
-
-                switch self.strategy {
-                case .batchOneByOne:
-                    _outputValues.removeAll() // clear data
-                case .latestForever:
-                    break
-                }
+            let completed = matchedIdentifiers.map { values[$0]! }
+            if case .batchOneByOne = strategy {
+                values.removeAll()
             }
+            return completed
+        }
+
+        if let result {
+            handler(result)
         }
     }
 

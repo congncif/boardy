@@ -77,6 +77,8 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
 
     @discardableResult
     public func registerFlow(_ flow: BoardFlow) -> Self {
+        boardyAssertMainThread()
+
         #if DEBUG
             if flows.firstIndex(where: { registeredFlow in
                 registeredFlow.identifier == flow.identifier
@@ -90,11 +92,14 @@ open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMoth
     }
 
     public func resetFlows() {
+        boardyAssertMainThread()
         flows = []
         registerDefaultFlows()
+        restoreBarrierCompletionFlows()
     }
 
     public func removeFlow(by identifier: String) {
+        boardyAssertMainThread()
         flows.removeAll { flow in
             flow.identifier == identifier
         }
