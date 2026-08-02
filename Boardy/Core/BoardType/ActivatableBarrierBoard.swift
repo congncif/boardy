@@ -35,19 +35,18 @@ private struct BarrierCycleStart {
     let barrierOptionValue: Any?
 }
 
-private struct BarrierEnqueueResult {
+/// What a state transition leaves for the caller to do outside the lock: activations that can
+/// never run, and a cycle to start.
+private struct BarrierTransitionResult {
     let discardedTasks: [BarrierPendingTask]
     let start: BarrierCycleStart?
+
+    static let none = BarrierTransitionResult(discardedTasks: [], start: nil)
 }
 
 private struct BarrierCompletionTransition {
     let tasks: [BarrierPendingTask]
     let ownerToken: BarrierOwnerToken
-}
-
-private struct BarrierFinishResult {
-    let discardedTasks: [BarrierPendingTask]
-    let start: BarrierCycleStart?
 }
 
 private struct BarrierCycleState {
@@ -66,13 +65,13 @@ private struct BarrierCycleState {
         phase != .idle
     }
 
-    mutating func enqueue(_ task: BarrierPendingTask) -> BarrierEnqueueResult {
+    mutating func enqueue(_ task: BarrierPendingTask) -> BarrierTransitionResult {
         switch phase {
         case .idle:
             guard task.ownerToken.owner != nil else {
-                return BarrierEnqueueResult(discardedTasks: [task], start: nil)
+                return BarrierTransitionResult(discardedTasks: [task], start: nil)
             }
-            return BarrierEnqueueResult(
+            return BarrierTransitionResult(
                 discardedTasks: [],
                 start: claim([task], ownerToken: task.ownerToken)
             )
@@ -80,25 +79,25 @@ private struct BarrierCycleState {
         case .active:
             if ownerToken?.owner != nil {
                 currentTasks.append(task)
-                return BarrierEnqueueResult(discardedTasks: [], start: nil)
+                return BarrierTransitionResult.none
             }
 
             let discarded = currentTasks
             resetToIdle()
             guard task.ownerToken.owner != nil else {
-                return BarrierEnqueueResult(
+                return BarrierTransitionResult(
                     discardedTasks: discarded + [task],
                     start: nil
                 )
             }
-            return BarrierEnqueueResult(
+            return BarrierTransitionResult(
                 discardedTasks: discarded,
                 start: claim([task], ownerToken: task.ownerToken)
             )
 
         case .completing:
             nextTasks.append(task)
-            return BarrierEnqueueResult(discardedTasks: [], start: nil)
+            return BarrierTransitionResult.none
         }
     }
 
@@ -120,9 +119,9 @@ private struct BarrierCycleState {
         return BarrierCompletionTransition(tasks: tasks, ownerToken: source)
     }
 
-    mutating func finishCompletion() -> BarrierFinishResult {
+    mutating func finishCompletion() -> BarrierTransitionResult {
         guard phase == .completing else {
-            return BarrierFinishResult(discardedTasks: [], start: nil)
+            return BarrierTransitionResult.none
         }
 
         let queued = nextTasks
@@ -130,16 +129,7 @@ private struct BarrierCycleState {
         ownerToken = nil
         phase = .idle
 
-        let liveTasks = queued.filter { $0.ownerToken.owner != nil }
-        let discarded = queued.filter { $0.ownerToken.owner == nil }
-        guard let first = liveTasks.first else {
-            return BarrierFinishResult(discardedTasks: discarded, start: nil)
-        }
-
-        return BarrierFinishResult(
-            discardedTasks: discarded,
-            start: claim(liveTasks, ownerToken: first.ownerToken)
-        )
+        return resume(queued)
     }
 
     func owns(_ start: BarrierCycleStart) -> Bool {
@@ -150,7 +140,7 @@ private struct BarrierCycleState {
 
     mutating func recoverUnstartedCycle(
         _ start: BarrierCycleStart
-    ) -> BarrierFinishResult? {
+    ) -> BarrierTransitionResult? {
         guard owns(start) else {
             return nil
         }
@@ -158,17 +148,24 @@ private struct BarrierCycleState {
         let pending = currentTasks
         resetToIdle()
 
-        let liveTasks = pending.filter {
-            $0.ownerToken !== start.ownerToken && $0.ownerToken.owner != nil
-        }
-        let discarded = pending.filter {
-            $0.ownerToken === start.ownerToken || $0.ownerToken.owner == nil
-        }
+        // The owner that failed to start this cycle cannot start the next one either, so its
+        // tasks are discarded alongside those whose owner has been released.
+        return resume(pending) { $0.ownerToken !== start.ownerToken && $0.ownerToken.owner != nil }
+    }
+
+    /// Starts a cycle for whichever queued tasks can still run, reporting the rest as discarded.
+    private mutating func resume(
+        _ tasks: [BarrierPendingTask],
+        isLive: (BarrierPendingTask) -> Bool = { $0.ownerToken.owner != nil }
+    ) -> BarrierTransitionResult {
+        let liveTasks = tasks.filter(isLive)
+        let discarded = tasks.filter { !isLive($0) }
+
         guard let first = liveTasks.first else {
-            return BarrierFinishResult(discardedTasks: discarded, start: nil)
+            return BarrierTransitionResult(discardedTasks: discarded, start: nil)
         }
 
-        return BarrierFinishResult(
+        return BarrierTransitionResult(
             discardedTasks: discarded,
             start: claim(liveTasks, ownerToken: first.ownerToken)
         )
