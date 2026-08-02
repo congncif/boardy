@@ -5,13 +5,13 @@ let package = Package(
     name: "Boardy",
     platforms: [.iOS(.v14)],
     products: [
-        .library(name: "Boardy", targets: ["Boardy"])
+        .library(name: "Boardy", targets: ["Boardy"]),
     ],
     dependencies: [
         .package(
             url: "https://github.com/congncif/UIComposable.git",
             exact: "1.1.0"
-        )
+        ),
     ],
     targets: [
         .target(
@@ -20,7 +20,7 @@ let package = Package(
                 .product(
                     name: "UIComposableCore",
                     package: "uicomposable"
-                )
+                ),
             ],
             path: "Boardy"
         ),
@@ -29,7 +29,7 @@ let package = Package(
             dependencies: ["Boardy"],
             path: "Example/Tests",
             exclude: ["Info.plist"]
-        )
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )

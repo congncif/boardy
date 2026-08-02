@@ -548,7 +548,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             }
             if let nextRecord = resolution.nextRecord {
                 executeDirectTask(taskID: nextRecord.taskID, input: nextRecord.handler.input)
-            } else if transition.becameTerminallyEmpty && resolution.isTerminallyEmpty {
+            } else if transition.becameTerminallyEmpty, resolution.isTerminallyEmpty {
                 complete(true)
             }
         case .default, .latest, .only, .concurrent:
@@ -580,7 +580,7 @@ public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, Guaran
             }
             if let nextRecord = resolution.nextRecord {
                 executeDirectTask(taskID: nextRecord.taskID, input: nextRecord.handler.input)
-            } else if transition.becameTerminallyEmpty && resolution.isTerminallyEmpty {
+            } else if transition.becameTerminallyEmpty, resolution.isTerminallyEmpty {
                 complete(true)
             }
         }

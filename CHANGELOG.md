@@ -37,7 +37,8 @@ publication remain deferred. The current evidence boundary is recorded in the
   as the approved 1.x compatibility branch.
 - Deferred MainActor, framework-wide/public Sendable migration and Swift 6 language-mode readiness
   to a separate follow-up; 1.61.0 preserves caller-controlled synchronous behavior and adds no
-  main-thread precondition or queue hop. Narrow lock-backed conformances remain audited internals.
+  release main-thread precondition or queue hop. DEBUG builds assert Motherboard storage mutations
+  occur on the main thread. Narrow lock-backed conformances remain audited internals.
 - Documented `PluginLauncher` URL results as matched candidates and introduced the clean
   `GatewayBarrierRegistration.exempt` spelling while retaining the deprecated legacy spelling.
 - Pinned template inputs to immutable revisions and removed the permission-bypassing helper script.
@@ -51,6 +52,8 @@ publication remain deferred. The current evidence boundary is recorded in the
   locked.
 - Made `BlockTaskBoard` terminal delivery exactly once across success, failure, cancellation,
   cancel-before-canceler-install and late-completion paths.
+- Preserved per-activation identity for `.unidentified` activation barriers so distinct application-
+  scoped requests do not coalesce behind one barrier cycle.
 - Added a valid popover anchor for action-sheet presentation on iPad-class presentation contexts.
 - Preserved module-plugin lifetime and lazy component behavior during plugin composition.
 

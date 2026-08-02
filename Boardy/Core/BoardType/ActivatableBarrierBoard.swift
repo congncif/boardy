@@ -428,19 +428,23 @@ enum ActivationBarrierFactory {
     ) -> ActivatableBarrierBoard {
         let identifier = identifier ?? barrierActivation.barrierIdentifier
 
-        switch barrierActivation.scope {
-        case .mainboard:
-            return ActivatableBarrierBoard(
+        let makeBoard = {
+            ActivatableBarrierBoard(
                 identifier: identifier,
                 completableIdentifier: barrierActivation.identifier
             )
+        }
+
+        switch barrierActivation.scope {
+        case .mainboard:
+            return makeBoard()
         case .application:
-            return cache.value(forKey: identifier) {
-                ActivatableBarrierBoard(
-                    identifier: identifier,
-                    completableIdentifier: barrierActivation.identifier
-                )
+            if case let .unidentified(value) = barrierActivation.option,
+               value != nil,
+               !(value is Void) {
+                return makeBoard()
             }
+            return cache.value(forKey: identifier, orInsert: makeBoard)
         }
     }
 }

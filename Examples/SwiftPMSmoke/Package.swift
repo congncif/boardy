@@ -5,19 +5,19 @@ let package = Package(
     name: "BoardySmoke",
     platforms: [.iOS(.v14)],
     products: [
-        .library(name: "BoardySmoke", targets: ["BoardySmoke"])
+        .library(name: "BoardySmoke", targets: ["BoardySmoke"]),
     ],
     dependencies: [
-        .package(path: "../..")
+        .package(path: "../.."),
     ],
     targets: [
         .target(
             name: "BoardySmoke",
             dependencies: [
-                .product(name: "Boardy", package: "boardy")
+                .product(name: "Boardy", package: "boardy"),
             ],
             path: "Sources/BoardySmoke"
-        )
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )

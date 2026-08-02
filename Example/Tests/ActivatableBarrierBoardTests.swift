@@ -538,9 +538,8 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertEqual(barrier.barrierIdentifier, barrier.barrierIdentifier)
     }
 
-    /// Two barriers built from the same destination and input must address the same barrier board,
-    /// otherwise the `.application` cache grows by one retained board per activation.
-    func testApplicationScopeBarrierReusesCachedBoard() {
+    /// `.application` barriers with `.unidentified` input must not coalesce different activations.
+    func testApplicationScopeUnidentifiedBarrierKeepsEachActivationIdentity() {
         let destination: BoardID = .random()
 
         let first = ActivationBarrier(
@@ -554,12 +553,42 @@ class ActivatableBarrierBoardTests: XCTestCase {
             option: .unidentified("payload")
         )
 
-        XCTAssertEqual(first.barrierIdentifier, second.barrierIdentifier)
+        XCTAssertNotEqual(first.barrierIdentifier, second.barrierIdentifier)
 
         let firstBoard = ActivationBarrierFactory.makeBarrierBoard(first)
         let secondBoard = ActivationBarrierFactory.makeBarrierBoard(second)
 
-        XCTAssertTrue(firstBoard === secondBoard, "Application-scope barrier leaked a second board")
+        XCTAssertFalse(firstBoard === secondBoard)
+    }
+
+    func testApplicationScopeUniqueBarrierStillReusesCachedBoard() {
+        let destination: BoardID = .random()
+        let first = ActivationBarrier(
+            identifier: destination,
+            scope: .application,
+            option: .unique(AnyHashable("payload"))
+        )
+        let second = ActivationBarrier(
+            identifier: destination,
+            scope: .application,
+            option: .unique(AnyHashable("payload"))
+        )
+
+        XCTAssertEqual(first.barrierIdentifier, second.barrierIdentifier)
+        XCTAssertTrue(
+            ActivationBarrierFactory.makeBarrierBoard(first) ===
+                ActivationBarrierFactory.makeBarrierBoard(second)
+        )
+    }
+
+    func testUnidentifiedBarrierIdentifierIsStablePerActivation() {
+        let barrier = ActivationBarrier(
+            identifier: .random(),
+            scope: .application,
+            option: .unidentified("payload")
+        )
+
+        XCTAssertEqual(barrier.barrierIdentifier, barrier.barrierIdentifier)
     }
 
     func testActivationBarrierDone() throws {

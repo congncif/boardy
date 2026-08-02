@@ -40,6 +40,26 @@ public struct ActivationBarrier {
     public let identifier: BoardID
     public let scope: ActivationBarrierScope
     public let option: ActivationBarrierOption
+
+    private let unidentifiedIdentifier: BoardID?
+
+    init(
+        identifier: BoardID,
+        scope: ActivationBarrierScope,
+        option: ActivationBarrierOption
+    ) {
+        self.identifier = identifier
+        self.scope = scope
+        self.option = option
+
+        if case let .unidentified(value) = option,
+           value != nil,
+           !(value is Void) {
+            unidentifiedIdentifier = .random()
+        } else {
+            unidentifiedIdentifier = nil
+        }
+    }
 }
 
 /// Control lifecycle of Activation Barrier
@@ -84,9 +104,8 @@ public enum ActivationBarrierOption {
 public extension ActivationBarrier {
     /// Identifier of the barrier board that guards this activation.
     ///
-    /// The value is derived purely from `identifier` and `option`, so repeated reads of the same
-    /// `ActivationBarrier` always agree. A non-deterministic value would make `.application`-scope
-    /// barriers miss their cache and retain one extra barrier board per activation.
+    /// Repeated reads of one barrier always agree. `.unidentified` uses one identity per barrier
+    /// value, while `.unique` and nil/void values can reuse application-scoped barriers.
     var barrierIdentifier: BoardID {
         var privateID = identifier.appending("___PRIVATE_BARRIER___")
 
@@ -97,14 +116,12 @@ public extension ActivationBarrier {
             let optionValue = String(value.hashValue)
             privateID = privateID.appending(optionValue)
         case let .unidentified(value):
-            if value != nil {
-                if value is Void {
-                    break
-                } else {
-                    privateID = privateID.appending("unidentified")
-                }
-            } else {
+            if value == nil {
                 privateID = privateID.appending("none")
+            } else if value is Void {
+                break
+            } else if let unidentifiedIdentifier {
+                privateID = privateID.appending(unidentifiedIdentifier.rawValue)
             }
         }
 
