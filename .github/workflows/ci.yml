@@ -22,12 +22,19 @@ jobs:
           xcode-version: '26.4.1'
 
       - name: Install CocoaPods
+        env:
+          GEM_HOME: ${{ runner.temp }}/cocoapods
+          GEM_PATH: ${{ runner.temp }}/cocoapods
         run: |
-          gem install cocoapods -v 1.16.2 --install-dir "$RUNNER_TEMP/cocoapods" --no-document
-          "$RUNNER_TEMP/cocoapods/bin/pod" --version
+          gem install cocoapods -v 1.16.2 --no-document
+          echo "$GEM_HOME/bin" >> "$GITHUB_PATH"
+          pod --version
 
       - name: Install CocoaPods dependencies
-        run: "$RUNNER_TEMP/cocoapods/bin/pod install --project-directory=Example --deployment"
+        env:
+          GEM_HOME: ${{ runner.temp }}/cocoapods
+          GEM_PATH: ${{ runner.temp }}/cocoapods
+        run: pod install --project-directory=Example --deployment
 
       - name: Build and test
         run: >-
