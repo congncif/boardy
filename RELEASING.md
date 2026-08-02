@@ -198,7 +198,9 @@ publication.
 ## 9. Post-release verification
 
 - [ ] Verify local and remote annotated tag objects peel to the reviewed SHA.
-- [ ] Verify the GitHub Release is public and its notes match the changelog. For `1.61.0`, this remains open because the API returned 404.
+- [ ] Verify the GitHub Release is public and its notes match the changelog, **or** record that the
+      annotated tag is the only release artifact. `1.61.0` shipped without a Release object; that is
+      a valid outcome, not an open item, as long as the changelog says so.
 - [ ] Resolve SwiftPM by exact version from a clean external consumer.
 - [ ] Record any deferred CocoaPods publication and hosted compatibility follow-up without rewriting
       the released evidence.

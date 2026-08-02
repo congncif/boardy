@@ -1,6 +1,6 @@
 # Boardy 1.x API stability policy
 
-Applies to Boardy 1.61.0 and later supported 1.x releases.
+Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.62.0.
 
 ## Positioning
 
@@ -41,7 +41,36 @@ The requester-approved policy allows a minimum-platform increase in a minor rele
 
 Source/API removals still require a major-update decision. The platform exception does not authorize declaration or executor breaks.
 
-## Concurrency policy for 1.61.0
+## Concurrency policy for 1.61.0 and later 1.x
+
+Restated for 1.62.0 unchanged, with two clarifications the 1.62.0 work made necessary.
+
+**Flow dispatch is not a main-thread path, and cannot be made one.** The DEBUG main-thread
+assertion covers *mutation* of Motherboard storage. It deliberately does not cover
+`board(_:didSendData:)`: boards send output from whichever executor their work finished on, and
+`BlockTaskBoard`'s legacy completion executor is a published guarantee. Adding an assertion there
+would have contradicted that guarantee. 1.62.0 locks the flow storage instead, so an off-main
+reader is safe without any new caller obligation. The installed-board list keeps the
+assert-and-document approach because its mutators are already main-thread by contract.
+
+**A deliberate deviation, recorded so it is not read as an oversight.** The 1.61.0 review
+recommended hopping barrier completion to the main thread. That was not done and will not be done
+inside 1.x: a queue hop changes release-build execution and observable ordering, which this policy
+forbids. The off-main path is detected in DEBUG when it reaches a storage mutation; it is not
+prevented. Changing that requires the deferred isolation plan, not a point fix.
+
+## Deprecations
+
+| Declaration | Since | Replacement | Removal |
+|---|---|---|---|
+| `GatewayBarrierRegistration` zero-width-space `exempt` | 1.61.0 | `exempt` | Requires a major update |
+
+No declaration was deprecated in 1.62.0. `ContinuousBoard` is documented as legacy and emits a DEBUG
+signpost, but carries no deprecation attribute: migrating to `ModernContinuableBoard` changes how the
+board is constructed, not just which type is named, so a compiler warning would push callers toward a
+change they cannot make mechanically.
+
+## Original 1.61.0 policy statement
 
 The sole owner is designated and approved this policy, the iOS 14 support matrix and the
 caller-controlled compatibility contract on 2026-07-14. Known consumers below iOS 14 remain on

@@ -3,13 +3,13 @@
 ## Supported versions
 
 Boardy does not yet have an owner-approved long-term security-maintenance
-window. During the `1.61.0` transition, reports and fixes follow this best-effort
-boundary:
+window. Reports and fixes follow this best-effort boundary:
 
 | Version | Security status |
 | --- | --- |
-| `1.61.x` | Release candidate; becomes the supported line only after `1.61.0` passes its release gates and is published |
-| `1.60.1` | Current published line; reports and remediation are best effort until `1.61.0` is published |
+| `1.62.x` | Current line; fixes land here |
+| `1.61.x` | Superseded; report against it, but expect the fix on 1.62.x |
+| `1.60.1` | Last line published to the CocoaPods trunk; best effort only |
 | `1.60.0` and earlier | Unsupported |
 
 Unsupported versions may still be affected by a report, but fixes are not
