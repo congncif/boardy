@@ -57,6 +57,20 @@ public final class ChainDataHandler<Target: AnyObject> {
                 return
             }
         }
+
+        // Falling off the end means no registered type matched and no `fallback` was configured,
+        // so the data is dropped. That is a legitimate configuration, but it is indistinguishable
+        // from a handler that ran and did nothing, so say which one happened.
+        #if DEBUG
+            print(
+                """
+                ⚠️ [\(String(describing: ChainDataHandler.self))] unhandled data:
+                🎯 Target: \(String(describing: target))
+                🌸 Data: \(String(describing: data))
+                💡 No registered data type matched. Add `.with(dataType:handler:)` for it, or `.fallback()` to handle the rest.
+                """
+            )
+        #endif
     }
 }
 

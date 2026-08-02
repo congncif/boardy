@@ -32,11 +32,31 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     private let completionHandler: CompletionHandler
     private let allowBypassGatewayBarrier: Bool
 
-    @Atomic
-    private var activateCount = 0
+    private let activationSlot = Locked(0)
 
-    private func increaseActivateCount() { activateCount += 1 }
-    private func decreaseActivateCount() { activateCount -= 1 }
+    /// Claims the single activation slot. Returns `false` when the board is already active.
+    ///
+    /// Testing the counter and writing it back must be one indivisible operation: as two separate
+    /// operations, concurrent callers both read an idle board and both start work.
+    private func claimActivation() -> Bool {
+        activationSlot.withLock { count in
+            guard count == 0 else { return false }
+            count = 1
+            return true
+        }
+    }
+
+    /// Releases the slot. Returns `false` when it was already released, which makes a duplicate
+    /// executor completion a no-op instead of driving the counter below zero.
+    private func releaseActivation() -> Bool {
+        activationSlot.withLock { count in
+            guard count > 0 else { return false }
+            count -= 1
+            return true
+        }
+    }
+
+    private var activateCount: Int { activationSlot.withLock { $0 } }
 
     public var isCompleted: Bool { activateCount == 0 }
     public var isProcessing: Bool { activateCount != 0 }
@@ -76,14 +96,13 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     }
 
     public func activate(withGuaranteedInput input: Input) {
-        guard activateCount == 0 else {
+        guard claimActivation() else {
             #if DEBUG
                 print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
             #endif
             return
         }
 
-        increaseActivateCount()
         handleProgress()
 
         execute(input: input) { [weak self] result in
@@ -102,7 +121,8 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
     }
 
     func endProcess(isDone: Bool) {
-        decreaseActivateCount()
+        guard releaseActivation() else { return }
+
         handleProgress()
         willComplete()
 
@@ -113,7 +133,7 @@ open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, Guara
 
     deinit {
         if !isCompleted {
-            activateCount = 0
+            activationSlot.withLock { $0 = 0 }
             handleProgress()
         }
     }

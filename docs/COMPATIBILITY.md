@@ -27,10 +27,34 @@ surface; CocoaPods `Default` now depends on `Boardy/Composable` explicitly.
 
 ## Threading contract
 
-Motherboard board and flow storage is not synchronized. Call `addBoard`, `removeBoard`,
-`clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows` on the main thread. DEBUG builds
-assert this contract; release builds keep the existing caller-controlled execution and do not hop
-queues or add a release precondition.
+Call `addBoard`, `removeBoard`, `clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows`
+on the main thread. DEBUG builds assert this contract; release builds keep the existing
+caller-controlled execution and do not hop queues or add a release precondition.
+
+The installed-board list is plain unsynchronized storage, which is why that contract exists. The
+flow list is different: a board sends its output from whichever executor its work finished on —
+`BlockTaskBoard` deliberately keeps its legacy completion executor — so flow *dispatch* is not a
+main-thread-only path and cannot be made one without changing published behavior. That storage is
+therefore locked internally and every reader takes a snapshot. No caller obligation is added by
+this; sending output off the main thread was always supported and remains so.
+
+## CocoaPods publication gate
+
+Boardy 1.61.0 ships as a Git tag and GitHub Release only; it is not published to the CocoaPods
+trunk. Existing pod consumers therefore do not resolve it automatically and stay on their current
+line until their own owner schedules a migration.
+
+This gate must be cleared before any later trunk publication. Every known consumer that depends on
+Boardy without a version bound and targets below iOS 14 must do one of:
+
+- raise its own deployment floor to iOS 14, or
+- add an explicit `< 1.61` ceiling on its Boardy dependency, or
+- record a retirement disposition.
+
+Unbounded dependencies below the floor were the reason publication was excluded, not an oversight.
+The Boardy owner owns this gate; application owners own their own migrations. Templates that
+generate podspecs must stop emitting unbounded Boardy dependencies before publication, or they
+reintroduce the problem for every module they scaffold.
 
 ## Compatibility policy
 

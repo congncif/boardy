@@ -1,6 +1,6 @@
 # Boardy 1.x API stability policy
 
-Applies to Boardy 1.61.0 and later supported 1.x releases.
+Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.62.0.
 
 ## Positioning
 
@@ -13,13 +13,17 @@ Boardy 1.x is a legacy-compatible modular orchestration framework with typed inp
 - **Legacy-compatible:** public behavior intentionally preserved for 1.x, including `Any?` transport, synchronous entry points and callback-based task execution.
 - **Experimental/deferred:** proposals that are not part of the supported 1.x contract, including typed-route core, async/await task API and public activation identity.
 
-The exhaustive declaration-keyed inventory is generated from the Swift API Digester graph later in the release. The immutable baseline artifacts are:
+The immutable baseline artifacts are the textual interfaces:
 
-- [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface)
-- [`api/Boardy-1.60.1.api.json`](api/Boardy-1.60.1.api.json)
-- [`api/Boardy-1.60.1.interface.api.json`](api/Boardy-1.60.1.interface.api.json) (normalized
-  comparison graph; see [`BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md))
+- [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — the **active** baseline;
+  every candidate is verified against the latest released line
+- [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface) — retained for provenance
+  and for re-running the 1.60.1 → 1.61.0 comparison on demand
 - [`api/BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md)
+
+Digester graphs are **derived, not committed**. `tools/derive-api-graph.sh` reproduces one from a
+`.swiftinterface`, and CI derives both sides of every comparison the same way. The exhaustive
+declaration-keyed inventory is likewise generated, not stored.
 
 ## Compatibility rules
 
@@ -37,7 +41,36 @@ The requester-approved policy allows a minimum-platform increase in a minor rele
 
 Source/API removals still require a major-update decision. The platform exception does not authorize declaration or executor breaks.
 
-## Concurrency policy for 1.61.0
+## Concurrency policy for 1.61.0 and later 1.x
+
+Restated for 1.62.0 unchanged, with two clarifications the 1.62.0 work made necessary.
+
+**Flow dispatch is not a main-thread path, and cannot be made one.** The DEBUG main-thread
+assertion covers *mutation* of Motherboard storage. It deliberately does not cover
+`board(_:didSendData:)`: boards send output from whichever executor their work finished on, and
+`BlockTaskBoard`'s legacy completion executor is a published guarantee. Adding an assertion there
+would have contradicted that guarantee. 1.62.0 locks the flow storage instead, so an off-main
+reader is safe without any new caller obligation. The installed-board list keeps the
+assert-and-document approach because its mutators are already main-thread by contract.
+
+**A deliberate deviation, recorded so it is not read as an oversight.** The 1.61.0 review
+recommended hopping barrier completion to the main thread. That was not done and will not be done
+inside 1.x: a queue hop changes release-build execution and observable ordering, which this policy
+forbids. The off-main path is detected in DEBUG when it reaches a storage mutation; it is not
+prevented. Changing that requires the deferred isolation plan, not a point fix.
+
+## Deprecations
+
+| Declaration | Since | Replacement | Removal |
+|---|---|---|---|
+| `GatewayBarrierRegistration` zero-width-space `exempt` | 1.61.0 | `exempt` | Requires a major update |
+
+No declaration was deprecated in 1.62.0. `ContinuousBoard` is documented as legacy and emits a DEBUG
+signpost, but carries no deprecation attribute: migrating to `ModernContinuableBoard` changes how the
+board is constructed, not just which type is named, so a compiler warning would push callers toward a
+change they cannot make mechanically.
+
+## Original 1.61.0 policy statement
 
 The sole owner is designated and approved this policy, the iOS 14 support matrix and the
 caller-controlled compatibility contract on 2026-07-14. Known consumers below iOS 14 remain on
@@ -57,20 +90,24 @@ selected contract is:
   separately approved follow-up plan; narrowly audited lock-backed internal conformances remain.
   Swift 6 readiness is not a 1.61.0 release claim.
 
-The final 1.61.0 interface and API graph must be compared to the immutable baseline with
-`tools/verify-public-api.sh` before tagging. The current report uses the normalized
-interface-derived comparison graph because the raw 1.60.1 graph and interface have a documented
-capture-format mismatch; the raw graph remains unchanged for auditability.
+Every candidate must be compared to the active baseline with `tools/verify-public-api.sh` before
+tagging. The `api-verify` job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs this
+on every push, so the comparison is a build result rather than a release-time ritual.
 
-## 1.61.0 inventory and migration artifacts
+## Inventory and verification artifacts
 
-The candidate declaration inventory is maintained in [`api/PUBLIC_API_1_61.md`](api/PUBLIC_API_1_61.md)
-and is generated from [`api/Boardy-1.61.0.api.json`](api/Boardy-1.61.0.api.json), not by grepping
-the textual interface. The machine-readable compatibility result is
-[`api/BOARDY_1_61_API_VERIFICATION.md`](api/BOARDY_1_61_API_VERIFICATION.md); the durable candidate
-interface is [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface). These files are
-prepared on the final candidate build and must be regenerated if a public declaration or package
-dependency changes.
+The declaration inventory and the compatibility report are **CI artifacts**, not repository files.
+`api-verify` publishes `API_VERIFICATION.md`, `PUBLIC_API.md` and the candidate `.swiftinterface`
+for each run. Nothing needs regenerating by hand when a public declaration changes; the next run
+produces it.
+
+Inventory classification is derived mechanically from the graph's deprecation flag, so the inventory
+is a completeness check over declaration keys — it is not a record of human API review. Human review
+is what this document and the release checklist govern.
+
+Baseline selection matters more than it looks. Verifying against 1.60.1 would silently permit
+removing anything introduced in 1.61.0, because a declaration absent from the baseline cannot be
+reported as removed. The active baseline is therefore the latest released line.
 
 New deprecations remain available through at least the next supported major migration window.
 The requester-approved project policy allows a minimum-platform change in a minor release, while

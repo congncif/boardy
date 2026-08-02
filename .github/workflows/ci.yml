@@ -35,3 +35,89 @@ jobs:
 
       - name: Lint podspec
         run: pod lib lint Boardy.podspec --allow-warnings --no-clean
+
+  api-verify:
+    runs-on: macos-26
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.4.1'
+
+      - name: Install CocoaPods dependencies
+        run: pod install --project-directory=Example --deployment
+
+      # BUILD_LIBRARY_FOR_DISTRIBUTION=YES is mandatory: without library evolution no
+      # .swiftinterface is emitted and the capture below has nothing to read.
+      - name: Build Boardy with library evolution
+        run: >-
+          xcodebuild build
+          -workspace Example/Boardy.xcworkspace
+          -scheme Boardy
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath .build-local/DerivedData-api
+          BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+          CODE_SIGNING_ALLOWED=NO
+
+      # Only the .swiftinterface from this step is used downstream. The graph it also writes is
+      # binary-module-derived and is deliberately discarded: see the warning in the script and in
+      # tools/derive-api-graph.sh.
+      - name: Capture candidate public interface
+        run: >-
+          tools/capture-public-api.sh
+          .build-local/DerivedData-api
+          .build-local/api/Boardy-candidate.swiftinterface
+          .build-local/api/unused-binary-derived.api.json
+
+      # Both graphs are derived the same way, from a .swiftinterface. The committed baseline
+      # interface is the durable artifact; its graph is regenerated rather than committed.
+      #
+      # The baseline is the LATEST RELEASED line, not the oldest. A declaration missing from the
+      # baseline cannot be reported as removed, so verifying against 1.60.1 would silently permit
+      # deleting anything 1.61.0 introduced.
+      - name: Derive baseline and candidate API graphs
+        run: |
+          tools/derive-api-graph.sh \
+            docs/api/Boardy-1.61.0.swiftinterface \
+            .build-local/DerivedData-api \
+            .build-local/api/Boardy-baseline.api.json
+          tools/derive-api-graph.sh \
+            .build-local/api/Boardy-candidate.swiftinterface \
+            .build-local/DerivedData-api \
+            .build-local/api/Boardy-candidate.api.json
+
+      - name: Verify public API compatibility
+        run: >-
+          tools/verify-public-api.sh
+          docs/api/Boardy-1.61.0.swiftinterface
+          .build-local/api/Boardy-baseline.api.json
+          .build-local/api/Boardy-candidate.swiftinterface
+          .build-local/api/Boardy-candidate.api.json
+          .build-local/api/API_VERIFICATION.md
+
+      # Classification in the inventory is derived mechanically from the graph's deprecation flag,
+      # so this is a self-consistency check over declaration keys, not a human-review gate.
+      - name: Render and verify the declaration inventory
+        run: |
+          tools/render-api-inventory.rb generate \
+            --api .build-local/api/Boardy-candidate.api.json \
+            --output .build-local/api/PUBLIC_API.md
+          tools/render-api-inventory.rb verify \
+            --api .build-local/api/Boardy-candidate.api.json \
+            --inventory .build-local/api/PUBLIC_API.md
+
+      - name: Upload API verification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-api-verification
+          path: |
+            .build-local/api/API_VERIFICATION.md
+            .build-local/api/PUBLIC_API.md
+            .build-local/api/Boardy-candidate.swiftinterface
+          if-no-files-found: warn

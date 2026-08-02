@@ -7,14 +7,15 @@ policy exists, maintenance and triage are best effort and no service-level agree
 
 | Version | Status | Platform and evidence boundary |
 |---|---|---|
-| 1.61.0 | Unreleased candidate under implementation; not production/G1 supported | Selected floor is iOS 14+; current verification is limited to Xcode 26.4.1 on iPhone 17 / iOS 26.4. Hosted CI, older runtimes/devices and N-1 Xcode are deferred. |
-| 1.60.1 | Current released legacy line | CocoaPods release with an iOS 12 floor; fixes and response times are not guaranteed. |
+| 1.62.0 | Current line | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification against the 1.61.0 baseline. Older runtimes, other devices and N-1 Xcode remain unverified. |
+| 1.61.0 | Released, superseded by 1.62.0 | iOS 14+. Published as a Git tag; not published to the CocoaPods trunk. |
+| 1.60.1 | Last CocoaPods-published line | iOS 12 floor; fixes and response times are not guaranteed. |
 | 1.60.0 and earlier | Historical | No active maintenance commitment. Use tags and commit history as the record. |
 
-The current evidence boundary is in the
-[`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md); the
-release task must add `docs/COMPATIBILITY.md` before publication. A consumer below iOS 14 must
+The current evidence boundary is in
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md). A consumer below iOS 14 must
 remain below Boardy 1.61 unless it raises its deployment target.
+Boardy is published as Git tags only; the CocoaPods trunk still serves 1.60.1.
 
 ## Where to ask
 
@@ -48,6 +49,5 @@ behavior is defined by released code, API stability documentation, migration not
 
 Useful reports isolate behavior in Boardy itself. App-specific architecture design, migration of an
 entire proprietary codebase and debugging third-party dependencies may require work outside this
-project's support scope. The consumer inventory in
-[`docs/governance/CONSUMER_INVENTORY.md`](docs/governance/CONSUMER_INVENTORY.md) records known
-compatibility risks but does not assign support ownership.
+project's support scope. [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) records the known
+compatibility boundary but does not assign support ownership for consumer applications.

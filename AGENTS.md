@@ -1,5 +1,8 @@
 # Boardy Project
 
+> Maintained by hand. This file used to be force-synced from `.claude/CLAUDE.md` by a pre-commit
+> hook; that hook is gone and the editor-local config is no longer tracked. Edit this file directly.
+
 **Type**: Swift iOS Framework  
 **Architecture**: Microservice-inspired modular orchestration  
 **Language**: Swift 5.9+  

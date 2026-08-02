@@ -97,7 +97,9 @@ for input in \
     fi
 done
 
-if ! ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0))); JSON.parse(File.read(ARGV.fetch(1)))' \
+# Read as UTF-8 explicitly: the graphs contain non-ASCII declaration text, and Ruby would
+# otherwise decode them with the locale's external encoding and fail under a non-UTF-8 LANG.
+if ! ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0), encoding: "UTF-8")); JSON.parse(File.read(ARGV.fetch(1), encoding: "UTF-8"))' \
     "$BASELINE_API" "$CANDIDATE_API"; then
     finish_failure "One or both API graph inputs are not parseable JSON."
 fi
@@ -107,7 +109,7 @@ fi
 # module, so 100 is a conservative lower bound that still leaves headroom for future pruning.
 MIN_TOP_LEVEL_NODES=100
 for input in "$BASELINE_API" "$CANDIDATE_API"; do
-    node_count="$(ruby -rjson -e 'n = JSON.parse(File.read(ARGV.fetch(0))).dig("ABIRoot", "children")&.size.to_i; puts n' "$input")"
+    node_count="$(ruby -rjson -e 'n = JSON.parse(File.read(ARGV.fetch(0), encoding: "UTF-8")).dig("ABIRoot", "children")&.size.to_i; puts n' "$input")"
     if [ "$node_count" -lt "$MIN_TOP_LEVEL_NODES" ]; then
         finish_failure "API graph $input has only $node_count top-level nodes; expected >= $MIN_TOP_LEVEL_NODES. Capture likely failed."
     fi

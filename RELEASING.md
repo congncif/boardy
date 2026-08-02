@@ -6,8 +6,9 @@ publication because each has a different gate and authority.
 
 Boardy 1.61.0 is published from annotated tag `1.61.0` after PR #10 merged into `master`. Hosted CI
 passed on `macos-26` with Xcode 26.4.1, so this release has hosted evidence but remains pre-G1:
-older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner
-and private security contact are recorded in [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
+older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner is
+recorded in [`.github/CODEOWNERS`](.github/CODEOWNERS) and the private security contact in
+[`SECURITY.md`](SECURITY.md).
 CocoaPods trunk publication remains excluded; metadata, lock resolution and pod lint were verified.
 
 ## Versioning policy
@@ -31,10 +32,8 @@ See [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) for the normative con
 
 Before creating a future Boardy release tag or GitHub Release:
 
-- [ ] The sole technical owner and release actor are explicitly designated in
-      [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
+- [ ] `CODEOWNERS` contains the confirmed owner handle, who is also the release actor.
 - [ ] A private security reporting contact/channel exists in `SECURITY.md`.
-- [ ] `CODEOWNERS` contains the confirmed owner handle.
 - [ ] The compatibility matrix and consumer dispositions are owner-approved.
 - [ ] Release notes explicitly state that hosted CI/G1, older-runtime/device evidence and
       organization production support are deferred.
@@ -112,15 +111,17 @@ inferred from them.
 
 ## 5. Verify public API and documentation
 
-- [ ] Capture final `docs/api/Boardy-1.61.0.swiftinterface` and
-      `docs/api/Boardy-1.61.0.api.json` from the final resolved Boardy build after all package and
-      pod metadata changes are complete.
-- [ ] Run `tools/verify-public-api.sh` against the immutable 1.60.1 interface and API graph.
-- [ ] Confirm zero removed/renamed declarations and no global-actor annotation added to an existing
-      declaration.
-- [ ] Generate `docs/api/PUBLIC_API_1_61.md` and run
-      `tools/render-api-inventory.rb verify` so every eligible declaration is classified exactly
-      once.
+- [ ] Confirm the `api-verify` job passed on the release commit. It builds with library evolution,
+      derives both graphs from `.swiftinterface`, runs `tools/verify-public-api.sh` against the
+      active baseline and renders the declaration inventory. Its report, inventory and candidate
+      interface are downloadable run artifacts.
+- [ ] Confirm the report shows zero removed/renamed declarations and no global-actor annotation
+      added to an existing declaration.
+- [ ] Commit the run's candidate `.swiftinterface` as `docs/api/Boardy-<version>.swiftinterface`
+      and promote it to the active baseline in `.github/workflows/ci.yml`,
+      `docs/api/BASELINE_PROVENANCE.md` and `docs/API_STABILITY_1X.md`. The baseline must always be
+      the latest released line: a declaration absent from the baseline cannot be reported as
+      removed, so an older baseline would silently permit deleting what the newer release added.
 - [ ] Confirm migration guidance covers the iOS floor, unchanged caller-controlled execution,
       DEBUG-only Motherboard main-thread assertions with no release queue hop/precondition,
       `BlockTaskBoard` executor/order, `GatewayBarrierRegistration.exempt`, URL matching and
@@ -179,8 +180,10 @@ register a trunk session or describe the candidate as available from CocoaPods 1
 For a later, separately approved CocoaPods publication:
 
 - [ ] Confirm UIComposable dependency availability and the exact Boardy pod constraint.
-- [ ] Migrate or version-cap every known consumer below iOS 14 in
-      [`docs/governance/CONSUMER_INVENTORY.md`](docs/governance/CONSUMER_INVENTORY.md).
+- [ ] Clear the publication gate in
+      [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication-gate): every consumer
+      depending on Boardy without a version bound below iOS 14 must raise its floor, pin `< 1.61`,
+      or record retirement.
 - [ ] Re-resolve the Example lock, rerun the CocoaPods test row and pass `pod lib lint` from a clean
       tagged checkout.
 - [ ] Confirm the podspec source tag is the annotated public `1.61.0` tag and its peeled SHA matches the
@@ -195,7 +198,9 @@ publication.
 ## 9. Post-release verification
 
 - [ ] Verify local and remote annotated tag objects peel to the reviewed SHA.
-- [ ] Verify the GitHub Release is public and its notes match the changelog. For `1.61.0`, this remains open because the API returned 404.
+- [ ] Verify the GitHub Release is public and its notes match the changelog, **or** record that the
+      annotated tag is the only release artifact. `1.61.0` shipped without a Release object; that is
+      a valid outcome, not an open item, as long as the changelog says so.
 - [ ] Resolve SwiftPM by exact version from a clean external consumer.
 - [ ] Record any deferred CocoaPods publication and hosted compatibility follow-up without rewriting
       the released evidence.

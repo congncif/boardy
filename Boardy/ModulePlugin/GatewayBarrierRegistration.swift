@@ -39,7 +39,9 @@ public final class GatewayBarrierRegistration {
         makeExemptRegistration()
     }
 
-    @available(*, deprecated, renamed: "exempt")
+    // `renamed:` is useless here: the fix-it it offers is this same identifier, which renders
+    // identically to `exempt`. Spell out what is actually wrong instead.
+    @available(*, deprecated, message: "This spelling contains a zero-width space (U+200B) and renders identically to `exempt`. Retype the call site as `exempt` — copying the text reproduces the invisible character.")
     public static var ​exempt: GatewayBarrierRegistration {
         exempt
     }

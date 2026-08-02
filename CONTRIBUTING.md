@@ -69,8 +69,9 @@ an empty package graph. Use `-clonedSourcePackagesDirPath` with
 ## Target candidate verification matrix
 
 This is the matrix required before candidate completion, not a claim that every row is already
-available or a hosted/CI-enforced support matrix. Current execution evidence is tracked in the
-[`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
+available or a hosted/CI-enforced support matrix. Current execution evidence is the CI run for the
+commit under review ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)); the recorded boundary
+is [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
 | Integration | Language mode | Destination | Expected signal |
 |---|---|---|---|

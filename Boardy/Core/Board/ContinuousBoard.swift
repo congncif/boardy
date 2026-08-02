@@ -81,11 +81,30 @@ public extension ModernContinuableBoard {
 // MARK: - Legacy ContinuousBoard
 
 /// A ContinuousBoard contains an internal sub-motherboard by default.
+///
+/// Still supported in 1.x. New code should prefer `ModernContinuableBoard`, which builds its
+/// sub-motherboard lazily from a producer instead of holding one from construction.
+///
+/// This is not carrying a deprecation attribute, because moving is not a rename. `init(identifier:motherboard:)`
+/// takes a `FlowMotherboard` the caller assembled; `ModernContinuableBoard` has no equivalent and
+/// only accepts a producer, calling `produceContinuousMotherboard()` when the board is first used.
+/// A call site that assembles its own motherboard has to change how it is constructed, not just
+/// which type it names, so existing code is left to migrate on its own schedule.
 open class ContinuousBoard: Board, ContinuableBoard {
     public let motherboard: FlowMotherboard
 
+    #if DEBUG
+        /// Emitted once per process rather than per instance: this is a signpost, not a warning
+        /// about the call site it happens to fire from.
+        private static let legacyNotice: Void = print("ℹ️ [Boardy] ContinuousBoard is the legacy continuable board and remains supported. New code should prefer ModernContinuableBoard — see the type's documentation for why migrating changes construction, not just the type name.")
+    #endif
+
     public init(identifier: BoardID,
                 motherboard: FlowMotherboard) {
+        #if DEBUG
+            _ = Self.legacyNotice
+        #endif
+
         self.motherboard = motherboard
         super.init(identifier: identifier)
 
@@ -94,6 +113,10 @@ open class ContinuousBoard: Board, ContinuableBoard {
 
     public init(identifier: BoardID,
                 boardProducer: ActivatableBoardProducer) {
+        #if DEBUG
+            _ = Self.legacyNotice
+        #endif
+
         let motherboard = Motherboard(identifier: BoardID(rawValue: identifier.rawValue + ".continuous-main"), boardProducer: boardProducer)
 
         self.motherboard = motherboard

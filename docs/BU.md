@@ -76,3 +76,32 @@ func sendCustomEvent(value: String) {
     eventBus.transport(value)
 }
 ```
+
+## Choosing a board producer
+
+Two producers implement `BoardDynamicProducer`, and they are not interchangeable. Pick by what you
+need, not by which name you saw first.
+
+| | `BoardProducer` | `BoardContainer` |
+|---|---|---|
+| Duplicate `registerBoard` | keeps the **first** factory | keeps the **last** factory |
+| Register many identifiers at once | — | `registerBoards(_:factory:)` |
+| Inspect what is registered | `registrations`, `gatewayRegistrations` | not exposed |
+| Duplicate `registerGatewayBoard` | keeps the first | keeps the first |
+
+The opposite defaults for boards are historical and are preserved for compatibility. Note that
+`BoardContainer` disagrees with *itself*: its gateway path keeps the first registration while its
+board path replaces.
+
+When a duplicate registration is deliberate — swapping an A/B variant, overriding a module default
+in a test — do not rely on either default:
+
+```swift
+producer.registerBoard(.checkout, replacingExisting: true) { id in
+    CheckoutBoardVariantB(identifier: id)
+}
+```
+
+Both producers honour that call identically. DEBUG builds log whenever a plain `registerBoard`
+overwrites or discards an existing registration, so an accidental collision is visible rather than
+silent.

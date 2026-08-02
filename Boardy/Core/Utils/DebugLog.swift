@@ -90,4 +90,16 @@ enum DebugLog {
             }
         #endif
     }
+
+    /// Reports something the framework dropped on purpose but that a caller cannot otherwise see.
+    ///
+    /// Unlike the flow logs above, this is not gated on `boardyLogEnabled`: a silently discarded
+    /// activation is undiagnosable in the field, and someone reading a DEBUG console needs to see
+    /// it whether or not they opted into flow tracing.
+    static func logWarning(source: IdentifiableBoard, message: String) {
+        #if DEBUG
+            print("⚠️ [\(String(describing: type(of: source)))] ➤ \(source.identifier.rawValue)")
+            print("    \(message)")
+        #endif
+    }
 }

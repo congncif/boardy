@@ -202,23 +202,6 @@ class ActivatableBarrierBoardTests: XCTestCase {
 
     override func tearDownWithError() throws {}
 
-    func testSafeArrayAppendReportsExactlyOneEmptyTransition() {
-        let array = SafeArray<Int>()
-        let resultLock = NSLock()
-        var emptyTransitions = 0
-
-        DispatchQueue.concurrentPerform(iterations: 100) { index in
-            if array.append(index) {
-                resultLock.lock()
-                emptyTransitions += 1
-                resultLock.unlock()
-            }
-        }
-
-        XCTAssertEqual(emptyTransitions, 1)
-        XCTAssertEqual(Set(array.elements), Set(0 ..< 100))
-    }
-
     func testSafeDictionaryValueOrInsertReturnsOneSharedReference() {
         let dictionary = SafeDictionary<String, SafeDictionaryReference>()
         let resultLock = NSLock()

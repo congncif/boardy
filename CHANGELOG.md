@@ -10,7 +10,73 @@ not strict Semantic Versioning.
 
 ## [Unreleased]
 
-No changes have been assigned beyond the 1.61.0 release.
+No changes have been assigned beyond the 1.62.0 release.
+
+## [1.62.0] - 2026-08-02
+
+A correctness and hygiene release. No public declaration was removed, no new
+deprecation was introduced, and no release-build behavior changed for callers who
+were not already hitting one of the defects below.
+
+Verified by hosted CI on every commit: build, 73 tests, `pod lib lint`, and
+public-API verification against the 1.61.0 baseline.
+
+### Fixed
+
+- `TaskBoard` and `ResultTaskBoard` ran their executor more than once under
+  concurrent activation. Claiming the activation slot read the counter and wrote
+  it back as two separate locked operations, so simultaneous callers all saw an
+  idle board. Measured before the fix with 100 concurrent activations: the
+  executor ran 4 times on `TaskBoard` and 5 on `ResultTaskBoard`.
+- A duplicate executor completion drove `TaskBoard`'s counter below zero and left
+  the board permanently reporting `isProcessing`. Releasing the slot is now
+  idempotent, so the second completion is a no-op — matching the terminal-event
+  behavior `BlockTaskBoard` already guaranteed.
+- `Motherboard.flows` was a plain array read during flow dispatch while
+  registration appended to it. Because boards deliberately send output from
+  whichever executor their work finished on, that read is not a main-thread-only
+  path; the storage is now locked and readers take a snapshot. No caller
+  obligation is added.
+- `BoardProducer` scanned its registration sets linearly on every lookup even
+  though `BoardRegistration` hashes on identifier alone. Lookups are now O(1).
+
+### Added
+
+- `registerBoard(_:replacingExisting:factory:)` on `BoardDynamicProducer`. The two
+  built-in producers disagree on duplicate registration — `BoardProducer` keeps the
+  first factory, `BoardContainer` keeps the last — and always have. Both defaults
+  are preserved; this states the intent explicitly and means the same thing on
+  either. The protocol requirement ships with a default implementation so existing
+  external conformers keep compiling.
+- DEBUG diagnostics for paths that previously dropped work silently: duplicate
+  board registration, activations discarded by a barrier whose owner was released,
+  activations a barrier board could not interpret, and data reaching
+  `ChainDataHandler` with no matching handler and no fallback.
+
+### Changed
+
+- The deprecation on the zero-width-space `GatewayBarrierRegistration.exempt`
+  spelling now explains the invisible character. `renamed:` offered a fix-it that
+  rendered identically to the problem, which made the warning unactionable.
+- `ContinuousBoard` carries documentation and a once-per-process DEBUG note
+  pointing at `ModernContinuableBoard`. It is deliberately **not** deprecated:
+  `init(identifier:motherboard:)` accepts a caller-assembled motherboard and the
+  modern type has no equivalent, so migrating changes construction rather than the
+  type name.
+
+### Removed
+
+- Internal `Atomic` property wrapper and `SafeArray`, neither of which had a
+  correct or a live use left.
+- 4.7 MB of generated API artifacts from `docs/api/`. The digester graphs are now
+  derived from the committed `.swiftinterface` files by `tools/derive-api-graph.sh`
+  during CI, and the declaration inventory and verification report are published as
+  run artifacts. One deleted graph was actively misleading: it was labelled
+  authoritative while reporting two inherited constructors as removed and fourteen
+  phantom type changes.
+- Process documents (plan transcripts, living roadmap, governance records) from the
+  shipped repository. Their durable content moved into `docs/COMPATIBILITY.md`,
+  `SECURITY.md` and `.github/CODEOWNERS`.
 
 ## [1.61.0] - 2026-08-02
 
@@ -19,10 +85,10 @@ pre-G1: hosted CI passed on Xcode 26.4.1 / `macos-26`, but older runtimes, other
 Xcode remain unverified; organization production support is not claimed. CocoaPods metadata and
 Example lock were verified, but CocoaPods trunk publication is not claimed. The iOS 14 floor,
 compatibility boundary and migration path are documented in
-[`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md) and the
-[`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
+[`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md) and
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
-GitHub Release API returned 404 for tag `1.61.0`; release-object publication remains unverified.
+No GitHub Release object was published for tag `1.61.0`. The annotated tag is the release artifact.
 
 ### Added
 
