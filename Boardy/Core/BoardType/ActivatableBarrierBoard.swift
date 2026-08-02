@@ -291,13 +291,35 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         "boardy.barrier.completion.\(identifier.rawValue)"
     }
 
+    /// Reports activations the barrier dropped because their owning motherboard went away.
+    ///
+    /// From the caller's side a discarded task is indistinguishable from one that simply never
+    /// ran: `activation.activate(with:)` returns normally and nothing else happens. Without this
+    /// there is no way to tell the two apart in a running app.
+    private func reportDiscarded(_ tasks: [BarrierPendingTask]) {
+        guard !tasks.isEmpty else { return }
+        DebugLog.logWarning(
+            source: self,
+            message: "[Barrier] discarded \(tasks.count) pending activation(s): the owning motherboard was released before the gate completed."
+        )
+    }
+
     func activate(withOption option: Any?) {
-        guard let task = option as? BarrierPendingTask else { return }
+        guard let task = option as? BarrierPendingTask else {
+            // Not an assertion: `activateAllBoards` walks every installed board, and an installed
+            // barrier board is one of them, so this branch is reachable from supported API with a
+            // perfectly ordinary option. The activation is still dropped, so say so.
+            DebugLog.logWarning(
+                source: self,
+                message: "[Barrier] ignored an activation carrying \(String(describing: option)); a barrier board is driven by the motherboard and only accepts a pending task."
+            )
+            return
+        }
 
         let result = cycle.withLock { state in
             state.enqueue(task)
         }
-        _ = result.discardedTasks
+        reportDiscarded(result.discardedTasks)
         if let start = result.start {
             perform(start)
         }
@@ -320,7 +342,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
             let recovery = cycle.withLock { state in
                 state.finishCompletion()
             }
-            _ = recovery.discardedTasks
+            reportDiscarded(recovery.discardedTasks)
             if let start = recovery.start {
                 perform(start)
             }
@@ -338,7 +360,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         let result = cycle.withLock { state in
             state.finishCompletion()
         }
-        _ = result.discardedTasks
+        reportDiscarded(result.discardedTasks)
         if let start = result.start {
             perform(start)
         }
@@ -389,7 +411,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         if let intendedOwner {
             cleanExactInstallations(intendedOwner: intendedOwner)
         }
-        _ = result.discardedTasks
+        reportDiscarded(result.discardedTasks)
         if let next = result.start {
             perform(next)
         }

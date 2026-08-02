@@ -60,4 +60,24 @@ class ResultBoardTests: XCTestCase {
         XCTAssertEqual(results, "DATA")
         XCTAssertEqual(motherboard.boards.count, 0)
     }
+
+    /// `guard !isActive` and `isActive = true` are two separate operations on the flag, so two
+    /// concurrent callers can both observe an inactive board and both run the executor.
+    func testConcurrentActivationRunsTheExecutorExactlyOnce() {
+        let lock = NSLock()
+        var executions = 0
+
+        // This executor never calls back, so the board stays active for the whole test.
+        let board = ResultTaskBoard<Int, Int, Error>(identifier: "result-board-race") { _, _ in
+            lock.lock()
+            executions += 1
+            lock.unlock()
+        }
+
+        DispatchQueue.concurrentPerform(iterations: 100) { _ in
+            board.activate(withGuaranteedInput: 1)
+        }
+
+        XCTAssertEqual(executions, 1)
+    }
 }

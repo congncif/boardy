@@ -37,8 +37,31 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
     private let executor: Executor
     private let allowBypassGatewayBarrier: Bool
 
-    @Atomic
-    private var isActive = false
+    private let activeState = Locked(false)
+
+    private var isActive: Bool { activeState.withLock { $0 } }
+
+    /// Claims the board. Returns `false` when it is already active.
+    ///
+    /// Testing the flag and setting it must be one indivisible operation: as two separate
+    /// operations, concurrent callers both observe an inactive board and both start work.
+    private func claimActivation() -> Bool {
+        activeState.withLock { active in
+            guard !active else { return false }
+            active = true
+            return true
+        }
+    }
+
+    /// Releases the board. Returns `false` when it was already released, which makes a duplicate
+    /// terminal result a no-op instead of sending output twice.
+    private func releaseActivation() -> Bool {
+        activeState.withLock { active in
+            guard active else { return false }
+            active = false
+            return true
+        }
+    }
 
     public init(identifier: BoardID,
                 allowBypassGatewayBarrier: Bool = true,
@@ -53,13 +76,12 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
     }
 
     public func activate(withGuaranteedInput input: Input) {
-        guard !isActive else {
+        guard claimActivation() else {
             #if DEBUG
                 print("⚠️ [\(String(describing: self))] [\(identifier)] is already activated. Duplicated activations should avoid.")
             #endif
             return
         }
-        isActive = true
 
         execute(input: input) { [weak self] result in
             guard let self = self else { return }
@@ -67,15 +89,15 @@ public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBo
             case let .progress(fractionCompleted):
                 self.sendOutput(.progress(fractionCompleted: fractionCompleted))
             case let .success(output):
-                self.isActive = false
+                guard self.releaseActivation() else { return }
                 self.sendOutput(.success(output))
                 self.complete(true)
             case let .failure(error):
-                self.isActive = false
+                guard self.releaseActivation() else { return }
                 self.sendOutput(.failure(error))
                 self.complete(false)
             case .cancel:
-                self.isActive = false
+                guard self.releaseActivation() else { return }
                 self.sendOutput(.cancel)
                 self.complete(false)
             }
