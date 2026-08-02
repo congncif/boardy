@@ -118,12 +118,18 @@ public final class Bus<Input> {
 
     /// Delivers `input` to every valid cable, in connection order.
     ///
-    /// - Important: do not connect to or invalidate this bus from inside a handler; see the note on
-    ///   ``Bus``.
+    /// A handler may connect to or invalidate cables on this bus. Delivery iterates the set of
+    /// cables as it stood when the transport began, so a cable connected from inside a handler
+    /// starts receiving from the *next* transport rather than the current one.
     public func transport(input: Input) {
         cleanInvalidCablesIfNeeded()
 
-        cables.forEach {
+        // Iterate an explicit snapshot. Reading `cables` already yields a copy today — `Bus` is a
+        // class, so the property get hands back a copy-on-write value rather than a long-term
+        // borrow — but relying on that leaves the re-entrancy guarantee resting on an
+        // implementation detail of property access. Naming the snapshot makes it a decision.
+        let snapshot = cables
+        snapshot.forEach {
             $0.transport(input: input)
         }
     }

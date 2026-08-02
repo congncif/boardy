@@ -288,6 +288,30 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         "boardy.barrier.completion.\(identifier.rawValue)"
     }
 
+    /// Takes the completion flow back off `owner`.
+    ///
+    /// A barrier board removes itself when its gate completes, but the flow it registered lives on
+    /// the owner and outlives it. Reopening the same gate builds a fresh barrier board that
+    /// registers the flow again, so without this every cycle leaves one dead flow behind — and the
+    /// owner filters all of them on every board message.
+    private func unregisterCompletableFlow(from owner: BarrierOwningMotherboard) {
+        let identity = ObjectIdentifier(owner)
+
+        let flowIdentifier = registrations.withLock { registrations -> String? in
+            guard var registration = registrations[identity],
+                  let flowIdentifier = registration.flowIdentifier
+            else {
+                return nil
+            }
+            registration.flowIdentifier = nil
+            registrations[identity] = registration
+            return flowIdentifier
+        }
+
+        guard let flowIdentifier else { return }
+        owner.removeFlow(by: flowIdentifier)
+    }
+
     /// Reports activations the barrier dropped because their owning motherboard went away.
     ///
     /// From the caller's side a discarded task is indistinguishable from one that simply never
@@ -347,6 +371,7 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
         }
 
         complete()
+        unregisterCompletableFlow(from: owner)
 
         if isDone {
             transition.tasks.forEach { task in
@@ -430,6 +455,8 @@ final class ActivatableBarrierBoard: Board, ActivatableBoard {
     private func removeExactInstallation(
         from owner: BarrierOwningMotherboard
     ) {
+        unregisterCompletableFlow(from: owner)
+
         let containsSelf = owner.boards.contains { board in
             (board as AnyObject) === self
         }
