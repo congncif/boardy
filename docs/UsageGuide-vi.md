@@ -1,8 +1,12 @@
 # Boardy
 
-> **Tài liệu legacy:** hướng dẫn này giữ lại để tham chiếu lịch sử. Với Boardy 1.61.0, hãy đọc
-> [README](../README.md), [compatibility](COMPATIBILITY.md) và
-> [migration guide](MIGRATING_TO_1.61.md) trước khi tích hợp.
+> **Tài liệu legacy:** hướng dẫn này giữ lại để tham chiếu lịch sử. Cách diễn đạt
+> "Microservices / Microsystems" ở đây là định vị cũ và đã được thay — xem
+> [Introducing Boardy](Introducing%20Boardy.md) cho định vị hiện tại. Phần nội dung kỹ thuật vẫn
+> đúng; điều thay đổi là cách gọi tên, không phải mô hình.
+>
+> Trước khi tích hợp, hãy đọc [README](../README.md), [compatibility](COMPATIBILITY.md) và
+> [migration guide](MIGRATING_TO_1.61.md).
 
 ## Triển khai Microsystems những điểm cần chú ý
 

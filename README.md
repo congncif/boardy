@@ -8,70 +8,92 @@
 [![Swift](https://img.shields.io/badge/swift-5.9-orange)](https://swift.org)  
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) 
 
+**A lifecycle-aware orchestration layer for modular iOS apps. Your screens keep their own architecture.**
+
 ## Why Boardy?
 
-**Microservices** is an architecture especially effective for building large, complex, and fast-evolving systems.
+Every app answers one question over and over: *what happens after this screen?* In a large app that
+becomes the most expensive code you own, because it is the only code that knows about more than one
+feature at a time — a view controller importing the next feature, a coordinator that grew into a
+state container, a module importing its sibling to hand something over.
 
-In mobile application development, implementing true microservices is challenging due to technical limitations. While microservices emphasize independence, mobile app components often work in high cohesion. Furthermore, while microservices favor flexible, dynamic interactions, mobile apps benefit from type-safe, well-defined contracts. However, by adapting key design principles of microservices, we can architect mobile apps with similar scalability and modularity.
+Boardy gives that decision its own layer. A **Board** is one step — show a screen, run a task, make a
+choice — and **it never names the step that follows it**. A **Motherboard** holds a set of boards and
+the flows between them; a **flow** is the rule that says *when this board emits this, do that*.
 
-### Two principles that guide microservice-inspired design:
+That is the whole mental model, and it is deliberately small enough to explain in five minutes.
 
-- **Minimize and isolate dependencies**: This allows each component to be self-contained and **deployable anywhere** in the system.
-- **Unify communication protocols**: All components interact via a common interface, making them **interchangeable** without modifying core business logic.
+What it buys you:
 
-**Boardy** embraces these ideas to help you build mobile microservice-like systems with ease. Inspired by the design of computer motherboards, Boardy models systems as a collection of **Boards** — each representing a self-contained business unit. Boards communicate only through a consistent protocol layer, and are coordinated by a central **Motherboard**.
+- **Reordering a flow does not touch a board.** Replace a screen with a variant, or delete a feature,
+  without its neighbours failing to compile.
+- **Your view architecture is untouched.** A board builds a controller and wires its callbacks; the
+  controller keeps the business logic and can be MVC, MVVM, VIP or Clean. Boardy never asks. Adoption
+  is screen by screen, with no rewrite.
+- **Flow becomes testable without UI.** A flow is a registration and a handler, so a path between
+  features can be driven by sending values — no simulator, no view controller.
+- **Features assemble instead of coupling.** A module registers only its own boards; the app assembly
+  is the single place that knows the full set.
 
-This architecture provides:
-- Encapsulation of core logic
-- Strong type safety
-- Plug-and-play extensibility
-- Easy reconfiguration and scalability
+Boardy no longer describes itself as microservices for mobile. That framing promised things a single
+iOS binary cannot deliver — process isolation, independent deployment, failure boundaries between
+modules. What survives it is the part that was always the real idea: components that depend on
+nothing but a shared contract, and are therefore interchangeable.
 
-> [!IMPORTANT]  
+📖 **[Introducing Boardy](docs/Introducing%20Boardy.md)** — the longer version, with a runnable
+two-board example and an honest list of what the library does not do.
+
+> [!IMPORTANT]
 > A Board should ideally be stateless. It should not retain context-related state internally. Its lifecycle is automatically managed by its Motherboard, so in most cases you don’t need to worry about its creation or disposal. If you opt to use a Board as a stateful component (not recommended), be sure to call `complete()` when it's no longer needed to release resources.
 
-**Boardy** is a lightweight orchestration framework inspired by microservices architecture, tailored for modular, flow-driven applications in iOS.
+## Installation
 
-## Candidate installation (1.61.0)
-
-Boardy 1.61.0 is currently prepared for maintainer review; it has not been tagged or published yet.
-The candidate targets iOS 14+ and Swift 5 language mode on Xcode 26.4.1.
+Boardy 1.63.0 targets iOS 14+ and Swift 5 language mode.
 
 ### Swift Package Manager (recommended)
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/congncif/boardy.git", exact: "1.61.0")
+    .package(url: "https://github.com/congncif/boardy.git", from: "1.63.0")
 ]
 ```
 
 Import the umbrella module with `import Boardy`. The package includes the Composable surface through
 the exact `UIComposableCore` 1.1.0 dependency and does not pull in the legacy DiffUI/Rx products.
 
-### CocoaPods transition
+### CocoaPods
 
-The podspec and Example project are prepared for iOS 14, but CocoaPods publication and CocoaPods
-test/lint verification are intentionally deferred in this review cycle. Existing iOS 12/13
-consumers should remain on their current release line until they explicitly migrate.
+```ruby
+pod 'Boardy'
+```
+
+The trunk currently serves 1.61.0. Later versions are published as Git tags, so use SwiftPM — or a
+`:git`/`:tag` pod entry — to get them.
+
+A dependency without a version bound inherits whatever floor the resolved version carries; 1.61.0
+raised it from iOS 12 to iOS 14. An app that must stay below iOS 14 pins `~> 1.60`. See
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
 ## Execution and type-safety contract
 
-Boardy keeps the existing synchronous, caller-controlled executor. No MainActor annotation,
-release main-thread precondition or automatic queue hop is introduced in 1.61.0; UIKit callers remain
-responsible for main-thread use. DEBUG builds assert Motherboard storage mutations occur on the main
-thread. `BlockTaskBoard` preserves its legacy terminal executor and observable callback order. Typed
-façades improve call-site safety, but the central runtime transport remains `Any?`; this is not
+Boardy keeps a synchronous, caller-controlled executor. No MainActor annotation, release main-thread
+precondition or automatic queue hop is introduced; UIKit callers remain responsible for main-thread
+use. DEBUG builds assert that Motherboard storage mutations happen on the main thread. Board *output*
+carries no such restriction — it arrives on whichever executor the work finished on, and
+`BlockTaskBoard` preserves its legacy terminal executor and observable callback order.
+
+Typed façades improve call-site safety, but the central runtime transport remains `Any?`; this is not
 end-to-end static type safety.
 
 See [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md), [`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md),
 [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md), [`RELEASING.md`](RELEASING.md),
-[`SECURITY.md`](SECURITY.md) and [`SUPPORT.md`](SUPPORT.md) before adopting the candidate.
+[`SECURITY.md`](SECURITY.md) and [`SUPPORT.md`](SUPPORT.md) for the full contract.
 
 ---
 
 ### 🧩 Core Concepts
 
-- **Board**: A self-contained *microservice-like unit*. It can be activated by calling its `activate` method.
+- **Board**: One self-contained step in a flow. It is activated by calling its `activate` method, and it never names the step that follows it.
 - **Motherboard**: The central *orchestrator* that activates boards and manages their workflow. It supports **Gateway Barriers** to perform pre-checks before activating a board.
 
 Boards and Motherboards can be installed into any **root context** (an `AnyObject`, usually a `UIViewController` or `UIWindow` in UIKit). Once installed, they can access that context for UI presentation or interactions.
@@ -130,7 +152,7 @@ motherboard.ioPayment().flow.addTarget(motherboard) { target, output in
 }
 ```
 
-> **Note**: `IOInterface` (generated by Boardy templates) enforces type-safe communication. While uncommon in server-side microservices, type safety significantly improves developer experience in mobile apps, where type casting can otherwise become a nightmare.
+> **Note**: `IOInterface` (generated by Boardy templates) declares a module's input, output, command and action types in one place. The transport underneath is `Any?`, so this is a typed façade rather than end-to-end type safety — but it is where the casting mistakes actually happen, and pinning the contract there removes most of them.
 
 ---
 

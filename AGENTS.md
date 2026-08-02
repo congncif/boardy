@@ -4,15 +4,15 @@
 > hook; that hook is gone and the editor-local config is no longer tracked. Edit this file directly.
 
 **Type**: Swift iOS Framework  
-**Architecture**: Microservice-inspired modular orchestration  
+**Architecture**: Modular flow orchestration  
 **Language**: Swift 5.9+  
 **Platform**: iOS
 
 ## Project Overview
 
-Boardy is a lightweight orchestration framework that adapts microservices principles for iOS app architecture. It enables modular, flow-driven applications through two core concepts:
+Boardy is a lightweight orchestration layer for modular, flow-driven iOS apps. It separates *what happens next* from *what a screen does*, through two core concepts:
 
-- **Board**: A self-contained, stateless business unit (microservice-like). Activated via `activate()`.
+- **Board**: A self-contained, stateless step in a flow. Activated via `activate()`. It never names the step that follows it.
 - **Motherboard**: Central orchestrator managing board lifecycle and workflow coordination.
 
 Boards communicate through a unified protocol layer and can be dynamically composed, enabling plug-and-play modularity.

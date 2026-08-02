@@ -19,7 +19,7 @@ final class CheckoutBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard 
     func activate(withGuaranteedInput cart: Cart) {
         let screen = CheckoutViewController(cart: cart)
         screen.onPaid = { [weak self] receipt in self?.sendOutput(receipt) }
-        rootViewController.show(screen)
+        rootViewController.show(screen, sender: nil)
     }
 }
 
