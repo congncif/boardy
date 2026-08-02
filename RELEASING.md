@@ -9,7 +9,9 @@ passed on `macos-26` with Xcode 26.4.1, so this release has hosted evidence but 
 older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner is
 recorded in [`.github/CODEOWNERS`](.github/CODEOWNERS) and the private security contact in
 [`SECURITY.md`](SECURITY.md).
-CocoaPods trunk publication remains excluded; metadata, lock resolution and pod lint were verified.
+`1.61.0` was subsequently published to the CocoaPods trunk; `1.62.0` has not been. Trunk
+publication is a separate step from tagging and needs its own authority — see
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication).
 
 ## Versioning policy
 
@@ -102,7 +104,7 @@ annotations or warning suppression.
 
 For the original SPM-first candidate procedure, CocoaPods tests and `pod lib lint` were deferred;
 Boardy 1.61.0 later passed the hosted CocoaPods test/lint row on exact merge SHA
-`eba3b311b28066c604dd878f92df799d99ed06f0`. `pod trunk push` remains excluded. Always finish with
+`eba3b311b28066c604dd878f92df799d99ed06f0`. Always finish with
 `git diff --check` and `git status --short`.
 
 Retain Xcode version, destination, logs and result bundles under `.build-local/Results`. Local results
@@ -182,20 +184,19 @@ create a release from another SHA.
 
 ## 8. CocoaPods transition checklist
 
-CocoaPods trunk publication is excluded from the current execution. Do not run `pod trunk push`,
-register a trunk session or describe the candidate as available from CocoaPods 1.61.0.
+Trunk publication is a separate step from tagging, with its own authority. `1.61.0` is on the trunk;
+`1.62.0` is not. Tagging a version does not publish it, and a tag must never be moved or replaced to
+make a publication succeed.
 
-For a later, separately approved CocoaPods publication:
+For each publication:
 
 - [ ] Confirm UIComposable dependency availability and the exact Boardy pod constraint.
-- [ ] Clear the publication gate in
-      [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication-gate): every consumer
-      depending on Boardy without a version bound below iOS 14 must raise its floor, pin `< 1.61`,
-      or record retirement.
+- [ ] Re-read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication) and confirm the
+      recorded consumer disposition still holds for the floor this release carries.
 - [ ] Re-resolve the Example lock, rerun the CocoaPods test row and pass `pod lib lint` from a clean
       tagged checkout.
-- [ ] Confirm the podspec source tag is the annotated public `1.61.0` tag and its peeled SHA matches the
-      reviewed release commit.
+- [ ] Confirm the podspec source tag is the annotated public tag for the version being published and
+      its peeled SHA matches the reviewed release commit.
 - [ ] Obtain explicit CocoaPods publication authority and record the release actor.
 - [ ] Publish through the approved CocoaPods process, then verify the public podspec and install it
       in a disposable consumer.
