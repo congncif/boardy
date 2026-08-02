@@ -11,6 +11,13 @@ import XCTest
 
 private final class SafeDictionaryReference {}
 
+private final class GateBoard: Board, ActivatableBoard {
+    func activate(withOption _: Any?) {}
+
+    /// Completes the gate, which is what the barrier's completion flow listens for.
+    func open() { complete(true) }
+}
+
 private final class BarrierProbeBoard: Board, ActivatableBoard {
     weak var owner: BarrierTestMotherboard?
 
@@ -202,6 +209,44 @@ class ActivatableBarrierBoardTests: XCTestCase {
 
     override func tearDownWithError() throws {}
 
+    // MARK: - Flow accumulation
+
+    /// A barrier board registers a completion flow on its owner and removes itself when the gate
+    /// completes — but nothing removes that flow. Reopening the same gate builds a new barrier
+    /// board, which registers the flow again.
+    ///
+    /// The stale handlers are `[weak self]` so they do nothing, but `board(_:didSendData:)` filters
+    /// every flow on every message, so the cost is permanent and grows with each cycle.
+    func testRepeatedBarrierCyclesDoNotAccumulateFlows() {
+        let target = BarrierTargetBoard(
+            identifier: "target",
+            barrierDestination: "gate",
+            barrierScope: .mainboard
+        )
+        let motherboard = Motherboard(boards: [target])
+        let baseline = motherboard.flows.count
+
+        for round in 0 ..< 5 {
+            let gate = GateBoard(identifier: "gate")
+            motherboard.installBoard(gate)
+
+            motherboard.activateBoard(identifier: "target", withOption: "round-\(round)")
+            XCTAssertTrue(
+                motherboard.boards.contains { $0 is ActivatableBarrierBoard },
+                "round \(round) should install a barrier"
+            )
+
+            gate.open()
+        }
+
+        XCTAssertEqual(target.activatedValues.count, 5)
+        XCTAssertFalse(motherboard.boards.contains { $0 is ActivatableBarrierBoard })
+        XCTAssertEqual(
+            motherboard.flows.count, baseline,
+            "each completed barrier must take its completion flow with it"
+        )
+    }
+
     func testSafeDictionaryValueOrInsertReturnsOneSharedReference() {
         let dictionary = SafeDictionary<String, SafeDictionaryReference>()
         let resultLock = NSLock()
@@ -374,11 +419,12 @@ class ActivatableBarrierBoardTests: XCTestCase {
             option: .void
         ).barrierIdentifier
 
+        let flowsBeforeBarrierA = managerA.flows.count
         managerA.activateBoard(identifier: targetA.identifier, withOption: "a")
         guard let barrier = managerA.boards.first(where: { $0.identifier == barrierID }) else {
             return XCTFail("Expected the application barrier to be installed in owner A")
         }
-        let flowCountA = managerA.flows.count
+        XCTAssertEqual(managerA.flows.count, flowsBeforeBarrierA + 1, "the barrier registers one completion flow")
 
         managerB.activateBoard(identifier: coalescedB.identifier, withOption: "b-coalesced")
         XCTAssertNil(managerB.boards.first(where: { $0.identifier == barrierID }))
@@ -417,7 +463,11 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertTrue(barrier.delegate === managerB)
         XCTAssertEqual(managerA.installCounts[barrierID], 1)
         XCTAssertEqual(managerB.installCounts[barrierID], 1)
-        XCTAssertEqual(managerA.flows.count, flowCountA)
+        // Owner A no longer hosts the barrier, so it must not keep listening for the gate either.
+        // This used to assert the count was unchanged, which pinned the leak in place: the flow
+        // outlived every barrier that registered it.
+        XCTAssertEqual(managerA.flows.count, flowsBeforeBarrierA,
+                       "the completion flow must leave owner A along with the barrier")
         XCTAssertEqual(managerB.barrierActivationCount, 1)
         XCTAssertEqual(managerA.duplicateInstallAttempts + managerB.duplicateInstallAttempts, 0)
 

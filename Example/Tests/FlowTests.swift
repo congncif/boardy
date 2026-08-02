@@ -199,6 +199,69 @@ final class FlowTests: XCTestCase {
         waitForExpectations(timeout: hangGuardTimeout, handler: nil)
         XCTAssertEqual(result, Action.ok)
     }
+
+    // MARK: - Bus re-entrancy
+
+    /// `transport` iterated the stored cable array directly while `connect` appended to it, so a
+    /// handler that connected to the same bus tripped Swift's exclusivity check:
+    /// "Simultaneous accesses to ..., but modification requires exclusive access".
+    ///
+    /// Fanning out to a newly connected target from inside a handler is an ordinary thing to do,
+    /// and `Bus` is fully public.
+    func testBusHandlerCanConnectToTheSameBus() {
+        let bus = Bus<String>()
+        var received: [String] = []
+
+        bus.connect(BusCable<String> { value in
+            received.append("first:\(value)")
+            if value == "one" {
+                bus.connect(BusCable<String> { later in
+                    received.append("second:\(later)")
+                })
+            }
+        })
+
+        bus.transport(input: "one")
+        bus.transport(input: "two")
+
+        // The cable added mid-transport takes effect from the next transport, not retroactively.
+        XCTAssertEqual(received, ["first:one", "first:two", "second:two"])
+    }
+
+    /// A handler that invalidates its own cable must not disturb the transport in progress.
+    func testBusHandlerCanInvalidateItsOwnCableDuringTransport() {
+        let bus = Bus<String>()
+        var received: [String] = []
+
+        let once = BusCable<String> { received.append("once:\($0)") }
+        bus.connect(once)
+        bus.connect(BusCable<String> { value in
+            received.append("always:\(value)")
+            once.invalidate()
+        })
+
+        bus.transport(input: "one")
+        bus.transport(input: "two")
+
+        XCTAssertEqual(received, ["once:one", "always:one", "always:two"])
+    }
+
+    /// Re-entering `transport` from a handler must not trap either.
+    func testBusHandlerCanReenterTransport() {
+        let bus = Bus<String>()
+        var received: [String] = []
+
+        bus.connect(BusCable<String> { value in
+            received.append(value)
+            if value == "outer" {
+                bus.transport(input: "inner")
+            }
+        })
+
+        bus.transport(input: "outer")
+
+        XCTAssertEqual(received, ["outer", "inner"])
+    }
 }
 
 private final class TestBoard: Board, ActivatableBoard {

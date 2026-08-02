@@ -10,11 +10,25 @@ import Foundation
 public class MainboardDestination {
     public init(destinationID: BoardID, mainboard: any FlowMotherboard) {
         self.destinationID = destinationID
-        self.mainboard = mainboard
+        mainboardBox.setObject(mainboard)
     }
 
     public let destinationID: BoardID
-    let mainboard: FlowMotherboard
+
+    private let mainboardBox = ObjectBox()
+
+    /// The motherboard is held weakly.
+    ///
+    /// A destination is meant to be stored — that is the point of the type — and the natural place
+    /// to store it is the motherboard it came from, or one of its boards. Holding it strongly makes
+    /// that shape a retain cycle, and every other reference in this framework (`ObjectBox`,
+    /// `ContentBox`, `BarrierOwnerToken`, `BoardProducerBox`) is already weak.
+    ///
+    /// Once the motherboard is gone the destination becomes inert: it answers with a detached
+    /// stand-in, so sending through it does nothing instead of trapping.
+    var mainboard: FlowMotherboard {
+        mainboardBox.unboxed(FlowMotherboard.self) ?? DetachedDestination.makeMotherboard()
+    }
 }
 
 public extension MotherboardType where Self: FlowManageable {
@@ -74,11 +88,20 @@ public final class MainboardGenericDestination<Input, Output, Command, Action: B
 public class BoardDestination {
     public init(destinationID: BoardID, source: any ActivatableBoard) {
         self.destinationID = destinationID
-        self.source = source
+        sourceBox.setObject(source)
     }
 
     public let destinationID: BoardID
-    let source: ActivatableBoard
+
+    private let sourceBox = ObjectBox()
+
+    /// The source board is held weakly; see ``MainboardDestination/mainboard`` for why.
+    ///
+    /// Once the source is gone the destination becomes inert: it answers with a detached stand-in
+    /// that has no motherboard, so messages sent through it go nowhere.
+    var source: ActivatableBoard {
+        sourceBox.unboxed(ActivatableBoard.self) ?? DetachedDestination.makeBoard()
+    }
 }
 
 public extension ActivatableBoard {
@@ -112,5 +135,45 @@ public extension BoardDestination {
 
     var completer: BoardCompleter {
         source.completer(destinationID)
+    }
+}
+
+// MARK: - Detached stand-ins
+
+/// Answers every identifier with a board that does nothing.
+///
+/// A detached motherboard must not fall back to `NoBoardProducer`: that answers with a ``NoBoard``,
+/// which presents a "feature not found" alert and traps in DEBUG when it has no context. Sending
+/// through a dead destination should be silent, not fatal.
+private final class InertBoard: Board, ActivatableBoard {
+    func activate(withOption _: Any?) {}
+}
+
+private final class InertBoardProducer: ActivatableBoardProducer {
+    func produceBoard(identifier: BoardID) -> ActivatableBoard? {
+        InertBoard(identifier: identifier)
+    }
+
+    func produceGatewayBoard(identifier _: BoardID) -> ActivatableBoard? {
+        nil
+    }
+
+    func matchBoard(withIdentifier _: BoardID, to anotherIdentifier: BoardID) -> ActivatableBoard? {
+        InertBoard(identifier: anotherIdentifier)
+    }
+}
+
+private enum DetachedDestination {
+    static let boardIdentifier: BoardID = "boardy.detached-destination-source"
+
+    /// Stand-in source for a destination whose board is gone. It has no motherboard, so anything
+    /// sent through it goes nowhere.
+    static func makeBoard() -> ActivatableBoard {
+        InertBoard(identifier: boardIdentifier)
+    }
+
+    /// Stand-in for a destination whose motherboard is gone.
+    static func makeMotherboard() -> FlowMotherboard {
+        Motherboard(identifier: boardIdentifier, boardProducer: InertBoardProducer())
     }
 }

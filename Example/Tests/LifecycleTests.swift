@@ -41,6 +41,32 @@ private final class LifecycleRecordingBoard: Board, DedicatedBoard {
     }
 }
 
+/// Stores a destination to a sibling on itself — the convenient shape the docs and templates
+/// encourage — so the test can check whether that shape retains the board.
+private final class DestinationHostBoard: Board, ActivatableBoard {
+    private var destination: BoardDestination?
+    private var genericDestination: BoardGenericDestination<String, String>?
+
+    func activate(withOption _: Any?) {}
+
+    func storeDestinations() {
+        destination = ioDestination("sibling")
+        genericDestination = BoardGenericDestination<String, String>(destinationID: "sibling", source: self)
+    }
+}
+
+private final class DestinationHostMotherboard: Motherboard {
+    private var destination: MainboardDestination?
+    private var genericDestination: MainboardGenericDestination<String, String, String, NoAction>?
+
+    func storeDestinations() {
+        destination = ioDestination("child")
+        genericDestination = MainboardGenericDestination(destinationID: "child", mainboard: self)
+    }
+}
+
+private enum NoAction: BoardFlowAction {}
+
 class LifecycleTests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -62,6 +88,44 @@ class LifecycleTests: XCTestCase {
     /// This used to be the whole of `testBoardShouldBeReleasedAfterCompleted`, with the direct
     /// `complete()` call commented out — so the name promised the self-completion path while the
     /// body only ever exercised this one. The two paths are now separate tests.
+
+    // MARK: - Destination lifetime
+
+    /// Every other reference in this framework is weak — `ObjectBox`, `ContentBox`,
+    /// `BarrierOwnerToken`, `BoardProducerBox`. The destination types are the exception, and
+    /// storing one on the board it came from is the shape the templates produce.
+    func testStoredBoardDestinationDoesNotRetainItsSource() {
+        var board: DestinationHostBoard? = DestinationHostBoard(identifier: "host")
+        weak var weakBoard = board
+        board?.storeDestinations()
+
+        board = nil
+
+        XCTAssertNil(weakBoard, "a destination stored on its own source must not keep it alive")
+    }
+
+    func testStoredMainboardDestinationDoesNotRetainItsMotherboard() {
+        var motherboard: DestinationHostMotherboard? = DestinationHostMotherboard(identifier: "host")
+        weak var weakMotherboard = motherboard
+        motherboard?.storeDestinations()
+
+        motherboard = nil
+
+        XCTAssertNil(weakMotherboard, "a destination stored on its own motherboard must not keep it alive")
+    }
+
+    /// Releasing the source must make the destination inert rather than unsafe.
+    func testDestinationIsInertAfterItsSourceIsReleased() {
+        var board: DestinationHostBoard? = DestinationHostBoard(identifier: "host")
+        let destination = board!.ioDestination("sibling")
+        board = nil
+
+        // No crash, no delivery: there is nobody left to send to.
+        destination.activation(with: String.self).activate(with: "ignored")
+        destination.interaction(with: String.self).send(command: "ignored")
+        destination.completer.complete()
+    }
+
     func testBoardIsReleasedWhenCompletedBySibling() throws {
         let motherboard: FlowMotherboard = Motherboard(boards: [SingleBoard(identifier: "1"), ContiBoard(identifier: "2", motherboard: Motherboard())])
         weak var singleBoard = motherboard.boards.first { $0.identifier == "1" }
