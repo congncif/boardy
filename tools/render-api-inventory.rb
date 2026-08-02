@@ -30,7 +30,9 @@ def parse_options
 end
 
 def load_json(path)
-  JSON.parse(File.read(path))
+  # Explicit UTF-8: the graph carries non-ASCII declaration text and would otherwise be decoded
+  # with the locale's external encoding, failing under a non-UTF-8 LANG.
+  JSON.parse(File.read(path, encoding: "UTF-8"))
 rescue Errno::ENOENT, JSON::ParserError => e
   abort "Unable to read API graph #{path}: #{e.message}"
 end
@@ -131,11 +133,11 @@ def generate(options)
     values = [row[:key], row[:usr], row[:kind], row[:decl_kind], row[:printed], row[:area], classification, change, replacement]
     lines << "| #{values.map { |value| escape(value) }.join(" | ")} |"
   end
-  File.write(options[:output], lines.join("\n") + "\n")
+  File.write(options[:output], lines.join("\n") + "\n", encoding: "UTF-8")
 end
 
 def parse_inventory(path)
-  lines = File.readlines(path, chomp: true)
+  lines = File.readlines(path, chomp: true, encoding: "UTF-8")
   table = lines.drop_while { |line| !line.start_with?("| Declaration key |") }
   abort "Inventory table not found: #{path}" if table.empty?
   rows = table.drop(2).take_while { |line| line.start_with?("|") }

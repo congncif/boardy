@@ -7,8 +7,14 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
     echo "Usage: [DEVELOPER_DIR=/path/to/Xcode.app/Contents/Developer] $0 <derived-data-root> <swiftinterface-output> <api-json-output>" >&2
-    echo "The library must be built first with BUILD_LIBRARY_FOR_DISTRIBUTION=YES." >&2
+    echo "The library must be built first with BUILD_LIBRARY_FOR_DISTRIBUTION=YES; without library" >&2
+    echo "evolution no .swiftinterface is emitted and this script has nothing to capture." >&2
     echo "Set BOARDY_ALLOW_XCODE_MISMATCH=1 to bypass the minimum Xcode check." >&2
+    echo >&2
+    echo "WARNING: the captured API graph is binary-module-derived and preserves typealias sugar." >&2
+    echo "Do not compare it against an interface-derived graph — every sugared declaration is" >&2
+    echo "reported as a phantom type change. Use tools/derive-api-graph.sh for both sides of a" >&2
+    echo "comparison; the captured .swiftinterface remains the durable artifact." >&2
 }
 
 if [ "$#" -ne 3 ]; then
@@ -164,7 +170,9 @@ if [ ! -s "$API_TEMP" ]; then
     exit 65
 fi
 
-ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0)))' "$API_TEMP"
+# Read as UTF-8 explicitly: the graph contains non-ASCII declaration text, and Ruby would
+# otherwise decode it with the locale's external encoding and fail under a non-UTF-8 LANG.
+ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0), encoding: "UTF-8"))' "$API_TEMP"
 
 mv "$INTERFACE_TEMP" "$SWIFTINTERFACE_OUTPUT"
 mv "$API_TEMP" "$API_JSON_OUTPUT"
