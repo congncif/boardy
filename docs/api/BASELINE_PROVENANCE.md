@@ -5,8 +5,16 @@ This directory holds the immutable textual baselines used to verify source compa
 
 | Artifact | Role | SHA-256 |
 |---|---|---|
-| `Boardy-1.61.0.swiftinterface` | **Active baseline.** Every candidate is verified against it. | `21ff72a7fd1c4eb0062aac23c0d4d9748c37a9b39fe1e5abbd64e4dc6d9ee85a` |
+| `Boardy-1.62.0.swiftinterface` | **Active baseline.** Every candidate is verified against it. | `37c9a630b003e60c3e854726fb87d92022670b1e8a1cb2d41cb7d398b8c4ac91` |
+| `Boardy-1.61.0.swiftinterface` | Previous released line; retained as the release record. | `21ff72a7fd1c4eb0062aac23c0d4d9748c37a9b39fe1e5abbd64e4dc6d9ee85a` |
 | `Boardy-1.60.1.swiftinterface` | Retained for provenance and for re-running the 1.60.1 → 1.61.0 comparison. | `a29d4bb97a6214d477c3fa739366616d911393a2d557c5d4d62c69c834454bb9` |
+
+## 1.62.0 capture
+
+Taken from the `api-verify` artifact of the CI run on the tagged commit
+`46f8d22` — the same interface the release was verified against, not a local
+rebuild. Byte-identical to an independent local build on a different machine,
+which is the reproducibility claim the derived-graph approach rests on.
 
 ## 1.60.1 capture
 
@@ -61,7 +69,7 @@ xcodebuild build -workspace Example/Boardy.xcworkspace -scheme Boardy \
   -derivedDataPath .build-local/DerivedData-api \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES CODE_SIGNING_ALLOWED=NO
 
-tools/derive-api-graph.sh docs/api/Boardy-1.61.0.swiftinterface \
+tools/derive-api-graph.sh docs/api/Boardy-1.62.0.swiftinterface \
   .build-local/DerivedData-api .build-local/api/baseline.api.json
 ```
 

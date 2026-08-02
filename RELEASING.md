@@ -109,6 +109,14 @@ Retain Xcode version, destination, logs and result bundles under `.build-local/R
 are evidence for the candidate only; older-runtime/device, N-1 Xcode and hosted results must not be
 inferred from them.
 
+## 4b. Version metadata
+
+- [ ] Bump `s.version` in `Boardy.podspec`.
+- [ ] Run `pod install --project-directory=Example` and commit `Example/Podfile.lock`.
+      CI installs with `--deployment`, which treats a stale lock as an error. Neither
+      `pod lib lint` nor `xcodebuild test` reads the lock, so local verification will not
+      catch this — only `pod install --deployment` will.
+
 ## 5. Verify public API and documentation
 
 - [ ] Confirm the `api-verify` job passed on the release commit. It builds with library evolution,

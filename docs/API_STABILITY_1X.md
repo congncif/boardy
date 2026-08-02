@@ -15,8 +15,9 @@ Boardy 1.x is a legacy-compatible modular orchestration framework with typed inp
 
 The immutable baseline artifacts are the textual interfaces:
 
-- [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — the **active** baseline;
+- [`api/Boardy-1.62.0.swiftinterface`](api/Boardy-1.62.0.swiftinterface) — the **active** baseline;
   every candidate is verified against the latest released line
+- [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — previous released line
 - [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface) — retained for provenance
   and for re-running the 1.60.1 → 1.61.0 comparison on demand
 - [`api/BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md)
