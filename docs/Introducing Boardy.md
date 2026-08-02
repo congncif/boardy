@@ -112,12 +112,45 @@ deployment, and no failure boundary between modules. What survives the analogy i
 always the real idea — components that depend on nothing but a shared contract, and are therefore
 interchangeable.
 
-Two more limits, stated plainly:
+Two more limits, stated plainly.
 
-**The transport is `Any?`.** Boardy gives you typed façades at the edges — declared input and output
-types, typed flow handlers — and they catch real mistakes at the call site. Underneath, values move
-untyped and are cast on arrival. This is not end-to-end static type safety and the library does not
-claim it.
+**The transport is `Any?`.** Values move untyped between boards and are cast on arrival. This is not
+end-to-end static type safety and the library does not claim it.
+
+But be precise about where the risk in that actually lives. It is not the cast — it is two
+independently hand-written ends drifting apart: one side sends `PaymentInput`, the other was updated
+last month to expect something else, and nothing complains until a user taps the button.
+
+That is the part Boardy removes. A module declares its surface once in an `IOInterface`, and the
+[Xcode template](https://github.com/congncif/module-template) generates both ends from that single
+declaration:
+
+```swift
+public extension BoardID {
+    static let pubLogin: BoardID = "pub.mod.Authentication.Login"
+}
+
+public typealias LoginMainDestination =
+    MainboardGenericDestination<LoginInput, LoginOutput, LoginCommand, LoginAction>
+
+extension MotherboardType where Self: FlowManageable {
+    func ioLogin(_ identifier: BoardID = .pubLogin) -> LoginMainDestination {
+        LoginMainDestination(destinationID: identifier, mainboard: self)
+    }
+}
+```
+
+From then on the call site is checked by the compiler, and there is no string and no type to get
+wrong by hand:
+
+```swift
+motherboard.ioLogin().activation.activate(with: LoginInput(username: name))
+motherboard.ioLogin().flow.handle { output in       // output is a typed LoginOutput
+    print(output.token)
+}
+```
+
+The cast still happens underneath. Nobody chose the type twice, which is what made it dangerous.
 
 **It is iOS and UIKit, iOS 14 or newer.** Not multiplatform, and not a SwiftUI-first framework.
 

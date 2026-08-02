@@ -166,15 +166,13 @@ For the purpose of increasing efficiency, **Boardy Modularization** provides a s
 
 ### Install templates
 
-We provide some scripts to install these templates and some other tools.
+The scripts live in this repository under `tools/`. Each clones a pinned revision of its template
+repo, verifies the checkout, and works from a temporary directory — there is nothing to clone into
+your project root.
 
-* Clone [scripts repo](https://github.com/ifsolution/father-scripts.git) to your project root folder
+* Install **Boardy Xcode templates** from [`module-template`](https://github.com/congncif/module-template)
 ```sh
-git clone https://github.com/ifsolution/father-scripts.git
-```
-* Install **Boardy Xcode templates**
-```sh
-sh father-scripts/install-template.sh
+sh tools/install-template.sh
 ```
 
 * Create a new module use **Boardy Modularization template**
@@ -191,7 +189,7 @@ mkdir your-module
 ```sh
 # 3. Create initial source code using template
 cd your-module
-sh ../../father-scripts/init-module.sh YourModuleName
+sh /path/to/boardy/tools/init-module.sh YourModuleName
 ```
 ```ruby
 # 4. Add Your Module to Podfile
