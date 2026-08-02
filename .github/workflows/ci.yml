@@ -23,11 +23,12 @@ jobs:
 
       - name: Install CocoaPods
         run: |
-          gem install cocoapods -v 1.16.2 --install-dir "$RUNNER_TEMP/cocoapods" --no-document
-          "$RUNNER_TEMP/cocoapods/bin/pod" --version
+          gem install cocoapods -v 1.16.2 --no-document
+          echo "$(ruby -e 'print Gem.bindir')" >> "$GITHUB_PATH"
+          pod --version
 
       - name: Install CocoaPods dependencies
-        run: "$RUNNER_TEMP/cocoapods/bin/pod install --project-directory=Example --deployment"
+        run: pod install --project-directory=Example --deployment
 
       - name: Build and test
         run: >-
