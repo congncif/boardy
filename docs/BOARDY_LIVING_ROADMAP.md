@@ -2,19 +2,21 @@
 
 > Tài liệu tổng hợp để review, lựa chọn và theo dõi từng bước nâng cấp Boardy.
 >
-> **Trạng thái quyết định:** Option A đã materialize candidate implementation trên branch `codex/boardy-1.61.0`; Boardy floor là iOS 14+; execution đã hoàn tất lượt SPM-first build/test compile và API/inventory artifacts để maintainer review. Chưa tạo Boardy tag/GitHub Release và chưa publish/test CocoaPods; hosted CI, N-1 Xcode và toàn bộ MainActor/Swift 6 isolation được tách sang các plan sau.
+> **Trạng thái quyết định:** Boardy `1.61.0` đã merge vào `master` qua PR #10 và đã publish annotated tag `1.61.0`. Hosted CI chạy xanh trên exact merge SHA `eba3b311b28066c604dd878f92df799d99ed06f0` với Xcode 26.4.1 trên `macos-26`; CocoaPods test/lint cũng đã pass. Release vẫn **pre-G1**: older runtimes/devices, N-1 Xcode, signed release, SBOM/provenance và organization production support chưa được claim. GitHub Release object chưa xác minh được qua API tại lần cập nhật này.
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Trạng thái tài liệu | Candidate prepared — maintainer review pending |
-| Phiên bản tài liệu | 0.20.0 |
+| Trạng thái tài liệu | `1.61.0` published tag — pre-G1 follow-up open |
+| Phiên bản tài liệu | 0.21.0 |
 | Ngày audit | 2026-07-14 |
-| Cập nhật gần nhất | 2026-07-14 |
+| Cập nhật gần nhất | 2026-08-02 |
 | Audit baseline | `d62970a81432` |
 | Option A source/API baseline | `bfa9579977047b6e112b40b94c4c49243eb46dc8` |
 | Immutable API-baseline commit | `53664db10ae92924a6a7ca97bf0d0b906d0a3cca` |
 | Tasks 2–8 checkpoint | `f4284278c348f279c833c32e231d39473e5dd5f1` |
-| Framework release hiện tại | `1.60.1` |
+| Framework release hiện tại | `1.61.0` |
+| Release tag | annotated `1.61.0` → `eba3b311b28066c604dd878f92df799d99ed06f0` |
+| Hosted CI | pass: run `30728752451`, PR #10 merge SHA |
 | Owner tài liệu | Technical owner `congnc.if@gmail.com` (`@congncif`) |
 | Phạm vi | Vision, architecture, source, tests, documentation, distribution, OSS governance và organizational adoption |
 | Ngoài phạm vi audit | Production telemetry, consumer interviews, legal review chính thức và performance profiling trên ứng dụng thật |
@@ -776,10 +778,10 @@ Effort chỉ dùng để so sánh tương đối; chưa phải estimate cam kế
 | Work item | Priority | Status | Effort | Outcome | Finding/Dependency |
 |---|---|---|---|---|---|
 | `BUILD-001` Sửa test target compile | P0 | Done | S | Test suite có thể chạy | Commit `dadf9a5`; full suite 59/59 |
-| `BUILD-002` Thêm GitHub Actions build/test matrix | P0 | Proposed | M | Required checks tin cậy | `REL-001`, `REL-002` |
+| `BUILD-002` Thêm GitHub Actions build/test matrix | P0 | Done for 1.61.0 pre-G1 evidence | M | Required checks tin cậy on exact merge SHA | Workflow `.github/workflows/ci.yml`; hosted run `30728752451`; broader supported matrix remains follow-up |
 | `BUILD-003` Thêm `Package.swift` và products ban đầu | P0 | Done | M/L | SwiftPM installation | Exact UIComposable `1.1.0`; root package test target compile pass |
 | `BUILD-004` Thêm clean-consumer SPM smoke test | P0 | Done | M | Xác minh package dùng ngoài repo | `Examples/SwiftPMSmoke` imports/builds Boardy via local path |
-| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Deferred | S | Không phá consumer CocoaPods hiện tại | Requester defer CocoaPods test/lint; later transition pass |
+| `BUILD-005` Duy trì `pod lib lint` trong transition | P1 | Done for 1.61.0 candidate | S | Không phá consumer CocoaPods hiện tại | Hosted run `30728752451` passed `pod lib lint`; trunk publication remains deferred |
 | `BUILD-006` Đồng bộ Swift/platform metadata | P0 | Done | S | Một compatibility contract | iOS 14 metadata, Swift 5 mode, README/compat/migration/release docs aligned |
 | `BUILD-007` Thiết lập Swift API digester baseline | P1 | Done | M | Detect source/API break | Immutable commit `53664db`; self-verifier PASS |
 | `BUILD-008` Tách Boardy warnings khỏi dependency warnings | P1 | Proposed | S/M | CI ownership rõ | `CON-001`–`CON-007` |
@@ -1227,7 +1229,18 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 | Unsafe helper | `claude-dangerous.sh` removed |
 | Project-scoped side effects | Confined to ignored `.build-local/`; cleanup traps left no checkout work directories |
 
-### 21.4. Task 9–13 SPM candidate checkpoint
+### 21.4. Task 9–13 and release checkpoint
+
+| Activity | Result |
+|---|---|
+| Corrective release review | PASS; independent final review found no blockers; CI runner and `.unidentified` barrier identity corrections committed before merge |
+| Pull request | PASS; PR #10 merged into `master` at `eba3b311b28066c604dd878f92df799d99ed06f0` |
+| Hosted CI | PASS; run `30728752451` on exact merge SHA, Xcode 26.4.1 / `macos-26`; build/test and pod lint passed |
+| Boardy tag | PASS; annotated `1.61.0` remote tag peels to `eba3b311b28066c604dd878f92df799d99ed06f0`; unsigned by design under deferred signing policy |
+| GitHub Release object | Not verified by API at this update; tag publication is verified |
+| CocoaPods publication | Not claimed; trunk publication remains deferred |
+
+### 21.5. Task 9–13 SPM candidate checkpoint
 
 | Activity | Result |
 |---|---|
@@ -1239,7 +1252,7 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 | Executor characterization | Added as a deterministic `DispatchSpecificKey` regression; included in the package test target compile. Runtime assertion awaits a working approved simulator service |
 | Public API artifacts | PASS against normalized interface-derived baseline: no source/API break, no new global-actor annotation; `PUBLIC_API_1_61.md` verifies 822 eligible declarations including synthetic `->>` |
 | Raw API graph caveat | Raw immutable `Boardy-1.60.1.api.json` is retained; its mismatch with the paired interface is documented in `api/BASELINE_PROVENANCE.md` and is not hidden by an allowlist |
-| CocoaPods/CI/release | Deferred by requester; no CocoaPods test/lint, hosted CI, Boardy tag or GitHub Release executed |
+| CocoaPods/CI/release | Hosted CI run `30728752451` passed build/test and pod lint on exact merge SHA; annotated Boardy tag `1.61.0` published; CocoaPods trunk publication remains deferred; GitHub Release object not verified by API at this update |
 
 ---
 
@@ -1247,6 +1260,7 @@ Các hoạt động dưới đây mô tả trạng thái tại audit baseline, t
 
 | Document version | Date | Change |
 |---|---|---|
+| 0.21.0 | 2026-08-02 | Cập nhật sau merge/publish 1.61.0: PR #10 merged at `eba3b311`, hosted CI `30728752451` xanh trên `macos-26`/Xcode 26.4.1, annotated tag `1.61.0` verified; release vẫn pre-G1, CocoaPods trunk và GitHub Release API verification còn pending |
 | 0.20.0 | 2026-07-14 | Hoàn tất batch config/package/docs; SPM root + clean consumer compile pass, API/inventory artifacts và normalized baseline comparison được ghi nhận; CoreSimulator runtime unavailable, CocoaPods/CI/tag/release vẫn deferred |
 | 0.19.0 | 2026-07-14 | User đổi objective thành hoàn thành implementation và chuẩn bị candidate chờ review; gom config/package tasks, chuyển verification sang SPM-first một lượt, defer CocoaPods test/lint và chưa tạo Boardy tag/release |
 | 0.18.0 | 2026-07-14 | Theo quyết định requester, chuyển sang sole owner/release actor `congnc.if@gmail.com` / `@congncif`, defer backup continuity; approve opt-in consumer disposition, API policy và iOS 14/minor matrix; đóng Gate A1 và tạo single-owner CODEOWNERS |

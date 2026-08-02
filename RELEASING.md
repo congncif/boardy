@@ -4,12 +4,11 @@ This document is the maintainer checklist for Boardy 1.x. It separates candidate
 the requester-authorized pre-G1 GitHub release, later production-support designation and CocoaPods
 publication because each has a different gate and authority.
 
-Boardy 1.61.0 is currently a release candidate being prepared for maintainer review. No Boardy tag
-or GitHub Release is created in the current execution. A later GitHub-only release may proceed after
-the local gates even though hosted CI is deferred; it would remain pre-G1 and must not be described
-as organization production support. The owner and private security contact are recorded in
-[`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md). The current execution is
-Git/GitHub-only and does not authorize CocoaPods trunk publication.
+Boardy 1.61.0 is published from annotated tag `1.61.0` after PR #10 merged into `master`. Hosted CI
+passed on `macos-26` with Xcode 26.4.1, so this release has hosted evidence but remains pre-G1:
+older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner
+and private security contact are recorded in [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
+CocoaPods trunk publication remains excluded; metadata, lock resolution and pod lint were verified.
 
 ## Versioning policy
 
@@ -30,7 +29,7 @@ See [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) for the normative con
 
 ## 1. Confirm authority and gates
 
-Before creating the Boardy 1.61.0 tag or GitHub Release:
+Before creating a future Boardy release tag or GitHub Release:
 
 - [ ] The sole technical owner and release actor are explicitly designated in
       [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
@@ -57,7 +56,7 @@ For 1.61.0, confirm all normative locations agree:
 - [ ] The Example Podfile/project and generated Pods use iOS 14.
 - [ ] `README.md`, `CHANGELOG.md`, `docs/COMPATIBILITY.md` and
       `docs/MIGRATING_TO_1.61.md` exist and describe the same version, platform and toolchain.
-- [ ] The changelog still labels 1.61.0 as a candidate until the release date is known.
+- [ ] The changelog labels each unreleased version as a candidate until its release date is known.
 
 Do not add a branch dependency or move an existing public tag to make resolution pass.
 
@@ -102,11 +101,10 @@ Boardy Swift 6 language mode, MainActor isolation and Sendable migration are not
 gates. They belong to the separately approved follow-up plan and must not be simulated with unsafe
 annotations or warning suppression.
 
-Do not run CocoaPods tests, `pod lib lint` or `pod trunk push` in the current review cycle. The
-Example lock may still record the prior 1.60.1 local-development pod state; refresh it only in the
-later CocoaPods transition pass. The
-podspec and iOS 14 project metadata remain prepared for a separate transition pass. Always finish
-with `git diff --check` and `git status --short`.
+For the original SPM-first candidate procedure, CocoaPods tests and `pod lib lint` were deferred;
+Boardy 1.61.0 later passed the hosted CocoaPods test/lint row on exact merge SHA
+`eba3b311b28066c604dd878f92df799d99ed06f0`. `pod trunk push` remains excluded. Always finish with
+`git diff --check` and `git status --short`.
 
 Retain Xcode version, destination, logs and result bundles under `.build-local/Results`. Local results
 are evidence for the candidate only; older-runtime/device, N-1 Xcode and hosted results must not be
@@ -148,9 +146,9 @@ pre-G1 GitHub release and do not replace future hosted final-SHA evidence.
 
 ## 7. Finalize changelog and create the GitHub release
 
-Finalize changelog/release metadata before the plan's one joined consistency review. After that
-review and its corrective batch, tracked files must remain unchanged. Only after all local
-GitHub-release gates pass:
+Finalize changelog/release metadata before each release's joined consistency review. After that
+review and its corrective batch, tracked files must remain unchanged. For the already published
+1.61.0 tag, use Task 14's recorded evidence; only after all future GitHub-release gates pass:
 
 1. Confirm the joined review included the actual 1.61.0 release date and final release metadata.
 2. Verify release notes prominently disclose the iOS 14 floor, migration guide, compatibility
@@ -197,7 +195,7 @@ publication.
 ## 9. Post-release verification
 
 - [ ] Verify local and remote annotated tag objects peel to the reviewed SHA.
-- [ ] Verify the GitHub Release is public and its notes match the changelog.
+- [ ] Verify the GitHub Release is public and its notes match the changelog. For `1.61.0`, this remains open because the API returned 404.
 - [ ] Resolve SwiftPM by exact version from a clean external consumer.
 - [ ] Record any deferred CocoaPods publication and hosted compatibility follow-up without rewriting
       the released evidence.

@@ -10,16 +10,19 @@ not strict Semantic Versioning.
 
 ## [Unreleased]
 
-No changes have been assigned beyond the 1.61.0 candidate.
+No changes have been assigned beyond the 1.61.0 release.
 
-## [1.61.0] - Unreleased release candidate
+## [1.61.0] - 2026-08-02
 
-Boardy 1.61.0 is a maintainer-review candidate and has not passed the hosted-CI/G1
-organization-support gate. It is not tagged or published. Verification is limited to Xcode
-26.4.1 on an iPhone 17 simulator running iOS 26.4; older runtimes, other devices, N-1 Xcode and
-hosted CI remain deferred. SwiftPM is the current verification path; CocoaPods test/lint and
-publication remain deferred. The current evidence boundary is recorded in the
+Boardy 1.61.0 is published from annotated tag `1.61.0` at the merged PR #10 commit. It remains
+pre-G1: hosted CI passed on Xcode 26.4.1 / `macos-26`, but older runtimes, other devices and N-1
+Xcode remain unverified; organization production support is not claimed. CocoaPods metadata and
+Example lock were verified, but CocoaPods trunk publication is not claimed. The iOS 14 floor,
+compatibility boundary and migration path are documented in
+[`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md) and the
 [`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
+
+GitHub Release API returned 404 for tag `1.61.0`; release-object publication remains unverified.
 
 ### Added
 
