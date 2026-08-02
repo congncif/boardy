@@ -7,6 +7,19 @@
 
 import Foundation
 
+/// Holds work until a value it is waiting for arrives.
+///
+/// Callers queue closures with ``Action/wait(_:)``. When the value is known, ``Action/overcome(_:)``
+/// runs every queued closure with it, emits the value as output and completes successfully.
+/// ``Action/cancel`` drops the queue without running anything and completes unsuccessfully.
+///
+/// ```swift
+/// motherboard.activation(.gate, with: BarrierBoard<Token>.Action.self)
+///     .activate(with: .wait { token in openSettings(with: token) })
+/// ```
+///
+/// This is the general-purpose barrier a feature drives explicitly. It is unrelated to the
+/// activation barriers the framework installs automatically around gateway boards.
 public final class BarrierBoard<Input>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = Action
     public typealias OutputType = Input

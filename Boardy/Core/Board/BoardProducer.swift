@@ -19,6 +19,11 @@ extension [BoardRegistration]: BoardRegistrationsConvertible {
     public func asBoardRegistrations() -> [BoardRegistration] { self }
 }
 
+/// A producer whose registrations can be added at runtime.
+///
+/// This is what plugins register into while an app is being assembled. Two implementations ship —
+/// ``BoardProducer`` and ``BoardContainer`` — and they differ on duplicate registration; see either
+/// type, or `docs/BU.md`.
 public protocol BoardDynamicProducer: ActivatableBoardProducer {
     func registerBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
     func registerGatewayBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> ActivatableBoard)
@@ -50,6 +55,21 @@ public extension BoardDynamicProducer {
     }
 }
 
+/// Creates boards on demand from registered factories.
+///
+/// A motherboard holding a producer stays empty until something is activated, so a screen deep in
+/// a flow costs nothing until it is reached. Registrations can be inspected through
+/// ``registrations``, which is what distinguishes this from ``BoardContainer``.
+///
+/// ```swift
+/// let producer = BoardProducer()
+/// producer.registerBoard(.checkout) { id in CheckoutBoard(identifier: id) }
+/// ```
+///
+/// - Note: registering the same identifier twice keeps the **first** factory and ignores the
+///   second. ``BoardContainer`` does the opposite. When a duplicate is deliberate, use
+///   ``BoardDynamicProducer/registerBoard(_:replacingExisting:factory:)``, which both honour
+///   identically.
 public final class BoardProducer: BoardDynamicProducer {
     public private(set) var registrations = Set<BoardRegistration>()
     public private(set) var gatewayRegistrations = Set<BoardRegistration>()

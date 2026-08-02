@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// A unit of app assembly: one module's contribution to the launcher.
+///
+/// A plugin registers the boards its module provides and nothing else, so modules can be added or
+/// removed without any other module knowing about them.
 public protocol LauncherPlugin {
     func prepareForLaunching(withOptions options: MainOptions) -> ModuleComponent
 }

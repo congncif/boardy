@@ -13,6 +13,26 @@ public protocol TaskingBoard: NormalBoard {
     var isProcessing: Bool { get }
 }
 
+/// A board that runs one piece of work and reports the result.
+///
+/// Use it for the steps in a flow that are not screens: fetch, validate, upload. The executor
+/// receives the input and a completion; the board turns that into typed output plus the usual
+/// board completion, so it composes with flows exactly like a UI board does.
+///
+/// ```swift
+/// let load = TaskBoard<UserID, Profile>(identifier: .loadProfile) { _, id, done in
+///     api.profile(for: id) { done($0) }
+/// }
+/// ```
+///
+/// ## One activation at a time
+///
+/// A task board holds a single activation slot. Activating while work is in flight is rejected —
+/// the executor does not run twice — and the slot is released when the executor completes.
+/// A duplicate completion is a no-op rather than an error.
+///
+/// Execution is caller-controlled: the executor runs wherever `activate` was called from, and the
+/// handlers run wherever the completion was delivered from. Hop to the main queue yourself for UI.
 open class TaskBoard<Input, Output>: Board, GuaranteedBoard, TaskingBoard, GuaranteedOutputSendingBoard {
     public typealias ExecutorCompletion = (Result<Output, Error>) -> Void
     public typealias Executor = (TaskingBoard, Input, @escaping ExecutorCompletion) -> Void

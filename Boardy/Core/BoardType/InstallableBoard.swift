@@ -8,6 +8,12 @@
 import Foundation
 import UIKit
 
+/// A board that presents UIKit content from its installed context.
+///
+/// Gives access to `rootViewController`, resolved from whatever the board was put into.
+///
+/// - Important: reading `rootViewController` before the board has a context traps in DEBUG. Install
+///   the board — or its motherboard — before presenting.
 public protocol InstallableBoard: OriginalBoard {
     var rootViewController: UIViewController { get }
 

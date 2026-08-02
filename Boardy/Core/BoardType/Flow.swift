@@ -14,6 +14,19 @@ public enum BoardFlowNoneAction: BoardFlowAction {}
 
 public typealias FlowStepID = BoardID
 
+/// Holds the flows that decide what happens after a board emits.
+///
+/// A flow is a match plus a handler: match this identifier and this output type, then run this.
+/// Registering flows is how boards get composed without knowing each other — the flow, not the
+/// board, names what comes next.
+///
+/// ```swift
+/// motherboard.matchedFlow(.checkout, with: Receipt.self)
+///     .nextToBoard(.receipt)
+/// ```
+///
+/// - Important: register and reset flows on the main thread. Dispatch may happen on any thread,
+///   because a board sends output from wherever its work finished.
 public protocol FlowManageable: AnyObject {
     var flows: [BoardFlow] { get }
 

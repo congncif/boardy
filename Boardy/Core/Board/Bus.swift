@@ -7,6 +7,11 @@
 
 import Foundation
 
+/// One subscription on a ``Bus``.
+///
+/// A cable carries values from the bus to whatever it was created for, and can be invalidated to
+/// stop receiving. Use ``Bus/connect(target:handler:)`` rather than building cables by hand — the
+/// target variant invalidates itself when its target is released.
 open class BusCable<Input> {
     public typealias Handler = (Input) -> Void
 
@@ -73,6 +78,29 @@ public final class TargetBusCable<Target, Input>: BusCable<Input> {
     }
 }
 
+/// A typed broadcast channel a board can expose to whoever holds it.
+///
+/// Flows route between boards; a bus routes *within* one board's world — from the board to the
+/// controller it built, or from a controller callback back into the board. It is the piece that
+/// keeps a controller from having to know about `Boardy` at all:
+///
+/// ```swift
+/// private let events = Bus<CartEvent>()
+///
+/// func activate(withGuaranteedInput input: Cart) {
+///     let component = builder.build(withDelegate: self)
+///     events.connect(target: component.controller) { controller, event in
+///         controller.apply(event)
+///     }
+/// }
+/// ```
+///
+/// Connecting with a target holds that target weakly and drops the cable once it is gone, so a bus
+/// does not keep a screen alive.
+///
+/// - Important: `Bus` performs no synchronization. Connect and transport from one thread — in
+///   practice the main thread. Mutating the cable list from a handler while a transport is in
+///   flight is undefined behavior, not merely a missed delivery.
 public final class Bus<Input> {
     private var cables: [BusCable<Input>] = []
 
@@ -82,11 +110,16 @@ public final class Bus<Input> {
         cables.removeAll { !$0.isValid }
     }
 
+    /// Adds `cable` to the channel. Invalid cables are pruned first.
     public func connect(_ cable: BusCable<Input>) {
         cleanInvalidCablesIfNeeded()
         cables.append(cable)
     }
 
+    /// Delivers `input` to every valid cable, in connection order.
+    ///
+    /// - Important: do not connect to or invalidate this bus from inside a handler; see the note on
+    ///   ``Bus``.
     public func transport(input: Input) {
         cleanInvalidCablesIfNeeded()
 

@@ -8,12 +8,26 @@
 import Foundation
 import UIKit
 
+/// The receiving end of everything a board emits.
+///
+/// A board never talks to another board directly. It hands data to its delegate — in practice a
+/// ``Motherboard`` — which matches the message against its registered flows and decides what
+/// happens next. That indirection is what lets boards be composed without knowing about each other.
+///
+/// The delegate is held weakly by the board, and the motherboard sets itself as delegate when the
+/// board is installed.
 public protocol BoardDelegate: AnyObject {
+    /// Called when `board` emits data. `data` is untyped at this layer; the typed façades
+    /// (``GuaranteedBoard``, flows) cast it on the way in and out.
     func board(_ board: IdentifiableBoard, didSendData data: Any?)
 }
 
 // MARK: - Board
 
+/// A board's link to the object it was installed into.
+///
+/// The context is usually the `UIViewController` or `UIWindow` the board presents from. It is set
+/// once, by whoever installs the board, and is what lets an otherwise stateless board reach UIKit.
 public protocol OriginalBoard {
     /// System context which helps this Board access current state of system.
     var context: AnyObject? { get }
@@ -22,8 +36,15 @@ public protocol OriginalBoard {
     func putIntoContext(_ context: AnyObject)
 }
 
+/// The minimum a board must provide: a name to be addressed by, and somewhere to send output.
+///
+/// Everything the framework routes — activation, interaction, completion, flows — is keyed on
+/// ``identifier``. Two boards with the same identifier cannot be installed in the same motherboard.
 public protocol IdentifiableBoard: AnyObject, CustomDebugStringConvertible {
+    /// Set by the motherboard when the board is installed. Held weakly.
     var delegate: BoardDelegate? { get set }
+
+    /// The board's address within its motherboard. Stable for the board's lifetime.
     var identifier: BoardID { get }
 }
 
