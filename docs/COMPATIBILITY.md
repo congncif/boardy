@@ -38,23 +38,17 @@ main-thread-only path and cannot be made one without changing published behavior
 therefore locked internally and every reader takes a snapshot. No caller obligation is added by
 this; sending output off the main thread was always supported and remains so.
 
-## CocoaPods publication gate
+## CocoaPods publication
 
-Boardy 1.61.0 ships as a Git tag and GitHub Release only; it is not published to the CocoaPods
-trunk. Existing pod consumers therefore do not resolve it automatically and stay on their current
-line until their own owner schedules a migration.
+Boardy 1.61.0 is published to the CocoaPods trunk. A consumer that depends on Boardy without a
+version bound resolves it and inherits the iOS 14 floor.
 
-This gate must be cleared before any later trunk publication. Every known consumer that depends on
-Boardy without a version bound and targets below iOS 14 must do one of:
+The owner's disposition: every known consumer already targets iOS 14 or newer, so this is not a
+migration event. An application that must stay below iOS 14 pins `~> 1.60`, which continues to serve
+the iOS 12 line.
 
-- raise its own deployment floor to iOS 14, or
-- add an explicit `< 1.61` ceiling on its Boardy dependency, or
-- record a retirement disposition.
-
-Unbounded dependencies below the floor were the reason publication was excluded, not an oversight.
-The Boardy owner owns this gate; application owners own their own migrations. Templates that
-generate podspecs must stop emitting unbounded Boardy dependencies before publication, or they
-reintroduce the problem for every module they scaffold.
+Templates that generate podspecs should still emit a bounded Boardy dependency; an unbounded one
+hands every scaffolded module whatever floor the newest release happens to carry.
 
 ## Compatibility policy
 

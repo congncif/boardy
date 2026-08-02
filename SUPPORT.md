@@ -8,14 +8,14 @@ policy exists, maintenance and triage are best effort and no service-level agree
 | Version | Status | Platform and evidence boundary |
 |---|---|---|
 | 1.62.0 | Current line | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification against the 1.61.0 baseline. Older runtimes, other devices and N-1 Xcode remain unverified. |
-| 1.61.0 | Released, superseded by 1.62.0 | iOS 14+. Published as a Git tag; not published to the CocoaPods trunk. |
+| 1.61.0 | Released, superseded by 1.62.0 | iOS 14+. Published as a Git tag and to the CocoaPods trunk. |
 | 1.60.1 | Last CocoaPods-published line | iOS 12 floor; fixes and response times are not guaranteed. |
 | 1.60.0 and earlier | Historical | No active maintenance commitment. Use tags and commit history as the record. |
 
-The current evidence boundary is in
-[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md). A consumer below iOS 14 must
-remain below Boardy 1.61 unless it raises its deployment target.
-Boardy is published as Git tags only; the CocoaPods trunk still serves 1.60.1.
+The current evidence boundary is in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
+
+The CocoaPods trunk serves up to 1.61.0, so a dependency without a version bound resolves it and
+inherits the iOS 14 floor. An application that must stay below iOS 14 pins `~> 1.60`.
 
 ## Where to ask
 

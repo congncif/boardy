@@ -67,6 +67,23 @@ private final class DestinationHostMotherboard: Motherboard {
 
 private enum NoAction: BoardFlowAction {}
 
+/// Holds the completion its executor was handed, so a test can fire it after the board is gone —
+/// the shape an in-flight URLSession callback has.
+private final class DeferredCompletionBoard: Board, ActivatableBoard, GuaranteedOutputSendingBoard {
+    typealias OutputType = String
+
+    var deferredOutput: (() -> Void)?
+
+    func activate(withOption _: Any?) {
+        deferredOutput = { [weak self] in self?.sendOutput("late") }
+    }
+}
+
+private final class CountingBoard: Board, ActivatableBoard {
+    private(set) var activationCount = 0
+    func activate(withOption _: Any?) { activationCount += 1 }
+}
+
 class LifecycleTests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -124,6 +141,65 @@ class LifecycleTests: XCTestCase {
         destination.activation(with: String.self).activate(with: "ignored")
         destination.interaction(with: String.self).send(command: "ignored")
         destination.completer.complete()
+    }
+
+    // MARK: - Terminal events
+
+    /// §P1-1. `removeBoard` dropped the board from the list but left its `delegate` pointing at the
+    /// motherboard. A callback still holding the board — an in-flight network completion, say —
+    /// could therefore emit output after the board was gone, match the flow that was registered for
+    /// it, and drive the next board a second time.
+    func testOutputFromARemovedBoardDoesNotReachTheMotherboard() {
+        let source = DeferredCompletionBoard(identifier: "source")
+        let next = CountingBoard(identifier: "next")
+        let motherboard: FlowMotherboard = Motherboard(boards: [source, next])
+        motherboard.matchedFlow("source", with: String.self).handle { [unowned motherboard] _ in
+            motherboard.activateBoard(identifier: "next", withOption: nil)
+        }
+
+        motherboard.activateBoard(identifier: "source", withOption: nil)
+        let deferredOutput = source.deferredOutput
+        XCTAssertNotNil(deferredOutput)
+
+        source.complete()
+        XCTAssertFalse(motherboard.boards.contains { $0.identifier == "source" })
+
+        // The callback finally fires, long after the board was removed.
+        deferredOutput?()
+
+        XCTAssertEqual(next.activationCount, 0, "a removed board must not still drive the flow")
+    }
+
+    /// §P1-2. A board that completes twice — success path plus an error-path callback, or an app
+    /// calling `completer(id).complete()` while the board completes itself — hit an assertion in
+    /// `removeBoard` and crashed DEBUG builds.
+    func testCompletingTwiceIsANoOpRatherThanATrap() {
+        let board = CountingBoard(identifier: "board")
+        let motherboard: FlowMotherboard = Motherboard(boards: [board])
+
+        var completions: [Bool] = []
+        motherboard.completionFlow("board").handle { completions.append($0) }
+
+        board.complete(true)
+        board.complete(true)
+
+        XCTAssertTrue(motherboard.boards.isEmpty)
+        XCTAssertEqual(completions, [true], "the second completion must not be delivered again")
+    }
+
+    /// The same, driven from the outside rather than by the board itself.
+    func testCompleterOnAnAlreadyRemovedBoardIsANoOp() {
+        let board = CountingBoard(identifier: "board")
+        let motherboard: FlowMotherboard = Motherboard(boards: [board])
+
+        var completions: [Bool] = []
+        motherboard.completionFlow("board").handle { completions.append($0) }
+
+        board.complete(true)
+        motherboard.completer("board").complete(true)
+
+        XCTAssertTrue(motherboard.boards.isEmpty)
+        XCTAssertEqual(completions, [true])
     }
 
     func testBoardIsReleasedWhenCompletedBySibling() throws {

@@ -143,12 +143,34 @@ extension MotherboardRepresentable {
 
     public func removeBoard(withIdentifier identifier: BoardID) {
         boardyAssertMainThread()
-        assert(installedBoard(identifier: identifier) != nil, "\(String(describing: self)) \n🔥 Board with identifier \(identifier) was not in motherboard \(self).")
+
+        guard let board = installedBoard(identifier: identifier) else {
+            // Not an assertion. A board completing twice is ordinary — a success path and an
+            // error-path callback both firing, or the app calling `completer(id).complete()` while
+            // the board completes itself — and it used to trap here in DEBUG. The second removal
+            // has nothing left to do, so it does nothing.
+            #if DEBUG
+                print("⚠️ [\(String(describing: type(of: self)))] ➤ \(self.identifier)\n  [Already removed] ➤ Board \(identifier) is not installed; this completion is a no-op.")
+            #endif
+            return
+        }
+
+        // Detach before dropping the reference. A callback that still holds the board — an
+        // in-flight network completion, say — could otherwise emit output through this motherboard
+        // after the board is gone, match the flow registered for it, and drive the next board a
+        // second time. `mainboard.didSet` only reattaches boards that are still in the list.
+        board.delegate = nil
+
         mainboard.removeAll { $0.identifier == identifier }
     }
 
     public func clearActiveBoards() {
         boardyAssertMainThread()
+
+        for board in mainboard {
+            board.delegate = nil
+        }
+
         mainboard.removeAll()
     }
 }
