@@ -1,7 +1,8 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 6.3.1 effective-5.10 (swiftlang-6.3.1.1.2 clang-2100.0.123.102)
-// swift-module-flags: -target arm64-apple-ios14.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -module-name Boardy
-// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.1
+// swift-module-flags: -target arm64-apple-ios14.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -Onone -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name Boardy
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.1
+@_exported import Boardy
 import Foundation
 import Swift
 import UIComposable
@@ -9,20 +10,242 @@ import UIKit
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
-@_functionBuilder public enum BoardRegistrationBuilder {
-  public static func buildArray(_ components: [any Boardy.BoardRegistrationsConvertible]) -> [Boardy.BoardRegistration]
-  public static func buildBlock(_ components: any Boardy.BoardRegistrationsConvertible...) -> [Boardy.BoardRegistration]
-  public static func buildEither(first component: any Boardy.BoardRegistrationsConvertible) -> any Boardy.BoardRegistrationsConvertible
-  public static func buildEither(second component: any Boardy.BoardRegistrationsConvertible) -> any Boardy.BoardRegistrationsConvertible
-  public static func buildIf(_ value: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
-  public static func buildOptional(_ component: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
-  public static func buildExpression(_ component: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
+public protocol ActivatableBoard : Boardy.BoardRegistrationsConvertible, Boardy.IdentifiableBoard, Boardy.OriginalBoard {
+  func activationBarrier(withOption option: Any?) -> Boardy.ActivationBarrier?
+  func activate(withOption option: Any?)
+  func shouldBypassGatewayBarrier() -> Swift.Bool
 }
-extension Boardy.Motherboard {
-  convenience public init(identifier: Boardy.BoardID = .random(), externalProducer: any Boardy.ActivatableBoardProducer = NoBoardProducer(), @Boardy.BoardRegistrationBuilder registrationsBuilder: (_ producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration])
+extension Boardy.ActivatableBoard {
+  public func asBoardRegistrations() -> [Boardy.BoardRegistration]
+  public func shouldBypassGatewayBarrier() -> Swift.Bool
 }
-extension Boardy.BoardProducer {
-  convenience public init(externalProducer: any Boardy.ActivatableBoardProducer = NoBoardProducer(), @Boardy.BoardRegistrationBuilder registrationsBuilder: (_ producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration])
+extension Boardy.ActivatableBoard {
+  public func activate()
+  public func activationBarrier(withOption _: Any?) -> Boardy.ActivationBarrier?
+}
+public typealias NormalBoard = Boardy.ActivatableBoard & Boardy.InstallableBoard
+public struct ActivationBarrier {
+  public let identifier: Boardy.BoardID
+  public let scope: Boardy.ActivationBarrierScope
+  public let option: Boardy.ActivationBarrierOption
+}
+public enum ActivationBarrierScope {
+  case mainboard
+  case application
+  public static func == (a: Boardy.ActivationBarrierScope, b: Boardy.ActivationBarrierScope) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension Boardy.ActivationBarrierScope {
+  @available(*, deprecated, renamed: "mainboard", message: "Use .mainboard instead")
+  public static var inMain: Boardy.ActivationBarrierScope {
+    get
+  }
+  @available(*, deprecated, renamed: "application", message: "Use .application instead")
+  public static var global: Boardy.ActivationBarrierScope {
+    get
+  }
+}
+public enum ActivationBarrierOption {
+  case void
+  case unique(Swift.AnyHashable)
+  case unidentified(Any?)
+}
+extension Boardy.ActivationBarrier {
+  public var barrierIdentifier: Boardy.BoardID {
+    get
+  }
+}
+public protocol ActivatableBoardProducer {
+  func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  func produceGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  func matchBoard(withIdentifier identifier: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+}
+extension Boardy.ActivatableBoardProducer {
+  public func matchBoard(withIdentifier _: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  public func produceGatewayBoard(identifier _: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+}
+@available(*, deprecated, renamed: "ActivatableBoardProducer", message: "The protocol was renamed to ActivatableBoardProducer to fix typo")
+public typealias ActivableBoardProducer = Boardy.ActivatableBoardProducer
+final public class AdapterBoard<Destination, In, Out> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard, Boardy.InteractableBoard, Boardy.BoardDelegate where Destination : Boardy.GuaranteedBoard, Destination : Boardy.GuaranteedOutputSendingBoard {
+  public typealias InputType = In
+  public typealias OutputType = Out
+  final public let destination: Destination
+  public init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType, outputMapper: @escaping (Destination.OutputType) -> Out)
+  final public func setInputMapper(_ mapper: @escaping (In) -> Destination.InputType) -> Self
+  final public func setOutputMapper(_ mapper: @escaping (Destination.OutputType) -> Out) -> Self
+  final public func activationBarrier(withGuaranteedInput input: In) -> Boardy.ActivationBarrier?
+  final public func activate(withGuaranteedInput input: Boardy.AdapterBoard<Destination, In, Out>.InputType)
+  final public func interact(command: Any?)
+  final public func board(_: any Boardy.IdentifiableBoard, didSendData data: Any?)
+  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+  @objc deinit
+}
+extension Boardy.AdapterBoard where In == Destination.InputType {
+  convenience public init(destination: Destination, outputMapper: @escaping (Destination.OutputType) -> Out)
+}
+extension Boardy.AdapterBoard where Out == Destination.OutputType {
+  convenience public init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType)
+}
+extension Boardy.AdapterBoard where In == Destination.InputType, Out == Destination.OutputType {
+  convenience public init(destination: Destination)
+}
+public struct AlertAction {
+  public init(title: Swift.String, style: Boardy.AlertAction.Style = .default, shouldBePreferred: Swift.Bool = false, handler: (() -> Swift.Void)?)
+  public init<Target>(title: Swift.String, style: Boardy.AlertAction.Style = .default, shouldBePreferred: Swift.Bool = false, target: Target, handler: ((Target) -> Swift.Void)?) where Target : AnyObject
+  public enum Style {
+    case `default`
+    case cancel
+    case destructive
+    public static func == (a: Boardy.AlertAction.Style, b: Boardy.AlertAction.Style) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public struct Alert {
+  public init(title: Swift.String? = nil, message: Swift.String?, style: Boardy.Alert.Style = .alert, actions: [Boardy.AlertAction])
+  public enum Style {
+    case alert
+    case actionSheet
+    public static func == (a: Boardy.Alert.Style, b: Boardy.Alert.Style) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension Boardy.MotherboardType {
+  public func activateAlert(_ alert: Boardy.Alert)
+}
+public protocol DetachableObject : AnyObject {
+  func detachObject(_ object: Swift.AnyObject)
+}
+public protocol AttachableObject : Boardy.DetachableObject {
+  func attach(to object: Swift.AnyObject)
+  func attachObject(_ object: Swift.AnyObject)
+  func attachedObjects() -> [Swift.AnyObject]
+  func detachAllObjects()
+}
+extension Boardy.AttachableObject {
+  public func attach(to object: Swift.AnyObject)
+  public func attachObject(_ object: Swift.AnyObject)
+  public func attachedObjects() -> [Swift.AnyObject]
+  public func attachedObjects<ObjectType>(_: ObjectType.Type = ObjectType.self) -> [ObjectType]
+  public func firstAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType?
+  public func lastAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType?
+  public func detachObject(_ object: Swift.AnyObject)
+  public func detachObjects<ObjectType>(_: ObjectType.Type, where condition: (ObjectType) -> Swift.Bool = { _ in true })
+  public func detachObjects(where condition: (Swift.AnyObject) -> Swift.Bool)
+  public func detachAllObjects()
+}
+@_inheritsConvenienceInitializers final public class BarrierBoard<Input> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
+  public typealias InputType = Boardy.BarrierBoard<Input>.Action
+  public typealias OutputType = Input
+  public typealias Process = (Input) -> Swift.Void
+  public enum Action {
+    case wait(Boardy.BarrierBoard<Input>.Process)
+    case overcome(Boardy.BarrierBoard<Input>.OutputType)
+    case cancel
+  }
+  final public func activate(withGuaranteedInput input: Boardy.BarrierBoard<Input>.InputType)
+  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+  override public init(identifier: Boardy.BoardID)
+  @objc deinit
+}
+final public class BlockTaskParameter<Input, Output> {
+  public init(input: Input)
+  final public func onSuccess(_ handler: Boardy.BlockTaskParameter<Input, Output>.SuccessHandler?) -> Self
+  final public func onSuccess(_ handler: ((Output) -> Swift.Void)?) -> Self
+  final public func onSuccess<Target>(target: Target, action: ((Target, Output) -> Swift.Void)?) -> Self
+  final public func onProcessing(_ handler: Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler?) -> Self
+  final public func onProcessing(_ handler: ((Swift.Bool) -> Swift.Void)?) -> Self
+  final public func onProcessing<Target>(target: Target, action: ((Target, Swift.Bool) -> Swift.Void)?) -> Self
+  final public func onError(_ handler: Boardy.BlockTaskParameter<Input, Output>.ErrorHandler?) -> Self
+  final public func onError(_ handler: ((any Swift.Error) -> Swift.Void)?) -> Self
+  final public func onError<Target>(target: Target, action: ((Target, any Swift.Error) -> Swift.Void)?) -> Self
+  final public func onCompletion(_ handler: Boardy.BlockTaskParameter<Input, Output>.CompletionHandler?) -> Self
+  final public func onCompletion(_ handler: ((Boardy.TaskCompletionStatus) -> Swift.Void)?) -> Self
+  final public func onCompletion<Target>(target: Target, action: ((Target, Boardy.TaskCompletionStatus) -> Swift.Void)?) -> Self
+  final public let input: Input
+  final public var successHandler: Boardy.BlockTaskParameter<Input, Output>.SuccessHandler? {
+    get
+  }
+  final public var processingHandler: Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler? {
+    get
+  }
+  final public var errorHandler: Boardy.BlockTaskParameter<Input, Output>.ErrorHandler? {
+    get
+  }
+  final public var completionHandler: Boardy.BlockTaskParameter<Input, Output>.CompletionHandler? {
+    get
+  }
+  public typealias SuccessHandler = (any Boardy.ActivatableBoard, Output) -> Swift.Void
+  public typealias ProcessingHandler = (any Boardy.ActivatableBoard, Swift.Bool) -> Swift.Void
+  public typealias ErrorHandler = (any Boardy.ActivatableBoard, any Swift.Error) -> Swift.Void
+  public typealias CompletionHandler = (any Boardy.ActivatableBoard, Boardy.TaskCompletionStatus) -> Swift.Void
+  @objc deinit
+}
+extension Boardy.BlockTaskParameter {
+  final public func appendingSuccessHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.SuccessHandler) -> Self
+  final public func appendingErrorHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.ErrorHandler) -> Self
+  final public func appendingCompletionHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.CompletionHandler) -> Self
+  final public func appendingProcessingHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler) -> Self
+}
+public enum TaskCompletionStatus {
+  case done
+  case cancelled
+  public static func == (a: Boardy.TaskCompletionStatus, b: Boardy.TaskCompletionStatus) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension Boardy.BlockTaskParameter where Input : Swift.ExpressibleByNilLiteral {
+  convenience public init()
+}
+extension Boardy.BlockTaskParameter where Input == () {
+  convenience public init()
+}
+extension Boardy.BlockTaskBoard {
+  convenience public init(identifier: Boardy.BoardID, executingType: Boardy.ExecutingType = .default, execute work: @escaping (Boardy.BlockTaskBoard<Input, Output>, Input, @escaping Boardy.BlockTaskBoard<Input, Output>.ExecutorCompletion) -> Swift.Void)
+}
+public enum ExecutingType {
+  case `default`
+  case latest
+  case only
+  case onlyResult
+  case queue
+  case concurrent(max: Swift.Int)
+  public static var concurrent: Boardy.ExecutingType {
+    get
+  }
+}
+final public class BlockTaskBoard<Input, Output> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
+  public typealias InputType = Boardy.BlockTaskParameter<Input, Output>
+  public typealias OutputType = Output
+  public typealias ExecutorCompletion = (Swift.Result<Output, any Swift.Error>) -> Swift.Void
+  public typealias Executor = (Boardy.BlockTaskBoard<Input, Output>, Input, @escaping Boardy.BlockTaskBoard<Input, Output>.ExecutorCompletion) -> Boardy.BlockTaskCanceler
+  public init(identifier: Boardy.BoardID, executingType: Boardy.ExecutingType, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.BlockTaskBoard<Input, Output>.Executor)
+  @objc deinit
+  final public var inputAdapters: [(Any?) -> Boardy.BlockTaskParameter<Input, Output>?] {
+    get
+  }
+  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+  final public func activate(withGuaranteedInput input: Boardy.BlockTaskBoard<Input, Output>.InputType)
+}
+extension Boardy.BlockTaskCanceler {
+  public static var none: Boardy.BlockTaskCanceler {
+    get
+  }
+  public static func `default`(handler: @escaping () -> Swift.Void) -> Boardy.BlockTaskCanceler
+}
+public struct BlockTaskCanceler {
+  public init(handler: @escaping () -> Swift.Void)
+  public func cancel()
 }
 open class Board : Boardy.IdentifiableBoard, Boardy.OriginalBoard {
   final public let identifier: Boardy.BoardID
@@ -50,61 +273,139 @@ extension Boardy.Board : Boardy.InstallableBoard {
 }
 extension Boardy.Board : Boardy.WindowInstallableBoard {
 }
-open class BusCable<Input> {
-  public typealias Handler = (Input) -> Swift.Void
-  public init(transportHandler: @escaping Boardy.BusCable<Input>.Handler)
-  open func transport(input: Input)
-  open var isValid: Swift.Bool {
-    get
-  }
-  open func invalidate()
-  @objc deinit
+extension ObjectiveC.NSObject : Boardy.AttachableObject {
 }
-final public class TargetBusCable<Target, Input> : Boardy.BusCable<Input> {
-  public init(target: Target, handler: @escaping (Target, Input) -> Swift.Void)
-  override final public var isValid: Swift.Bool {
-    get
-  }
-  override final public func invalidate()
-  @objc deinit
+extension Boardy.Board : Boardy.AttachableObject {
 }
-final public class Bus<Input> {
-  public init()
-  final public func connect(_ cable: Boardy.BusCable<Input>)
-  final public func transport(input: Input)
-  @objc deinit
-}
-extension Boardy.Bus {
-  final public func connect<Target>(target: Target, handler: @escaping (Target, Input) -> Swift.Void)
-  final public func connect<Target>(target: Target, handler: @escaping (Target) -> Swift.Void)
-  final public func deliver(handler: @escaping (Input) -> Swift.Void)
-}
-extension Boardy.Bus where Input == () {
-  final public func transport()
-}
-extension Boardy.Bus where Input == Any? {
-  final public func transport()
-}
-extension Boardy.Bus where Input == Any {
-  final public func transport()
-}
-open class Motherboard : Boardy.Board, Boardy.BoardDelegate, Boardy.FlowMotherboard {
-  public var flows: [any Boardy.BoardFlow]
-  override public var debugDescription: Swift.String {
-    get
-  }
-  public init(identifier: Boardy.BoardID = .random(), boards: [any Boardy.ActivatableBoard] = [])
-  public init(identifier: Boardy.BoardID = .random(), boardProducer: any Boardy.ActivatableBoardProducer)
-  convenience public init(identifier: Boardy.BoardID = .random(), boardProducer: any Boardy.ActivatableBoardProducer, boards: [any Boardy.ActivatableBoard])
-  override open func putIntoContext(_ context: Swift.AnyObject)
+extension Boardy.ModernContinuableBoard {
   @discardableResult
-  public func registerFlow(_ flow: any Boardy.BoardFlow) -> Self
-  public func resetFlows()
-  public func removeFlow(by identifier: Swift.String)
-  public var boardProducer: any Boardy.ActivatableBoardProducer {
+  public func attachContinuousMotherboard(to context: any Boardy.AttachableObject, configurationBuilder: (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> any Boardy.FlowManageable & Boardy.MotherboardType
+  @discardableResult
+  public func attachContinuousMotherboard<Mainboard>(to context: any Boardy.AttachableObject, build: (any Boardy.ActivatableBoardProducer) -> Mainboard) -> Mainboard where Mainboard : Boardy.FlowManageable, Mainboard : Boardy.MotherboardType
+}
+extension Boardy.ActivatableBoardProducer {
+  public func produceComposableMotherboard(identifier: Boardy.BoardID, from parent: (any Boardy.IdentifiableBoard)? = nil, elementsBuilder: (any Boardy.ActivatableBoardProducer) -> [any Boardy.ActivatableBoard] = { _ in [] }) -> any Boardy.ComposableMotherboardType & Boardy.FlowManageable
+}
+extension Boardy.ActivatableBoardProducer {
+  public func produceContinuousMotherboard(identifier: Boardy.BoardID, from parent: (any Boardy.IdentifiableBoard)? = nil, elementsBuilder: (any Boardy.ActivatableBoardProducer) -> [any Boardy.ActivatableBoard] = { _ in [] }) -> any Boardy.FlowManageable & Boardy.MotherboardType
+}
+public struct BoardActivateFlow : Boardy.BoardFlow {
+  public let identifier: Swift.String
+  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, outputNextHandler: @escaping (any Boardy.BoardOutputModel) -> Swift.Void)
+  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, nextHandler: @escaping (Any?) -> Swift.Void)
+  public init<Output>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, dedicatedNextHandler: @escaping (Output?) -> Swift.Void)
+  public init<Output>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, guaranteedNextHandler: @escaping (Output) -> Swift.Void)
+  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], outputNextHandler: @escaping (any Boardy.BoardOutputModel) -> Swift.Void)
+  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], nextHandler: @escaping (Any?) -> Swift.Void)
+  public init<Output>(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], dedicatedNextHandler: @escaping (Output?) -> Swift.Void)
+  public init<Output>(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], guaranteedNextHandler: @escaping (Output) -> Swift.Void)
+  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+  public func doNext(with output: any Boardy.BoardOutputModel)
+}
+final public class BoardContainer : Boardy.BoardDynamicProducer {
+  public init(externalProducer: (any Boardy.ActivatableBoardProducer)? = nil)
+  final public func registerBoard(_ identifier: Boardy.BoardID, factory: @escaping Boardy.BoardConstructor)
+  final public func registerBoards(_ identifiers: [Boardy.BoardID], factory: @escaping Boardy.BoardConstructor)
+  final public func registerBoards(_ identifiers: Boardy.BoardID..., factory: @escaping Boardy.BoardConstructor)
+  final public func registerGatewayBoard(_ identifier: Boardy.BoardID, factory: @escaping (Boardy.BoardID) -> any Boardy.ActivatableBoard)
+  final public func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  final public func produceGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  final public func matchBoard(withIdentifier identifier: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  @objc deinit
+}
+public protocol BoardFlow {
+  var identifier: Swift.String { get }
+  func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+  func doNext(with output: any Boardy.BoardOutputModel)
+}
+public protocol IDMatchBoardFlow : Boardy.BoardFlow {
+  var matchedBoardIDs: [Boardy.BoardID] { get }
+}
+extension Boardy.IDMatchBoardFlow {
+  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+}
+public protocol DataMatchBoardFlow : Boardy.BoardFlow {
+  associatedtype Output
+  func doNext(withData data: Self.Output)
+}
+extension Boardy.DataMatchBoardFlow {
+  public func doNext(with output: any Boardy.BoardOutputModel)
+}
+public protocol GuaranteedBoardFlow : Boardy.DataMatchBoardFlow, Boardy.IDMatchBoardFlow {
+}
+public struct IDGenericBoardFlow<Out> : Boardy.GuaranteedBoardFlow {
+  public typealias Output = Out
+  public let identifier: Swift.String
+  public let matchedBoardIDs: [Boardy.BoardID]
+  public init(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: [Boardy.BoardID], nextHandler: @escaping (Out) -> Swift.Void)
+  public init(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: Boardy.BoardID..., nextHandler: @escaping (Out) -> Swift.Void)
+  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: [Boardy.BoardID], target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
+  public init<BoardType, HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardID: Boardy.BoardID, of _: BoardType.Type, target: HandlerTarget, nextHandler: @escaping (HandlerTarget, BoardType.OutputType) -> Swift.Void) where Out == BoardType.OutputType, BoardType : Boardy.GuaranteedOutputSendingBoard
+  public init<BoardType>(identifier: Swift.String = UUID().uuidString, matchedBoardID: Boardy.BoardID, of _: BoardType.Type, nextHandler: @escaping (BoardType.OutputType) -> Swift.Void) where Out == BoardType.OutputType, BoardType : Boardy.GuaranteedOutputSendingBoard
+  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: Boardy.BoardID..., target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
+  public func doNext(withData data: Out)
+}
+public struct GenericBoardFlow<Out> : Boardy.DataMatchBoardFlow {
+  public typealias Output = Out
+  public var identifier: Swift.String
+  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+  public func doNext(withData data: Out)
+  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool = { _ in true }, nextHandler: @escaping (Out) -> Swift.Void)
+  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool = { _ in true }, target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
+}
+public struct BoardID : Swift.LosslessStringConvertible, Swift.ExpressibleByStringLiteral, Swift.Hashable, Swift.RawRepresentable {
+  public typealias StringLiteralType = Swift.String
+  public let rawValue: Swift.String
+  public init(stringLiteral value: Boardy.BoardID.StringLiteralType)
+  public init(_ description: Swift.String)
+  public init(rawValue: Swift.String)
+  public var description: Swift.String {
     get
   }
-  @objc deinit
+  public static func random() -> Boardy.BoardID
+  public typealias ExtendedGraphemeClusterLiteralType = Boardy.BoardID.StringLiteralType
+  public typealias RawValue = Swift.String
+  public typealias UnicodeScalarLiteralType = Boardy.BoardID.StringLiteralType
+}
+extension Boardy.BoardID : Swift.Equatable {
+  public static func == (lhs: Boardy.BoardID, rhs: Boardy.BoardID) -> Swift.Bool
+}
+public func ~= (pattern: Boardy.BoardID, value: Swift.String) -> Swift.Bool
+extension Boardy.BoardID {
+  public func appending(_ tail: Swift.String, separator: Swift.String = ".") -> Boardy.BoardID
+}
+public protocol BoardInputModel {
+  var identifier: Boardy.BoardID { get }
+  var option: Any? { get }
+}
+public struct BoardInput<Input> : Boardy.BoardInputModel {
+  public let identifier: Boardy.BoardID
+  public let input: Input
+  public var option: Any? {
+    get
+  }
+  public init(target: Boardy.BoardID, input: Input)
+}
+extension Boardy.BoardInput {
+  public static func target<InputValue>(_ id: Boardy.BoardID, _ input: InputValue) -> Boardy.BoardInput<InputValue>
+}
+extension Boardy.BoardInput where Input == () {
+  public init(target: Boardy.BoardID)
+  public static func target(_ id: Boardy.BoardID) -> Boardy.BoardInput<Swift.Void>
+}
+extension Boardy.BoardInput where Input : Swift.ExpressibleByNilLiteral {
+  public init(target: Boardy.BoardID)
+  public static func target(_ id: Boardy.BoardID) -> Boardy.BoardInput<Input>
+}
+extension Boardy.BoardID {
+  public func with<Input>(input: Input) -> Boardy.BoardInput<Input>
+  public var withoutInput: Boardy.BoardInput<Swift.Void> {
+    get
+  }
+}
+public protocol BoardOutputModel {
+  var identifier: Boardy.BoardID { get }
+  var data: Any? { get }
 }
 public protocol BoardRegistrationsConvertible {
   func asBoardRegistrations() -> [Boardy.BoardRegistration]
@@ -151,28 +452,217 @@ extension Boardy.ActivatableBoardProducer where Self : AnyObject {
     get
   }
 }
-final public class BoardContainer : Boardy.BoardDynamicProducer {
-  public init(externalProducer: (any Boardy.ActivatableBoardProducer)? = nil)
-  final public func registerBoard(_ identifier: Boardy.BoardID, factory: @escaping Boardy.BoardConstructor)
-  final public func registerBoards(_ identifiers: [Boardy.BoardID], factory: @escaping Boardy.BoardConstructor)
-  final public func registerBoards(_ identifiers: Boardy.BoardID..., factory: @escaping Boardy.BoardConstructor)
-  final public func registerGatewayBoard(_ identifier: Boardy.BoardID, factory: @escaping (Boardy.BoardID) -> any Boardy.ActivatableBoard)
-  final public func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  final public func produceGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  final public func matchBoard(withIdentifier identifier: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+public typealias BoardConstructor = (Boardy.BoardID) -> any Boardy.ActivatableBoard
+public struct BoardRegistration : Swift.Hashable {
+  public init(_ identifier: Boardy.BoardID, constructor: @escaping (Boardy.BoardID) -> (any Boardy.ActivatableBoard)?)
+  public let identifier: Boardy.BoardID
+  public let constructor: (Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  public func hash(into hasher: inout Swift.Hasher)
+  public static func == (lhs: Boardy.BoardRegistration, rhs: Boardy.BoardRegistration) -> Swift.Bool
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_functionBuilder public enum BoardRegistrationBuilder {
+  public static func buildArray(_ components: [any Boardy.BoardRegistrationsConvertible]) -> [Boardy.BoardRegistration]
+  public static func buildBlock(_ components: any Boardy.BoardRegistrationsConvertible...) -> [Boardy.BoardRegistration]
+  public static func buildEither(first component: any Boardy.BoardRegistrationsConvertible) -> any Boardy.BoardRegistrationsConvertible
+  public static func buildEither(second component: any Boardy.BoardRegistrationsConvertible) -> any Boardy.BoardRegistrationsConvertible
+  public static func buildIf(_ value: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
+  public static func buildOptional(_ component: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
+  public static func buildExpression(_ component: (any Boardy.BoardRegistrationsConvertible)?) -> any Boardy.BoardRegistrationsConvertible
+}
+extension Boardy.Motherboard {
+  convenience public init(identifier: Boardy.BoardID = .random(), externalProducer: any Boardy.ActivatableBoardProducer = NoBoardProducer(), @Boardy.BoardRegistrationBuilder registrationsBuilder: (_ producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration])
+}
+extension Boardy.BoardProducer {
+  convenience public init(externalProducer: any Boardy.ActivatableBoardProducer = NoBoardProducer(), @Boardy.BoardRegistrationBuilder registrationsBuilder: (_ producer: any Boardy.ActivatableBoardProducer) -> [Boardy.BoardRegistration])
+}
+public protocol BoardDelegate : AnyObject {
+  func board(_ board: any Boardy.IdentifiableBoard, didSendData data: Any?)
+}
+public protocol OriginalBoard {
+  var context: Swift.AnyObject? { get }
+  func putIntoContext(_ context: Swift.AnyObject)
+}
+public protocol IdentifiableBoard : AnyObject, Swift.CustomDebugStringConvertible {
+  var delegate: (any Boardy.BoardDelegate)? { get set }
+  var identifier: Boardy.BoardID { get }
+}
+extension Boardy.IdentifiableBoard {
+  public func sendToMotherboard(data: Any? = nil)
+  public func nextToBoard(model: any Boardy.BoardInputModel)
+  public func nextToBoard<Input>(_ input: Boardy.BoardInput<Input>)
+  public func sendFlowAction(_ action: any Boardy.BoardFlowAction)
+  public func interactWithOtherBoard(command: any Boardy.BoardCommandModel)
+  public func interactWithOtherBoard<Input>(_ input: Boardy.BoardCommand<Input>)
+  public func complete(_ isDone: Swift.Bool = true)
+  public var debugDescription: Swift.String {
+    get
+  }
+}
+extension Boardy.IdentifiableBoard {
+  public func putToComposer(elementAction: UIComposable.UIElementAction)
+}
+extension UIComposable.UIElement {
+  public init(identifier: Boardy.BoardID, contentViewController: UIKit.UIViewController?, configuration: Any? = nil)
+}
+open class BusCable<Input> {
+  public typealias Handler = (Input) -> Swift.Void
+  public init(transportHandler: @escaping Boardy.BusCable<Input>.Handler)
+  open func transport(input: Input)
+  open var isValid: Swift.Bool {
+    get
+  }
+  open func invalidate()
   @objc deinit
 }
-final public class NoBoard : Boardy.Board, Boardy.ActivatableBoard {
-  public init(identifier: Boardy.BoardID, message: Swift.String? = nil, handler: ((Any?) -> Swift.Void)? = nil)
-  final public func activate(withOption option: Any?)
-  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+final public class TargetBusCable<Target, Input> : Boardy.BusCable<Input> {
+  public init(target: Target, handler: @escaping (Target, Input) -> Swift.Void)
+  override final public var isValid: Swift.Bool {
+    get
+  }
+  override final public func invalidate()
   @objc deinit
 }
-final public class NoBoardProducer : Boardy.ActivatableBoardProducer {
+final public class Bus<Input> {
   public init()
-  final public func produceGatewayBoard(identifier _: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  final public func matchBoard(withIdentifier _: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  final public func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  final public func connect(_ cable: Boardy.BusCable<Input>)
+  final public func transport(input: Input)
+  @objc deinit
+}
+extension Boardy.Bus {
+  final public func connect<Target>(target: Target, handler: @escaping (Target, Input) -> Swift.Void)
+  final public func connect<Target>(target: Target, handler: @escaping (Target) -> Swift.Void)
+  final public func deliver(handler: @escaping (Input) -> Swift.Void)
+}
+extension Boardy.Bus where Input == () {
+  final public func transport()
+}
+extension Boardy.Bus where Input == Any? {
+  final public func transport()
+}
+extension Boardy.Bus where Input == Any {
+  final public func transport()
+}
+final public class ChainBoardFlow<Target> : Boardy.BoardFlow {
+  final public let identifier: Swift.String
+  public init(identifier: Swift.String = UUID().uuidString, manager: any Boardy.FlowManageable, target: Target, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool)
+  final public func handle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output) -> Swift.Void) -> Self
+  @discardableResult
+  final public func eventuallyHandle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output?) -> Swift.Void) -> any Boardy.FlowManageable
+  @discardableResult
+  final public func eventuallyHandle(skipSilentData: Swift.Bool = true, handler: @escaping (Target, Any?) -> Swift.Void) -> any Boardy.FlowManageable
+  @discardableResult
+  final public func eventuallySkipHandling() -> any Boardy.FlowManageable
+  final public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+  final public func doNext(with output: any Boardy.BoardOutputModel)
+  @objc deinit
+}
+final public class ChainDataHandler<Target> where Target : AnyObject {
+  weak final public var target: Target?
+  public init(_ target: Target)
+  final public func with<Value>(dataType _: Value.Type, handler: @escaping (Target, Value) -> Swift.Void) -> Self
+  final public func fallback(handler: @escaping (Target, Any?) -> Swift.Void = { target, data in
+            print(
+                """
+                ⚠️ [\(String(describing: ChainDataHandler.self))] fallback handling:
+                🎯 Target: \(String(describing: target))
+                🌸 Data: \(String(describing: data))
+                """
+            )
+    }) -> Self
+  final public func handle(data: Any?)
+  @objc deinit
+}
+public protocol OutputSpecifications {
+  var identifier: Boardy.BoardID { get }
+  func validateOutput(_ data: Any?) -> Swift.Bool
+}
+public struct GeneralOutputSpecifications : Boardy.OutputSpecifications {
+  public init(identifier: Boardy.BoardID, validation: ((Any?) -> Swift.Bool)? = nil)
+  public let identifier: Boardy.BoardID
+  public let validation: (Any?) -> Swift.Bool
+  public func validateOutput(_ data: Any?) -> Swift.Bool
+}
+public struct GuaranteedOutputSpecifications<Value> : Boardy.OutputSpecifications {
+  public init(identifier: Boardy.BoardID, valueType: Value.Type)
+  public let identifier: Boardy.BoardID
+  public let valueType: Value.Type
+  public func validateOutput(_ data: Any?) -> Swift.Bool
+}
+public class OutputCombinedFlow : Boardy.BoardFlow {
+  public enum Strategy {
+    case batchOneByOne
+    case latestForever
+    public static func == (a: Boardy.OutputCombinedFlow.Strategy, b: Boardy.OutputCombinedFlow.Strategy) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  final public let identifier: Swift.String
+  final public let specifications: [any Boardy.OutputSpecifications]
+  final public let strategy: Boardy.OutputCombinedFlow.Strategy
+  public var matchedIdentifiers: [Boardy.BoardID] {
+    get
+  }
+  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.BoardID], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, handler: @escaping ([Any]) -> Swift.Void)
+  public init(identifier: Swift.String = UUID().uuidString, specifications: [any Boardy.OutputSpecifications], strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping ([Any]) -> Swift.Void)
+  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
+  public func doNext(with output: any Boardy.BoardOutputModel)
+  @objc deinit
+}
+public class OutputCombinedCollectionFlow<Value> : Boardy.OutputCombinedFlow {
+  public init(identifier: Swift.String = UUID().uuidString, specs: [Boardy.GuaranteedOutputSpecifications<Value>], strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping ([Value]) -> Swift.Void)
+  @objc deinit
+}
+public class OutputCombined2Flow<V1, V2> : Boardy.OutputCombinedFlow {
+  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2) -> Swift.Void)
+  @objc deinit
+}
+public class OutputCombined3Flow<V1, V2, V3> : Boardy.OutputCombinedFlow {
+  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3) -> Swift.Void)
+  @objc deinit
+}
+public class OutputCombined4Flow<V1, V2, V3, V4> : Boardy.OutputCombinedFlow {
+  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, spec4: Boardy.GuaranteedOutputSpecifications<V4>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3, V4) -> Swift.Void)
+  @objc deinit
+}
+public class OutputCombined5Flow<V1, V2, V3, V4, V5> : Boardy.OutputCombinedFlow {
+  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, spec4: Boardy.GuaranteedOutputSpecifications<V4>, spec5: Boardy.GuaranteedOutputSpecifications<V5>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3, V4, V5) -> Swift.Void)
+  @objc deinit
+}
+extension Boardy.FlowManageable {
+  @discardableResult
+  public func registerCombinedFlow<Output>(_ specs: [Boardy.GuaranteedOutputSpecifications<Output>], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping ([Output]) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<Target, Output>(_ specs: [Boardy.GuaranteedOutputSpecifications<Output>], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, [Output]) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<O1, O2>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<Target, O1, O2>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<O1, O2, O3>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<Target, O1, O2, O3>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<O1, O2, O3, O4>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3, O4) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<Target, O1, O2, O3, O4>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3, O4) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<O1, O2, O3, O4, O5>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, _ outputSpecifications5: Boardy.GuaranteedOutputSpecifications<O5>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3, O4, O5) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerCombinedFlow<Target, O1, O2, O3, O4, O5>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, _ outputSpecifications5: Boardy.GuaranteedOutputSpecifications<O5>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3, O4, O5) -> Swift.Void) -> Self
+}
+public protocol ComposableMotherboardType : Boardy.MotherboardType {
+  func connect(to interface: any UIComposable.ComposableInterface)
+}
+public typealias FlowComposableMotherboard = Boardy.ComposableMotherboardType & Boardy.FlowManageable
+@_inheritsConvenienceInitializers open class ComposableMotherboard : Boardy.Motherboard, Boardy.ComposableMotherboardType {
+  public func connect(to interface: any UIComposable.ComposableInterface)
+  override public init(identifier: Boardy.BoardID = super, boards: [any Boardy.ActivatableBoard] = super)
+  override public init(identifier: Boardy.BoardID = super, boardProducer: any Boardy.ActivatableBoardProducer)
   @objc deinit
 }
 public protocol ContinuableBoard : Boardy.IdentifiableBoard, Boardy.OriginalBoard {
@@ -205,164 +695,6 @@ open class ContinuousBoard : Boardy.Board, Boardy.ContinuableBoard {
   public init(identifier: Boardy.BoardID, boardProducer: any Boardy.ActivatableBoardProducer)
   override open func putIntoContext(_ context: Swift.AnyObject)
   @objc deinit
-}
-extension Boardy.ActivatableBoardProducer {
-  public func produceContinuousMotherboard(identifier: Boardy.BoardID, from parent: (any Boardy.IdentifiableBoard)? = nil, elementsBuilder: (any Boardy.ActivatableBoardProducer) -> [any Boardy.ActivatableBoard] = { _ in [] }) -> any Boardy.FlowManageable & Boardy.MotherboardType
-}
-final public class ChainDataHandler<Target> where Target : AnyObject {
-  weak final public var target: Target?
-  public init(_ target: Target)
-  final public func with<Value>(dataType _: Value.Type, handler: @escaping (Target, Value) -> Swift.Void) -> Self
-  final public func fallback(handler: @escaping (Target, Any?) -> Swift.Void = { target, data in
-    }) -> Self
-  final public func handle(data: Any?)
-  @objc deinit
-}
-public protocol BoardOutputModel {
-  var identifier: Boardy.BoardID { get }
-  var data: Any? { get }
-}
-extension Boardy.MotherboardType {
-  public func activateBoard(identifier: Boardy.BoardID, withOption option: Any?)
-  public func activateBoard(model: any Boardy.BoardInputModel)
-  public func activateBoard(_ input: Boardy.BoardInput<some Any>)
-  public func deactivateBoard(identifier: Boardy.BoardID)
-}
-public protocol BoardInputModel {
-  var identifier: Boardy.BoardID { get }
-  var option: Any? { get }
-}
-public struct BoardInput<Input> : Boardy.BoardInputModel {
-  public let identifier: Boardy.BoardID
-  public let input: Input
-  public var option: Any? {
-    get
-  }
-  public init(target: Boardy.BoardID, input: Input)
-}
-extension Boardy.BoardInput {
-  public static func target<InputValue>(_ id: Boardy.BoardID, _ input: InputValue) -> Boardy.BoardInput<InputValue>
-}
-extension Boardy.BoardInput where Input == () {
-  public init(target: Boardy.BoardID)
-  public static func target(_ id: Boardy.BoardID) -> Boardy.BoardInput<Swift.Void>
-}
-extension Boardy.BoardInput where Input : Swift.ExpressibleByNilLiteral {
-  public init(target: Boardy.BoardID)
-  public static func target(_ id: Boardy.BoardID) -> Boardy.BoardInput<Input>
-}
-extension Boardy.BoardID {
-  public func with<Input>(input: Input) -> Boardy.BoardInput<Input>
-  public var withoutInput: Boardy.BoardInput<Swift.Void> {
-    get
-  }
-}
-final public class ChainBoardFlow<Target> : Boardy.BoardFlow {
-  final public let identifier: Swift.String
-  public init(identifier: Swift.String = UUID().uuidString, manager: any Boardy.FlowManageable, target: Target, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool)
-  final public func handle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output) -> Swift.Void) -> Self
-  @discardableResult
-  final public func eventuallyHandle<Output>(outputType _: Output.Type, handler: @escaping (Target, Output?) -> Swift.Void) -> any Boardy.FlowManageable
-  @discardableResult
-  final public func eventuallyHandle(skipSilentData: Swift.Bool = true, handler: @escaping (Target, Any?) -> Swift.Void) -> any Boardy.FlowManageable
-  @discardableResult
-  final public func eventuallySkipHandling() -> any Boardy.FlowManageable
-  final public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-  final public func doNext(with output: any Boardy.BoardOutputModel)
-  @objc deinit
-}
-public protocol InstallableBoard : Boardy.OriginalBoard {
-  var rootViewController: UIKit.UIViewController { get }
-  func installIntoRootViewController(_ rootViewController: UIKit.UIViewController)
-}
-extension Boardy.InstallableBoard {
-  public var rootViewController: UIKit.UIViewController {
-    get
-  }
-  public func installIntoRootViewController(_ rootViewController: UIKit.UIViewController)
-  public var navigationController: UIKit.UINavigationController {
-    get
-  }
-  public var tabBarController: UIKit.UITabBarController {
-    get
-  }
-}
-public protocol WindowInstallableBoard : Boardy.OriginalBoard {
-  var window: UIKit.UIWindow { get }
-  func installIntoWindow(_ window: UIKit.UIWindow)
-}
-extension Boardy.WindowInstallableBoard {
-  public var window: UIKit.UIWindow {
-    get
-  }
-  public func installIntoWindow(_ window: UIKit.UIWindow)
-}
-extension Boardy.InstallableBoard where Self : Boardy.WindowInstallableBoard {
-  public var rootViewController: UIKit.UIViewController {
-    get
-  }
-}
-public protocol BoardFlowAction {
-}
-public enum BoardFlowNoneAction : Boardy.BoardFlowAction {
-}
-public typealias FlowStepID = Boardy.BoardID
-public protocol FlowManageable : AnyObject {
-  var flows: [any Boardy.BoardFlow] { get }
-  @discardableResult
-  func registerFlow(_ flow: any Boardy.BoardFlow) -> Self
-  func resetFlows()
-  func removeFlow(by identifier: Swift.String)
-}
-extension Boardy.FlowManageable {
-  @discardableResult
-  public func registerFlows(_ flows: [any Boardy.BoardFlow]) -> Self
-  @discardableResult
-  public func registerGeneralFlow<Output>(uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerGeneralFlow<Target, Output>(target: Target, uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerFlow<Output>(matchedIdentifiers: [Boardy.FlowStepID], uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerFlow<Target, Output>(matchedIdentifiers: [Boardy.FlowStepID], target: Target, uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerGuaranteedFlow<Target, Output>(matchedIdentifiers: [Boardy.FlowStepID], target: Target, uniqueOutputType _: Output.Type = Output.self, handler: @escaping (Target, Output) -> Swift.Void) -> Self
-  public func registerChainFlow<Target>(matchedIdentifiers: [Boardy.FlowStepID], target: Target) -> Boardy.ChainBoardFlow<Target>
-  @discardableResult
-  public func registerCompletionFlow(matchedIdentifiers: [Boardy.FlowStepID], nextHandler: @escaping (_ isDone: Swift.Bool) -> Swift.Void) -> Self
-}
-extension Boardy.FlowManageable where Self : Boardy.MotherboardType {
-  @discardableResult
-  public func registerFlowSteps(_ flowSteps: [Boardy.IDFlowStep]) -> Self
-}
-public struct IDFlowStep {
-  public let source: Boardy.FlowStepID
-  public let destination: Boardy.FlowStepID
-  public init(source: Boardy.FlowStepID, destination: Boardy.FlowStepID)
-}
-infix operator ->> : MultiplicationPrecedence
-public func ->> (left: Boardy.FlowStepID, right: Boardy.FlowStepID) -> [Boardy.IDFlowStep]
-public func ->> (left: [Boardy.IDFlowStep], right: Boardy.FlowStepID) -> [Boardy.IDFlowStep]
-public typealias FlowMotherboard = Boardy.FlowManageable & Boardy.MotherboardType
-extension Boardy.BoardDelegate where Self : Boardy.FlowManageable {
-  public func board(_ board: any Boardy.IdentifiableBoard, didSendData data: Any?)
-}
-extension Boardy.FlowManageable {
-  public func forwardActionFlow(to board: any Boardy.IdentifiableBoard)
-  public func forwardActivationFlow(to board: any Boardy.IdentifiableBoard)
-}
-public struct BoardActivateFlow : Boardy.BoardFlow {
-  public let identifier: Swift.String
-  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, outputNextHandler: @escaping (any Boardy.BoardOutputModel) -> Swift.Void)
-  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, nextHandler: @escaping (Any?) -> Swift.Void)
-  public init<Output>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, dedicatedNextHandler: @escaping (Output?) -> Swift.Void)
-  public init<Output>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool, guaranteedNextHandler: @escaping (Output) -> Swift.Void)
-  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], outputNextHandler: @escaping (any Boardy.BoardOutputModel) -> Swift.Void)
-  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], nextHandler: @escaping (Any?) -> Swift.Void)
-  public init<Output>(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], dedicatedNextHandler: @escaping (Output?) -> Swift.Void)
-  public init<Output>(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.FlowStepID], guaranteedNextHandler: @escaping (Output) -> Swift.Void)
-  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-  public func doNext(with output: any Boardy.BoardOutputModel)
 }
 public protocol AdaptableBoard {
   associatedtype InputType
@@ -416,14 +748,140 @@ public protocol GuaranteedActionSendingBoard : Boardy.IdentifiableBoard {
 extension Boardy.GuaranteedActionSendingBoard {
   public func broadcastAction(_ action: Self.FlowActionType)
 }
-public typealias BoardConstructor = (Boardy.BoardID) -> any Boardy.ActivatableBoard
-public struct BoardRegistration : Swift.Hashable {
-  public init(_ identifier: Boardy.BoardID, constructor: @escaping (Boardy.BoardID) -> (any Boardy.ActivatableBoard)?)
-  public let identifier: Boardy.BoardID
-  public let constructor: (Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  public func hash(into hasher: inout Swift.Hasher)
-  public static func == (lhs: Boardy.BoardRegistration, rhs: Boardy.BoardRegistration) -> Swift.Bool
-  public var hashValue: Swift.Int {
+public protocol BoardFlowAction {
+}
+public enum BoardFlowNoneAction : Boardy.BoardFlowAction {
+}
+public typealias FlowStepID = Boardy.BoardID
+public protocol FlowManageable : AnyObject {
+  var flows: [any Boardy.BoardFlow] { get }
+  @discardableResult
+  func registerFlow(_ flow: any Boardy.BoardFlow) -> Self
+  func resetFlows()
+  func removeFlow(by identifier: Swift.String)
+}
+extension Boardy.FlowManageable {
+  @discardableResult
+  public func registerFlows(_ flows: [any Boardy.BoardFlow]) -> Self
+  @discardableResult
+  public func registerGeneralFlow<Output>(uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerGeneralFlow<Target, Output>(target: Target, uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerFlow<Output>(matchedIdentifiers: [Boardy.FlowStepID], uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerFlow<Target, Output>(matchedIdentifiers: [Boardy.FlowStepID], target: Target, uniqueOutputType _: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerGuaranteedFlow<Target, Output>(matchedIdentifiers: [Boardy.FlowStepID], target: Target, uniqueOutputType _: Output.Type = Output.self, handler: @escaping (Target, Output) -> Swift.Void) -> Self
+  public func registerChainFlow<Target>(matchedIdentifiers: [Boardy.FlowStepID], target: Target) -> Boardy.ChainBoardFlow<Target>
+  @discardableResult
+  public func registerCompletionFlow(matchedIdentifiers: [Boardy.FlowStepID], nextHandler: @escaping (_ isDone: Swift.Bool) -> Swift.Void) -> Self
+}
+extension Boardy.FlowManageable where Self : Boardy.MotherboardType {
+  @discardableResult
+  public func registerFlowSteps(_ flowSteps: [Boardy.IDFlowStep]) -> Self
+}
+public struct IDFlowStep {
+  public let source: Boardy.FlowStepID
+  public let destination: Boardy.FlowStepID
+  public init(source: Boardy.FlowStepID, destination: Boardy.FlowStepID)
+}
+infix operator ->> : MultiplicationPrecedence
+public func ->> (left: Boardy.FlowStepID, right: Boardy.FlowStepID) -> [Boardy.IDFlowStep]
+public func ->> (left: [Boardy.IDFlowStep], right: Boardy.FlowStepID) -> [Boardy.IDFlowStep]
+public typealias FlowMotherboard = Boardy.FlowManageable & Boardy.MotherboardType
+extension Boardy.BoardDelegate where Self : Boardy.FlowManageable {
+  public func board(_ board: any Boardy.IdentifiableBoard, didSendData data: Any?)
+}
+extension Boardy.FlowManageable {
+  public func forwardActionFlow(to board: any Boardy.IdentifiableBoard)
+  public func forwardActivationFlow(to board: any Boardy.IdentifiableBoard)
+}
+extension Boardy.FlowManageable {
+  @discardableResult
+  public func registerFlow<Target, Output>(matchedIdentifiers: Boardy.FlowStepID..., target: Target, uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerFlow<Output>(matchedIdentifiers: Boardy.FlowStepID..., bindToBus bus: Boardy.Bus<Output>) -> Self
+  @discardableResult
+  public func registerFlow<Output, OutBoard>(matchedIdentifiers: Boardy.FlowStepID..., uniqueOutputType _: Output.Type = Output.self, sendOutputThrough board: OutBoard) -> Self where Output == OutBoard.OutputType, OutBoard : Boardy.GuaranteedOutputSendingBoard
+  @discardableResult
+  public func registerGuaranteedFlow<Target, Output>(matchedIdentifiers: Boardy.FlowStepID..., target: Target, uniqueOutputType: Output.Type = Output.self, handler: @escaping (Target, Output) -> Swift.Void) -> Self
+  @discardableResult
+  public func registerGuaranteedFlow<Output>(matchedIdentifiers: Boardy.FlowStepID..., bindToBus bus: Boardy.Bus<Output>) -> Self
+  @discardableResult
+  public func registerGuaranteedFlow<Output, OutBoard>(matchedIdentifiers: Boardy.FlowStepID..., uniqueOutputType _: Output.Type = Output.self, sendOutputThrough board: OutBoard) -> Self where Output == OutBoard.OutputType, OutBoard : Boardy.GuaranteedOutputSendingBoard
+  public func registerChainFlow<Target>(matchedIdentifiers: Boardy.FlowStepID..., target: Target) -> Boardy.ChainBoardFlow<Target>
+  @discardableResult
+  public func registerCompletionFlow(matchedIdentifiers: Boardy.FlowStepID..., nextHandler: @escaping (_ isDone: Swift.Bool) -> Swift.Void) -> Self
+}
+public protocol FlowingBoard : Boardy.ActivatableBoard, Boardy.InstallableBoard {
+  var motherboard: any Boardy.FlowManageable & Boardy.MotherboardType { get }
+}
+open class FlowBoard<Input, Output, Command, Action> : Boardy.ModernContinuableBoard, Boardy.GuaranteedBoard, Boardy.FlowingBoard, Boardy.GuaranteedOutputSendingBoard, Boardy.GuaranteedActionSendingBoard, Boardy.GuaranteedCommandBoard where Action : Boardy.BoardFlowAction {
+  public typealias InputType = Input
+  public typealias OutputType = Output
+  public typealias CommandType = Command
+  public typealias FlowActionType = Action
+  public typealias FlowRegistration = (Boardy.FlowBoard<Input, Output, Command, Action>) -> Swift.Void
+  public typealias FlowActivation = (Boardy.FlowBoard<Input, Output, Command, Action>, Boardy.FlowBoard<Input, Output, Command, Action>.InputType) -> Swift.Void
+  public typealias FlowInteraction = (Boardy.FlowBoard<Input, Output, Command, Action>, Boardy.FlowBoard<Input, Output, Command, Action>.CommandType) -> Swift.Void
+  public init(identifier: Boardy.BoardID, producer: any Boardy.ActivatableBoardProducer, allowBypassGatewayBarrier: Swift.Bool = true, flowRegistration: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowRegistration, flowActivation: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowActivation, flowInteraction: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowInteraction = { board, command in
+                        print("""
+                        ⚠️ The FlowBoard received an interaction command but missing a handler!
+                            🏝 [\(String(describing: type(of: board)))] ➤ \(board.identifier.rawValue)
+                            🚦 [\(String(describing: type(of: command)))] ➤ \(command)
+                        """)
+                        if let motherboard = board.delegate as? IdentifiableBoard {
+                            print("    🌏 [\(String(describing: type(of: motherboard)))] ➤ \(motherboard.identifier.rawValue)")
+                        }
+                })
+  open func activate(withGuaranteedInput input: Boardy.FlowBoard<Input, Output, Command, Action>.InputType)
+  open func interact(guaranteedCommand: Boardy.FlowBoard<Input, Output, Command, Action>.CommandType)
+  open func registerFlows()
+  open func shouldBypassGatewayBarrier() -> Swift.Bool
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class GatewayBarrierRegistration {
+  public static func registerWithActivation(_ activation: @escaping (_ barrier: any Boardy.Completable & Boardy.ContinuableBoard, _ option: Any?) -> Swift.Void) -> Boardy.GatewayBarrierRegistration
+  final public func withFlowRegistration(_ flowRegistration: @escaping (_ barrier: any Boardy.Completable & Boardy.ContinuableBoard) -> Swift.Void) -> Self
+  public static var exempt: Boardy.GatewayBarrierRegistration {
+    get
+  }
+  @available(*, deprecated, renamed: "exempt")
+  public static var ​exempt: Boardy.GatewayBarrierRegistration {
+    get
+  }
+  @objc deinit
+}
+public typealias GatewayBarrierBoard = Boardy.Completable & Boardy.ContinuableBoard
+public protocol InstallableBoard : Boardy.OriginalBoard {
+  var rootViewController: UIKit.UIViewController { get }
+  func installIntoRootViewController(_ rootViewController: UIKit.UIViewController)
+}
+extension Boardy.InstallableBoard {
+  public var rootViewController: UIKit.UIViewController {
+    get
+  }
+  public func installIntoRootViewController(_ rootViewController: UIKit.UIViewController)
+  public var navigationController: UIKit.UINavigationController {
+    get
+  }
+  public var tabBarController: UIKit.UITabBarController {
+    get
+  }
+}
+public protocol WindowInstallableBoard : Boardy.OriginalBoard {
+  var window: UIKit.UIWindow { get }
+  func installIntoWindow(_ window: UIKit.UIWindow)
+}
+extension Boardy.WindowInstallableBoard {
+  public var window: UIKit.UIWindow {
+    get
+  }
+  public func installIntoWindow(_ window: UIKit.UIWindow)
+}
+extension Boardy.InstallableBoard where Self : Boardy.WindowInstallableBoard {
+  public var rootViewController: UIKit.UIViewController {
     get
   }
 }
@@ -465,185 +923,6 @@ extension Boardy.BoardCommand where Input == () {
 extension Boardy.BoardCommand where Input : Swift.ExpressibleByNilLiteral {
   public init(identifier: Boardy.BoardID)
   public static func target(_ id: Boardy.BoardID) -> Boardy.BoardCommand<Input>
-}
-public protocol BoardFlow {
-  var identifier: Swift.String { get }
-  func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-  func doNext(with output: any Boardy.BoardOutputModel)
-}
-public protocol IDMatchBoardFlow : Boardy.BoardFlow {
-  var matchedBoardIDs: [Boardy.BoardID] { get }
-}
-extension Boardy.IDMatchBoardFlow {
-  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-}
-public protocol DataMatchBoardFlow : Boardy.BoardFlow {
-  associatedtype Output
-  func doNext(withData data: Self.Output)
-}
-extension Boardy.DataMatchBoardFlow {
-  public func doNext(with output: any Boardy.BoardOutputModel)
-}
-public protocol GuaranteedBoardFlow : Boardy.DataMatchBoardFlow, Boardy.IDMatchBoardFlow {
-}
-public struct IDGenericBoardFlow<Out> : Boardy.GuaranteedBoardFlow {
-  public typealias Output = Out
-  public let identifier: Swift.String
-  public let matchedBoardIDs: [Boardy.BoardID]
-  public init(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: [Boardy.BoardID], nextHandler: @escaping (Out) -> Swift.Void)
-  public init(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: Boardy.BoardID..., nextHandler: @escaping (Out) -> Swift.Void)
-  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: [Boardy.BoardID], target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
-  public init<BoardType, HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardID: Boardy.BoardID, of _: BoardType.Type, target: HandlerTarget, nextHandler: @escaping (HandlerTarget, BoardType.OutputType) -> Swift.Void) where Out == BoardType.OutputType, BoardType : Boardy.GuaranteedOutputSendingBoard
-  public init<BoardType>(identifier: Swift.String = UUID().uuidString, matchedBoardID: Boardy.BoardID, of _: BoardType.Type, nextHandler: @escaping (BoardType.OutputType) -> Swift.Void) where Out == BoardType.OutputType, BoardType : Boardy.GuaranteedOutputSendingBoard
-  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matchedBoardIDs: Boardy.BoardID..., target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
-  public func doNext(withData data: Out)
-}
-public struct GenericBoardFlow<Out> : Boardy.DataMatchBoardFlow {
-  public typealias Output = Out
-  public var identifier: Swift.String
-  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-  public func doNext(withData data: Out)
-  public init(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool = { _ in true }, nextHandler: @escaping (Out) -> Swift.Void)
-  public init<HandlerTarget>(identifier: Swift.String = UUID().uuidString, matcher: @escaping (any Boardy.BoardOutputModel) -> Swift.Bool = { _ in true }, target: HandlerTarget, nextHandler: @escaping (HandlerTarget, Out) -> Swift.Void)
-}
-public protocol ActivatableBoardProducer {
-  func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  func produceGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  func matchBoard(withIdentifier identifier: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-}
-extension Boardy.ActivatableBoardProducer {
-  public func matchBoard(withIdentifier _: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  public func produceGatewayBoard(identifier _: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-}
-@available(*, deprecated, renamed: "ActivatableBoardProducer", message: "The protocol was renamed to ActivatableBoardProducer to fix typo")
-public typealias ActivableBoardProducer = Boardy.ActivatableBoardProducer
-public protocol BoardDelegate : AnyObject {
-  func board(_ board: any Boardy.IdentifiableBoard, didSendData data: Any?)
-}
-public protocol OriginalBoard {
-  var context: Swift.AnyObject? { get }
-  func putIntoContext(_ context: Swift.AnyObject)
-}
-public protocol IdentifiableBoard : AnyObject, Swift.CustomDebugStringConvertible {
-  var delegate: (any Boardy.BoardDelegate)? { get set }
-  var identifier: Boardy.BoardID { get }
-}
-extension Boardy.IdentifiableBoard {
-  public func sendToMotherboard(data: Any? = nil)
-  public func nextToBoard(model: any Boardy.BoardInputModel)
-  public func nextToBoard<Input>(_ input: Boardy.BoardInput<Input>)
-  public func sendFlowAction(_ action: any Boardy.BoardFlowAction)
-  public func interactWithOtherBoard(command: any Boardy.BoardCommandModel)
-  public func interactWithOtherBoard<Input>(_ input: Boardy.BoardCommand<Input>)
-  public func complete(_ isDone: Swift.Bool = true)
-  public var debugDescription: Swift.String {
-    get
-  }
-}
-public struct BoardID : Swift.LosslessStringConvertible, Swift.ExpressibleByStringLiteral, Swift.Hashable, Swift.RawRepresentable {
-  public typealias StringLiteralType = Swift.String
-  public let rawValue: Swift.String
-  public init(stringLiteral value: Boardy.BoardID.StringLiteralType)
-  public init(_ description: Swift.String)
-  public init(rawValue: Swift.String)
-  public var description: Swift.String {
-    get
-  }
-  public static func random() -> Boardy.BoardID
-  public typealias ExtendedGraphemeClusterLiteralType = Boardy.BoardID.StringLiteralType
-  public typealias RawValue = Swift.String
-  public typealias UnicodeScalarLiteralType = Boardy.BoardID.StringLiteralType
-}
-extension Boardy.BoardID : Swift.Equatable {
-  public static func == (lhs: Boardy.BoardID, rhs: Boardy.BoardID) -> Swift.Bool
-}
-public func ~= (pattern: Boardy.BoardID, value: Swift.String) -> Swift.Bool
-extension Boardy.BoardID {
-  public func appending(_ tail: Swift.String, separator: Swift.String = ".") -> Boardy.BoardID
-}
-public protocol MotherboardType : Boardy.IdentifiableBoard, Boardy.OriginalBoard {
-  var boards: [any Boardy.ActivatableBoard] { get }
-  func activateBoard(identifier: Boardy.BoardID, withOption option: Any?)
-  func addBoard(_ board: any Boardy.ActivatableBoard)
-  func removeBoard(withIdentifier identifier: Boardy.BoardID)
-  func getBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  func getGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-  func clearActiveBoards()
-}
-extension Boardy.MotherboardType {
-  public func removeBoard(_ board: any Boardy.ActivatableBoard)
-  public func installBoard(_ board: any Boardy.ActivatableBoard)
-  public func extended(boards: [any Boardy.ActivatableBoard]) -> Self
-  public func installedBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
-}
-extension Boardy.FlowManageable {
-  @discardableResult
-  public func registerFlow<Target, Output>(matchedIdentifiers: Boardy.FlowStepID..., target: Target, uniqueOutputType: Output.Type = Output.self, nextHandler: @escaping (Target, Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerFlow<Output>(matchedIdentifiers: Boardy.FlowStepID..., bindToBus bus: Boardy.Bus<Output>) -> Self
-  @discardableResult
-  public func registerFlow<Output, OutBoard>(matchedIdentifiers: Boardy.FlowStepID..., uniqueOutputType _: Output.Type = Output.self, sendOutputThrough board: OutBoard) -> Self where Output == OutBoard.OutputType, OutBoard : Boardy.GuaranteedOutputSendingBoard
-  @discardableResult
-  public func registerGuaranteedFlow<Target, Output>(matchedIdentifiers: Boardy.FlowStepID..., target: Target, uniqueOutputType: Output.Type = Output.self, handler: @escaping (Target, Output) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerGuaranteedFlow<Output>(matchedIdentifiers: Boardy.FlowStepID..., bindToBus bus: Boardy.Bus<Output>) -> Self
-  @discardableResult
-  public func registerGuaranteedFlow<Output, OutBoard>(matchedIdentifiers: Boardy.FlowStepID..., uniqueOutputType _: Output.Type = Output.self, sendOutputThrough board: OutBoard) -> Self where Output == OutBoard.OutputType, OutBoard : Boardy.GuaranteedOutputSendingBoard
-  public func registerChainFlow<Target>(matchedIdentifiers: Boardy.FlowStepID..., target: Target) -> Boardy.ChainBoardFlow<Target>
-  @discardableResult
-  public func registerCompletionFlow(matchedIdentifiers: Boardy.FlowStepID..., nextHandler: @escaping (_ isDone: Swift.Bool) -> Swift.Void) -> Self
-}
-extension Boardy.MotherboardType {
-  public func interactWithBoard(command: any Boardy.BoardCommandModel)
-  public func interactWithBoard<Input>(_ input: Boardy.BoardCommand<Input>)
-}
-public protocol ActivatableBoard : Boardy.BoardRegistrationsConvertible, Boardy.IdentifiableBoard, Boardy.OriginalBoard {
-  func activationBarrier(withOption option: Any?) -> Boardy.ActivationBarrier?
-  func activate(withOption option: Any?)
-  func shouldBypassGatewayBarrier() -> Swift.Bool
-}
-extension Boardy.ActivatableBoard {
-  public func asBoardRegistrations() -> [Boardy.BoardRegistration]
-  public func shouldBypassGatewayBarrier() -> Swift.Bool
-}
-extension Boardy.ActivatableBoard {
-  public func activate()
-  public func activationBarrier(withOption _: Any?) -> Boardy.ActivationBarrier?
-}
-public typealias NormalBoard = Boardy.ActivatableBoard & Boardy.InstallableBoard
-public struct ActivationBarrier {
-  public let identifier: Boardy.BoardID
-  public let scope: Boardy.ActivationBarrierScope
-  public let option: Boardy.ActivationBarrierOption
-}
-public enum ActivationBarrierScope {
-  case mainboard
-  case application
-  public static func == (a: Boardy.ActivationBarrierScope, b: Boardy.ActivationBarrierScope) -> Swift.Bool
-  public func hash(into hasher: inout Swift.Hasher)
-  public var hashValue: Swift.Int {
-    get
-  }
-}
-extension Boardy.ActivationBarrierScope {
-  @available(*, deprecated, renamed: "mainboard", message: "Use .mainboard instead")
-  public static var inMain: Boardy.ActivationBarrierScope {
-    get
-  }
-  @available(*, deprecated, renamed: "application", message: "Use .application instead")
-  public static var global: Boardy.ActivationBarrierScope {
-    get
-  }
-}
-public enum ActivationBarrierOption {
-  case void
-  case unique(Swift.AnyHashable)
-  case unidentified(Any?)
-}
-extension Boardy.ActivationBarrier {
-  public var barrierIdentifier: Boardy.BoardID {
-    get
-  }
 }
 public protocol Completable {
   func complete(_ isDone: Swift.Bool)
@@ -772,85 +1051,26 @@ extension Boardy.MotherboardType {
   public func interaction<Input>(_ destinationID: Boardy.BoardID, with _: Input.Type) -> Boardy.MainboardInteraction<Input>
   public func interaction(_ destinationID: Boardy.BoardID) -> Boardy.MainboardInteraction<Any?>
 }
-public protocol OutputSpecifications {
-  var identifier: Boardy.BoardID { get }
-  func validateOutput(_ data: Any?) -> Swift.Bool
+public struct BlockTaskBoardActivation<In, Out> : Boardy.BoardActivating {
+  public typealias Input = Boardy.BlockTaskParameter<In, Out>
+  public func activate(with input: Boardy.BlockTaskParameter<In, Out>)
+  public func activate(with input: In)
 }
-public struct GeneralOutputSpecifications : Boardy.OutputSpecifications {
-  public init(identifier: Boardy.BoardID, validation: ((Any?) -> Swift.Bool)? = nil)
-  public let identifier: Boardy.BoardID
-  public let validation: (Any?) -> Swift.Bool
-  public func validateOutput(_ data: Any?) -> Swift.Bool
+public struct BlockTaskMainboardActivation<In, Out> : Boardy.BoardActivating {
+  public typealias Input = Boardy.BlockTaskParameter<In, Out>
+  public func activate(with input: Boardy.BlockTaskMainboardActivation<In, Out>.Input)
+  public func activate(with input: In)
 }
-public struct GuaranteedOutputSpecifications<Value> : Boardy.OutputSpecifications {
-  public init(identifier: Boardy.BoardID, valueType: Value.Type)
-  public let identifier: Boardy.BoardID
-  public let valueType: Value.Type
-  public func validateOutput(_ data: Any?) -> Swift.Bool
+extension Boardy.ActivatableBoard {
+  public func blockActivation<Input, Output>(_ destinationID: Boardy.BoardID, with _: Boardy.BlockTaskParameter<Input, Output>.Type) -> Boardy.BlockTaskBoardActivation<Input, Output>
 }
-public class OutputCombinedFlow : Boardy.BoardFlow {
-  public enum Strategy {
-    case batchOneByOne
-    case latestForever
-    public static func == (a: Boardy.OutputCombinedFlow.Strategy, b: Boardy.OutputCombinedFlow.Strategy) -> Swift.Bool
-    public func hash(into hasher: inout Swift.Hasher)
-    public var hashValue: Swift.Int {
-      get
-    }
-  }
-  final public let identifier: Swift.String
-  final public let specifications: [any Boardy.OutputSpecifications]
-  final public let strategy: Boardy.OutputCombinedFlow.Strategy
-  public var matchedIdentifiers: [Boardy.BoardID] {
+extension Boardy.MotherboardType {
+  public func blockActivation<Input, Output>(_ destinationID: Boardy.BoardID, with _: Boardy.BlockTaskParameter<Input, Output>.Type) -> Boardy.BlockTaskMainboardActivation<Input, Output>
+}
+extension Boardy.MainboardGenericDestination {
+  final public var blockActivation: Boardy.BlockTaskMainboardActivation<Input, Output> {
     get
   }
-  public init(identifier: Swift.String = UUID().uuidString, matchedIdentifiers: [Boardy.BoardID], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, handler: @escaping ([Any]) -> Swift.Void)
-  public init(identifier: Swift.String = UUID().uuidString, specifications: [any Boardy.OutputSpecifications], strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping ([Any]) -> Swift.Void)
-  public func match(with output: any Boardy.BoardOutputModel) -> Swift.Bool
-  public func doNext(with output: any Boardy.BoardOutputModel)
-  @objc deinit
-}
-public class OutputCombinedCollectionFlow<Value> : Boardy.OutputCombinedFlow {
-  public init(identifier: Swift.String = UUID().uuidString, specs: [Boardy.GuaranteedOutputSpecifications<Value>], strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping ([Value]) -> Swift.Void)
-  @objc deinit
-}
-public class OutputCombined2Flow<V1, V2> : Boardy.OutputCombinedFlow {
-  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2) -> Swift.Void)
-  @objc deinit
-}
-public class OutputCombined3Flow<V1, V2, V3> : Boardy.OutputCombinedFlow {
-  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3) -> Swift.Void)
-  @objc deinit
-}
-public class OutputCombined4Flow<V1, V2, V3, V4> : Boardy.OutputCombinedFlow {
-  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, spec4: Boardy.GuaranteedOutputSpecifications<V4>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3, V4) -> Swift.Void)
-  @objc deinit
-}
-public class OutputCombined5Flow<V1, V2, V3, V4, V5> : Boardy.OutputCombinedFlow {
-  public init(identifier: Swift.String = UUID().uuidString, spec1: Boardy.GuaranteedOutputSpecifications<V1>, spec2: Boardy.GuaranteedOutputSpecifications<V2>, spec3: Boardy.GuaranteedOutputSpecifications<V3>, spec4: Boardy.GuaranteedOutputSpecifications<V4>, spec5: Boardy.GuaranteedOutputSpecifications<V5>, strategy: Boardy.OutputCombinedFlow.Strategy, handler: @escaping (V1, V2, V3, V4, V5) -> Swift.Void)
-  @objc deinit
-}
-extension Boardy.FlowManageable {
-  @discardableResult
-  public func registerCombinedFlow<Output>(_ specs: [Boardy.GuaranteedOutputSpecifications<Output>], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping ([Output]) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<Target, Output>(_ specs: [Boardy.GuaranteedOutputSpecifications<Output>], strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, [Output]) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<O1, O2>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<Target, O1, O2>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<O1, O2, O3>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<Target, O1, O2, O3>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<O1, O2, O3, O4>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3, O4) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<Target, O1, O2, O3, O4>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3, O4) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<O1, O2, O3, O4, O5>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, _ outputSpecifications5: Boardy.GuaranteedOutputSpecifications<O5>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, nextHandler: @escaping (O1, O2, O3, O4, O5) -> Swift.Void) -> Self
-  @discardableResult
-  public func registerCombinedFlow<Target, O1, O2, O3, O4, O5>(_ outputSpecifications1: Boardy.GuaranteedOutputSpecifications<O1>, _ outputSpecifications2: Boardy.GuaranteedOutputSpecifications<O2>, _ outputSpecifications3: Boardy.GuaranteedOutputSpecifications<O3>, _ outputSpecifications4: Boardy.GuaranteedOutputSpecifications<O4>, _ outputSpecifications5: Boardy.GuaranteedOutputSpecifications<O5>, strategy: Boardy.OutputCombinedFlow.Strategy = .batchOneByOne, target: Target, action: @escaping (Target, O1, O2, O3, O4, O5) -> Swift.Void) -> Self
 }
 public class MainboardDestination {
   public init(destinationID: Boardy.BoardID, mainboard: any Boardy.FlowManageable & Boardy.MotherboardType)
@@ -913,24 +1133,14 @@ extension Boardy.BoardDestination {
     get
   }
 }
-extension Boardy.IdentifiableBoard {
-  public func putToComposer(elementAction: UIComposable.UIElementAction)
+public protocol LauncherPlugin {
+  func prepareForLaunching(withOptions options: Boardy.MainOptions) -> Boardy.ModuleComponent
 }
-extension UIComposable.UIElement {
-  public init(identifier: Boardy.BoardID, contentViewController: UIKit.UIViewController?, configuration: Any? = nil)
-}
-extension Boardy.ActivatableBoardProducer {
-  public func produceComposableMotherboard(identifier: Boardy.BoardID, from parent: (any Boardy.IdentifiableBoard)? = nil, elementsBuilder: (any Boardy.ActivatableBoardProducer) -> [any Boardy.ActivatableBoard] = { _ in [] }) -> any Boardy.ComposableMotherboardType & Boardy.FlowManageable
-}
-public protocol ComposableMotherboardType : Boardy.MotherboardType {
-  func connect(to interface: any UIComposable.ComposableInterface)
-}
-public typealias FlowComposableMotherboard = Boardy.ComposableMotherboardType & Boardy.FlowManageable
-@_inheritsConvenienceInitializers open class ComposableMotherboard : Boardy.Motherboard, Boardy.ComposableMotherboardType {
-  public func connect(to interface: any UIComposable.ComposableInterface)
-  override public init(identifier: Boardy.BoardID = super, boards: [any Boardy.ActivatableBoard] = super)
-  override public init(identifier: Boardy.BoardID = super, boardProducer: any Boardy.ActivatableBoardProducer)
-  @objc deinit
+public struct ModuleComponent {
+  public init(modulePlugins: [any Boardy.ModulePlugin], urlOpenerPlugins: [any Boardy.URLOpenerPlugin] = [], launchSettings: @escaping (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
+  public let modulePlugins: [any Boardy.ModulePlugin]
+  public let urlOpenerPlugins: [any Boardy.URLOpenerPlugin]
+  public let launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void
 }
 extension Boardy.ModernContinuableBoard {
   @discardableResult
@@ -944,286 +1154,6 @@ extension Boardy.ModernContinuableBoard {
   @discardableResult
   public func attachComposableMotherboard<Mainboard>(to interface: any Boardy.AttachableObject & UIComposable.ComposableInterface, build: (any Boardy.ActivatableBoardProducer) -> Mainboard) -> Mainboard where Mainboard : Boardy.ComposableMotherboardType, Mainboard : Boardy.FlowManageable
 }
-extension Boardy.MotherboardType {
-  public func activateAllBoards(withOptions options: [Boardy.BoardID : Any] = [:], defaultOption: Any? = nil)
-  public func activateAllBoards(models: [any Boardy.BoardInputModel], defaultOption: Any? = nil)
-  public func activateAllBoards<Input>(withInputs inputs: [Boardy.BoardInput<Input>] = [], defaultInput: Input)
-  public func activateAllBoards<Input>(withInputs inputs: [Boardy.BoardInput<Input>])
-}
-final public class BlockTaskParameter<Input, Output> {
-  public init(input: Input)
-  final public func onSuccess(_ handler: Boardy.BlockTaskParameter<Input, Output>.SuccessHandler?) -> Self
-  final public func onSuccess(_ handler: ((Output) -> Swift.Void)?) -> Self
-  final public func onSuccess<Target>(target: Target, action: ((Target, Output) -> Swift.Void)?) -> Self
-  final public func onProcessing(_ handler: Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler?) -> Self
-  final public func onProcessing(_ handler: ((Swift.Bool) -> Swift.Void)?) -> Self
-  final public func onProcessing<Target>(target: Target, action: ((Target, Swift.Bool) -> Swift.Void)?) -> Self
-  final public func onError(_ handler: Boardy.BlockTaskParameter<Input, Output>.ErrorHandler?) -> Self
-  final public func onError(_ handler: ((any Swift.Error) -> Swift.Void)?) -> Self
-  final public func onError<Target>(target: Target, action: ((Target, any Swift.Error) -> Swift.Void)?) -> Self
-  final public func onCompletion(_ handler: Boardy.BlockTaskParameter<Input, Output>.CompletionHandler?) -> Self
-  final public func onCompletion(_ handler: ((Boardy.TaskCompletionStatus) -> Swift.Void)?) -> Self
-  final public func onCompletion<Target>(target: Target, action: ((Target, Boardy.TaskCompletionStatus) -> Swift.Void)?) -> Self
-  final public let input: Input
-  final public var successHandler: Boardy.BlockTaskParameter<Input, Output>.SuccessHandler? {
-    get
-  }
-  final public var processingHandler: Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler? {
-    get
-  }
-  final public var errorHandler: Boardy.BlockTaskParameter<Input, Output>.ErrorHandler? {
-    get
-  }
-  final public var completionHandler: Boardy.BlockTaskParameter<Input, Output>.CompletionHandler? {
-    get
-  }
-  public typealias SuccessHandler = (any Boardy.ActivatableBoard, Output) -> Swift.Void
-  public typealias ProcessingHandler = (any Boardy.ActivatableBoard, Swift.Bool) -> Swift.Void
-  public typealias ErrorHandler = (any Boardy.ActivatableBoard, any Swift.Error) -> Swift.Void
-  public typealias CompletionHandler = (any Boardy.ActivatableBoard, Boardy.TaskCompletionStatus) -> Swift.Void
-  @objc deinit
-}
-extension Boardy.BlockTaskParameter {
-  final public func appendingSuccessHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.SuccessHandler) -> Self
-  final public func appendingErrorHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.ErrorHandler) -> Self
-  final public func appendingCompletionHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.CompletionHandler) -> Self
-  final public func appendingProcessingHandler(_ handler: @escaping Boardy.BlockTaskParameter<Input, Output>.ProcessingHandler) -> Self
-}
-public enum TaskCompletionStatus {
-  case done
-  case cancelled
-  public static func == (a: Boardy.TaskCompletionStatus, b: Boardy.TaskCompletionStatus) -> Swift.Bool
-  public func hash(into hasher: inout Swift.Hasher)
-  public var hashValue: Swift.Int {
-    get
-  }
-}
-extension Boardy.BlockTaskParameter where Input : Swift.ExpressibleByNilLiteral {
-  convenience public init()
-}
-extension Boardy.BlockTaskParameter where Input == () {
-  convenience public init()
-}
-extension Boardy.BlockTaskBoard {
-  convenience public init(identifier: Boardy.BoardID, executingType: Boardy.ExecutingType = .default, execute work: @escaping (Boardy.BlockTaskBoard<Input, Output>, Input, @escaping Boardy.BlockTaskBoard<Input, Output>.ExecutorCompletion) -> Swift.Void)
-}
-public enum ExecutingType {
-  case `default`
-  case latest
-  case only
-  case onlyResult
-  case queue
-  case concurrent(max: Swift.Int)
-  public static var concurrent: Boardy.ExecutingType {
-    get
-  }
-}
-final public class BlockTaskBoard<Input, Output> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
-  public typealias InputType = Boardy.BlockTaskParameter<Input, Output>
-  public typealias OutputType = Output
-  public typealias ExecutorCompletion = (Swift.Result<Output, any Swift.Error>) -> Swift.Void
-  public typealias Executor = (Boardy.BlockTaskBoard<Input, Output>, Input, @escaping Boardy.BlockTaskBoard<Input, Output>.ExecutorCompletion) -> Boardy.BlockTaskCanceler
-  public init(identifier: Boardy.BoardID, executingType: Boardy.ExecutingType, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.BlockTaskBoard<Input, Output>.Executor)
-  @objc deinit
-  final public var inputAdapters: [(Any?) -> Boardy.BlockTaskParameter<Input, Output>?] {
-    get
-  }
-  final public func shouldBypassGatewayBarrier() -> Swift.Bool
-  final public func activate(withGuaranteedInput input: Boardy.BlockTaskBoard<Input, Output>.InputType)
-}
-extension Boardy.BlockTaskCanceler {
-  public static var none: Boardy.BlockTaskCanceler {
-    get
-  }
-  public static func `default`(handler: @escaping () -> Swift.Void) -> Boardy.BlockTaskCanceler
-}
-public struct BlockTaskCanceler {
-  public init(handler: @escaping () -> Swift.Void)
-  public func cancel()
-}
-public protocol FlowingBoard : Boardy.ActivatableBoard, Boardy.InstallableBoard {
-  var motherboard: any Boardy.FlowManageable & Boardy.MotherboardType { get }
-}
-open class FlowBoard<Input, Output, Command, Action> : Boardy.ModernContinuableBoard, Boardy.GuaranteedBoard, Boardy.FlowingBoard, Boardy.GuaranteedOutputSendingBoard, Boardy.GuaranteedActionSendingBoard, Boardy.GuaranteedCommandBoard where Action : Boardy.BoardFlowAction {
-  public typealias InputType = Input
-  public typealias OutputType = Output
-  public typealias CommandType = Command
-  public typealias FlowActionType = Action
-  public typealias FlowRegistration = (Boardy.FlowBoard<Input, Output, Command, Action>) -> Swift.Void
-  public typealias FlowActivation = (Boardy.FlowBoard<Input, Output, Command, Action>, Boardy.FlowBoard<Input, Output, Command, Action>.InputType) -> Swift.Void
-  public typealias FlowInteraction = (Boardy.FlowBoard<Input, Output, Command, Action>, Boardy.FlowBoard<Input, Output, Command, Action>.CommandType) -> Swift.Void
-  public init(identifier: Boardy.BoardID, producer: any Boardy.ActivatableBoardProducer, allowBypassGatewayBarrier: Swift.Bool = true, flowRegistration: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowRegistration, flowActivation: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowActivation, flowInteraction: @escaping Boardy.FlowBoard<Input, Output, Command, Action>.FlowInteraction = { board, command in
-                })
-  open func activate(withGuaranteedInput input: Boardy.FlowBoard<Input, Output, Command, Action>.InputType)
-  open func interact(guaranteedCommand: Boardy.FlowBoard<Input, Output, Command, Action>.CommandType)
-  open func registerFlows()
-  open func shouldBypassGatewayBarrier() -> Swift.Bool
-  @objc deinit
-}
-final public class AdapterBoard<Destination, In, Out> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard, Boardy.InteractableBoard, Boardy.BoardDelegate where Destination : Boardy.GuaranteedBoard, Destination : Boardy.GuaranteedOutputSendingBoard {
-  public typealias InputType = In
-  public typealias OutputType = Out
-  final public let destination: Destination
-  public init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType, outputMapper: @escaping (Destination.OutputType) -> Out)
-  final public func setInputMapper(_ mapper: @escaping (In) -> Destination.InputType) -> Self
-  final public func setOutputMapper(_ mapper: @escaping (Destination.OutputType) -> Out) -> Self
-  final public func activationBarrier(withGuaranteedInput input: In) -> Boardy.ActivationBarrier?
-  final public func activate(withGuaranteedInput input: Boardy.AdapterBoard<Destination, In, Out>.InputType)
-  final public func interact(command: Any?)
-  final public func board(_: any Boardy.IdentifiableBoard, didSendData data: Any?)
-  final public func shouldBypassGatewayBarrier() -> Swift.Bool
-  @objc deinit
-}
-extension Boardy.AdapterBoard where In == Destination.InputType {
-  convenience public init(destination: Destination, outputMapper: @escaping (Destination.OutputType) -> Out)
-}
-extension Boardy.AdapterBoard where Out == Destination.OutputType {
-  convenience public init(destination: Destination, inputMapper: @escaping (In) -> Destination.InputType)
-}
-extension Boardy.AdapterBoard where In == Destination.InputType, Out == Destination.OutputType {
-  convenience public init(destination: Destination)
-}
-public struct BlockTaskBoardActivation<In, Out> : Boardy.BoardActivating {
-  public typealias Input = Boardy.BlockTaskParameter<In, Out>
-  public func activate(with input: Boardy.BlockTaskParameter<In, Out>)
-  public func activate(with input: In)
-}
-public struct BlockTaskMainboardActivation<In, Out> : Boardy.BoardActivating {
-  public typealias Input = Boardy.BlockTaskParameter<In, Out>
-  public func activate(with input: Boardy.BlockTaskMainboardActivation<In, Out>.Input)
-  public func activate(with input: In)
-}
-extension Boardy.ActivatableBoard {
-  public func blockActivation<Input, Output>(_ destinationID: Boardy.BoardID, with _: Boardy.BlockTaskParameter<Input, Output>.Type) -> Boardy.BlockTaskBoardActivation<Input, Output>
-}
-extension Boardy.MotherboardType {
-  public func blockActivation<Input, Output>(_ destinationID: Boardy.BoardID, with _: Boardy.BlockTaskParameter<Input, Output>.Type) -> Boardy.BlockTaskMainboardActivation<Input, Output>
-}
-extension Boardy.MainboardGenericDestination {
-  final public var blockActivation: Boardy.BlockTaskMainboardActivation<Input, Output> {
-    get
-  }
-}
-public protocol TaskingBoard : Boardy.ActivatableBoard, Boardy.InstallableBoard {
-  var isCompleted: Swift.Bool { get }
-  var isProcessing: Swift.Bool { get }
-}
-open class TaskBoard<Input, Output> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.TaskingBoard, Boardy.GuaranteedOutputSendingBoard {
-  public typealias ExecutorCompletion = (Swift.Result<Output, any Swift.Error>) -> Swift.Void
-  public typealias Executor = (any Boardy.TaskingBoard, Input, @escaping Boardy.TaskBoard<Input, Output>.ExecutorCompletion) -> Swift.Void
-  public typealias SuccessHandler = (Boardy.TaskBoard<Input, Output>, Output) -> Swift.Void
-  public typealias ProcessingHandler = (Boardy.TaskBoard<Input, Output>) -> Swift.Void
-  public typealias ErrorHandler = (Boardy.TaskBoard<Input, Output>, any Swift.Error) -> Swift.Void
-  public typealias CompletionHandler = (Boardy.TaskBoard<Input, Output>) -> Swift.Void
-  public typealias InputType = Input
-  public typealias OutputType = Output
-  public var isCompleted: Swift.Bool {
-    get
-  }
-  public var isProcessing: Swift.Bool {
-    get
-  }
-  public init(identifier: Boardy.BoardID, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.TaskBoard<Input, Output>.Executor, successHandler: @escaping Boardy.TaskBoard<Input, Output>.SuccessHandler = { _, _ in }, processingHandler: @escaping Boardy.TaskBoard<Input, Output>.ProcessingHandler = { _ in }, errorHandler: @escaping Boardy.TaskBoard<Input, Output>.ErrorHandler = { board, error in
-                    guard board.context != nil else { return }
-
-
-                    var topViewController = board.rootViewController
-                    while let viewController = topViewController.presentedViewController {
-                        topViewController = viewController
-                    }
-
-                    DispatchQueue.main.async { [weak topViewController] in
-                        let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
-                        topViewController?.present(alert, animated: true)
-                    }
-                }, completionHandler: @escaping Boardy.TaskBoard<Input, Output>.CompletionHandler = { _ in })
-  public func shouldBypassGatewayBarrier() -> Swift.Bool
-  public func activate(withGuaranteedInput input: Input)
-  @objc deinit
-  open func handleSuccess(_ output: Output)
-  open func handleProgress()
-  open func handleError(_ error: any Swift.Error)
-  open func willComplete()
-}
-public enum BoardResult<Success, Failure> {
-  case progress(fractionCompleted: Swift.Double)
-  case success(Success)
-  case failure(Failure)
-  case cancel
-  public static var progress: Boardy.BoardResult<Success, Failure> {
-    get
-  }
-  public var inProgress: Swift.Bool {
-    get
-  }
-}
-final public class ResultTaskBoard<Input, Success, Failure> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
-  public typealias InputType = Input
-  public typealias OutputType = Boardy.BoardResult<Success, Failure>
-  public typealias ExecutorCallback = (Boardy.BoardResult<Success, Failure>) -> Swift.Void
-  public typealias Executor = (Input, @escaping Boardy.ResultTaskBoard<Input, Success, Failure>.ExecutorCallback) -> Swift.Void
-  public init(identifier: Boardy.BoardID, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.ResultTaskBoard<Input, Success, Failure>.Executor)
-  final public func shouldBypassGatewayBarrier() -> Swift.Bool
-  final public func activate(withGuaranteedInput input: Input)
-  @objc deinit
-}
-public struct AlertAction {
-  public init(title: Swift.String, style: Boardy.AlertAction.Style = .default, shouldBePreferred: Swift.Bool = false, handler: (() -> Swift.Void)?)
-  public init<Target>(title: Swift.String, style: Boardy.AlertAction.Style = .default, shouldBePreferred: Swift.Bool = false, target: Target, handler: ((Target) -> Swift.Void)?) where Target : AnyObject
-  public enum Style {
-    case `default`
-    case cancel
-    case destructive
-    public static func == (a: Boardy.AlertAction.Style, b: Boardy.AlertAction.Style) -> Swift.Bool
-    public func hash(into hasher: inout Swift.Hasher)
-    public var hashValue: Swift.Int {
-      get
-    }
-  }
-}
-public struct Alert {
-  public init(title: Swift.String? = nil, message: Swift.String?, style: Boardy.Alert.Style = .alert, actions: [Boardy.AlertAction])
-  public enum Style {
-    case alert
-    case actionSheet
-    public static func == (a: Boardy.Alert.Style, b: Boardy.Alert.Style) -> Swift.Bool
-    public func hash(into hasher: inout Swift.Hasher)
-    public var hashValue: Swift.Int {
-      get
-    }
-  }
-}
-extension Boardy.MotherboardType {
-  public func activateAlert(_ alert: Boardy.Alert)
-}
-@_inheritsConvenienceInitializers final public class BarrierBoard<Input> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
-  public typealias InputType = Boardy.BarrierBoard<Input>.Action
-  public typealias OutputType = Input
-  public typealias Process = (Input) -> Swift.Void
-  public enum Action {
-    case wait(Boardy.BarrierBoard<Input>.Process)
-    case overcome(Boardy.BarrierBoard<Input>.OutputType)
-    case cancel
-  }
-  final public func activate(withGuaranteedInput input: Boardy.BarrierBoard<Input>.InputType)
-  final public func shouldBypassGatewayBarrier() -> Swift.Bool
-  override public init(identifier: Boardy.BoardID)
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers final public class GatewayBarrierRegistration {
-  public static func registerWithActivation(_ activation: @escaping (_ barrier: any Boardy.Completable & Boardy.ContinuableBoard, _ option: Any?) -> Swift.Void) -> Boardy.GatewayBarrierRegistration
-  final public func withFlowRegistration(_ flowRegistration: @escaping (_ barrier: any Boardy.Completable & Boardy.ContinuableBoard) -> Swift.Void) -> Self
-  public static var exempt: Boardy.GatewayBarrierRegistration {
-    get
-  }
-  @available(*, deprecated, renamed: "exempt")
-  public static var ​exempt: Boardy.GatewayBarrierRegistration {
-    get
-  }
-  @objc deinit
-}
-public typealias GatewayBarrierBoard = Boardy.Completable & Boardy.ContinuableBoard
 extension Boardy.MainOptions.Key {
   public static let environment: Boardy.MainOptions.Key
 }
@@ -1284,6 +1214,250 @@ public protocol ModuleBuilderPlugin : Boardy.ModulePlugin {
 extension Boardy.ModuleBuilderPlugin {
   public func apply(for main: any Boardy.MainComponent)
   public func pluginDidLoad(with _: any Boardy.SharedValueComponent)
+}
+extension Swift.Array : Boardy.ModulePluginConvertible where Element == any Boardy.ModulePlugin {
+  public var modulePlugins: [any Boardy.ModulePlugin] {
+    get
+  }
+}
+@_functionBuilder public enum ModulePluginBuilder {
+  public static func buildBlock(_ components: any Boardy.ModulePluginConvertible...) -> [any Boardy.ModulePlugin]
+  public static func buildArray(_ components: [any Boardy.ModulePluginConvertible]) -> [any Boardy.ModulePlugin]
+  public static func buildEither(first component: any Boardy.ModulePluginConvertible) -> any Boardy.ModulePluginConvertible
+  public static func buildEither(second component: any Boardy.ModulePluginConvertible) -> any Boardy.ModulePluginConvertible
+  public static func buildOptional(_ component: (any Boardy.ModulePluginConvertible)?) -> any Boardy.ModulePluginConvertible
+  public static func buildExpression(_ expression: (any Boardy.ModulePluginConvertible)?) -> any Boardy.ModulePluginConvertible
+}
+extension Boardy.LauncherComponent {
+  final public func install(@Boardy.ModulePluginBuilder pluginsBuilder: () -> [any Boardy.ModulePlugin]) -> Self
+}
+open class Motherboard : Boardy.Board, Boardy.BoardDelegate, Boardy.FlowMotherboard {
+  public var flows: [any Boardy.BoardFlow]
+  override public var debugDescription: Swift.String {
+    get
+  }
+  public init(identifier: Boardy.BoardID = .random(), boards: [any Boardy.ActivatableBoard] = [])
+  public init(identifier: Boardy.BoardID = .random(), boardProducer: any Boardy.ActivatableBoardProducer)
+  convenience public init(identifier: Boardy.BoardID = .random(), boardProducer: any Boardy.ActivatableBoardProducer, boards: [any Boardy.ActivatableBoard])
+  override open func putIntoContext(_ context: Swift.AnyObject)
+  @discardableResult
+  public func registerFlow(_ flow: any Boardy.BoardFlow) -> Self
+  public func resetFlows()
+  public func removeFlow(by identifier: Swift.String)
+  public var boardProducer: any Boardy.ActivatableBoardProducer {
+    get
+  }
+  @objc deinit
+}
+public protocol MotherboardType : Boardy.IdentifiableBoard, Boardy.OriginalBoard {
+  var boards: [any Boardy.ActivatableBoard] { get }
+  func activateBoard(identifier: Boardy.BoardID, withOption option: Any?)
+  func addBoard(_ board: any Boardy.ActivatableBoard)
+  func removeBoard(withIdentifier identifier: Boardy.BoardID)
+  func getBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  func getOrProduceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  func getGatewayBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  func clearActiveBoards()
+}
+extension Boardy.MotherboardType {
+  public func removeBoard(_ board: any Boardy.ActivatableBoard)
+  public func installBoard(_ board: any Boardy.ActivatableBoard)
+  public func extended(boards: [any Boardy.ActivatableBoard]) -> Self
+  public func installedBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  public func getOrProduceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+}
+extension Boardy.MotherboardType {
+  public func activateBoard(identifier: Boardy.BoardID, withOption option: Any?)
+  public func activateBoard(model: any Boardy.BoardInputModel)
+  public func activateBoard(_ input: Boardy.BoardInput<some Any>)
+  public func deactivateBoard(identifier: Boardy.BoardID)
+}
+extension Boardy.MotherboardType {
+  public func interactWithBoard(command: any Boardy.BoardCommandModel)
+  public func interactWithBoard<Input>(_ input: Boardy.BoardCommand<Input>)
+}
+extension Boardy.MotherboardType {
+  public func activateAllBoards(withOptions options: [Boardy.BoardID : Any] = [:], defaultOption: Any? = nil)
+  public func activateAllBoards(models: [any Boardy.BoardInputModel], defaultOption: Any? = nil)
+  public func activateAllBoards<Input>(withInputs inputs: [Boardy.BoardInput<Input>] = [], defaultInput: Input)
+  public func activateAllBoards<Input>(withInputs inputs: [Boardy.BoardInput<Input>])
+}
+final public class NoBoard : Boardy.Board, Boardy.ActivatableBoard {
+  public init(identifier: Boardy.BoardID, message: Swift.String? = nil, handler: ((Any?) -> Swift.Void)? = nil)
+  final public func activate(withOption option: Any?)
+  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+  @objc deinit
+}
+final public class NoBoardProducer : Boardy.ActivatableBoardProducer {
+  public init()
+  final public func produceGatewayBoard(identifier _: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  final public func matchBoard(withIdentifier _: Boardy.BoardID, to anotherIdentifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  final public func produceBoard(identifier: Boardy.BoardID) -> (any Boardy.ActivatableBoard)?
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class LauncherComponent {
+  final public let options: Boardy.MainOptions
+  final public var sharedEncodedData: Foundation.Data?
+  final public func share(value: some Encodable) -> Self
+  final public func install(plugins: [any Boardy.ModulePlugin]) -> Self
+  final public func install(plugin: any Boardy.ModulePlugin) -> Self
+  final public func install(gatewayBarrier registration: Boardy.GatewayBarrierRegistration) -> Self
+  final public func install(gatewayBarrier registration: Boardy.GatewayBarrierRegistration, for destinationID: Boardy.BoardID) -> Self
+  final public func install(urlOpenerPlugins: [any Boardy.URLOpenerPlugin]) -> Self
+  final public func install(launchSettings: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void) -> Self
+  @discardableResult
+  final public func install(launcherPlugin: any Boardy.LauncherPlugin) -> Self
+  final public func instantiate(_ launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> Boardy.PluginLauncher
+  @discardableResult
+  final public func initialize(_ launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> Boardy.PluginLauncher
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class PluginLauncher {
+  public static var shared: Boardy.PluginLauncher {
+    get
+  }
+  public static func with(options: Boardy.MainOptions) -> Boardy.LauncherComponent
+  @available(*, deprecated, message: "Use launch(in: action:) instead of")
+  final public func launch(in context: Swift.AnyObject, with input: Boardy.BoardInput<some Any>)
+  final public func launch(in context: Swift.AnyObject, action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
+  final public func activateNow(_ action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void)
+  public typealias URLOpenerSelectionHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL, _ candidatePlugins: [any Boardy.URLOpenerPlugin], (_ selectedPlugins: [any Boardy.URLOpenerPlugin]) -> Swift.Void) -> Swift.Void
+  public typealias URLNotFoundHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL) -> Swift.Void
+  public typealias URLOpeningValidator = (_ url: Foundation.URL) -> Boardy.URLOpeningValidationStatus
+  public typealias URLDeniedHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL) -> Swift.Void
+  @discardableResult
+  final public func install(urlOpenerPlugin: any Boardy.URLOpenerPlugin) -> Self
+  @discardableResult
+  final public func install(urlOpenerPlugins: [any Boardy.URLOpenerPlugin]) -> Self
+  @discardableResult
+  final public func installURLOpenerPlugin<Parameter>(name: Swift.String? = nil, condition: @escaping (Foundation.URL) -> Boardy.URLOpeningOption<Parameter>, handler: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType, Parameter) -> Swift.Void) -> Self
+  @discardableResult
+  final public func installURLOpenerPlugin(name: Swift.String? = nil, condition: @escaping (Foundation.URL) -> Swift.Bool, handler: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void) -> Self
+  @discardableResult
+  final public func installURLOpenerPlugin(name: Swift.String? = nil, matchingPath: Swift.String, handler: @escaping (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ parameters: [Swift.String : Swift.String]) -> Swift.Void) -> Self
+  @discardableResult
+  final public func setURLNotFoundHandler(_ handler: Boardy.PluginLauncher.URLNotFoundHandler?) -> Self
+  @discardableResult
+  final public func setURLOpenerSelectionHandler(_ handler: @escaping Boardy.PluginLauncher.URLOpenerSelectionHandler) -> Self
+  @discardableResult
+  final public func setURLOpeningValidator(_ validator: @escaping Boardy.PluginLauncher.URLOpeningValidator) -> Self
+  @discardableResult
+  final public func setURLDeniedHandler(_ handler: @escaping Boardy.PluginLauncher.URLDeniedHandler) -> Self
+  @discardableResult
+  final public func open(url: Foundation.URL) -> [Swift.String]
+  @discardableResult
+  final public func open(link: Swift.String) -> [Swift.String]
+  @objc deinit
+}
+public enum URLOpeningValidationStatus {
+  case accepted
+  case denied
+  public static func == (a: Boardy.URLOpeningValidationStatus, b: Boardy.URLOpeningValidationStatus) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension Boardy.PluginLauncher {
+  final public func attachLaunch(in context: any Boardy.AttachableObject, action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
+}
+public enum BoardResult<Success, Failure> {
+  case progress(fractionCompleted: Swift.Double)
+  case success(Success)
+  case failure(Failure)
+  case cancel
+  public static var progress: Boardy.BoardResult<Success, Failure> {
+    get
+  }
+  public var inProgress: Swift.Bool {
+    get
+  }
+}
+final public class ResultTaskBoard<Input, Success, Failure> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.GuaranteedOutputSendingBoard {
+  public typealias InputType = Input
+  public typealias OutputType = Boardy.BoardResult<Success, Failure>
+  public typealias ExecutorCallback = (Boardy.BoardResult<Success, Failure>) -> Swift.Void
+  public typealias Executor = (Input, @escaping Boardy.ResultTaskBoard<Input, Success, Failure>.ExecutorCallback) -> Swift.Void
+  public init(identifier: Boardy.BoardID, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.ResultTaskBoard<Input, Success, Failure>.Executor)
+  final public func shouldBypassGatewayBarrier() -> Swift.Bool
+  final public func activate(withGuaranteedInput input: Input)
+  @objc deinit
+}
+open class ServiceMap {
+  final public let mainboard: any Boardy.FlowManageable & Boardy.MotherboardType
+  required public init(mainboard: any Boardy.FlowManageable & Boardy.MotherboardType)
+  @objc deinit
+}
+extension Boardy.MotherboardType where Self : Boardy.FlowManageable {
+  public var serviceMap: Boardy.ServiceMap {
+    get
+  }
+}
+extension Boardy.IdentifiableBoard {
+  public var serviceMap: Boardy.ServiceMap {
+    get
+  }
+}
+extension Boardy.ServiceMap {
+  public func link<MapType>(_: MapType.Type = MapType.self) -> MapType where MapType : Boardy.ServiceMap
+}
+public protocol TaskingBoard : Boardy.ActivatableBoard, Boardy.InstallableBoard {
+  var isCompleted: Swift.Bool { get }
+  var isProcessing: Swift.Bool { get }
+}
+open class TaskBoard<Input, Output> : Boardy.Board, Boardy.GuaranteedBoard, Boardy.TaskingBoard, Boardy.GuaranteedOutputSendingBoard {
+  public typealias ExecutorCompletion = (Swift.Result<Output, any Swift.Error>) -> Swift.Void
+  public typealias Executor = (any Boardy.TaskingBoard, Input, @escaping Boardy.TaskBoard<Input, Output>.ExecutorCompletion) -> Swift.Void
+  public typealias SuccessHandler = (Boardy.TaskBoard<Input, Output>, Output) -> Swift.Void
+  public typealias ProcessingHandler = (Boardy.TaskBoard<Input, Output>) -> Swift.Void
+  public typealias ErrorHandler = (Boardy.TaskBoard<Input, Output>, any Swift.Error) -> Swift.Void
+  public typealias CompletionHandler = (Boardy.TaskBoard<Input, Output>) -> Swift.Void
+  public typealias InputType = Input
+  public typealias OutputType = Output
+  public var isCompleted: Swift.Bool {
+    get
+  }
+  public var isProcessing: Swift.Bool {
+    get
+  }
+  public init(identifier: Boardy.BoardID, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.TaskBoard<Input, Output>.Executor, successHandler: @escaping Boardy.TaskBoard<Input, Output>.SuccessHandler = { _, _ in }, processingHandler: @escaping Boardy.TaskBoard<Input, Output>.ProcessingHandler = { _ in }, errorHandler: @escaping Boardy.TaskBoard<Input, Output>.ErrorHandler = { board, error in
+                    guard board.context != nil else { return }
+
+                     
+                    var topViewController = board.rootViewController
+                    while let viewController = topViewController.presentedViewController {
+                        topViewController = viewController
+                    }
+
+                    DispatchQueue.main.async { [weak topViewController] in
+                        let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel, handler: nil))
+                        topViewController?.present(alert, animated: true)
+                    }
+                }, completionHandler: @escaping Boardy.TaskBoard<Input, Output>.CompletionHandler = { _ in })
+  public func shouldBypassGatewayBarrier() -> Swift.Bool
+  public func activate(withGuaranteedInput input: Input)
+  @objc deinit
+  open func handleSuccess(_ output: Output)
+  open func handleProgress()
+  open func handleError(_ error: any Swift.Error)
+  open func willComplete()
+}
+extension Foundation.URL {
+  public var boardy: Boardy.BoardyURLExtensions {
+    get
+  }
+}
+public struct BoardyURLExtensions {
+  public var queryParameters: [Swift.String : Swift.String] {
+    get
+  }
+  public var queryData: Foundation.Data {
+    get
+  }
+  public var pathComponents: [Swift.String] {
+    get
+  }
 }
 public protocol URLOpenerPlugin : Boardy.URLOpenerPluginConvertible {
   var name: Swift.String { get }
@@ -1356,171 +1530,15 @@ extension Swift.Array : Boardy.URLOpenerPluginConvertible where Element == any B
 extension Boardy.PluginLauncher {
   final public func install(@Boardy.URLOpenerPluginBuilder urlOpenerPluginsBuilder: () -> [any Boardy.URLOpenerPlugin]) -> Self
 }
-extension Swift.Array : Boardy.ModulePluginConvertible where Element == any Boardy.ModulePlugin {
-  public var modulePlugins: [any Boardy.ModulePlugin] {
-    get
-  }
-}
-@_functionBuilder public enum ModulePluginBuilder {
-  public static func buildBlock(_ components: any Boardy.ModulePluginConvertible...) -> [any Boardy.ModulePlugin]
-  public static func buildArray(_ components: [any Boardy.ModulePluginConvertible]) -> [any Boardy.ModulePlugin]
-  public static func buildEither(first component: any Boardy.ModulePluginConvertible) -> any Boardy.ModulePluginConvertible
-  public static func buildEither(second component: any Boardy.ModulePluginConvertible) -> any Boardy.ModulePluginConvertible
-  public static func buildOptional(_ component: (any Boardy.ModulePluginConvertible)?) -> any Boardy.ModulePluginConvertible
-  public static func buildExpression(_ expression: (any Boardy.ModulePluginConvertible)?) -> any Boardy.ModulePluginConvertible
-}
-extension Boardy.LauncherComponent {
-  final public func install(@Boardy.ModulePluginBuilder pluginsBuilder: () -> [any Boardy.ModulePlugin]) -> Self
-}
-open class ServiceMap {
-  final public let mainboard: any Boardy.FlowManageable & Boardy.MotherboardType
-  required public init(mainboard: any Boardy.FlowManageable & Boardy.MotherboardType)
-  @objc deinit
-}
-extension Boardy.MotherboardType where Self : Boardy.FlowManageable {
-  public var serviceMap: Boardy.ServiceMap {
-    get
-  }
-}
-extension Boardy.IdentifiableBoard {
-  public var serviceMap: Boardy.ServiceMap {
-    get
-  }
-}
-extension Boardy.ServiceMap {
-  public func link<MapType>(_: MapType.Type = MapType.self) -> MapType where MapType : Boardy.ServiceMap
-}
-extension Boardy.PluginLauncher {
-  final public func attachLaunch(in context: any Boardy.AttachableObject, action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
-}
-@_hasMissingDesignatedInitializers final public class LauncherComponent {
-  final public let options: Boardy.MainOptions
-  final public var sharedEncodedData: Foundation.Data?
-  final public func share(value: some Encodable) -> Self
-  final public func install(plugins: [any Boardy.ModulePlugin]) -> Self
-  final public func install(plugin: any Boardy.ModulePlugin) -> Self
-  final public func install(gatewayBarrier registration: Boardy.GatewayBarrierRegistration) -> Self
-  final public func install(gatewayBarrier registration: Boardy.GatewayBarrierRegistration, for destinationID: Boardy.BoardID) -> Self
-  final public func install(urlOpenerPlugins: [any Boardy.URLOpenerPlugin]) -> Self
-  final public func install(launchSettings: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void) -> Self
-  @discardableResult
-  final public func install(launcherPlugin: any Boardy.LauncherPlugin) -> Self
-  final public func instantiate(_ launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> Boardy.PluginLauncher
-  @discardableResult
-  final public func initialize(_ launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> Boardy.PluginLauncher
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers final public class PluginLauncher {
-  public static var shared: Boardy.PluginLauncher {
-    get
-  }
-  public static func with(options: Boardy.MainOptions) -> Boardy.LauncherComponent
-  @available(*, deprecated, message: "Use launch(in: action:) instead of")
-  final public func launch(in context: Swift.AnyObject, with input: Boardy.BoardInput<some Any>)
-  final public func launch(in context: Swift.AnyObject, action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
-  final public func activateNow(_ action: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void)
-  public typealias URLOpenerSelectionHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL, _ candidatePlugins: [any Boardy.URLOpenerPlugin], (_ selectedPlugins: [any Boardy.URLOpenerPlugin]) -> Swift.Void) -> Swift.Void
-  public typealias URLNotFoundHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL) -> Swift.Void
-  public typealias URLOpeningValidator = (_ url: Foundation.URL) -> Boardy.URLOpeningValidationStatus
-  public typealias URLDeniedHandler = (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ url: Foundation.URL) -> Swift.Void
-  @discardableResult
-  final public func install(urlOpenerPlugin: any Boardy.URLOpenerPlugin) -> Self
-  @discardableResult
-  final public func install(urlOpenerPlugins: [any Boardy.URLOpenerPlugin]) -> Self
-  @discardableResult
-  final public func installURLOpenerPlugin<Parameter>(name: Swift.String? = nil, condition: @escaping (Foundation.URL) -> Boardy.URLOpeningOption<Parameter>, handler: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType, Parameter) -> Swift.Void) -> Self
-  @discardableResult
-  final public func installURLOpenerPlugin(name: Swift.String? = nil, condition: @escaping (Foundation.URL) -> Swift.Bool, handler: @escaping (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void) -> Self
-  @discardableResult
-  final public func installURLOpenerPlugin(name: Swift.String? = nil, matchingPath: Swift.String, handler: @escaping (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType, _ parameters: [Swift.String : Swift.String]) -> Swift.Void) -> Self
-  @discardableResult
-  final public func setURLNotFoundHandler(_ handler: Boardy.PluginLauncher.URLNotFoundHandler?) -> Self
-  @discardableResult
-  final public func setURLOpenerSelectionHandler(_ handler: @escaping Boardy.PluginLauncher.URLOpenerSelectionHandler) -> Self
-  @discardableResult
-  final public func setURLOpeningValidator(_ validator: @escaping Boardy.PluginLauncher.URLOpeningValidator) -> Self
-  @discardableResult
-  final public func setURLDeniedHandler(_ handler: @escaping Boardy.PluginLauncher.URLDeniedHandler) -> Self
-  @discardableResult
-  final public func open(url: Foundation.URL) -> [Swift.String]
-  @discardableResult
-  final public func open(link: Swift.String) -> [Swift.String]
-  @objc deinit
-}
-public enum URLOpeningValidationStatus {
-  case accepted
-  case denied
-  public static func == (a: Boardy.URLOpeningValidationStatus, b: Boardy.URLOpeningValidationStatus) -> Swift.Bool
-  public func hash(into hasher: inout Swift.Hasher)
-  public var hashValue: Swift.Int {
-    get
-  }
-}
-public protocol LauncherPlugin {
-  func prepareForLaunching(withOptions options: Boardy.MainOptions) -> Boardy.ModuleComponent
-}
-public struct ModuleComponent {
-  public init(modulePlugins: [any Boardy.ModulePlugin], urlOpenerPlugins: [any Boardy.URLOpenerPlugin] = [], launchSettings: @escaping (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in })
-  public let modulePlugins: [any Boardy.ModulePlugin]
-  public let urlOpenerPlugins: [any Boardy.URLOpenerPlugin]
-  public let launchSettings: (_ mainboard: any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void
-}
-extension Foundation.URL {
-  public var boardy: Boardy.BoardyURLExtensions {
-    get
-  }
-}
-public struct BoardyURLExtensions {
-  public var queryParameters: [Swift.String : Swift.String] {
-    get
-  }
-  public var queryData: Foundation.Data {
-    get
-  }
-  public var pathComponents: [Swift.String] {
-    get
-  }
-}
-public protocol DetachableObject : AnyObject {
-  func detachObject(_ object: Swift.AnyObject)
-}
-public protocol AttachableObject : Boardy.DetachableObject {
-  func attach(to object: Swift.AnyObject)
-  func attachObject(_ object: Swift.AnyObject)
-  func attachedObjects() -> [Swift.AnyObject]
-  func detachAllObjects()
-}
-extension Boardy.AttachableObject {
-  public func attach(to object: Swift.AnyObject)
-  public func attachObject(_ object: Swift.AnyObject)
-  public func attachedObjects() -> [Swift.AnyObject]
-  public func attachedObjects<ObjectType>(_: ObjectType.Type = ObjectType.self) -> [ObjectType]
-  public func firstAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType?
-  public func lastAttachedObject<ObjectType>(_: ObjectType.Type = ObjectType.self) -> ObjectType?
-  public func detachObject(_ object: Swift.AnyObject)
-  public func detachObjects<ObjectType>(_: ObjectType.Type, where condition: (ObjectType) -> Swift.Bool = { _ in true })
-  public func detachObjects(where condition: (Swift.AnyObject) -> Swift.Bool)
-  public func detachAllObjects()
-}
-extension ObjectiveC.NSObject : Boardy.AttachableObject {
-}
-extension Boardy.Board : Boardy.AttachableObject {
-}
-extension Boardy.ModernContinuableBoard {
-  @discardableResult
-  public func attachContinuousMotherboard(to context: any Boardy.AttachableObject, configurationBuilder: (any Boardy.FlowManageable & Boardy.MotherboardType) -> Swift.Void = { _ in }) -> any Boardy.FlowManageable & Boardy.MotherboardType
-  @discardableResult
-  public func attachContinuousMotherboard<Mainboard>(to context: any Boardy.AttachableObject, build: (any Boardy.ActivatableBoardProducer) -> Mainboard) -> Mainboard where Mainboard : Boardy.FlowManageable, Mainboard : Boardy.MotherboardType
-}
 extension Boardy.ActivationBarrierScope : Swift.Equatable {}
 extension Boardy.ActivationBarrierScope : Swift.Hashable {}
-extension Boardy.OutputCombinedFlow.Strategy : Swift.Equatable {}
-extension Boardy.OutputCombinedFlow.Strategy : Swift.Hashable {}
-extension Boardy.TaskCompletionStatus : Swift.Equatable {}
-extension Boardy.TaskCompletionStatus : Swift.Hashable {}
 extension Boardy.AlertAction.Style : Swift.Equatable {}
 extension Boardy.AlertAction.Style : Swift.Hashable {}
 extension Boardy.Alert.Style : Swift.Equatable {}
 extension Boardy.Alert.Style : Swift.Hashable {}
+extension Boardy.TaskCompletionStatus : Swift.Equatable {}
+extension Boardy.TaskCompletionStatus : Swift.Hashable {}
+extension Boardy.OutputCombinedFlow.Strategy : Swift.Equatable {}
+extension Boardy.OutputCombinedFlow.Strategy : Swift.Hashable {}
 extension Boardy.URLOpeningValidationStatus : Swift.Equatable {}
 extension Boardy.URLOpeningValidationStatus : Swift.Hashable {}

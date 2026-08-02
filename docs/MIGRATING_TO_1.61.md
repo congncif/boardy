@@ -51,6 +51,31 @@ observable order. `Any?` remains the runtime transport behind the typed façades
 - Do not add actor isolation or broad `Sendable` constraints as an application-side workaround.
   Swift 6 isolation is a separate follow-up plan.
 
+## Behavior changes that can reach existing apps
+
+These are observable changes in the 1.61 release line. Each one is backed by a regression test in
+the 1.61 test suite.
+
+**`BlockTaskBoard.latest` and `BlockTaskBoard` `deinit` actually cancel in-flight tasks now.**
+Earlier releases discarded the `BlockTaskCanceler` returned by the direct executor on four of the
+six executing types; cancellation from `cancelPendingTasksIfNeeded()` or `deinit` was a no-op for
+`.default`, `.only`, `.onlyResult` and `.queue`. A task that used to run to completion will now
+short-circuit. Move terminal callback delivery to the main queue if your cancel path interacts with
+UIKit or the motherboard storage described in [COMPATIBILITY.md](COMPATIBILITY.md).
+
+**Class-conforming `ModuleBuilderPlugin`s are now retained for the lifetime of the producer.**
+Previously, the lazy factory held the plugin through a weak box and could `preconditionFailure` if
+the plugin was a class instance released after `apply(for:)`. The plugin is now strongly captured
+instead. Plugins that themselves retain the `MainComponent`/`ActivatableBoardProducer` will form a
+retain cycle: review yours and prefer struct conformance where possible.
+
+**`Motherboard.getBoard(identifier:)` is now a pure lookup.** It no longer produces and installs a
+board. Activation paths now call `Motherboard.getOrProduceBoard(identifier:)`, which preserves the
+old behavior. Read paths — interaction commands, completer, the new IO completion flow — use
+`getBoard(identifier:)` and report an unknown identifier as a diagnostic instead of installing a
+placeholder `NoBoard`. No code change is required in apps that did not rely on the placeholder side
+effect.
+
 ## Review boundary
 
 The candidate is prepared for maintainer review, not yet tagged or published as Boardy 1.61.0.

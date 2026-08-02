@@ -25,10 +25,12 @@ Pod::Spec.new do |s|
     co.dependency "Boardy/Attachable"
     co.dependency "Boardy/ModulePlugin"
     co.dependency "Boardy/ComponentKit"
+    co.dependency "Boardy/Composable"
   end
 
   s.subspec "Core" do |co|
     co.source_files = "Boardy/Core/**/*.swift"
+    co.dependency "UIComposable", "~> 1.0.1"
   end
 
   s.subspec "ComponentKit" do |co|

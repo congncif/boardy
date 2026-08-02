@@ -19,8 +19,11 @@ older-runtime support, N-1 Xcode support or hosted-CI coverage.
 ## Dependency contract
 
 SwiftPM resolves `UIComposableCore` from the exact public tag `1.1.0`; Boardy keeps one umbrella
-product and preserves `import Boardy`. The CocoaPods constraint remains `~> 1.0.1` so the current
-podspec does not require a CocoaPods trunk publication of UIComposable 1.1.0.
+product and preserves `import Boardy`. CocoaPods resolves `UIComposable ~> 1.0.1` from trunk. The
+UIComposable `1.0.1` and `1.1.0` tags contain identical `UIComposable/` source; `1.1.0` adds the
+SwiftPM manifest and test metadata only. Boardy's SPM and CocoaPods version labels therefore differ
+without shipping different Boardy-facing source. Both package paths include Boardy's Composable
+surface; CocoaPods `Default` now depends on `Boardy/Composable` explicitly.
 
 ## Threading contract
 

@@ -60,8 +60,11 @@ if ! XCODE_VERSION_OUTPUT="$(DEVELOPER_DIR="$DEVELOPER_DIR" xcodebuild -version 
     finish_failure "Unable to read the configured Xcode version: $XCODE_VERSION_OUTPUT"
 fi
 XCODE_VERSION_LINE="$(printf '%s\n' "$XCODE_VERSION_OUTPUT" | sed -n '1p')"
-if [ "$XCODE_VERSION_LINE" != "Xcode 26.4.1" ]; then
-    finish_failure "Expected Xcode 26.4.1, found: $XCODE_VERSION_LINE"
+MIN_XCODE_VERSION="${BOARDY_MIN_XCODE_VERSION:-Xcode 26.4.1}"
+if [ "${BOARDY_ALLOW_XCODE_MISMATCH:-0}" != "1" ]; then
+    if ! printf '%s\n' "$XCODE_VERSION_LINE" "$MIN_XCODE_VERSION" | sort -V | tail -n1 | grep -qx "$XCODE_VERSION_LINE"; then
+        finish_failure "Need at least $MIN_XCODE_VERSION, found: $XCODE_VERSION_LINE. Set BOARDY_ALLOW_XCODE_MISMATCH=1 to override."
+    fi
 fi
 
 HOST_ARCH="$(uname -m)"
@@ -98,6 +101,17 @@ if ! ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0))); JSON.parse(File.read(
     "$BASELINE_API" "$CANDIDATE_API"; then
     finish_failure "One or both API graph inputs are not parseable JSON."
 fi
+
+# Refuse to verify against a truncated or wrong-module capture: parseable JSON is not enough.
+# The render-inventory inventory currently reports ~820 public declarations on the umbrella
+# module, so 100 is a conservative lower bound that still leaves headroom for future pruning.
+MIN_TOP_LEVEL_NODES=100
+for input in "$BASELINE_API" "$CANDIDATE_API"; do
+    node_count="$(ruby -rjson -e 'n = JSON.parse(File.read(ARGV.fetch(0))).dig("ABIRoot", "children")&.size.to_i; puts n' "$input")"
+    if [ "$node_count" -lt "$MIN_TOP_LEVEL_NODES" ]; then
+        finish_failure "API graph $input has only $node_count top-level nodes; expected >= $MIN_TOP_LEVEL_NODES. Capture likely failed."
+    fi
+done
 
 if ! BASELINE_INTERFACE_SHA="$(shasum -a 256 "$BASELINE_INTERFACE" | awk '{print $1}')" ||
     ! BASELINE_API_SHA="$(shasum -a 256 "$BASELINE_API" | awk '{print $1}')" ||

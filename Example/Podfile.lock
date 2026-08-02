@@ -5,22 +5,24 @@ PODS:
     - Authentication
     - Boardy/ModulePlugin
     - SiFUtilities
-  - Boardy (1.60.1):
-    - Boardy/Default (= 1.60.1)
-  - Boardy/Attachable (1.60.1):
+  - Boardy (1.61.0):
+    - Boardy/Default (= 1.61.0)
+  - Boardy/Attachable (1.61.0):
     - Boardy/Core
-  - Boardy/ComponentKit (1.60.1):
+  - Boardy/ComponentKit (1.61.0):
     - Boardy/Core
-  - Boardy/Composable (1.60.1):
+  - Boardy/Composable (1.61.0):
     - Boardy/Attachable
-    - UIComposable
-  - Boardy/Core (1.60.1)
-  - Boardy/Default (1.60.1):
+    - UIComposable (~> 1.0.1)
+  - Boardy/Core (1.61.0):
+    - UIComposable (~> 1.0.1)
+  - Boardy/Default (1.61.0):
     - Boardy/Attachable
     - Boardy/ComponentKit
+    - Boardy/Composable
     - Boardy/Core
     - Boardy/ModulePlugin
-  - Boardy/ModulePlugin (1.60.1):
+  - Boardy/ModulePlugin (1.61.0):
     - Boardy/Attachable
   - Dashboard (0.1.0):
     - Boardy
@@ -30,11 +32,11 @@ PODS:
     - Dashboard
     - EmployeeManagement
     - SiFUtilities
-  - DiffableDataSources (0.4.0):
+  - DiffableDataSources (0.5.0):
     - DifferenceKit/AppKitExtension (~> 1.1)
     - DifferenceKit/UIKitExtension (~> 1.1)
-  - DifferenceKit/Core (1.1.5)
-  - DifferenceKit/UIKitExtension (1.1.5):
+  - DifferenceKit/Core (1.3.0)
+  - DifferenceKit/UIKitExtension (1.3.0):
     - DifferenceKit/Core
   - EmployeeManagement (0.1.0):
     - Boardy
@@ -81,16 +83,16 @@ PODS:
   - SiFUtilities/UIKit (4.28.0)
   - SiFUtilities/WeakObject (4.28.0)
   - SwiftFormat/CLI (0.49.7)
-  - UIComposable (0.5.1):
-    - UIComposable/Default (= 0.5.1)
-  - UIComposable/Core (0.5.1)
-  - UIComposable/Default (0.5.1):
+  - UIComposable (1.0.1):
+    - UIComposable/Default (= 1.0.1)
+  - UIComposable/Core (1.0.1)
+  - UIComposable/Default (1.0.1):
     - UIComposable/Core
     - UIComposable/UIKit
-  - UIComposable/DiffUI (0.5.1):
+  - UIComposable/DiffUI (1.0.1):
     - DiffableDataSources
     - UIComposable/Core
-  - UIComposable/UIKit (0.5.1):
+  - UIComposable/UIKit (1.0.1):
     - UIComposable/Core
 
 DEPENDENCIES:
@@ -135,16 +137,16 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Authentication: d87578c03865995057e0951fc4bbc386236edf9d
   AuthenticationPlugins: dbc14cded27c507a4e160d81d8561b86ab36ff08
-  Boardy: fd5397dd117dd425d5ebb7f954dc3b1365faa22c
+  Boardy: 67216149ca31c1f8c0da046a1abbb213abac00b6
   Dashboard: 6e9b7ad513f594514f4b8ee3118db5da41a572d4
   DashboardPlugins: 89dcf3a1cfdae0345f6977fe80b1ae2b470363bd
-  DiffableDataSources: 80396cec405c9b29e1e07b55c9be7d11b46c8741
-  DifferenceKit: 516f12e336ed65a3a0665847b5c3cb5cad4bd4ea
+  DiffableDataSources: 1ddde2de1978cc02619b2c3bfafab20e68b57279
+  DifferenceKit: ab185c4d7f9cef8af3fcf593e5b387fb81e999ca
   EmployeeManagement: 05353f717ea0677dc3f310da95a12ed86a3ff045
   EmployeeManagementPlugins: f8a5ae757eace7281875ab238456bdda89fe9e05
   SiFUtilities: 9224ff24e7b3fce4da0206aac9179eb386210399
   SwiftFormat: b70e3c776a74c67ce8bd140425a8c86d4a843759
-  UIComposable: a002bab42cc52f8f71df1282fa4432583dd8c860
+  UIComposable: 1d25a2857a45e0d087c12104deb3a399f3d828d7
 
 PODFILE CHECKSUM: 3c7c6557ac12d82da88acea7014e2d9318709abb
 

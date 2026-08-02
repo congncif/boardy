@@ -57,10 +57,11 @@ consumers should remain on their current release line until they explicitly migr
 ## Execution and type-safety contract
 
 Boardy keeps the existing synchronous, caller-controlled executor. No MainActor annotation,
-main-thread precondition or automatic queue hop is introduced in 1.61.0; UIKit callers remain
-responsible for main-thread use. `BlockTaskBoard` preserves its legacy terminal executor and
-observable callback order. Typed façades improve call-site safety, but the central runtime transport
-remains `Any?`; this is not end-to-end static type safety.
+release main-thread precondition or automatic queue hop is introduced in 1.61.0; UIKit callers remain
+responsible for main-thread use. DEBUG builds assert Motherboard storage mutations occur on the main
+thread. `BlockTaskBoard` preserves its legacy terminal executor and observable callback order. Typed
+façades improve call-site safety, but the central runtime transport remains `Any?`; this is not
+end-to-end static type safety.
 
 See [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md), [`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md),
 [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md), [`RELEASING.md`](RELEASING.md),

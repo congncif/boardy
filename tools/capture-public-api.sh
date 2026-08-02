@@ -7,6 +7,8 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
     echo "Usage: [DEVELOPER_DIR=/path/to/Xcode.app/Contents/Developer] $0 <derived-data-root> <swiftinterface-output> <api-json-output>" >&2
+    echo "The library must be built first with BUILD_LIBRARY_FOR_DISTRIBUTION=YES." >&2
+    echo "Set BOARDY_ALLOW_XCODE_MISMATCH=1 to bypass the minimum Xcode check." >&2
 }
 
 if [ "$#" -ne 3 ]; then
@@ -25,11 +27,17 @@ if [ ! -d "$DEVELOPER_DIR" ]; then
     exit 66
 fi
 
-XCODE_VERSION_OUTPUT="$(DEVELOPER_DIR="$DEVELOPER_DIR" xcodebuild -version)"
-XCODE_VERSION_LINE="$(printf '%s\n' "$XCODE_VERSION_OUTPUT" | sed -n '1p')"
-if [ "$XCODE_VERSION_LINE" != "Xcode 26.4.1" ]; then
-    echo "Expected Xcode 26.4.1, found: $XCODE_VERSION_LINE" >&2
+if ! XCODE_VERSION_OUTPUT="$(DEVELOPER_DIR="$DEVELOPER_DIR" xcodebuild -version 2>&1)"; then
+    echo "Unable to read the configured Xcode version: $XCODE_VERSION_OUTPUT" >&2
     exit 65
+fi
+XCODE_VERSION_LINE="$(printf '%s\n' "$XCODE_VERSION_OUTPUT" | sed -n '1p')"
+MIN_XCODE_VERSION="${BOARDY_MIN_XCODE_VERSION:-Xcode 26.4.1}"
+if [ "${BOARDY_ALLOW_XCODE_MISMATCH:-0}" != "1" ]; then
+    if ! printf '%s\n' "$XCODE_VERSION_LINE" "$MIN_XCODE_VERSION" | sort -V | tail -n1 | grep -qx "$XCODE_VERSION_LINE"; then
+        echo "Need at least $MIN_XCODE_VERSION, found: $XCODE_VERSION_LINE. Set BOARDY_ALLOW_XCODE_MISMATCH=1 to override." >&2
+        exit 65
+    fi
 fi
 
 echo "Public API capture toolchain:" >&2

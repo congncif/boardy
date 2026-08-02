@@ -19,7 +19,7 @@ sdk=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platfor
 | Baseline interface: `docs/api/Boardy-1.60.1.swiftinterface` | `a29d4bb97a6214d477c3fa739366616d911393a2d557c5d4d62c69c834454bb9` |
 | Baseline API graph: `docs/api/Boardy-1.60.1.interface.api.json` | `4a756df2debb2be8e071ed389914121c97474687d7aa1436b6d3e7967b26a1f1` |
 | Candidate interface: `docs/api/Boardy-1.61.0.swiftinterface` | `b0f928bad0f503418d5ae5e55495002216f606a4815aad75b42a3ca04906d543` |
-| Candidate API graph: `docs/api/Boardy-1.61.0.api.json` | `40264ea232b5c105931fdb8e20d8ee3a95758860a9672d934a0ace310d0e4064` |
+| Candidate API graph: `/tmp/Boardy-interface.api.json` | `97a2a14a86e422143628d6af7f632b0d857f4c192709ec594198b8ac9e0b298a` |
 
 ## API digester diagnosis
 
@@ -1878,7 +1878,7 @@ No source/API break diagnosed.
 -  public init(identifier: Boardy.BoardID, allowBypassGatewayBarrier: Swift.Bool = true, executor: @escaping Boardy.TaskBoard<Input, Output>.Executor, successHandler: @escaping Boardy.TaskBoard<Input, Output>.SuccessHandler = { _, _ in }, processingHandler: @escaping Boardy.TaskBoard<Input, Output>.ProcessingHandler = { _ in }, errorHandler: @escaping Boardy.TaskBoard<Input, Output>.ErrorHandler = { board, error in
 -                    guard board.context != nil else { return }
 -
--
+-                     
 -                    var topViewController = board.rootViewController
 -                    while let viewController = topViewController.presentedViewController {
 -                        topViewController = viewController

@@ -115,7 +115,8 @@ inferred from them.
 ## 5. Verify public API and documentation
 
 - [ ] Capture final `docs/api/Boardy-1.61.0.swiftinterface` and
-      `docs/api/Boardy-1.61.0.api.json` from the final resolved CocoaPods lock state.
+      `docs/api/Boardy-1.61.0.api.json` from the final resolved Boardy build after all package and
+      pod metadata changes are complete.
 - [ ] Run `tools/verify-public-api.sh` against the immutable 1.60.1 interface and API graph.
 - [ ] Confirm zero removed/renamed declarations and no global-actor annotation added to an existing
       declaration.
@@ -123,8 +124,9 @@ inferred from them.
       `tools/render-api-inventory.rb verify` so every eligible declaration is classified exactly
       once.
 - [ ] Confirm migration guidance covers the iOS floor, unchanged caller-controlled execution,
-      absence of new main-thread preconditions/hops, `BlockTaskBoard` executor/order,
-      `GatewayBarrierRegistration.exempt`, URL matching and CocoaPods-to-SwiftPM migration.
+      DEBUG-only Motherboard main-thread assertions with no release queue hop/precondition,
+      `BlockTaskBoard` executor/order, `GatewayBarrierRegistration.exempt`, URL matching and
+      CocoaPods-to-SwiftPM migration.
 - [ ] Confirm no document describes the typed façade over `Any?` as end-to-end typed transport.
 
 Any source, package dependency or public-declaration correction invalidates the corresponding API

@@ -45,10 +45,11 @@ their current release line because 1.61.0 is GitHub-only; a later CocoaPods publ
 their migration, `< 1.61` ceiling or retirement disposition. Gate A1 is therefore approved. The
 selected contract is:
 
-- No MainActor/global-actor isolation, main-thread precondition or automatic queue hop is added in
-  1.61.0.
+- No MainActor/global-actor isolation, release main-thread precondition or automatic queue hop is
+  added in 1.61.0.
 - Existing synchronous APIs preserve caller-controlled execution. UIKit callers remain responsible
-  for main-thread use according to UIKit's contract.
+  for main-thread use according to UIKit's contract. DEBUG builds assert Motherboard storage
+  mutations occur on the main thread; release builds retain the prior caller-controlled behavior.
 - The full `BlockTaskBoard` terminal sequence preserves its legacy completion executor and
   observable order, including Board messages.
 - Shared synchronous storage uses audited compound lock operations and never invokes handlers while locked.
