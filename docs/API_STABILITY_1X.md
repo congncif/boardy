@@ -13,13 +13,17 @@ Boardy 1.x is a legacy-compatible modular orchestration framework with typed inp
 - **Legacy-compatible:** public behavior intentionally preserved for 1.x, including `Any?` transport, synchronous entry points and callback-based task execution.
 - **Experimental/deferred:** proposals that are not part of the supported 1.x contract, including typed-route core, async/await task API and public activation identity.
 
-The exhaustive declaration-keyed inventory is generated from the Swift API Digester graph later in the release. The immutable baseline artifacts are:
+The immutable baseline artifacts are the textual interfaces:
 
-- [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface)
-- [`api/Boardy-1.60.1.api.json`](api/Boardy-1.60.1.api.json)
-- [`api/Boardy-1.60.1.interface.api.json`](api/Boardy-1.60.1.interface.api.json) (normalized
-  comparison graph; see [`BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md))
+- [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — the **active** baseline;
+  every candidate is verified against the latest released line
+- [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface) — retained for provenance
+  and for re-running the 1.60.1 → 1.61.0 comparison on demand
 - [`api/BASELINE_PROVENANCE.md`](api/BASELINE_PROVENANCE.md)
+
+Digester graphs are **derived, not committed**. `tools/derive-api-graph.sh` reproduces one from a
+`.swiftinterface`, and CI derives both sides of every comparison the same way. The exhaustive
+declaration-keyed inventory is likewise generated, not stored.
 
 ## Compatibility rules
 
@@ -57,20 +61,24 @@ selected contract is:
   separately approved follow-up plan; narrowly audited lock-backed internal conformances remain.
   Swift 6 readiness is not a 1.61.0 release claim.
 
-The final 1.61.0 interface and API graph must be compared to the immutable baseline with
-`tools/verify-public-api.sh` before tagging. The current report uses the normalized
-interface-derived comparison graph because the raw 1.60.1 graph and interface have a documented
-capture-format mismatch; the raw graph remains unchanged for auditability.
+Every candidate must be compared to the active baseline with `tools/verify-public-api.sh` before
+tagging. The `api-verify` job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs this
+on every push, so the comparison is a build result rather than a release-time ritual.
 
-## 1.61.0 inventory and migration artifacts
+## Inventory and verification artifacts
 
-The candidate declaration inventory is maintained in [`api/PUBLIC_API_1_61.md`](api/PUBLIC_API_1_61.md)
-and is generated from [`api/Boardy-1.61.0.api.json`](api/Boardy-1.61.0.api.json), not by grepping
-the textual interface. The machine-readable compatibility result is
-[`api/BOARDY_1_61_API_VERIFICATION.md`](api/BOARDY_1_61_API_VERIFICATION.md); the durable candidate
-interface is [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface). These files are
-prepared on the final candidate build and must be regenerated if a public declaration or package
-dependency changes.
+The declaration inventory and the compatibility report are **CI artifacts**, not repository files.
+`api-verify` publishes `API_VERIFICATION.md`, `PUBLIC_API.md` and the candidate `.swiftinterface`
+for each run. Nothing needs regenerating by hand when a public declaration changes; the next run
+produces it.
+
+Inventory classification is derived mechanically from the graph's deprecation flag, so the inventory
+is a completeness check over declaration keys — it is not a record of human API review. Human review
+is what this document and the release checklist govern.
+
+Baseline selection matters more than it looks. Verifying against 1.60.1 would silently permit
+removing anything introduced in 1.61.0, because a declaration absent from the baseline cannot be
+reported as removed. The active baseline is therefore the latest released line.
 
 New deprecations remain available through at least the next supported major migration window.
 The requester-approved project policy allows a minimum-platform change in a minor release, while

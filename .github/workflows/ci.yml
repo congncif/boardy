@@ -76,10 +76,14 @@ jobs:
 
       # Both graphs are derived the same way, from a .swiftinterface. The committed baseline
       # interface is the durable artifact; its graph is regenerated rather than committed.
+      #
+      # The baseline is the LATEST RELEASED line, not the oldest. A declaration missing from the
+      # baseline cannot be reported as removed, so verifying against 1.60.1 would silently permit
+      # deleting anything 1.61.0 introduced.
       - name: Derive baseline and candidate API graphs
         run: |
           tools/derive-api-graph.sh \
-            docs/api/Boardy-1.60.1.swiftinterface \
+            docs/api/Boardy-1.61.0.swiftinterface \
             .build-local/DerivedData-api \
             .build-local/api/Boardy-baseline.api.json
           tools/derive-api-graph.sh \
@@ -90,7 +94,7 @@ jobs:
       - name: Verify public API compatibility
         run: >-
           tools/verify-public-api.sh
-          docs/api/Boardy-1.60.1.swiftinterface
+          docs/api/Boardy-1.61.0.swiftinterface
           .build-local/api/Boardy-baseline.api.json
           .build-local/api/Boardy-candidate.swiftinterface
           .build-local/api/Boardy-candidate.api.json

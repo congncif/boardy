@@ -111,15 +111,17 @@ inferred from them.
 
 ## 5. Verify public API and documentation
 
-- [ ] Capture final `docs/api/Boardy-1.61.0.swiftinterface` and
-      `docs/api/Boardy-1.61.0.api.json` from the final resolved Boardy build after all package and
-      pod metadata changes are complete.
-- [ ] Run `tools/verify-public-api.sh` against the immutable 1.60.1 interface and API graph.
-- [ ] Confirm zero removed/renamed declarations and no global-actor annotation added to an existing
-      declaration.
-- [ ] Generate `docs/api/PUBLIC_API_1_61.md` and run
-      `tools/render-api-inventory.rb verify` so every eligible declaration is classified exactly
-      once.
+- [ ] Confirm the `api-verify` job passed on the release commit. It builds with library evolution,
+      derives both graphs from `.swiftinterface`, runs `tools/verify-public-api.sh` against the
+      active baseline and renders the declaration inventory. Its report, inventory and candidate
+      interface are downloadable run artifacts.
+- [ ] Confirm the report shows zero removed/renamed declarations and no global-actor annotation
+      added to an existing declaration.
+- [ ] Commit the run's candidate `.swiftinterface` as `docs/api/Boardy-<version>.swiftinterface`
+      and promote it to the active baseline in `.github/workflows/ci.yml`,
+      `docs/api/BASELINE_PROVENANCE.md` and `docs/API_STABILITY_1X.md`. The baseline must always be
+      the latest released line: a declaration absent from the baseline cannot be reported as
+      removed, so an older baseline would silently permit deleting what the newer release added.
 - [ ] Confirm migration guidance covers the iOS floor, unchanged caller-controlled execution,
       DEBUG-only Motherboard main-thread assertions with no release queue hop/precondition,
       `BlockTaskBoard` executor/order, `GatewayBarrierRegistration.exempt`, URL matching and

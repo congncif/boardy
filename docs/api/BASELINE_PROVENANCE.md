@@ -1,39 +1,72 @@
-# Boardy 1.60.1 API baseline provenance
+# Boardy public API baseline provenance
 
-This directory contains the immutable public API baseline used to review the
-source compatibility of Boardy `1.61.0`.
+This directory holds the immutable textual baselines used to verify source compatibility. It holds
+**no digester graphs** — those are derived on demand, see below.
+
+| Artifact | Role | SHA-256 |
+|---|---|---|
+| `Boardy-1.61.0.swiftinterface` | **Active baseline.** Every candidate is verified against it. | `21ff72a7fd1c4eb0062aac23c0d4d9748c37a9b39fe1e5abbd64e4dc6d9ee85a` |
+| `Boardy-1.60.1.swiftinterface` | Retained for provenance and for re-running the 1.60.1 → 1.61.0 comparison. | `a29d4bb97a6214d477c3fa739366616d911393a2d557c5d4d62c69c834454bb9` |
+
+## 1.60.1 capture
 
 | Field | Value |
 |---|---|
 | Source commit | `bfa9579977047b6e112b40b94c4c49243eb46dc8` |
-| Source commit subject | `docs: add Boardy living roadmap` |
 | Source commit timestamp | `2026-07-14 10:37:44 +0700` |
 | Capture toolchain | Xcode `26.4.1` (`17E202`) |
-| Swift interface SHA-256 | `a29d4bb97a6214d477c3fa739366616d911393a2d557c5d4d62c69c834454bb9` |
-| API digester JSON SHA-256 | `1a3b741beeef2bfaccac0b79ee07baa65f3da2343c03ce277df111f95b4199df` |
 
-The artifacts were captured and validated from the source tree at the commit
-above before any Task 2–8 Boardy source mutation. They are committed separately
-from those source changes so the compatibility reference remains independently
-auditable.
+Captured from the source tree at that commit before any 1.61.0 source mutation, and committed
+separately from those changes so the reference stays independently auditable.
 
-The raw API graph is retained unchanged for provenance. During the 1.61.0 review,
-the raw graph was found to contain declarations and type spellings that are not
-present in its paired textual interface (including synthesized `Equatable`
-members). `Boardy-1.60.1.interface.api.json` is therefore an additional,
-deterministic comparison graph dumped from that immutable interface with the same
-Xcode toolchain and interface-loading mode used for the candidate. It does not
-replace the raw capture; it prevents a tooling-format mismatch from being
-reported as a source compatibility break.
+## Why no graphs are committed
 
-Artifacts:
+The directory previously carried three digester graphs totalling 4.4 MB. All three are reproducible
+from the interfaces above with `tools/derive-api-graph.sh`, and reproducing them was verified to
+give the same verification verdict, the same report body, and the same detection of an injected
+removal. Their contract is semantic, not byte-level: the output is not reproducible byte-for-byte
+across toolchains, so committing one would assert a stability it does not have.
 
-- `Boardy-1.60.1.swiftinterface`: public, host-compatible simulator interface.
-- `Boardy-1.60.1.api.json`: authoritative Swift API Digester graph.
-- `Boardy-1.60.1.interface.api.json`: normalized interface-derived comparison graph;
-  SHA-256 `4a756df2debb2be8e071ed389914121c97474687d7aa1436b6d3e7967b26a1f1`; the raw graph above
-  remains immutable and authoritative for capture provenance.
+One of the three was worse than redundant. The raw `Boardy-1.60.1.api.json` was labelled
+authoritative but was never what the verification actually read: comparing against it reported two
+inherited constructors as removed and fourteen phantom type changes, none of them real. The
+`Boardy-1.60.1.interface.api.json` beside it existed only to route around that file.
 
-Extraction and comparison use `tools/capture-public-api.sh` and
-`tools/verify-public-api.sh`. Project-scoped temporary files and build products
-are written below the ignored repository-local `.build-local/` directory.
+## The two graph forms are not interchangeable
+
+This is the trap that produced the phantom findings above, and it is a property of the tooling
+rather than of any one file:
+
+| Form | Produced by | `FlowMotherboard` prints as |
+|---|---|---|
+| interface-derived | `tools/derive-api-graph.sh` | `FlowManageable & MotherboardType` (typealias expanded) |
+| binary-module-derived | `tools/capture-public-api.sh` | `FlowMotherboard` (sugar preserved) |
+
+Comparing one against the other reports every sugared declaration as a type change — 40+ findings on
+Boardy, none real. Both sides of a comparison must therefore be interface-derived.
+`capture-public-api.sh` still writes a graph, and CI discards it; only the `.swiftinterface` that
+step captures is used.
+
+## Reproducing a graph
+
+The interfaces open with `@_exported import Boardy`, so they do not load standalone through `-I`
+(`error: underlying Objective-C module 'Boardy' not found`). `derive-api-graph.sh` handles this by
+copying a freshly built `Boardy.framework`, deleting every shipped module slice and substituting the
+interface being examined.
+
+```bash
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+xcodebuild build -workspace Example/Boardy.xcworkspace -scheme Boardy \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath .build-local/DerivedData-api \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES CODE_SIGNING_ALLOWED=NO
+
+tools/derive-api-graph.sh docs/api/Boardy-1.61.0.swiftinterface \
+  .build-local/DerivedData-api .build-local/api/baseline.api.json
+```
+
+`BUILD_LIBRARY_FOR_DISTRIBUTION=YES` is not optional: without library evolution no
+`.swiftinterface` is emitted and there is nothing to capture or compare.
+
+The `api-verify` job in `.github/workflows/ci.yml` runs the whole chain on every push and uploads
+the report, the rendered inventory and the candidate interface.
