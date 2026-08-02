@@ -57,7 +57,12 @@ class LifecycleTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testBoardShouldBeReleasedAfterCompleted() throws {
+    /// A board completed by one of its siblings is released.
+    ///
+    /// This used to be the whole of `testBoardShouldBeReleasedAfterCompleted`, with the direct
+    /// `complete()` call commented out — so the name promised the self-completion path while the
+    /// body only ever exercised this one. The two paths are now separate tests.
+    func testBoardIsReleasedWhenCompletedBySibling() throws {
         let motherboard: FlowMotherboard = Motherboard(boards: [SingleBoard(identifier: "1"), ContiBoard(identifier: "2", motherboard: Motherboard())])
         weak var singleBoard = motherboard.boards.first { $0.identifier == "1" }
         weak var contiBoard = motherboard.boards.first { $0.identifier == "2" }
@@ -65,12 +70,31 @@ class LifecycleTests: XCTestCase {
         XCTAssertNotNil(singleBoard)
         XCTAssertNotNil(contiBoard)
 
+        // Board "2" completes board "1" through the shared motherboard, not by touching it.
         contiBoard?.completer("1").complete()
-//        singleBoard?.complete()
         XCTAssertNil(singleBoard)
+        XCTAssertNotNil(contiBoard)
+        XCTAssertEqual(motherboard.boards.map(\.identifier), ["2"])
 
         motherboard.completer("2").complete()
         XCTAssertNil(contiBoard)
+        XCTAssertTrue(motherboard.boards.isEmpty)
+    }
+
+    /// A board that completes itself is released.
+    func testBoardIsReleasedWhenItCompletesItself() throws {
+        let motherboard: FlowMotherboard = Motherboard(boards: [SingleBoard(identifier: "1"), SingleBoard(identifier: "2")])
+        weak var firstBoard = motherboard.boards.first { $0.identifier == "1" }
+        weak var secondBoard = motherboard.boards.first { $0.identifier == "2" }
+
+        XCTAssertNotNil(firstBoard)
+        XCTAssertNotNil(secondBoard)
+
+        firstBoard?.complete()
+
+        XCTAssertNil(firstBoard)
+        XCTAssertNotNil(secondBoard)
+        XCTAssertEqual(motherboard.boards.map(\.identifier), ["2"])
     }
 
     func testActivateAllBoardsWithDefaultInputContinuesAfterMissingInput() {

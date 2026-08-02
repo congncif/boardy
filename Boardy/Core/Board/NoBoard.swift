@@ -8,6 +8,14 @@
 import Foundation
 import UIKit
 
+/// The placeholder a producer returns for an identifier nothing is registered for.
+///
+/// Activating it presents a "feature not found" alert instead of failing silently, which surfaces a
+/// typo or a missing module during development.
+///
+/// - Important: because ``NoBoardProducer`` answers every identifier with one of these,
+///   `produceBoard(identifier:)` never returns `nil`. Test for `is NoBoard` rather than for nil
+///   when checking whether an identifier is actually registered.
 public final class NoBoard: Board, ActivatableBoard {
     private let handler: ((Any?) -> Void)?
     private let message: String?
@@ -38,6 +46,10 @@ public final class NoBoard: Board, ActivatableBoard {
     }
 }
 
+/// The fallback producer: answers any board identifier with a ``NoBoard``.
+///
+/// It is the default external producer, which is why an unregistered identifier produces a
+/// placeholder rather than nothing. Gateway boards are the exception — those return `nil`.
 public final class NoBoardProducer: ActivatableBoardProducer {
     public init() {}
 

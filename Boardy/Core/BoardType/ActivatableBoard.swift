@@ -8,6 +8,11 @@
 import Foundation
 import UIKit
 
+/// A board that can be started with an untyped option.
+///
+/// This is the raw activation surface the motherboard calls. Adopt ``GuaranteedBoard`` or
+/// ``DedicatedBoard`` instead so the option is converted to a declared type for you; conform here
+/// directly only for boards that genuinely take anything.
 public protocol ActivatableBoard: IdentifiableBoard, OriginalBoard, BoardRegistrationsConvertible {
     func activationBarrier(withOption option: Any?) -> ActivationBarrier?
     func activate(withOption option: Any?)
@@ -36,6 +41,15 @@ public extension ActivatableBoard {
 
 public typealias NormalBoard = ActivatableBoard & InstallableBoard
 
+/// A gate that must complete before a board is activated.
+///
+/// Declare one from a board's `activationBarrier(withOption:)` and the motherboard installs a
+/// barrier board in front of it: the activation is queued, the gate runs, and the queued work
+/// proceeds only once the gate completes successfully.
+///
+/// ``ActivationBarrierScope`` decides whether the gate is shared across the whole app or only the
+/// current motherboard; ``ActivationBarrierOption`` decides whether repeated activations share one
+/// gate or each get their own.
 public struct ActivationBarrier {
     public let identifier: BoardID
     public let scope: ActivationBarrierScope

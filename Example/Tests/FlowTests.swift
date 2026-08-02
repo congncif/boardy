@@ -124,7 +124,7 @@ final class FlowTests: XCTestCase {
 
         motherboard.activation("out-test").activate(with: "Input" as Any)
 
-        waitForExpectations(timeout: 2, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(result, expectedValue)
     }
@@ -151,7 +151,7 @@ final class FlowTests: XCTestCase {
 
         motherboard.activation("out-board").activate()
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(result, value)
     }
@@ -177,7 +177,7 @@ final class FlowTests: XCTestCase {
         otherBoard.complete(true)
         motherboard.activation(boardID, with: String.self).activate(with: "VALUE")
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(result, "VALUE")
     }
@@ -196,7 +196,7 @@ final class FlowTests: XCTestCase {
         }
 
         sutBoard.sendFlowAction(Action.ok)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
         XCTAssertEqual(result, Action.ok)
     }
 }
@@ -229,7 +229,7 @@ private final class OutputBoard: Board, ActivatableBoard {
     }
 
     func activate(withOption _: Any?) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.global().async { [weak self] in
             self?.sendToMotherboard(data: self?.result)
         }
     }
@@ -249,7 +249,7 @@ private final class CompletionBoard: Board, GuaranteedBoard, GuaranteedOutputSen
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: String) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             self?.sendOutput(input)
             self?.complete(true)
         }

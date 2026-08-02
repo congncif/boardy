@@ -9,6 +9,9 @@ import Foundation
 
 // MARK: - AdaptableBoard
 
+/// Supplies the input type a board is activated with, and how an untyped option converts to it.
+///
+/// Adopted through ``DedicatedBoard`` or ``GuaranteedBoard`` rather than directly.
 public protocol AdaptableBoard {
     associatedtype InputType
 
@@ -35,6 +38,25 @@ public extension AdaptableBoard {
 
 // MARK: - DedicatedBoard
 
+/// A board with a declared input type that tolerates receiving nothing.
+///
+/// Use this when "no input" is a real case the board handles — a screen that opens blank as
+/// readily as it opens on a record. If the input is required, use ``GuaranteedBoard`` instead: it
+/// reports a wrong or missing input rather than quietly passing `nil` through.
+///
+/// ```swift
+/// final class DetailBoard: Board, DedicatedBoard {
+///     typealias InputType = Record
+///
+///     func activate(withInput record: Record?) {
+///         show(DetailViewController(record: record))   // nil means "new record"
+///     }
+/// }
+/// ```
+///
+/// - Warning: do not conform to both `DedicatedBoard` and ``GuaranteedBoard`` on one type. Neither
+///   refines the other and both supply `activate(withOption:)` at the same specificity, so the
+///   compiler cannot choose — and their intended behavior is opposite.
 public protocol DedicatedBoard: AdaptableBoard, ActivatableBoard {
     func activationBarrier(withInput input: InputType?) -> ActivationBarrier?
 
@@ -58,6 +80,25 @@ public extension DedicatedBoard {
 
 // MARK: - GuaranteedBoard
 
+/// A board that requires its declared input type.
+///
+/// This is the usual choice. The framework converts the untyped activation option to `InputType`
+/// and reports a mismatch instead of activating with nothing, so a wiring mistake surfaces during
+/// development rather than as a blank screen.
+///
+/// ```swift
+/// final class CheckoutBoard: Board, GuaranteedBoard {
+///     typealias InputType = Cart
+///
+///     func activate(withGuaranteedInput cart: Cart) { … }
+/// }
+/// ```
+///
+/// - Note: "Guaranteed" is about the *conversion*, not about nullability. Declaring an optional
+///   `InputType` such as `String?` still passes `nil` through as a successfully converted value.
+///
+/// - Warning: do not conform to both ``DedicatedBoard`` and `GuaranteedBoard` on one type; see the
+///   warning on `DedicatedBoard`.
 public protocol GuaranteedBoard: AdaptableBoard, ActivatableBoard {
     func activationBarrier(withGuaranteedInput input: InputType) -> ActivationBarrier?
 
@@ -121,6 +162,10 @@ public extension GuaranteedBoard where InputType: Decodable {
 
 // MARK: - The Board sends a type safe Output data
 
+/// Adds a typed ``sendOutput(_:)`` to a board.
+///
+/// Output is what flows match on, so declaring `OutputType` is what lets a downstream board or
+/// flow receive a real type rather than `Any?`.
 public protocol GuaranteedOutputSendingBoard: IdentifiableBoard {
     associatedtype OutputType
 }

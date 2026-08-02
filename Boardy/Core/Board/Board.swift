@@ -8,10 +8,47 @@
 import Foundation
 import UIKit
 
+/// The base class for a unit of flow logic.
+///
+/// A board is glue, not a place to keep state. It receives an input, does one thing — show a
+/// screen, run a task, decide a route — and reports back through ``sendToMotherboard(data:)``.
+/// Business logic belongs in whatever controller the board builds; the board wires that controller
+/// to the rest of the app.
+///
+/// Subclass this and adopt one of the activation protocols rather than conforming from scratch:
+///
+/// ```swift
+/// final class CheckoutBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
+///     typealias InputType = Cart
+///     typealias OutputType = Receipt
+///
+///     func activate(withGuaranteedInput cart: Cart) {
+///         let screen = CheckoutViewController(cart: cart)
+///         screen.onPaid = { [weak self] receipt in self?.sendOutput(receipt) }
+///         rootViewController.show(screen)
+///     }
+/// }
+/// ```
+///
+/// ## Lifetime
+///
+/// A board is created by a producer when first activated and removed from its motherboard when it
+/// completes. Prefer letting that happen: a board that stores state across activations has to
+/// manage its own lifecycle and stops being safely reusable. If a board must outlive one
+/// activation, it is responsible for calling `complete()` itself.
+///
+/// ## Threading
+///
+/// Activation and output are caller-controlled — the framework adds no queue hops. UIKit work must
+/// therefore happen on the main thread, as usual. Installing and removing boards, and registering
+/// flows, must happen on the main thread; DEBUG builds assert this.
 open class Board: IdentifiableBoard, OriginalBoard {
     public let identifier: BoardID
     public weak var delegate: BoardDelegate?
 
+    /// Creates a board addressable as `identifier`.
+    ///
+    /// The identifier must be unique within the motherboard the board is installed into.
     public init(identifier: BoardID) {
         self.identifier = identifier
     }

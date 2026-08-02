@@ -9,6 +9,29 @@
 import Foundation
 import UIKit
 
+/// The orchestrator: it owns a set of boards and the flows that connect them.
+///
+/// A motherboard is itself a ``Board``, which is what lets one nest inside another and lets a whole
+/// feature be plugged into a larger app as a single unit. Its job is routing:
+///
+/// - **Activation** — `activateBoard(identifier:withOption:)` finds or produces a board and starts
+///   it, going through a gateway barrier first when one is registered.
+/// - **Flow** — a board's output is matched against registered flows, which decide what runs next.
+/// - **Completion** — a board that completes is removed, releasing it and its screen.
+///
+/// Boards are usually not added by hand. Give the motherboard a ``BoardProducer`` and it creates
+/// each board the first time that identifier is activated:
+///
+/// ```swift
+/// let motherboard = Motherboard(boardProducer: producer)
+/// motherboard.registerFlowSteps(.pubCart ->> .pubCheckout ->> .pubReceipt)
+/// motherboard.putIntoContext(window)
+/// ```
+///
+/// - Important: the installed-board list and the flow list are mutated from `addBoard`,
+///   `removeBoard`, `clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows`. Call those
+///   on the main thread; DEBUG builds assert it. Board *output* has no such restriction — it may
+///   arrive on whatever executor the work finished on, and the flow list is synchronized for that.
 open class Motherboard: Board, MotherboardRepresentable, BoardDelegate, FlowMotherboard, LazyMotherboard {
     /// Backing store for `flows`.
     ///

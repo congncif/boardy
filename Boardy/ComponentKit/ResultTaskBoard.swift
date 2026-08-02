@@ -27,6 +27,12 @@ public enum BoardResult<Success, Failure> {
     }
 }
 
+/// A task board whose output is a ``BoardResult``, so progress and cancellation are part of the
+/// contract rather than side channels.
+///
+/// Use it when a downstream flow needs to react to more than success and failure — a progress bar,
+/// or a user-initiated cancel. Like ``TaskBoard``, it accepts one activation at a time, and a
+/// duplicate terminal result is a no-op rather than a second output.
 public final class ResultTaskBoard<Input, Success, Failure>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = Input
     public typealias OutputType = BoardResult<Success, Failure>

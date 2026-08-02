@@ -14,7 +14,7 @@ class DesBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: String) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [unowned self] in
+        DispatchQueue.global().async { [unowned self] in
             self.sendOutput(input)
         }
     }
@@ -49,7 +49,7 @@ class AdapterTests: XCTestCase {
 
         motherboard.activation("board-to-test", with: Int.self).activate(with: 1)
 
-        waitForExpectations(timeout: 2, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(result, 1)
 

@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// The routing surface of a motherboard: which boards it holds and how they are reached.
+///
+/// Conform through ``Motherboard`` rather than directly. The protocol exists so a board can accept
+/// "some motherboard" without depending on the concrete class.
 public protocol MotherboardType: IdentifiableBoard, OriginalBoard {
     var boards: [ActivatableBoard] { get }
 

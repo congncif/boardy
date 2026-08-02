@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// A rule the motherboard consults for every board message: does this match, and if so what runs.
+///
+/// Build flows through the ``FlowManageable`` helpers (`matchedFlow`, `registerFlowSteps`,
+/// `registerCombinedFlow`) rather than conforming directly.
 public protocol BoardFlow {
     var identifier: String { get }
 

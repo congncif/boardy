@@ -153,9 +153,29 @@ class LauncherTests: XCTestCase {
         XCTAssertEqual(xValue, "allowed")
     }
 
-    func testLegacyZeroWidthGatewayBarrierExemptRemainsSourceCompatible() {
-        let registration = GatewayBarrierRegistration.​exempt
+    /// The legacy spelling carries a zero-width space (U+200B) in its identifier and renders
+    /// identically to `exempt`. Asserting it is non-nil proves nothing — the property is
+    /// non-optional and would satisfy that even if it produced a barrier that never completes.
+    /// Drive it end to end instead, so the test fails if the two spellings ever diverge.
+    func testLegacyZeroWidthGatewayBarrierExemptBehavesLikeTheCleanSpelling() {
+        let destinationID: BoardID = "gateway-legacy-exempt-destination"
+        let legacyLauncher = PluginLauncher.with(options: .default)
+            .install(plugin: SpyModulePlugin(identifier: destinationID))
+            .install(gatewayBarrier: .​exempt, for: destinationID)
+            .instantiate { mainboard in
+                mainboard.matchedFlow(destinationID, with: String.self)
+                    .addTarget(self) { target, value in
+                        target.xValue = value
+                    }
+            }
 
-        XCTAssertNotNil(registration)
+        legacyLauncher.activateNow { mainboard in
+            mainboard.activation(destinationID, with: String.self)
+                .activate(with: "allowed")
+        }
+
+        // Same outcome as testCleanGatewayBarrierExemptCompletesAndAllowsActivation: the gate
+        // completes immediately and the destination receives its input.
+        XCTAssertEqual(xValue, "allowed")
     }
 }

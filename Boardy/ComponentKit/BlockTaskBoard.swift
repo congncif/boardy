@@ -375,6 +375,15 @@ private extension DirectCancelerState {
     }
 }
 
+/// A task board with an execution policy: how concurrent activations relate to each other.
+///
+/// Where ``TaskBoard`` runs one activation at a time, this chooses what a second activation means —
+/// queue behind the first, run alongside it, replace it, or be ignored — and hands back a canceler
+/// so work in flight can be stopped.
+///
+/// - Important: the terminal sequence (`success`/`error` → output → processing → completion → board
+///   completion) is a published contract, and it stays on the executor the work completed on. It is
+///   deliberately not hopped to the main thread; UIKit work must hop itself.
 public final class BlockTaskBoard<Input, Output>: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     public typealias InputType = BlockTaskParameter<Input, Output>
     public typealias OutputType = Output

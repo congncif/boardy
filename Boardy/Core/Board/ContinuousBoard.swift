@@ -8,6 +8,11 @@
 import Foundation
 import UIKit
 
+/// A board that owns a nested motherboard, so it can run a whole sub-flow behind a single
+/// identifier.
+///
+/// The parent sees one board; inside, the sub-motherboard routes as many steps as the feature
+/// needs. Adopt through ``ModernContinuableBoard``.
 public protocol ContinuableBoard: IdentifiableBoard, OriginalBoard {
     var motherboard: FlowMotherboard { get }
 }
@@ -32,6 +37,11 @@ public extension ContinuableBoard {
 
 // MARK: - ModernContinuableBoard
 
+/// The current base class for a board that hosts a nested flow.
+///
+/// It takes a producer rather than a motherboard and builds its sub-motherboard lazily on first
+/// use, so nothing is constructed for a sub-flow that is never entered. Prefer this over the
+/// legacy ``ContinuousBoard``.
 open class ModernContinuableBoard: Board, ContinuableBoard {
     public var motherboard: FlowMotherboard { internalMainboard }
 

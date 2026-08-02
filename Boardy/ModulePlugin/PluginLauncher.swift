@@ -134,6 +134,23 @@ struct Component: MainComponent {
     }
 }
 
+/// Assembles an app from independently registered modules and starts it.
+///
+/// Each module contributes a plugin that registers its boards; the launcher collects them, builds
+/// the root motherboard, and installs it into a window or view controller. Modules stay unaware of
+/// each other — the launcher is the only place that knows the full set.
+///
+/// ```swift
+/// PluginLauncher.with(options: .default)
+///     .install(plugin: AuthenticationPlugin())
+///     .install(plugin: DashboardPlugin())
+///     .install(gatewayBarrier: authBarrier, for: .pubDashboard)
+///     .initialize()
+///     .launch(in: window)
+/// ```
+///
+/// A gateway barrier installed here guards activation of the board it names: the gate runs first
+/// and the activation only proceeds once it completes successfully.
 public final class PluginLauncher {
     static var sharedInstance: PluginLauncher?
 

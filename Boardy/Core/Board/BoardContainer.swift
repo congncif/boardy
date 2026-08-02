@@ -19,6 +19,17 @@ extension BoardID {
     }
 }
 
+/// A dictionary-backed board producer, with bulk registration.
+///
+/// Prefer this over ``BoardProducer`` when many identifiers share one factory:
+///
+/// ```swift
+/// container.registerBoards(.settings, .about, .help) { id in StaticPageBoard(identifier: id) }
+/// ```
+///
+/// - Note: registering the same identifier twice **replaces** the existing factory — the opposite
+///   of ``BoardProducer``, and of this type's own gateway registration. When a duplicate is
+///   deliberate, use ``BoardDynamicProducer/registerBoard(_:replacingExisting:factory:)``.
 public final class BoardContainer: BoardDynamicProducer {
     private var externalProducer: ActivatableBoardProducer?
     private var container: [BoardID: BoardConstructor] = [:]
