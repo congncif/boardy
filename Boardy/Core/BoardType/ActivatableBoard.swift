@@ -104,8 +104,12 @@ public enum ActivationBarrierOption {
 public extension ActivationBarrier {
     /// Identifier of the barrier board that guards this activation.
     ///
-    /// Repeated reads of one barrier always agree. `.unidentified` uses one identity per barrier
-    /// value, while `.unique` and nil/void values can reuse application-scoped barriers.
+    /// Repeated reads of one barrier always agree, because the identity is fixed at `init`.
+    ///
+    /// Note that `.unidentified` gets one identity per `ActivationBarrier` *instance*, not per
+    /// input value: two barriers built from the same input still differ, which is what "always
+    /// created with any input" means. `.unique` and nil/void values can reuse application-scoped
+    /// barriers.
     var barrierIdentifier: BoardID {
         var privateID = identifier.appending("___PRIVATE_BARRIER___")
 

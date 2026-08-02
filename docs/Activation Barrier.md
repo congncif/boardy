@@ -59,8 +59,8 @@ PluginLauncher.with(options: .default)
             target.complete(isAuthenticated)
         }
     })
-    .install(gatewayBarrier: .​exempt, for: .pubAuth)
-    .install(gatewayBarrier: .​exempt, for: .pubWelcome)
+    .install(gatewayBarrier: .exempt, for: .pubAuth)
+    .install(gatewayBarrier: .exempt, for: .pubWelcome)
     .initialize()
     .launch(in: window!) { mainboard in
         mainboard.serviceMap

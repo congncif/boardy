@@ -28,20 +28,39 @@ public final class BoardContainer: BoardDynamicProducer {
         self.externalProducer = externalProducer
     }
 
+    /// Registers `factory`, replacing any existing registration for `identifier`.
+    ///
+    /// This container has always replaced on duplicate registration, which is the opposite of
+    /// `BoardProducer` and of this type's own gateway registration below. Neither is being
+    /// changed; use `registerBoard(_:replacingExisting:factory:)` when the choice matters.
     public func registerBoard(_ identifier: BoardID, factory: @escaping BoardConstructor) {
+        #if DEBUG
+            if container[identifier] != nil {
+                print("⚠️ [BoardContainer] Board with identifier \(identifier) is already registered. The existing factory is replaced. Use registerBoard(_:replacingExisting:factory:) to state which one you want.")
+            }
+        #endif
+
+        registerBoard(identifier, replacingExisting: true, factory: factory)
+    }
+
+    public func registerBoard(_ identifier: BoardID, replacingExisting: Bool, factory: @escaping BoardConstructor) {
+        guard container[identifier] == nil else {
+            guard replacingExisting else { return }
+            container[identifier] = factory
+            return
+        }
+
         container[identifier] = factory
     }
 
     public func registerBoards(_ identifiers: [BoardID], factory: @escaping BoardConstructor) {
         identifiers.forEach { identifier in
-            container[identifier] = factory
+            registerBoard(identifier, factory: factory)
         }
     }
 
     public func registerBoards(_ identifiers: BoardID..., factory: @escaping BoardConstructor) {
-        identifiers.forEach { identifier in
-            container[identifier] = factory
-        }
+        registerBoards(identifiers, factory: factory)
     }
 
     public func registerGatewayBoard(_ identifier: BoardID, factory: @escaping (BoardID) -> any ActivatableBoard) {

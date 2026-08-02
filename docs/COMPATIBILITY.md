@@ -27,10 +27,16 @@ surface; CocoaPods `Default` now depends on `Boardy/Composable` explicitly.
 
 ## Threading contract
 
-Motherboard board and flow storage is not synchronized. Call `addBoard`, `removeBoard`,
-`clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows` on the main thread. DEBUG builds
-assert this contract; release builds keep the existing caller-controlled execution and do not hop
-queues or add a release precondition.
+Call `addBoard`, `removeBoard`, `clearActiveBoards`, `registerFlow`, `removeFlow` and `resetFlows`
+on the main thread. DEBUG builds assert this contract; release builds keep the existing
+caller-controlled execution and do not hop queues or add a release precondition.
+
+The installed-board list is plain unsynchronized storage, which is why that contract exists. The
+flow list is different: a board sends its output from whichever executor its work finished on —
+`BlockTaskBoard` deliberately keeps its legacy completion executor — so flow *dispatch* is not a
+main-thread-only path and cannot be made one without changing published behavior. That storage is
+therefore locked internally and every reader takes a snapshot. No caller obligation is added by
+this; sending output off the main thread was always supported and remains so.
 
 ## CocoaPods publication gate
 
