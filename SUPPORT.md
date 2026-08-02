@@ -7,8 +7,9 @@ policy exists, maintenance and triage are best effort and no service-level agree
 
 | Version | Status | Platform and evidence boundary |
 |---|---|---|
-| 1.62.0 | Current line | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification against the 1.61.0 baseline. Older runtimes, other devices and N-1 Xcode remain unverified. |
-| 1.61.0 | Released, superseded by 1.62.0 | iOS 14+. Published as a Git tag and to the CocoaPods trunk. |
+| 1.63.0 | Current line | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification. Older runtimes, other devices and N-1 Xcode remain unverified. |
+| 1.62.0 | Released, superseded by 1.63.0 | iOS 14+. Git tag only. |
+| 1.61.0 | Released | iOS 14+. Published as a Git tag and to the CocoaPods trunk. |
 | 1.60.1 | Last CocoaPods-published line | iOS 12 floor; fixes and response times are not guaranteed. |
 | 1.60.0 and earlier | Historical | No active maintenance commitment. Use tags and commit history as the record. |
 

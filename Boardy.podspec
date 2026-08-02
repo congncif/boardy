@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "Boardy"
-  s.version = "1.62.0"
+  s.version = "1.63.0"
   s.swift_version = "5.0"
   s.summary = "A modular orchestration framework for flow-driven iOS applications."
 
