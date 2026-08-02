@@ -4,7 +4,7 @@ Right click in **Xcode** to add *New File...* then choose **`Boardy`** template,
 
 New feature component will be created, contains a **Board**, an **IOInterface**, a **View Controller or Viewless Controller** with **Builder** pattern.
 
-**Boardy 1.19+** introduces [`IOInterface`](Boardy%20Modularization.md) to communicate between microservices  *(you can generate a custom public `IOInterface` by using above templates)*. This helps microservices ensure consistent `Input` `Output` values, ***type-safe interaction***.
+**Boardy 1.19+** introduces [`IOInterface`](Boardy%20Modularization.md) as the public surface a Business Unit exposes *(you can generate a custom public `IOInterface` by using above templates)*. It pins a module's `Input` and `Output` types in one place so callers get a typed contract instead of guessing at `Any?`.
 
 > Note: You need to check and update correct Input & Output Type you would like to use for Your Component in `YourInOut.swift` *(by default the Input Ouput is Optional Any)*.
 

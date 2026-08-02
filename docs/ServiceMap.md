@@ -1,6 +1,6 @@
 # Service Map
 
-One of the difficulties of microservices systems is the ability to visualize the components.
+One difficulty of a heavily modularised app is seeing what components exist at all.
 
 The code below describes calls to public boards
 
