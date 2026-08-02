@@ -1,6 +1,6 @@
 # Boardy 1.x API stability policy
 
-Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.62.0.
+Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.63.0.
 
 ## Positioning
 
@@ -15,8 +15,9 @@ Boardy 1.x is a legacy-compatible modular orchestration framework with typed inp
 
 The immutable baseline artifacts are the textual interfaces:
 
-- [`api/Boardy-1.62.0.swiftinterface`](api/Boardy-1.62.0.swiftinterface) — the **active** baseline;
-  every candidate is verified against the latest released line
+- [`api/Boardy-1.62.0.swiftinterface`](api/Boardy-1.62.0.swiftinterface) — the **active** baseline.
+  1.63.0 captures a byte-identical interface, so it adds no file of its own: a third identical copy
+  would be filing, not evidence
 - [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — previous released line
 - [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface) — retained for provenance
   and for re-running the 1.60.1 → 1.61.0 comparison on demand
@@ -44,7 +45,7 @@ Source/API removals still require a major-update decision. The platform exceptio
 
 ## Concurrency policy for 1.61.0 and later 1.x
 
-Restated for 1.62.0 unchanged, with two clarifications the 1.62.0 work made necessary.
+Unchanged since 1.61.0, with two clarifications the 1.62.0 work made necessary.
 
 **Flow dispatch is not a main-thread path, and cannot be made one.** The DEBUG main-thread
 assertion covers *mutation* of Motherboard storage. It deliberately does not cover
@@ -66,7 +67,7 @@ prevented. Changing that requires the deferred isolation plan, not a point fix.
 |---|---|---|---|
 | `GatewayBarrierRegistration` zero-width-space `exempt` | 1.61.0 | `exempt` | Requires a major update |
 
-No declaration was deprecated in 1.62.0. `ContinuousBoard` is documented as legacy and emits a DEBUG
+No declaration has been deprecated since 1.61.0. `ContinuousBoard` is documented as legacy and emits a DEBUG
 signpost, but carries no deprecation attribute: migrating to `ModernContinuableBoard` changes how the
 board is constructed, not just which type is named, so a compiler warning would push callers toward a
 change they cannot make mechanically.

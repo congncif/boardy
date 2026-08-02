@@ -10,7 +10,76 @@ not strict Semantic Versioning.
 
 ## [Unreleased]
 
-No changes have been assigned beyond the 1.62.0 release.
+No changes have been assigned beyond the 1.63.0 release.
+
+## [1.63.0] - 2026-08-02
+
+Closes every P0 and P1 item from the 2026-08-01 independent review. No public
+declaration was added, removed or renamed — the captured `.swiftinterface` is
+byte-identical to 1.62.0 — but four defect fixes change observable behavior, so
+this is a minor release rather than a patch.
+
+### Fixed
+
+- A barrier board registered a completion flow on its owner and removed itself
+  when its gate completed, but nothing removed the flow. Reopening the same gate
+  registered it again. Measured: five gate cycles took an owner from 4 flows to
+  9. The stale handlers were `[weak self]` and did nothing, but every board
+  message filtered all of them, so the cost was permanent and grew per cycle.
+- A board that completed twice trapped on an assertion in `removeBoard` and
+  crashed DEBUG builds. Two callbacks both firing, or an app calling
+  `completer(id).complete()` while the board completes itself, was enough.
+- Output from a removed board still drove the flow. Removal dropped the board
+  from the list but left its `delegate` pointing at the motherboard, so an
+  in-flight callback that still held the board could emit output afterwards,
+  match the flow registered for its identifier, and activate the next board a
+  second time.
+- `BoardDestination` and `MainboardDestination` retained the board or
+  motherboard they came from. Storing a destination on its own source — the
+  shape the templates produce — was therefore a retain cycle, against the weak
+  convention every other reference in the framework already followed.
+
+### Changed
+
+These follow from the fixes above. Nothing in the public API changed, but code
+that depended on the old behavior will notice.
+
+- A removed board is detached from its motherboard. A callback that still holds
+  it can no longer send output through that motherboard; previously it could.
+- Completing a board twice is a silent no-op with a DEBUG note, where it
+  previously trapped in DEBUG and delivered the completion handler twice in
+  release.
+- A destination no longer keeps its source alive. Once the source is released
+  the destination becomes inert: messages sent through it go nowhere rather than
+  reaching a resurrected object.
+- `Bus.transport` documents what it already did: a cable connected from inside a
+  handler starts receiving from the next transport, not the current one. The
+  iteration snapshot is now explicit rather than incidental.
+
+### Added
+
+- Tests: 73 to 112. All ten `registerCombinedFlow` overloads (one was covered),
+  the `Composable` subsystem (nothing was covered), and `Bus` re-entrancy.
+  Coverage 55.45% to 65.91%.
+- Documentation on 37 entry-point types and a `Boardy.docc` catalog with a
+  landing page and topic groups. `xcodebuild docbuild` succeeds; SwiftPM picks
+  the catalog up and CocoaPods ignores it.
+
+### Testing
+
+- The suite no longer measures time. Nine mocks delayed their output by a literal
+  second to be asynchronous while tests raced that delay against a 1–6 second
+  timeout; two of them failed the 1.62.0 release on code that had already passed.
+  Delays became plain `async` and every remaining timeout is one generous
+  deadlock guard. Full suite: 9.75s to 0.34s.
+- Three tests that asserted nothing were rewritten to assert something.
+
+### Documentation
+
+- Corrected the CocoaPods trunk statements. 1.61.0 has been on the trunk since
+  2026-08-02; five places in this repository said it had not been published. A
+  dependency without a version bound resolves it and inherits the iOS 14 floor;
+  anything that must stay below that pins `~> 1.60`.
 
 ## [1.62.0] - 2026-08-02
 
