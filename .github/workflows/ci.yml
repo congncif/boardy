@@ -22,10 +22,7 @@ jobs:
           xcode-version: '26.4.1'
 
       - name: Install CocoaPods
-        run: |
-          gem install cocoapods -v 1.16.2 --no-document
-          echo "$(ruby -e 'print Gem.bindir')" >> "$GITHUB_PATH"
-          pod --version
+        run: gem install cocoapods -v 1.16.2 --no-document
 
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=Example --deployment
