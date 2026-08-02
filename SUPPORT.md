@@ -47,6 +47,5 @@ behavior is defined by released code, API stability documentation, migration not
 
 Useful reports isolate behavior in Boardy itself. App-specific architecture design, migration of an
 entire proprietary codebase and debugging third-party dependencies may require work outside this
-project's support scope. The consumer inventory in
-[`docs/governance/CONSUMER_INVENTORY.md`](docs/governance/CONSUMER_INVENTORY.md) records known
-compatibility risks but does not assign support ownership.
+project's support scope. [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) records the known
+compatibility boundary but does not assign support ownership for consumer applications.

@@ -6,8 +6,9 @@ publication because each has a different gate and authority.
 
 Boardy 1.61.0 is published from annotated tag `1.61.0` after PR #10 merged into `master`. Hosted CI
 passed on `macos-26` with Xcode 26.4.1, so this release has hosted evidence but remains pre-G1:
-older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner
-and private security contact are recorded in [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
+older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner is
+recorded in [`.github/CODEOWNERS`](.github/CODEOWNERS) and the private security contact in
+[`SECURITY.md`](SECURITY.md).
 CocoaPods trunk publication remains excluded; metadata, lock resolution and pod lint were verified.
 
 ## Versioning policy
@@ -31,10 +32,8 @@ See [`docs/API_STABILITY_1X.md`](docs/API_STABILITY_1X.md) for the normative con
 
 Before creating a future Boardy release tag or GitHub Release:
 
-- [ ] The sole technical owner and release actor are explicitly designated in
-      [`docs/governance/OWNERSHIP.md`](docs/governance/OWNERSHIP.md).
+- [ ] `CODEOWNERS` contains the confirmed owner handle, who is also the release actor.
 - [ ] A private security reporting contact/channel exists in `SECURITY.md`.
-- [ ] `CODEOWNERS` contains the confirmed owner handle.
 - [ ] The compatibility matrix and consumer dispositions are owner-approved.
 - [ ] Release notes explicitly state that hosted CI/G1, older-runtime/device evidence and
       organization production support are deferred.
@@ -179,8 +178,10 @@ register a trunk session or describe the candidate as available from CocoaPods 1
 For a later, separately approved CocoaPods publication:
 
 - [ ] Confirm UIComposable dependency availability and the exact Boardy pod constraint.
-- [ ] Migrate or version-cap every known consumer below iOS 14 in
-      [`docs/governance/CONSUMER_INVENTORY.md`](docs/governance/CONSUMER_INVENTORY.md).
+- [ ] Clear the publication gate in
+      [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication-gate): every consumer
+      depending on Boardy without a version bound below iOS 14 must raise its floor, pin `< 1.61`,
+      or record retirement.
 - [ ] Re-resolve the Example lock, rerun the CocoaPods test row and pass `pod lib lint` from a clean
       tagged checkout.
 - [ ] Confirm the podspec source tag is the annotated public `1.61.0` tag and its peeled SHA matches the

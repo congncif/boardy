@@ -45,6 +45,11 @@ additional information when necessary, coordinate a fix and advisory, and
 credit reporters who request credit. Response-time and remediation targets
 remain undefined until the designated owners accept them.
 
+Boardy has one maintainer, who is also the security contact and the release
+actor; no backup contact is designated. This is a known operational risk and it
+is why no response SLA is offered. A report that receives no acknowledgement
+should be resent rather than assumed lost.
+
 Please report vulnerabilities in Boardy itself or in artifacts published by the
 Boardy project. For a vulnerability that originates entirely in a third-party
 dependency, also follow that dependency's security policy; include its advisory
