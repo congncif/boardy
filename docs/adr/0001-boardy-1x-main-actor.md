@@ -41,9 +41,22 @@ minor release and moved all actor-isolation work to a separate plan.
 MainActor, another actor model, public executor selection, framework-wide/public `Sendable`
 migration and Swift 6 language-mode readiness require a separately approved plan. Narrowly audited
 lock-backed internal conformances already used by 1.61 remain in scope. The follow-up must begin with consumer
-call-site evidence and choose one coherent isolation/executor model before implementation. The
-deferred outline is
-[`2026-07-14-boardy-mainactor-swift6-follow-up.md`](../superpowers/plans/2026-07-14-boardy-mainactor-swift6-follow-up.md).
+call-site evidence and choose one coherent isolation/executor model before implementation.
+
+The outline of that deferred work, recorded here so this ADR stands on its own:
+
+- **Goal** — build in Swift 6 language mode without silently changing synchronous public behavior,
+  callback ordering or UIKit responsibilities.
+- **Why separate** — Boardy 1.x exposes synchronous APIs with no executor annotations, and known
+  consumers call from both main and background queues. Hiding isolation behind existing methods
+  could introduce off-main traps, deadlocks, reentrancy changes or asynchronous reordering.
+- **Entry condition** — an inventory of representative main/off-main call sites and callback
+  assumptions per consumer, before any annotation is added.
+- **Baseline the work must preserve** — caller-controlled synchronous execution; no actor
+  annotation, release main-thread precondition or automatic queue hop; UIKit callers responsible
+  for main-thread use; the complete `BlockTaskBoard` terminal sequence on its legacy completion
+  executor with observable ordering intact; shared storage using audited lock transactions that
+  invoke callbacks only after unlock.
 
 This ADR must not be changed to `Accepted` as a MainActor design by the 1.61.0 plan. Its filename is
 retained as the historical path referenced by earlier plan revisions.

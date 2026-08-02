@@ -40,3 +40,6 @@ Carthage/Build
 # `pod install` in .travis.yml
 #
 Pods/
+
+# Process artifacts: review transcripts, plans and roadmaps are kept locally, not shipped.
+docs/02-working-docs/

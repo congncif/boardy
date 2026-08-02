@@ -11,9 +11,8 @@ policy exists, maintenance and triage are best effort and no service-level agree
 | 1.60.1 | Current released legacy line | CocoaPods release with an iOS 12 floor; fixes and response times are not guaranteed. |
 | 1.60.0 and earlier | Historical | No active maintenance commitment. Use tags and commit history as the record. |
 
-The current evidence boundary is in the
-[`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md); the
-release task must add `docs/COMPATIBILITY.md` before publication. A consumer below iOS 14 must
+The current evidence boundary is in
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md). A consumer below iOS 14 must
 remain below Boardy 1.61 unless it raises its deployment target.
 
 ## Where to ask

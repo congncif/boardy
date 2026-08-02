@@ -19,8 +19,8 @@ pre-G1: hosted CI passed on Xcode 26.4.1 / `macos-26`, but older runtimes, other
 Xcode remain unverified; organization production support is not claimed. CocoaPods metadata and
 Example lock were verified, but CocoaPods trunk publication is not claimed. The iOS 14 floor,
 compatibility boundary and migration path are documented in
-[`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md) and the
-[`living roadmap`](docs/BOARDY_LIVING_ROADMAP.md).
+[`docs/MIGRATING_TO_1.61.md`](docs/MIGRATING_TO_1.61.md) and
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
 GitHub Release API returned 404 for tag `1.61.0`; release-object publication remains unverified.
 
