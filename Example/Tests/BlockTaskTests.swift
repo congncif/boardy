@@ -21,6 +21,15 @@ private final class BlockTaskEventRecorder {
     }
 }
 
+/// Upper bound for any wait in this test target, shared across all test files.
+///
+/// Every wait here is signalled by a controlled executor, an injected completion or a run-loop
+/// turn — never by elapsed time. The timeout exists only so a hung test fails instead of blocking
+/// the suite forever, so it is deliberately generous: a value tight enough to be exceeded on a
+/// loaded CI runner turns a deadlock guard into a flake. Two of these did exactly that and failed
+/// a release.
+let hangGuardTimeout: TimeInterval = 10
+
 private final class ControlledBlockTaskExecutor {
     typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
 
@@ -235,11 +244,11 @@ final class BlockTaskTests: XCTestCase {
         }
 
         motherboard.activateBoard(.target(boardID, parameter("first")))
-        wait(for: [firstStarted], timeout: 2)
+        wait(for: [firstStarted], timeout: hangGuardTimeout)
         motherboard.activateBoard(.target(boardID, parameter("second")))
-        wait(for: [secondStarted], timeout: 2)
+        wait(for: [secondStarted], timeout: hangGuardTimeout)
         motherboard.activateBoard(.target(boardID, parameter("third")))
-        wait(for: [thirdStarted], timeout: 2)
+        wait(for: [thirdStarted], timeout: hangGuardTimeout)
         XCTAssertTrue(executor.complete("third", with: .success("third")))
 
         XCTAssertEqual(statuses.withLock { $0["first"] }, .cancelled)
@@ -380,11 +389,11 @@ final class BlockTaskTests: XCTestCase {
 
         motherboard.activateBoard(.target(boardID, parameter("first")))
         motherboard.activateBoard(.target(boardID, parameter("second")))
-        wait(for: [firstStarted], timeout: 2)
+        wait(for: [firstStarted], timeout: hangGuardTimeout)
         XCTAssertEqual(executor.startedInputs, ["first"])
 
         XCTAssertTrue(executor.complete("first", with: .success("first")))
-        wait(for: [secondStarted], timeout: 2)
+        wait(for: [secondStarted], timeout: hangGuardTimeout)
         XCTAssertEqual(executor.startedInputs, ["first", "second"])
         XCTAssertTrue(executor.complete("second", with: .success("second")))
 
@@ -404,7 +413,7 @@ final class BlockTaskTests: XCTestCase {
         let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
             completionStore.withLock { $0 = completion }
             enteredExecutor.signal()
-            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            _ = allowCancelerReturn.wait(timeout: .now() + hangGuardTimeout)
             return .default { cancellationCount.withLock { $0 += 1 } }
         })
         motherboard.installBoard(board)
@@ -418,14 +427,14 @@ final class BlockTaskTests: XCTestCase {
             board.activate(withGuaranteedInput: parameter)
             activationReturned.fulfill()
         }
-        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + hangGuardTimeout), .success)
 
         board.cancelPendingTasksIfNeeded()
         XCTAssertEqual(events.values, ["processing.true", "processing.false", "completion.cancelled"])
         XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
 
         allowCancelerReturn.signal()
-        wait(for: [activationReturned], timeout: 2)
+        wait(for: [activationReturned], timeout: hangGuardTimeout)
         XCTAssertEqual(cancellationCount.withLock { $0 }, 1)
 
         completionStore.withLock { $0 }?(.success("late"))
@@ -445,7 +454,7 @@ final class BlockTaskTests: XCTestCase {
         let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, completion in
             completionStore.withLock { $0 = completion }
             executorEntered.signal()
-            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            _ = allowCancelerReturn.wait(timeout: .now() + hangGuardTimeout)
             return .default { cancellationCount.withLock { $0 += 1 } }
         })
         motherboard.installBoard(board)
@@ -463,14 +472,14 @@ final class BlockTaskTests: XCTestCase {
             board.activate(withGuaranteedInput: parameter)
             activationReturned.fulfill()
         }
-        XCTAssertEqual(executorEntered.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(executorEntered.wait(timeout: .now() + hangGuardTimeout), .success)
 
         let completionDelivered = expectation(description: "completion delivered on main")
         DispatchQueue.main.async {
             completionStore.withLock { $0 }?(.success("input"))
             completionDelivered.fulfill()
         }
-        wait(for: [completionDelivered], timeout: 2)
+        wait(for: [completionDelivered], timeout: hangGuardTimeout)
 
         XCTAssertEqual(events.values, [
             "processing.true",
@@ -482,7 +491,7 @@ final class BlockTaskTests: XCTestCase {
         XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
 
         allowCancelerReturn.signal()
-        wait(for: [activationReturned], timeout: 2)
+        wait(for: [activationReturned], timeout: hangGuardTimeout)
         XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
         XCTAssertEqual(events.values.last, "board.complete")
     }
@@ -494,7 +503,7 @@ final class BlockTaskTests: XCTestCase {
         let startReturned = expectation(description: "operation start returned")
         let board = BlockTaskBoard<String, String>(identifier: boardID, executingType: .default, executor: { _, _, _ in
             enteredExecutor.signal()
-            _ = allowCancelerReturn.wait(timeout: .now() + 5)
+            _ = allowCancelerReturn.wait(timeout: .now() + hangGuardTimeout)
             return .default { cancellationCount.withLock { $0 += 1 } }
         })
         let operation = BlockTaskExecutionOperation(taskID: "task", input: "input", taskBoard: board)
@@ -503,7 +512,7 @@ final class BlockTaskTests: XCTestCase {
             operation.start()
             startReturned.fulfill()
         }
-        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(enteredExecutor.wait(timeout: .now() + hangGuardTimeout), .success)
 
         operation.cancel()
         operation.cancel()
@@ -512,7 +521,7 @@ final class BlockTaskTests: XCTestCase {
         XCTAssertEqual(cancellationCount.withLock { $0 }, 0)
 
         allowCancelerReturn.signal()
-        wait(for: [startReturned], timeout: 2)
+        wait(for: [startReturned], timeout: hangGuardTimeout)
         XCTAssertEqual(cancellationCount.withLock { $0 }, 1)
         XCTAssertTrue(operation.isFinished)
     }

@@ -15,7 +15,7 @@ class MockRequiredBoard: Board, GuaranteedBoard, GuaranteedOutputSendingBoard {
     typealias OutputType = String
 
     func activate(withGuaranteedInput input: InputType) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             self?.sendOutput(String(input))
         }
     }
@@ -64,7 +64,6 @@ class BarrierTests: XCTestCase {
 
         motherboard.matchedFlow("required-board", with: String.self).addTarget(motherboard) { mainboard, value in
             mainboard.activation("barrier", with: BarrierBoard<String>.Action.self).activate(with: .overcome(value))
-//            mainboard.activation("barrier", with: BarrierBoard<String>.Action.self).activate(with: .cancel)
         }
 
         let expectation = expectation(description: "expectation")
@@ -77,17 +76,46 @@ class BarrierTests: XCTestCase {
 
         motherboard.activateBoard(identifier: "required-board", withOption: 123)
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(client1Board.input as? String, "123")
         XCTAssertEqual(client2Board.input as? String, "123")
         XCTAssertEqual(client3Board.input as? String, "123")
 
-//        XCTAssertNil(client1Board.input)
-//        XCTAssertNil(client2Board.input)
-//        XCTAssertNil(client3Board.input)
-
         XCTAssertEqual(motherboard.boards.count, 4) // Barrier removed
+    }
+
+    /// `.cancel` was dead code: the happy-path test carried its assertions commented out, so
+    /// nothing exercised the branch. Cancelling must drop every queued process without running it
+    /// and complete the barrier unsuccessfully.
+    func testBarrierBoardCancelDropsQueuedProcessesWithoutRunningThem() throws {
+        let client1Board = ClientBoard(identifier: "client-1")
+        let client2Board = ClientBoard(identifier: "client-2")
+        let barrierBoard = BarrierBoard<String>(identifier: "barrier")
+
+        let motherboard: FlowMotherboard = Motherboard(boards: [client1Board, client2Board, barrierBoard])
+
+        for clientID: BoardID in ["client-1", "client-2"] {
+            motherboard.activation("barrier", with: BarrierBoard<String>.Action.self)
+                .activate(with: .wait { [unowned motherboard] value in
+                    motherboard.activateBoard(identifier: clientID, withOption: value)
+                })
+        }
+
+        var completionResults: [Bool] = []
+        motherboard.matchedFlow("barrier", with: CompleteAction.self).handle { action in
+            completionResults.append(action.isDone)
+        }
+
+        XCTAssertEqual(motherboard.boards.count, 3)
+
+        motherboard.activation("barrier", with: BarrierBoard<String>.Action.self)
+            .activate(with: .cancel)
+
+        XCTAssertNil(client1Board.input)
+        XCTAssertNil(client2Board.input)
+        XCTAssertEqual(completionResults, [false])
+        XCTAssertEqual(motherboard.boards.count, 2) // barrier removed on completion
     }
 
     func testMissingGatewayDoesNotInstallPhantomBarrier() {

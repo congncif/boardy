@@ -158,7 +158,7 @@ final class BarrierAuthBoard: Board, GuaranteedBoard {
         if activated {
             complete(stubIsDone)
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.activated = true
                 self.complete(self.stubIsDone)
@@ -234,7 +234,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
             completed.fulfill()
         }
 
-        wait(for: [completed], timeout: 0.5)
+        wait(for: [completed], timeout: hangGuardTimeout)
         XCTAssertNotNil(result.withLock { $0 })
     }
 
@@ -332,7 +332,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
             completionReturned.fulfill()
         }
 
-        XCTAssertEqual(callbackEntered.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(callbackEntered.wait(timeout: .now() + hangGuardTimeout), .success)
         XCTAssertNil(manager.boards.first(where: { $0.identifier == barrierID }))
 
         manager.activateBoard(identifier: second.identifier, withOption: "second")
@@ -340,7 +340,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertTrue(second.activatedValues.isEmpty)
 
         releaseCallback.signal()
-        wait(for: [completionReturned], timeout: 2)
+        wait(for: [completionReturned], timeout: hangGuardTimeout)
 
         let reinstalledBarrier = manager.boards.first(where: { $0.identifier == barrierID })
         XCTAssertTrue(reinstalledBarrier === barrier)
@@ -399,7 +399,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
             completionReturned.fulfill()
         }
 
-        XCTAssertEqual(callbackEntered.wait(timeout: .now() + 2), .success)
+        XCTAssertEqual(callbackEntered.wait(timeout: .now() + hangGuardTimeout), .success)
         XCTAssertNil(managerA.boards.first(where: { $0.identifier == barrierID }))
         XCTAssertNil(managerB.boards.first(where: { $0.identifier == barrierID }))
         XCTAssertTrue(barrier.delegate === managerA)
@@ -408,7 +408,7 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertEqual(managerB.barrierActivationCount, 0)
 
         releaseCallback.signal()
-        wait(for: [completionReturned], timeout: 2)
+        wait(for: [completionReturned], timeout: hangGuardTimeout)
 
         XCTAssertEqual(targetA.activatedValues, ["a"])
         XCTAssertEqual(coalescedB.activatedValues, ["b-coalesced"])
@@ -497,10 +497,10 @@ class ActivatableBarrierBoardTests: XCTestCase {
         sutMotherboard.resetFlows()
 
         let expectation = expectation(description: #function)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.async {
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: hangGuardTimeout)
 
         XCTAssertTrue(authBoard.activated)
         XCTAssertEqual(
@@ -589,10 +589,10 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertTrue(barrierBoard?.isProcessing == true)
         XCTAssertEqual(barrierBoard?.pendingTasks.count, 2)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.async {
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: hangGuardTimeout)
 
         XCTAssertTrue(authBoard.activated)
         XCTAssertEqual(sutBoard.activatedValue, sampleInputValue)
@@ -616,10 +616,10 @@ class ActivatableBarrierBoardTests: XCTestCase {
         XCTAssertTrue(barrierBoard?.isProcessing == true)
         XCTAssertEqual(barrierBoard?.pendingTasks.count, 2)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.async {
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: hangGuardTimeout)
 
         XCTAssertTrue(authBoard.activated)
         XCTAssertEqual(sutBoard.activatedValue, nil)

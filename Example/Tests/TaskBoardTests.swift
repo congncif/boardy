@@ -25,7 +25,7 @@ class TaskBoardTests: XCTestCase {
         let expectation = expectation(description: "expectation")
 
         let board = TaskBoard<Int, String>(identifier: "test-board") { _, input, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.global().async {
                 print("🚧 \(String(input))")
                 DispatchQueue.main.async {
                     completion(.success(String(input)))
@@ -49,7 +49,7 @@ class TaskBoardTests: XCTestCase {
         motherboard.activation("test-board", with: Int.self).activate(with: 2)
         motherboard.activation("test-board", with: Int.self).activate(with: 3)
 
-        waitForExpectations(timeout: 6, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
 
         XCTAssertEqual(isLoading, false)
         XCTAssertEqual(results.count, 1)

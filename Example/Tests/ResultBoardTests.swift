@@ -21,7 +21,7 @@ class ResultBoardTests: XCTestCase {
     func testExample() throws {
         let board = ResultTaskBoard<String, String, Error>(identifier: "result-board") { input, callback in
             callback(.progress)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.async {
                 callback(.success(input))
             }
         }
@@ -39,7 +39,7 @@ class ResultBoardTests: XCTestCase {
                 results = data
                 isLoading = false
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.async {
                     expectation.fulfill()
                 }
             case .progress:
@@ -47,7 +47,7 @@ class ResultBoardTests: XCTestCase {
             default:
                 isLoading = false
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.async {
                     expectation.fulfill()
                 }
             }
@@ -55,7 +55,7 @@ class ResultBoardTests: XCTestCase {
 
         motherboard.activation("result-board", with: String.self).activate(with: "DATA")
         XCTAssertEqual(isLoading, true)
-        waitForExpectations(timeout: 4, handler: nil)
+        waitForExpectations(timeout: hangGuardTimeout, handler: nil)
         XCTAssertEqual(isLoading, false)
         XCTAssertEqual(results, "DATA")
         XCTAssertEqual(motherboard.boards.count, 0)
