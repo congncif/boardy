@@ -20,6 +20,7 @@
 		000000000000BD1A0C0129A7 /* FlowPrimitiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */; };
 		000000000000BD1A0C0129A9 /* ComponentKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A8 /* ComponentKitTests.swift */; };
 		000000000000BD1A0C0129AB /* ServiceMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129AA /* ServiceMapTests.swift */; };
+		000000000000BD1A0C0129B1 /* FlowRegistrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */; };
 		000000000000BD1A0C0129AD /* ContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129AC /* ContextTests.swift */; };
 		BD1A0C0129A1000000000002 /* ComposableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1A0C0129A1000000000001 /* ComposableTests.swift */; };
 		2766A4672706ED7200C04DA9 /* PluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2766A4662706ED7200C04DA9 /* PluginTests.swift */; };
@@ -67,6 +68,7 @@
 		000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowPrimitiveTests.swift; sourceTree = "<group>"; };
 		000000000000BD1A0C0129A8 /* ComponentKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentKitTests.swift; sourceTree = "<group>"; };
 		000000000000BD1A0C0129AA /* ServiceMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceMapTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowRegistrationTests.swift; sourceTree = "<group>"; };
 		000000000000BD1A0C0129AC /* ContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextTests.swift; sourceTree = "<group>"; };
 		BD1A0C0129A1000000000001 /* ComposableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposableTests.swift; sourceTree = "<group>"; };
 		2766A4662706ED7200C04DA9 /* PluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginTests.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */,
 				000000000000BD1A0C0129A8 /* ComponentKitTests.swift */,
 				000000000000BD1A0C0129AA /* ServiceMapTests.swift */,
+				000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */,
 				000000000000BD1A0C0129AC /* ContextTests.swift */,
 				BD1A0C0129A1000000000001 /* ComposableTests.swift */,
 				2766A4662706ED7200C04DA9 /* PluginTests.swift */,
@@ -463,6 +466,7 @@
 				000000000000BD1A0C0129A7 /* FlowPrimitiveTests.swift in Sources */,
 				000000000000BD1A0C0129A9 /* ComponentKitTests.swift in Sources */,
 				000000000000BD1A0C0129AB /* ServiceMapTests.swift in Sources */,
+				000000000000BD1A0C0129B1 /* FlowRegistrationTests.swift in Sources */,
 				000000000000BD1A0C0129AD /* ContextTests.swift in Sources */,
 				BD1A0C0129A1000000000002 /* ComposableTests.swift in Sources */,
 				2766A4672706ED7200C04DA9 /* PluginTests.swift in Sources */,
