@@ -10,7 +10,7 @@ window. Reports and fixes follow this best-effort boundary:
 | `1.63.x` | Current line; fixes land here |
 | `1.62.x` | Superseded; report against it, but expect the fix on 1.63.x |
 | `1.61.x` | Superseded |
-| `1.60.1` | Last line published to the CocoaPods trunk; best effort only |
+| `1.60.1` | Last line with an iOS 12 floor; best effort only |
 | `1.60.0` and earlier | Unsupported |
 
 Unsupported versions may still be affected by a report, but fixes are not
