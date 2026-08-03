@@ -21,15 +21,6 @@ private final class BlockTaskEventRecorder {
     }
 }
 
-/// Upper bound for any wait in this test target, shared across all test files.
-///
-/// Every wait here is signalled by a controlled executor, an injected completion or a run-loop
-/// turn — never by elapsed time. The timeout exists only so a hung test fails instead of blocking
-/// the suite forever, so it is deliberately generous: a value tight enough to be exceeded on a
-/// loaded CI runner turns a deadlock guard into a flake. Two of these did exactly that and failed
-/// a release.
-let hangGuardTimeout: TimeInterval = 10
-
 private final class ControlledBlockTaskExecutor {
     typealias Completion = BlockTaskBoard<String, String>.ExecutorCompletion
 

@@ -40,8 +40,8 @@ this; sending output off the main thread was always supported and remains so.
 
 ## CocoaPods publication
 
-Boardy 1.61.0 is published to the CocoaPods trunk. A consumer that depends on Boardy without a
-version bound resolves it and inherits the iOS 14 floor.
+Boardy 1.61.0 and 1.63.0 are published to the CocoaPods trunk; 1.62.0 was skipped. A consumer that
+depends on Boardy without a version bound resolves 1.63.0 and inherits the iOS 14 floor.
 
 The owner's disposition: every known consumer already targets iOS 14 or newer, so this is not a
 migration event. An application that must stay below iOS 14 pins `~> 1.60`, which continues to serve

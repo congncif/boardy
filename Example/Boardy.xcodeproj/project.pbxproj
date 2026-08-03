@@ -15,6 +15,13 @@
 		272E7EF127547992001A2FDC /* CodableBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272E7EF027547992001A2FDC /* CodableBoardTests.swift */; };
 		275DD8D027D9977B00C622F1 /* LauncherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275DD8CF27D9977B00C622F1 /* LauncherTests.swift */; };
 		2766A4652706B22300C04DA9 /* ProducerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2766A4642706B22300C04DA9 /* ProducerTests.swift */; };
+		000000000000BD1A0C0129A3 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A2 /* TestSupport.swift */; };
+		000000000000BD1A0C0129A5 /* GatewayBarrierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A4 /* GatewayBarrierTests.swift */; };
+		000000000000BD1A0C0129A7 /* FlowPrimitiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */; };
+		000000000000BD1A0C0129A9 /* ComponentKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129A8 /* ComponentKitTests.swift */; };
+		000000000000BD1A0C0129AB /* ServiceMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129AA /* ServiceMapTests.swift */; };
+		000000000000BD1A0C0129B1 /* FlowRegistrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */; };
+		000000000000BD1A0C0129AD /* ContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000BD1A0C0129AC /* ContextTests.swift */; };
 		BD1A0C0129A1000000000002 /* ComposableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1A0C0129A1000000000001 /* ComposableTests.swift */; };
 		2766A4672706ED7200C04DA9 /* PluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2766A4662706ED7200C04DA9 /* PluginTests.swift */; };
 		2776F43126DD0F4900680B7F /* TaskBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2776F43026DD0F4900680B7F /* TaskBoardTests.swift */; };
@@ -56,6 +63,13 @@
 		272E7EF027547992001A2FDC /* CodableBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableBoardTests.swift; sourceTree = "<group>"; };
 		275DD8CF27D9977B00C622F1 /* LauncherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherTests.swift; sourceTree = "<group>"; };
 		2766A4642706B22300C04DA9 /* ProducerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProducerTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129A2 /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129A4 /* GatewayBarrierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayBarrierTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowPrimitiveTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129A8 /* ComponentKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentKitTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129AA /* ServiceMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceMapTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowRegistrationTests.swift; sourceTree = "<group>"; };
+		000000000000BD1A0C0129AC /* ContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextTests.swift; sourceTree = "<group>"; };
 		BD1A0C0129A1000000000001 /* ComposableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposableTests.swift; sourceTree = "<group>"; };
 		2766A4662706ED7200C04DA9 /* PluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginTests.swift; sourceTree = "<group>"; };
 		2776F43026DD0F4900680B7F /* TaskBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBoardTests.swift; sourceTree = "<group>"; };
@@ -188,6 +202,13 @@
 				2776F43026DD0F4900680B7F /* TaskBoardTests.swift */,
 				27F4F05726E499ED005BAC34 /* ResultBoardTests.swift */,
 				2766A4642706B22300C04DA9 /* ProducerTests.swift */,
+				000000000000BD1A0C0129A2 /* TestSupport.swift */,
+				000000000000BD1A0C0129A4 /* GatewayBarrierTests.swift */,
+				000000000000BD1A0C0129A6 /* FlowPrimitiveTests.swift */,
+				000000000000BD1A0C0129A8 /* ComponentKitTests.swift */,
+				000000000000BD1A0C0129AA /* ServiceMapTests.swift */,
+				000000000000BD1A0C0129B0 /* FlowRegistrationTests.swift */,
+				000000000000BD1A0C0129AC /* ContextTests.swift */,
 				BD1A0C0129A1000000000001 /* ComposableTests.swift */,
 				2766A4662706ED7200C04DA9 /* PluginTests.swift */,
 				2710A46F270F3EEE00259690 /* CombineFlowTests.swift */,
@@ -440,6 +461,13 @@
 				272E7EF127547992001A2FDC /* CodableBoardTests.swift in Sources */,
 				2710A470270F3EEE00259690 /* CombineFlowTests.swift in Sources */,
 				2766A4652706B22300C04DA9 /* ProducerTests.swift in Sources */,
+				000000000000BD1A0C0129A3 /* TestSupport.swift in Sources */,
+				000000000000BD1A0C0129A5 /* GatewayBarrierTests.swift in Sources */,
+				000000000000BD1A0C0129A7 /* FlowPrimitiveTests.swift in Sources */,
+				000000000000BD1A0C0129A9 /* ComponentKitTests.swift in Sources */,
+				000000000000BD1A0C0129AB /* ServiceMapTests.swift in Sources */,
+				000000000000BD1A0C0129B1 /* FlowRegistrationTests.swift in Sources */,
+				000000000000BD1A0C0129AD /* ContextTests.swift in Sources */,
 				BD1A0C0129A1000000000002 /* ComposableTests.swift in Sources */,
 				2766A4672706ED7200C04DA9 /* PluginTests.swift in Sources */,
 				270351C125C2BD26007AF693 /* AttachableTests.swift in Sources */,

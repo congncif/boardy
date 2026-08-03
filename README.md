@@ -74,8 +74,8 @@ the exact `UIComposableCore` 1.1.0 dependency and does not pull in the legacy Di
 pod 'Boardy'
 ```
 
-The trunk currently serves 1.61.0. Later versions are published as Git tags, so use SwiftPM — or a
-`:git`/`:tag` pod entry — to get them.
+The trunk serves 1.63.0. Note that 1.62.0 was never published there, so a pod consumer moves from
+1.61.0 straight to 1.63.0 — the changelog for both applies.
 
 A dependency without a version bound inherits whatever floor the resolved version carries; 1.61.0
 raised it from iOS 12 to iOS 14. An app that must stay below iOS 14 pins `~> 1.60`. See
