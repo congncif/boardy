@@ -9,8 +9,9 @@ passed on `macos-26` with Xcode 26.4.1, so this release has hosted evidence but 
 older runtimes/devices, N-1 Xcode and organization production support remain unclaimed. The owner is
 recorded in [`.github/CODEOWNERS`](.github/CODEOWNERS) and the private security contact in
 [`SECURITY.md`](SECURITY.md).
-`1.61.0` and `1.63.0` are published to the CocoaPods trunk; `1.62.0` was skipped. Trunk publication
-is a separate step from tagging and needs its own authority — see
+`1.61.0` and `1.63.0` are published to the CocoaPods trunk; `1.62.0` was skipped, and `1.63.1` ships
+no code change so it stands as a tag only. Trunk publication is a separate step from tagging and
+needs its own authority — see
 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md#cocoapods-publication).
 
 ## Versioning policy
@@ -185,8 +186,8 @@ create a release from another SHA.
 ## 8. CocoaPods transition checklist
 
 Trunk publication is a separate step from tagging, with its own authority. `1.61.0` and `1.63.0` are
-on the trunk; `1.62.0` was skipped. Tagging a version does not publish it, and a tag must never be
-moved or replaced to make a publication succeed.
+on the trunk; `1.62.0` was skipped and `1.63.1` carries no shipped-code change. Tagging a version
+does not publish it, and a tag must never be moved or replaced to make a publication succeed.
 
 A skipped version is fine — trunk history need not be contiguous — but the changelog must let a pod
 consumer see what they are jumping over.

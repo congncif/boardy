@@ -55,13 +55,13 @@ nothing but a shared contract, and are therefore interchangeable.
 
 ## Installation
 
-Boardy 1.63.0 targets iOS 14+ and Swift 5 language mode.
+Boardy 1.63.1 targets iOS 14+ and Swift 5 language mode.
 
 ### Swift Package Manager (recommended)
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/congncif/boardy.git", from: "1.63.0")
+    .package(url: "https://github.com/congncif/boardy.git", from: "1.63.1")
 ]
 ```
 
@@ -74,8 +74,9 @@ the exact `UIComposableCore` 1.1.0 dependency and does not pull in the legacy Di
 pod 'Boardy'
 ```
 
-The trunk serves 1.63.0. Note that 1.62.0 was never published there, so a pod consumer moves from
-1.61.0 straight to 1.63.0 — the changelog for both applies.
+The trunk serves 1.63.0. 1.63.1 is a Git tag only; it changes no code a pod consumer runs, so
+there is nothing on the trunk to wait for. Note that 1.62.0 was never published there either, so a
+pod consumer moves from 1.61.0 straight to 1.63.0 — the changelog for both applies.
 
 A dependency without a version bound inherits whatever floor the resolved version carries; 1.61.0
 raised it from iOS 12 to iOS 14. An app that must stay below iOS 14 pins `~> 1.60`. See

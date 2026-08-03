@@ -9,12 +9,16 @@ This directory holds the immutable textual baselines used to verify source compa
 | `Boardy-1.61.0.swiftinterface` | Previous released line; retained as the release record. | `21ff72a7fd1c4eb0062aac23c0d4d9748c37a9b39fe1e5abbd64e4dc6d9ee85a` |
 | `Boardy-1.60.1.swiftinterface` | Retained for provenance and for re-running the 1.60.1 → 1.61.0 comparison. | `a29d4bb97a6214d477c3fa739366616d911393a2d557c5d4d62c69c834454bb9` |
 
-## Why 1.63.0 has no file here
+## Why 1.63.0 and 1.63.1 have no file here
 
 1.63.0 fixes defects and changes observable behavior but touches no declaration, so its captured
 interface is byte-identical to 1.62.0's. The active baseline therefore stays at 1.62.0 rather than
 gaining a third identical copy. Verification is unaffected: comparing 1.63.0 against 1.62.0 is
 comparing it against its own surface, which is exactly what "no API change" means.
+
+1.63.1 is documentation and tests only. A `.swiftinterface` carries no doc comments, so the two
+changed doc comments in shipped source cannot reach the captured surface — the interface is again
+byte-identical to 1.62.0's and the baseline is unchanged for the same reason.
 
 ## 1.62.0 capture
 

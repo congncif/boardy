@@ -10,7 +10,59 @@ not strict Semantic Versioning.
 
 ## [Unreleased]
 
-No changes have been assigned beyond the 1.63.0 release.
+No changes have been assigned beyond the 1.63.1 release.
+
+## [1.63.1] - 2026-08-03
+
+Documentation and test coverage. **No shipped code changed** — a consumer already
+on 1.63.0 is running byte-identical library code, and the captured
+`.swiftinterface` is again identical to 1.62.0's. This release exists to record a
+verification milestone, not to deliver a fix. It is a Git tag only; there is
+nothing on the CocoaPods trunk to wait for.
+
+### Verified
+
+Every feature the documentation commits to now has a test asserting the contract
+as written. The suite went from 112 tests to **189** and line coverage from
+65.43% to **73.50%**, but the number that matters is that nine files which had
+executed almost no lines are now covered — `GatewayBarrierRegistration.swift`
+and `ServiceMap.swift` at 100%, `BoardFlow.swift` at 98.73%, `Flow.swift` at
+98.28%, `ActivatableBarrierBoard.swift` at 92.79%, `AlertBoard.swift` at 91.84%,
+`MotherboardType+Activate.swift` at 86.92%, `FLow+Variadic.swift` at 84.62% and
+`FlowBoard.swift` at 66.67%.
+
+The conditional gateway barrier, its three bypass routes, `FlowBoard`,
+`AlertBoard`, `ServiceMap`, `registerBoards`, nested-flow scoping through
+`mountContinuousMotherboard` and `attachContinuousMotherboard`, the flow
+primitives the Example app already relied on, the four uncovered flow-
+registration overloads and the `bindToBus:` / `sendOutputThrough:` composition
+primitives are all now pinned by tests.
+
+Four behaviours turned out to be correct but undocumented, so nothing held them
+in place. All four are now asserted by a test, and none of them changed:
+
+- `getGatewayBoard` installs two boards — the gateway and a private activation
+  barrier — and resolving the gate retires both.
+- `ObjectBox` stores a class weakly and a value type strongly, and every
+  `target:` overload routes through it. `bindToBus:` therefore does not keep the
+  caller's `Bus` alive: a `Bus` constructed inline at the registration site
+  delivers nothing, with no error and no warning.
+- `complete()` asks for the board's removal as it fires, so a completion flow
+  reports once per board.
+- `FlowBoard.allowBypassGatewayBarrier` defaults to `true`, so a `FlowBoard`
+  bypasses the gateway barrier unless told otherwise.
+
+### Changed
+
+- `ServiceMap`'s doc comment carried two descriptions of the same type, one
+  appended above the other. Reduced to one.
+- The DocC landing page showed `rootViewController.show(screen)`, which is a
+  SiFUtilities extension rather than UIKit — the same defect the independent
+  review had filed against the README. Corrected to
+  `show(screen, sender: nil)`.
+- `README.md` gained an introduction section and links to
+  `docs/Introducing Boardy.md`; the "Microservices" positioning was retired in
+  favour of claims the code supports.
 
 ## [1.63.0] - 2026-08-02
 
