@@ -7,7 +7,8 @@ policy exists, maintenance and triage are best effort and no service-level agree
 
 | Version | Status | Platform and evidence boundary |
 |---|---|---|
-| 1.63.0 | Current line; on the CocoaPods trunk | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification. Older runtimes, other devices and N-1 Xcode remain unverified. |
+| 1.63.1 | Current line; Git tag only | iOS 14+. Documentation and test-suite release: no shipped code changed, so a consumer on 1.63.0 is running identical library code. |
+| 1.63.0 | On the CocoaPods trunk | iOS 14+. Every push runs hosted CI on Xcode 26.4.1 / `macos-26`: build, tests, podspec lint and public-API verification. Older runtimes, other devices and N-1 Xcode remain unverified. |
 | 1.62.0 | Released, superseded by 1.63.0 | iOS 14+. Git tag only — never published to the CocoaPods trunk. |
 | 1.61.0 | Released | iOS 14+. Published as a Git tag and to the CocoaPods trunk. |
 | 1.60.1 | Last line with an iOS 12 floor | On the CocoaPods trunk; pin `~> 1.60` to stay here. Fixes and response times are not guaranteed. |
@@ -16,7 +17,8 @@ policy exists, maintenance and triage are best effort and no service-level agree
 The current evidence boundary is in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
 The CocoaPods trunk serves up to 1.63.0, so a dependency without a version bound resolves it and
-inherits the iOS 14 floor. An application that must stay below iOS 14 pins `~> 1.60`. 1.62.0 was
+inherits the iOS 14 floor. 1.63.1 is not on the trunk and does not need to be: it changes no shipped
+code. An application that must stay below iOS 14 pins `~> 1.60`. 1.62.0 was
 skipped on the trunk, so a pod consumer moving from 1.61.0 lands on 1.63.0 and takes both changelogs
 at once.
 

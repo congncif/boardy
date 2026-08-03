@@ -156,7 +156,7 @@ The cast still happens underneath. Nobody chose the type twice, which is what ma
 
 ## Where it stands
 
-Version 1.63.0. Every push runs hosted CI: build, the full test suite, podspec lint, and a
+Version 1.63.1. Every push runs hosted CI: build, the full test suite, podspec lint, and a
 public-API check that fails on a removed or renamed declaration.
 
 The lifecycle behavior is the part that was hardened most recently. Completing a board twice is a

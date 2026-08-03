@@ -1,6 +1,6 @@
 # Boardy 1.x API stability policy
 
-Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.63.0.
+Applies to Boardy 1.61.0 and later supported 1.x releases. Current line: 1.63.1.
 
 ## Positioning
 
@@ -16,8 +16,8 @@ Boardy 1.x is a legacy-compatible modular orchestration framework with typed inp
 The immutable baseline artifacts are the textual interfaces:
 
 - [`api/Boardy-1.62.0.swiftinterface`](api/Boardy-1.62.0.swiftinterface) — the **active** baseline.
-  1.63.0 captures a byte-identical interface, so it adds no file of its own: a third identical copy
-  would be filing, not evidence
+  1.63.0 and 1.63.1 both capture a byte-identical interface, so neither adds a file of its own:
+  further identical copies would be filing, not evidence
 - [`api/Boardy-1.61.0.swiftinterface`](api/Boardy-1.61.0.swiftinterface) — previous released line
 - [`api/Boardy-1.60.1.swiftinterface`](api/Boardy-1.60.1.swiftinterface) — retained for provenance
   and for re-running the 1.60.1 → 1.61.0 comparison on demand
